@@ -1,11 +1,13 @@
 #!/bin/bash
-
 # starts a specific VPN connection
 # The argument must be the name of the .ovpn file without .ovpn
 #	./start-vpn Germany
 # get a list of connection names with ./start-vpn list
 
+LANG=en_US.UTF-8
+export LANG
 
+#show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ]; then
 	LIST=`ls -1 /pia/ovpn/ | gawk -F"." '{print $1}'`
 	
@@ -20,6 +22,7 @@ if [ "$1" = "list" ] || [ $# -eq 0 ]; then
 fi
 
 
+#execute if .ovpn file exists with name passed
 if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	#check the for default value
 	PIA_UN=`sed -n '1p' /pia/login.conf`

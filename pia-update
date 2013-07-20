@@ -1,5 +1,7 @@
 #!/bin/bash
-#script to pull from origin
+# script to update everything in /pia/ from the GitRepo
+LANG=en_US.UTF-8
+export LANG
 
 echo "getting updates from https://github.com/KaiserSoft/PIA-Tunnel"
 cd /pia/

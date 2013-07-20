@@ -1,12 +1,23 @@
 #!/bin/bash
-# enable port forwarding /etc/sysctl.conf
+# script to display the current status of the VPN connection ... still needs work when things don't work
+LANG=en_US.UTF-8
+export LANG
 
-# name of your internal interface. this if for the private VM network
-IF_INT="eth1"
-# name of your VPN interface
-IF_TUNNEL="tun0"
-
-
+#config file has been added after the first release so this condition needs to stay here for a while
+if [ ! -f "/pia/settings.conf" ]; then
+	echo '#!/bin/bash' > '/pia/settings.conf'
+	echo 'LANG=en_US.UTF-8' >> '/pia/settings.conf'
+	echo 'export LANG' >> '/pia/settings.conf'
+	echo '' >> '/pia/settings.conf'
+	echo '# name of your external interface. this connects to the Internet/Router' >> '/pia/settings.conf'
+	echo 'IF_EXT="eth0"' >> '/pia/settings.conf'
+	echo '# name of your internal interface. this if for the private VM network' >> '/pia/settings.conf'
+	echo 'IF_INT="eth1"' >> '/pia/settings.conf'
+	echo '# name of your VPN interface' >> '/pia/settings.conf'
+	echo 'IF_TUNNEL="tun0"' >> '/pia/settings.conf'
+	echo '' >> '/pia/settings.conf'
+fi
+source '/pia/settings.conf'
 
 #get default gateway of tunnel interface using "ip"
 #get IP of tunnel Gateway

@@ -1,3 +1,10 @@
+#!/bin/bash
+# script to end the tunnel and reset the system back to normal
+# note: restarting the network to get the default route back in place
+
+LANG=en_US.UTF-8
+export LANG
+
 killall openvpn
 
 iptables -F

@@ -1,21 +1,52 @@
 #!/bin/bash
 # script to create links to the pia scripts and set permissions
 
+LANG=en_US.UTF-8
+export LANG
+
+#create a new login.conf if none exists
+if [ ! -f '/pia/login.conf' ]; then
+	echo "your PIA account name on this line" > '/pia/login.conf'
+	echo "your PIA account password on this line" >> '/pia/login.conf'
+fi
+
+#create a fresh settings file
+if [ ! -f "/pia/settings.conf" ]; then
+	echo '#!/bin/bash' > '/pia/settings.conf'
+	echo 'LANG=en_US.UTF-8' >> '/pia/settings.conf'
+	echo 'export LANG' >> '/pia/settings.conf'
+	echo '' >> '/pia/settings.conf'
+	echo '# name of your external interface. this connects to the Internet/Router' >> '/pia/settings.conf'
+	echo 'IF_EXT="eth0"' >> '/pia/settings.conf'
+	echo '# name of your internal interface. this if for the private VM network' >> '/pia/settings.conf'
+	echo 'IF_INT="eth1"' >> '/pia/settings.conf'
+	echo '# name of your VPN interface' >> '/pia/settings.conf'
+	echo 'IF_TUNNEL="tun0"' >> '/pia/settings.conf'
+	echo '' >> '/pia/settings.conf'
+fi
+
+if [ -f '/bin/pia-start' ]; then
+	rm '/bin/pia-start'
+fi
+ln -s '/pia/pia-start' '/bin/pia-start'
+
+if [ -f '/bin/pia-stop' ]; then
+	rm '/bin/pia-stop'
+fi
+ln -s '/pia/pia-stop' '/bin/pia-stop'
+
+if [ -f '/bin/pia-status' ]; then
+	rm '/bin/pia-status'
+fi
+ln -s '/pia/pia-status' '/bin/pia-status'
+
+if [ -f '/bin/pia-update' ]; then
+	rm '/bin/pia-update'
+fi
+ln -s '/pia/pia-update' '/bin/pia-update'
+
+
+#ALWAYS RUN THIS LAST
 chown -R root.root /pia
 chmod -R og-rwx /pia
 chmod u+x /pia/pia-*
-
-echo "your PIA account name on this line" > /pia/login.conf
-echo "your PIA account password on this line" >> /pia/login.conf
-
-rm /bin/pia-start
-ln -s /pia/pia-start /bin/pia-start
-
-rm /bin/pia-stop
-ln -s /pia/pia-stop /bin/pia-stop
-
-rm /bin/pia-status
-ln -s /pia/pia-status /bin/pia-status
-
-rm /bin/pia-update
-ln -s /pia/pia-update /bin/pia-update

@@ -1,5 +1,8 @@
 #!/bin/bash
-#this will delete any cache files and will create a sample login.conf
+# will delete any cache files and create login.conf and settings.conf
+
+LANG=en_US.UTF-8
+export LANG
 
 
 #clear existing ssh key
@@ -10,18 +13,43 @@ fi
 
 echo "" > /root/.bash_history
 cd /tmp/ ; rm -rf *
+#delete all files in /var/log
 find /var/log -type f -delete
 
+#delete and recreate dhcpd cache files
 cd /var/lib/dhcp/ ; rm -f *.leases
 cd /var/lib/dhcp/ ; rm -f *.leases~
 cd /var/lib/dhcp/ ; touch dhcpd.leases
 
+#delete pia-* cache files
 rm /pia/session.log
 rm /pia/login.conf
 rm /pia/client_id
 
+#create empty login.conf file
 echo "your PIA account name on this line" > /pia/login.conf
 echo "your PIA account password on this line" >> /pia/login.conf
 
+#create a fresh settings file
+echo '#!/bin/bash' > '/pia/settings.conf'
+echo 'LANG=en_US.UTF-8' >> '/pia/settings.conf'
+echo 'export LANG' >> '/pia/settings.conf'
+echo '' >> '/pia/settings.conf'
+echo '# name of your external interface. this connects to the Internet/Router' >> '/pia/settings.conf'
+echo 'IF_EXT="eth0"' >> '/pia/settings.conf'
+echo '# name of your internal interface. this if for the private VM network' >> '/pia/settings.conf'
+echo 'IF_INT="eth1"' >> '/pia/settings.conf'
+echo '# name of your VPN interface' >> '/pia/settings.conf'
+echo 'IF_TUNNEL="tun0"' >> '/pia/settings.conf'
+echo '' >> '/pia/settings.conf'
+
+
+
+
+
+
+
+#ALWAYS RUN THIS LAST
 chown -R root.root /pia
 chmod -R og-rwx /pia
+chmod u+x /pia/pia-*
