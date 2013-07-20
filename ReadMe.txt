@@ -42,7 +42,7 @@ VM Pia Tunnel hardware requirements
 # SETUP #
 #########
 
-1) Download the Image from  FOO
+1) Download the Image from  https://mega.co.nz/#!yI4UzSQQ!b2nKuDO_tjg5AlBlui9Q4G0muSFv1Z70ZxBlqoQ_9vg
 
 2) Extract and copy into your "Virtual Machines" directory
 
