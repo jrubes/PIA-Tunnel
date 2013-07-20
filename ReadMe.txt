@@ -1,7 +1,7 @@
 /*
   * Project: PIA Tunnel VM
-  * Description: Linux virtual machine to be used as a VPN to network bridge. This VM will
-  *		only work with the VPN service from https://www.privateinternetaccess.com/
+  * Description: Linux virtual machine to be used as a VPN to network bridge.
+  *		This VM will only work with the VPN service from https://www.privateinternetaccess.com/
   *
   * Author: Mirko Kaiser, http://www.KaiserSoft.net
   * Copyright (C) 2013 Mirko Kaiser
@@ -13,8 +13,8 @@
 */
 
 *WARNING* I have only been working on this for the past couple of days so the "PIA Tunnel VM" is still
-in development mode. It will listen to on port 22 (SSH) and will allow root logins!
-You have been warned!
+in development mode. It will listen on port 22 (SSH) and will allow root logins!
+! You have been warned !
 
 
 The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player or ESXi. It bridges a private VMware LAN segment to the PIA VPN Network, totally isolating any VMs on that private LAN segment from your LAN and Internet connection. This should prevent any traffic from bypassing the VPN tunnel and getting on the LAN and out your Internet connection.
