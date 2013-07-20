@@ -13,3 +13,6 @@ ln -s /pia/pia-stop /bin/pia-stop
 
 rm /bin/pia-status
 ln -s /pia/pia-status /bin/pia-status
+
+rm /bin/pia-update
+ln -s /pia/pia-update /bin/pia-update

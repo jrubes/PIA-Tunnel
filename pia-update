@@ -1,0 +1,5 @@
+#!/bin/bash
+#script to pull from origin
+
+echo "getting updates from https://github.com/KaiserSoft/PIA-Tunnel"
+git pull origin
