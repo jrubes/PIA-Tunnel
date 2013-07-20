@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# starts a specific VPN connection
+# The argument must be the name of the .ovpn file without .ovpn
+#	./start-vpn Germany
+# get a list of connection names with ./start-vpn list
+
+
+if [ "$1" = "list" ] || [ $# -eq 0 ]; then
+	LIST=`ls -1 /pia/ovpn/ | gawk -F"." '{print $1}'`
+	
+	echo
+	echo "Listing available VPN connections:"
+	echo "$LIST"
+	echo
+	echo "Examples:"
+	echo -e "\tpia-start Germany"
+	echo -e "\tpia-start \"UK London\""
+	exit
+fi
+
+
+if [ -f "/pia/ovpn/$1.ovpn" ]; then
+	#check the for default value
+	PIA_UN=`sed -n '1p' /pia/login.conf`
+	if [ "$PIA_UN" = "your PIA account name on this line" ]; then
+	        echo
+	        echo "Please add your Private Internet Access account information"
+	        echo "to /pia/login.conf"
+	        echo "Try"
+	        echo -e "\tvi /pia/login.conf"
+	        echo "or"
+	        echo -e "\tnano /pia/login.conf"
+	        echo
+        	exit
+	fi
+
+
+	#set iptables to something save until pia-fw is executed
+	iptables -F
+	iptables -P INPUT DROP
+	iptables -P FORWARD DROP
+	iptables -P OUTPUT ACCEPT
+	iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+	
+	echo "initiating  VPN connection. see /pia/session.log for details"
+	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
+	sleep 5
+	echo "configuring firewall and port forwarding"
+	/pia/pia-fw
+	/pia/pia-status
+fi

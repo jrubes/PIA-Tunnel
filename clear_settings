@@ -1,0 +1,23 @@
+#!/bin/bash
+#this will delete any cache files and will create a sample login.conf
+
+
+#clear existing ssh key
+cd /etc/ssh/ ; rm -f *key*
+if [ -f "/usr/sbin/dpkg-reconfigure" ]; then
+	/usr/sbin/dpkg-reconfigure openssh-server
+fi
+
+echo "" > /root/.bash_history
+cd /tmp/ ; rm -rf *
+find /var/log -type f -delete
+
+rm /pia/session.log
+rm /pia/login.conf
+rm /pia/client_id
+
+echo "your PIA account name on this line" > /pia/login.conf
+echo "your PIA account password on this line" >> /pia/login.conf
+
+chown -R root.root /pia
+chmod -R og-rwx /pia
