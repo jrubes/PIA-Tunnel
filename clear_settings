@@ -12,6 +12,9 @@ echo "" > /root/.bash_history
 cd /tmp/ ; rm -rf *
 find /var/log -type f -delete
 
+cd /var/lib/dhcp/ ; rm -rf *.leases
+cd /var/lib/dhcp/ ; rm -rf *.leases~
+
 rm /pia/session.log
 rm /pia/login.conf
 rm /pia/client_id
