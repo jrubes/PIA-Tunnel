@@ -112,3 +112,5 @@ route delete default dev $IF_EXT
 route add default gw $TUN_GATEWAY dev $IF_TUNNEL 
 
 
+# Enable forwarding
+echo 1 > /proc/sys/net/ipv4/ip_forward
