@@ -22,7 +22,8 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 The PIA Tunnel VM is a minimal Debian 7 installation with minor modifications.
 	* root is the only account. The password is "pia" without quotes.
 		* change the root password before you do anything else!!!!
-	* dhcpd is running on eth1 but only 192.168.10.101 may use port forwarding
+	* dhcpd is running on eth1 but only 192.168.10.101 will be configured
+	  for automatic port forwarding
 	* ntpd is disabled but a cronjob executes ntpd -q
 	* mtp-status removed
 	* open-vmware-tools have been installed
@@ -31,7 +32,7 @@ The PIA Tunnel VM is a minimal Debian 7 installation with minor modifications.
 	* git installed and repo PIA script repo cloned into /pia/
 		run pia-update to fetch new releases
 	
-VM Pia Tunnel hardware requirements
+VM PIA Tunnel hardware requirements
 	* 1 CPU
 	* 80MB RAM
 	* Network adapter 1 to LAN (port 22 is open so I use the NAT option in VMware)
@@ -49,7 +50,7 @@ VM Pia Tunnel hardware requirements
 3) Add VM to VMware Player or Workstation
 
 4) Ensure that the second network adapter is a member of a private vLAN segment
-	4.a) Workstation
+	4.a) Workstation and Player
 		* Select "Network Adapter 2"
 		* Click "LAN Segments" => "Add"
 		* Enter name of LAN segment. I use "VPN Bridge"
@@ -57,7 +58,7 @@ VM Pia Tunnel hardware requirements
 		* Use Dropdown to select the LAN segment you just created and click OK
 			Connect client VMs to this LAN segment and remove or disable their other network cards.
 			
-	4.b) Player
+	4.b) ESXi
 		* to be added
 
 5) Check that the machine has one CPU and around 80MB of RAM. 
