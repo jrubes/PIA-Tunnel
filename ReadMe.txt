@@ -18,8 +18,17 @@ You have been warned!
 
 The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player or ESXi. It bridges a private VMware LAN segment to the PIA VPN Network, totally isolating any VMs on that private LAN segment from your LAN and Internet connection. This should prevent any traffic from bypassing the VPN tunnel and getting on the LAN and out your Internet connection.
 
+* Features
+    * requires 1 CPU, 80MB RAM and a little over 1GB hard drive space
+    * primary network adapter pulls IP from your LAN so the VM is "start and use" once setup
+    * the secondary network adapter is running on 192.168.10.1 and is handing out IPs
+	  in the range 192.168.10.101 to 192.168.10.151
+    * the VM supports port forwarding and will route the port assigned by PIA to 192.168.10.101
+    * the external IP and port can be checked at any time with the command "pia-status"
 
-The PIA Tunnel VM is a minimal Debian 7 installation with minor modifications.
+
+* Linux details 
+	* the VM is running a minimal Debian 7 installation with minor modifications.
 	* root is the only account. The password is "pia" without quotes.
 		* change the root password before you do anything else!!!!
 	* dhcpd is running on eth1 but only 192.168.10.101 will be configured
@@ -31,14 +40,8 @@ The PIA Tunnel VM is a minimal Debian 7 installation with minor modifications.
 	* sshd running and allowing root logins
 	* git installed and repo PIA script repo cloned into /pia/
 		run pia-update to fetch new releases
-	
-VM PIA Tunnel hardware requirements
-	* 1 CPU
-	* 80MB RAM
-	* Network adapter 1 to LAN (port 22 is open so I use the NAT option in VMware)
-	* Network adapter 2 to private VMware LAN segment
 		
-
+		
 		
 # SETUP #
 #########
@@ -79,7 +82,7 @@ VM PIA Tunnel hardware requirements
 
 11) edit /pia/login.conf and enter your PIA account name and password. nothing else!
 		nano /pia/login.conf
-	So the file should look like this:
+	So the file should look something like this:
 		p1234567
 		f5Gh7Sw2vNmFa12OlP
 
@@ -100,7 +103,7 @@ VM PIA Tunnel hardware requirements
 		Will kill openvpn, reset the firewall and restart the network interfaces.
 		
 	pia-status
-		Will display your VPN IP address and the port forward to 192.168.10.101
+		Will display your VPN IP address and the port forwarded to 192.168.10.101
 		
 	pia-update
 		Will update files within /pia/ from https://github.com/KaiserSoft/PIA-Tunnel/
@@ -111,8 +114,9 @@ VM PIA Tunnel hardware requirements
 		*WARNING* This resets login.conf
 		
 	clear_settings
-		*WARNING* Deletes your login data, log files and generates new SSH keys. This resets /pia/ back to the original download state. You should reboot your system after running this command!
+		*WARNING* Deletes your login data, system log files and generates new SSH keys. 
+		You should reboot your system after running this command!
 		
-14) Switch to your "Internet VM" now and give it a try. All traffic should now be forwarded thorugh the 
+14) Switch to your "Internet VM" now and give it a try. All traffic should be forwarded thorugh the 
 	VPN tunnel.
 		traceroute -n google.com
