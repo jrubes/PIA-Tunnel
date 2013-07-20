@@ -106,6 +106,7 @@ VM Pia Tunnel hardware requirements
 	pia-setup
 		Will setup the scripts above. use this if you rolled your own VM image and would like to
 		set permissions and create links to the scripts in /pia/
+		*WARNING* This resets login.conf
 		
 	clear_settings
 		*WARNING* Deletes your login data, log files and generates new SSH keys. This resets /pia/ back to the original download state. You should reboot your system after running this command!
