@@ -86,7 +86,9 @@ VM Pia Tunnel hardware requirements
 12) see if you have Internet access by sending a few pings to google
 	 ping -c 5 google.com
 	 
-13) everything should be ready to create the VPN tunnel. you may now use the following commands
+13) everything should be ready to create the VPN tunnel.
+	*you should run "pia-update" before using any of the other commands*
+	
 	pia-start <location>
 		Will create a new VPN connection and setup the firewall. Calling this command without a location will display a list of available locations.
 		Example:
