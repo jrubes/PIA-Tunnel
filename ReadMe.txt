@@ -121,3 +121,23 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 14) Switch to your "Internet VM" now and give it a try. All traffic should be forwarded thorugh the 
 	VPN tunnel.
 		traceroute -n google.com
+
+		
+
+* Client VMs
+	You may use the build in DHCP server or assign your own IPs to your client VMs. The PIA Tunnel VM is configured to use 192.168.10.0 on the second network adapter with a DHCP range of .101 to .151
+		* The VM forwards the remote tunnel port only to the .101 IP!
+	
+	I use a dedicate VM for downloading on my network so I configure dhcpd to use a static assignment for .101. See the bottom of /etc/dhcp/dhcpd.conf for details.
+	Restart your dhcp server with the following command after you change the config file.
+		service isc-dhcp-server restart
+		
+
+* Advanced Tips and Tricks
+	* add "/pia/pia-start <SomeLocation>" to /etc/rc.local to have the VM create a tunnel when booting.
+	  The IP and port will be printed on the console or use "pia-status" if you use remote access.
+	  
+	  
+	  
+
+	
