@@ -45,6 +45,11 @@ if [ -f '/bin/pia-update' ]; then
 fi
 ln -s '/pia/pia-update' '/bin/pia-update'
 
+if [ -f '/bin/pia-setup' ]; then
+	rm '/bin/pia-setup'
+fi
+ln -s '/pia/pia-setup' '/bin/pia-setup'
+
 
 #ALWAYS RUN THIS LAST
 chown -R root.root /pia
