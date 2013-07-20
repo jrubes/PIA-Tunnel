@@ -1,9 +1,10 @@
 /*
   * Project: PIA Tunnel VM
   * Description: Linux virtual machine to be used as a VPN to network bridge.
-  *		This VM will only work with the VPN service from https://www.privateinternetaccess.com/
+  *	  This VM will only work with the VPN service from https://www.privateinternetaccess.com/
   *
   * Author: Mirko Kaiser, http://www.KaiserSoft.net
+  * Support the software with Bitcoins !thank you!: 157Gh2dTCkrip8hqj3TKqzWiezHXTPqNrV
   * Copyright (C) 2013 Mirko Kaiser
   * First created in Germany on 2013-07-20
   * License: New BSD License
