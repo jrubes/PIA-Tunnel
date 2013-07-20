@@ -16,8 +16,7 @@ in development mode. It will listen to on port 22 (SSH) and will allow root logi
 You have been warned!
 
 
-The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player or ESXi. It bridges your LAN to a private VMware LAN segment, totally isolating any VMs on that LAN segment from your LAN and Internet connection. This should prevent any traffic from bypassing the VPN tunnel 
-and getting on the LAN and out your Internet connection.
+The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player or ESXi. It bridges a private VMware LAN segment to the PIA VPN Network, totally isolating any VMs on that private LAN segment from your LAN and Internet connection. This should prevent any traffic from bypassing the VPN tunnel and getting on the LAN and out your Internet connection.
 
 
 The PIA Tunnel VM is a minimal Debian 7 installation with minor modifications.
