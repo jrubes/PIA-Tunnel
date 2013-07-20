@@ -110,9 +110,8 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 		Will update files within /pia/ from https://github.com/KaiserSoft/PIA-Tunnel/
 		
 	pia-setup
-		Will setup the scripts above. use this if you rolled your own VM image and would like to
-		set permissions and create links to the scripts in /pia/
-		*WARNING* This resets login.conf
+		Will setup the scripts above and fix any permission issues.
+		This command can also generate new login.conf and settings.conf files if the files are not found in /pia/.
 		
 	clear_settings
 		*WARNING* Resets login.conf, deletes the system log files, dhcp cache file

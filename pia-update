@@ -6,3 +6,6 @@ export LANG
 echo "getting updates from https://github.com/KaiserSoft/PIA-Tunnel"
 cd /pia/
 git pull origin
+
+#run pia-setup to fix permissions from git pull
+/pia/pia-setup
