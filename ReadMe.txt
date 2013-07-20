@@ -83,8 +83,8 @@ VM Pia Tunnel hardware requirements
 		p1234567
 		f5Gh7Sw2vNmFa12OlP
 
-12) see if you have Internet access by tracing your connection
-	 traceroute -n google.com
+12) see if you have Internet access by sending a few pings to google
+	 ping -c 5 google.com
 	 
 13) everything should be ready to create the VPN tunnel. you may now use the following commands
 	pia-start <location>

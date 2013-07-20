@@ -5,6 +5,9 @@ chown -R root.root /pia
 chmod -R og-rwx /pia
 chmod u+x /pia/pia-*
 
+echo "your PIA account name on this line" > /pia/login.conf
+echo "your PIA account password on this line" >> /pia/login.conf
+
 rm /bin/pia-start
 ln -s /pia/pia-start /bin/pia-start
 
