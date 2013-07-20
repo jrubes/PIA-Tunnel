@@ -77,7 +77,7 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 9) Generate new SSL certificates by running
 	/pia/clear_settings
 
-10) reboot the system! yes do it!
+10) reboot the VM with the following command! yes, really, just do it :)
 	reboot
 
 11) edit /pia/login.conf and enter your PIA account name and password. nothing else!
@@ -86,11 +86,11 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 		p1234567
 		f5Gh7Sw2vNmFa12OlP
 
-12) see if you have Internet access by sending a few pings to google
+12) see if you have Internet access by sending a few pings to Google
 	 ping -c 5 google.com
 	 
 13) everything should be ready to create the VPN tunnel.
-	*you should run "pia-update" before using any of the other commands*
+	*you should run "pia-update" before using any of the other commands for the first time*
 	
 	pia-start <location>
 		Will create a new VPN connection and setup the firewall. Calling this command without a location will display a list of available locations.
@@ -114,7 +114,8 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 		*WARNING* This resets login.conf
 		
 	clear_settings
-		*WARNING* Deletes your login data, system log files and generates new SSH keys. 
+		*WARNING* Resets login.conf, deletes the system log files, dhcp cache file
+		and generates new SSH keys. 
 		You should reboot your system after running this command!
 		
 14) Switch to your "Internet VM" now and give it a try. All traffic should be forwarded thorugh the 
