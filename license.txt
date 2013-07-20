@@ -1,5 +1,5 @@
 /*
-  * Project: PAI Tunnel VM
+  * Project: PIA Tunnel VM
   * Description: Linux virtual machine to be used as a VPN to network bridge
   *
   * Author: Mirko Kaiser, http://www.KaiserSoft.net
