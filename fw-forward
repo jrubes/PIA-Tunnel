@@ -2,6 +2,7 @@
 # these are the firewall settings used when the tunnel is active.
 LANG=en_US.UTF-8
 export LANG
+source '/pia/settings.conf'
 
 #get default gateway of tunnel interface using "ip"
 #get IP of tunnel Gateway
