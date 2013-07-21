@@ -1,24 +1,7 @@
 #!/bin/bash
-# this is the script setting up the firewall and adjusting the default route
+# these are the firewall settings used when the tunnel is active.
 LANG=en_US.UTF-8
 export LANG
-
-#config file has been added after the first release so this condition needs to stay here for a while
-if [ ! -f "/pia/settings.conf" ]; then
-	echo '#!/bin/bash' > '/pia/settings.conf'
-	echo 'LANG=en_US.UTF-8' >> '/pia/settings.conf'
-	echo 'export LANG' >> '/pia/settings.conf'
-	echo '' >> '/pia/settings.conf'
-	echo '# name of your external interface. this connects to the Internet/Router' >> '/pia/settings.conf'
-	echo 'IF_EXT="eth0"' >> '/pia/settings.conf'
-	echo '# name of your internal interface. this if for the private VM network' >> '/pia/settings.conf'
-	echo 'IF_INT="eth1"' >> '/pia/settings.conf'
-	echo '# name of your VPN interface' >> '/pia/settings.conf'
-	echo 'IF_TUNNEL="tun0"' >> '/pia/settings.conf'
-	echo '' >> '/pia/settings.conf'
-fi
-source '/pia/settings.conf'
-
 
 #get default gateway of tunnel interface using "ip"
 #get IP of tunnel Gateway
@@ -57,7 +40,6 @@ if [ ! -f /pia/client_id ]; then
 	head -n 100 /dev/urandom | md5sum | tr -d " -" > /pia/client_id
 fi
 PIA_CLIENT_ID=`cat /pia/client_id`
-
 
 #get open port of tunnel connection
 TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
@@ -102,16 +84,6 @@ iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 #development rules, need to think about port 22
 iptables -A INPUT -i $IF_EXT -p tcp --dport 22 -j ACCEPT
 iptables -A OUTPUT -o $IF_EXT -m state --state RELATED,ESTABLISHED -j ACCEPT
-
-
-
-
-
-# setup default routes
-#echo "E: route delete default dev $IF_EXT"
-route delete default dev $IF_EXT
-#echo "E: route add default gw $TUN_GATEWAY dev $IF_TUNNEL"
-route add default gw $TUN_GATEWAY dev $IF_TUNNEL 
 
 
 # Enable forwarding

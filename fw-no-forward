@@ -1,0 +1,27 @@
+#!/bin/bash
+# these are the firewall settings used when the tunnel is not active.
+LANG=en_US.UTF-8
+export LANG
+
+# load a default firewall
+source '/pia/settings.conf'
+iptables -F
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT ACCEPT
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+#trust private LAN segment
+iptables -A INPUT -i $IF_INT -p tcp -j ACCEPT
+
+#allow SSH on port 22 from EXT LAN
+iptables -A INPUT -i $IF_EXT -p tcp --dport 22 -j ACCEPT
+iptables -A OUTPUT -o $IF_EXT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+
+#disable forwarding
+echo 0 > /proc/sys/net/ipv4/ip_forward

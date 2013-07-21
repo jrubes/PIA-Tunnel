@@ -1,0 +1,25 @@
+#!/bin/bash
+# script to control the firewall, start and stop for now
+LANG=en_US.UTF-8
+export LANG
+source '/pia/settings.conf'
+
+if [ "$1" = "start" ]; then
+	#this needs a loop to check if tun0 exists ... later
+	
+	echo "setting up iptables for forwarding"
+	/pia/fw-forward
+	
+	# setup default routes
+	#echo "E: route delete default dev $IF_EXT"
+	route delete default dev $IF_EXT
+	#echo "E: route add default gw $TUN_GATEWAY dev $IF_TUNNEL"
+	route add default gw $TUN_GATEWAY dev $IF_TUNNEL 	
+	exit
+fi
+
+if [ "$1" = "stop" ]; then
+	echo "disabeling port forwarding"
+	/pia/fw-no-forward
+	exit
+fi

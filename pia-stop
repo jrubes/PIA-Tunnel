@@ -7,20 +7,8 @@ export LANG
 
 killall openvpn
 
-iptables -F
-iptables -t nat -F
-iptables -t nat -X
-iptables -t mangle -F
-iptables -t mangle -X
-iptables -P INPUT DROP
-iptables -P FORWARD DROP
-iptables -P OUTPUT ACCEPT
-
-iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-
-#development rules, need to think about port 22
-iptables -A INPUT -i eth0 -p tcp --dport 22 -j ACCEPT
-iptables -A OUTPUT -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+#disable forwarding
+/pia/pia-forward stop
 
 # restart networking to get default routes through eth0 working again
 # service network restart #CentOS

@@ -40,17 +40,13 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 
 
 	#set iptables to something save until pia-fw is executed
-	iptables -F
-	iptables -P INPUT DROP
-	iptables -P FORWARD DROP
-	iptables -P OUTPUT ACCEPT
-	iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+	/pia/pia-forward stop
 
 	
 	echo "initiating  VPN connection. see /pia/session.log for details"
 	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
+	
 	sleep 5
-	echo "configuring firewall and port forwarding"
-	/pia/pia-fw
+	/pia/pia-forward start
 	/pia/pia-status
 fi

@@ -25,33 +25,22 @@ if [ ! -f "/pia/settings.conf" ]; then
 	echo '' >> '/pia/settings.conf'
 fi
 
-if [ -f '/bin/pia-start' ]; then
-	rm '/bin/pia-start'
-fi
-ln -s '/pia/pia-start' '/bin/pia-start'
+FILES="pia-start pia-stop pia-status pia-update pia-setup pia-forward fw-forward fw-no-forward"
+for f in $FILES
+do
+	if [ -f "/bin/$f" ]; then
+		rm "/bin/$f"
+	fi
+	ln -s "/pia/$f" "/bin/$f"
+	chmod u+x "/pia/$f"
+done
 
-if [ -f '/bin/pia-stop' ]; then
-	rm '/bin/pia-stop'
-fi
-ln -s '/pia/pia-stop' '/bin/pia-stop'
 
-if [ -f '/bin/pia-status' ]; then
-	rm '/bin/pia-status'
-fi
-ln -s '/pia/pia-status' '/bin/pia-status'
 
-if [ -f '/bin/pia-update' ]; then
-	rm '/bin/pia-update'
-fi
-ln -s '/pia/pia-update' '/bin/pia-update'
 
-if [ -f '/bin/pia-setup' ]; then
-	rm '/bin/pia-setup'
-fi
-ln -s '/pia/pia-setup' '/bin/pia-setup'
+
 
 
 #ALWAYS RUN THIS LAST
 chown -R root.root /pia
 chmod -R og-rwx /pia
-chmod u+x /pia/pia-*
