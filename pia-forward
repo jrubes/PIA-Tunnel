@@ -18,8 +18,24 @@ if [ "$1" = "start" ]; then
 	exit
 fi
 
+
 if [ "$1" = "stop" ]; then
 	echo "disabeling port forwarding"
 	/pia/fw-no-forward
+	exit
+fi
+
+
+if [ "$1" = "fix" ]; then
+	echo "will attempt to stop any VPN tunnels and restart all network interfaces"
+	killall openvpn
+	
+	/pia/fw-no-forward
+	
+	# restart networking to get default routes through eth0 working again
+	# service network restart #CentOS
+	ifdown eth0 && ifup eth0 #Debian
+	echo ""
+	echo "Done! Please try again."
 	exit
 fi

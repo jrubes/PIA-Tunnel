@@ -20,7 +20,6 @@ iptables -A INPUT -i $IF_INT -p tcp -j ACCEPT
 
 #allow SSH on port 22 from EXT LAN
 iptables -A INPUT -i $IF_EXT -p tcp --dport 22 -j ACCEPT
-iptables -A OUTPUT -o $IF_EXT -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 
 #disable forwarding
