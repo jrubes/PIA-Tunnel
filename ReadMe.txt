@@ -22,6 +22,8 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 
 * Features
     * requires 1 CPU, 80MB RAM and a little over 1GB hard drive space
+		* Edit: I changed the RAM to 92MB because the VM does not always start up. Using LVN may not have
+		  been a good idea. Will try and rebuild the VM soon.
     * primary network adapter pulls IP from your LAN so the VM is "start and use" once setup
     * the secondary network adapter is running on 192.168.10.1 and is handing out IPs
 	  in the range 192.168.10.101 to 192.168.10.151
