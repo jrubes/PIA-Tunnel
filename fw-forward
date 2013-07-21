@@ -87,5 +87,11 @@ iptables -A INPUT -i $IF_EXT -p tcp --dport 22 -j ACCEPT
 iptables -A OUTPUT -o $IF_EXT -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 
+# setup default routes
+#echo "E: route delete default dev $IF_EXT"
+route delete default dev $IF_EXT
+#echo "E: route add default gw $TUN_GATEWAY dev $IF_TUNNEL"
+route add default gw $TUN_GATEWAY dev $IF_TUNNEL 
+
 # Enable forwarding
 echo 1 > /proc/sys/net/ipv4/ip_forward
