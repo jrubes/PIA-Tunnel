@@ -20,9 +20,8 @@ function ping_vpn() {
 	if [ "$VERBOSE" = "yes" ]; then
 		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- VPN ping failed!"
-		echo -e "\t"$PING_COMMAND
+		#echo -e "\t"$PING_COMMAND
 	fi
-	#echo "Er: $TUNNEL_PING---"
   fi  
 }
 
@@ -35,7 +34,10 @@ function ping_internet() {
 	#echo "OK: $RET_PING_INTERNET---"
   else
     RET_PING_INTERNET="ERROR"
-	#echo "Er: $RET_PING_INTERNET---"
+	if [ "$VERBOSE" = "yes" ]; then
+		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- Internet ping failed!"
+	fi
   fi  
 }
 

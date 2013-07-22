@@ -30,10 +30,23 @@ FAIL_RETRY_DELAY=1
 # setting verbose to yes will print status notification after each check. any other settings for "background mode"
 VERBOSE="yes"
 
-SLEEP_INTERNET_DOWN=10
+# time in seconds to wait before rechecking a down Internet connection
+# each run takes a few seconds to complete so don't go too low!
+# default 320 (5 minutes)
+SLEEP_INTERNET_DOWN=320
+
+# time in seconds to wait before attempting to ping a resource again
+# default 4
 SLEEP_PING_RETEST=4
-SLEEP_RECONNECT_ERROR=10
-SLEEP_MAIN_LOOP=20
+
+# time in seconds between retries when none of the PIA Gateways can be reached
+# default 320 (5 minutes)
+SLEEP_RECONNECT_ERROR=320
+
+# time (seconds) in between "uptime" checks. every check will send a few pings
+# to some server so please don't flood them or they may block you
+# default 30
+SLEEP_MAIN_LOOP=30
 
 
 
