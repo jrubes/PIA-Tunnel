@@ -50,7 +50,11 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 # SETUP #
 #########
 
-1) Download the Image from  https://mega.co.nz/#!jYxmRYII!Y-Hp9za2foppHB1hkLkKk03oQ91bkdbbEa45BaSnmL4
+1) Download the compressed VMware Image from 
+	 https://mega.co.nz/#!DARHnQra!SYUGKjeHjV3osOkVKPmcRDK8GYtHZMDomrzL3E_QClQ
+   Or the VMware OVF Template from the following link (for ESXi and advanced users)
+     https://mega.co.nz/#!WNgFHD5b!VHE9Sg6-jrAYTMwKqvSQ7VpZF3ta-Ab7bJ5D19a7nLU
+
 
 2) Extract and copy into your "Virtual Machines" directory
 
