@@ -5,8 +5,7 @@ export LANG
 source '/pia/settings.conf'
 source '/pia/include/functions.inc'
 
-echo "script disabled because it is not done yet. you may remove the \"exit\" if you feel adventurous."
-exit
+echo "WARNING: pia-daemon is not done yet and may do unexpected things!"
 
 
 # How it works

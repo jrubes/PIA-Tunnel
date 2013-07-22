@@ -2,8 +2,9 @@
 LANG=en_US.UTF-8
 export LANG
 
-#return variables fro functions
+#return variables for functions
 RET_PING=""
+
 #function to ping through the current VPN connection
 function ping_vpn () {
   TUNNEL_PING=`eval $PING_COMMAND`

@@ -41,7 +41,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 
 
 	#set iptables to something save until pia-fw is executed
-	/pia/pia-forward stop
+	/pia/pia-forward stop quite
 
 	echo "initiating  VPN connection. see /pia/session.log for details"
 	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
