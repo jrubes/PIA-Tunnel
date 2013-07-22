@@ -5,7 +5,7 @@ export LANG
 #return variables and static stuff
 RET_PING_VPN=""
 RET_PING_INTERNET=""
-PING_COMMAND="ping -qnw2c1 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
+PING_COMMAND="ping -qnw3c1 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
 PING_COMMAND_INTERNET="ping -qnw2c1 -I $IF_EXT 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
 
 #function to ping through the current VPN connection
@@ -19,7 +19,8 @@ function ping_vpn() {
     RET_PING_VPN="ERROR"
 	if [ "$VERBOSE" = "yes" ]; then
 		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- VPN ping failed: "$PING_COMMAND
+			"- VPN ping failed!"
+		echo -e "\t"$PING_COMMAND
 	fi
 	#echo "Er: $TUNNEL_PING---"
   fi  
@@ -61,7 +62,7 @@ function switch_vpn() {
 				return
 			fi
 			
-			#endless loop protect, about 1ß seconds
+			#endless loop protect, about 10 seconds
 			if [ "$LOOP_PROTECT" -eq 10 ]; then
 				killall openvpn 2>/dev/null
 				/pia/pia-forward stop quite

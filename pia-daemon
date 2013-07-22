@@ -21,8 +21,8 @@ MYVPN[1]="Sweden"
 MYVPN[2]="UK London"
 
 # set action when VPN fails: terminate | failover
-FAIL_ACTION="terminate"
-FAIL_RETRY_VPN=3
+FAIL_ACTION="failover"
+FAIL_RETRY_VPN=4
 FAIL_RETRY_INTERNET=3
 FAIL_RETRY_DELAY=1
 
@@ -31,9 +31,9 @@ FAIL_RETRY_DELAY=1
 VERBOSE="yes"
 
 SLEEP_INTERNET_DOWN=10
-SLEEP_PING_RETEST=2
+SLEEP_PING_RETEST=4
 SLEEP_RECONNECT_ERROR=10
-SLEEP_MAIN_LOOP=10
+SLEEP_MAIN_LOOP=20
 
 
 
@@ -162,6 +162,7 @@ while true; do
 			/pia/pia-forward stop quite
 			echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- VPN has failed - connection terminated and forwarding disabled!"
+			exit
 		fi
 	fi
   
@@ -169,7 +170,7 @@ while true; do
   
 	if [ "$VERBOSE" = "yes" ]; then
 		echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- VPN is up - next check in $SLEEP_MAIN_LOOP seconds..."
+			"- VPN is UP - next check in $SLEEP_MAIN_LOOP seconds..."
 	fi
 	sleep $SLEEP_MAIN_LOOP
 	
