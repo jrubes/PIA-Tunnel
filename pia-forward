@@ -8,7 +8,7 @@ if [ "$1" = "start" ]; then
 	#this needs a loop to check if tun0 exists ... later
 	
 	echo "setting up iptables for forwarding"
-	/pia/fw-forward	
+	/pia/include/fw-forward	
 	exit
 fi
 
@@ -17,7 +17,7 @@ if [ "$1" = "stop" ] || [ "$2" = "stop" ]; then
 	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
 		echo "disabeling port forwarding"
 	fi
-	/pia/fw-no-forward
+	/pia/include/fw-no-forward
 	exit
 fi
 
@@ -26,7 +26,7 @@ if [ "$1" = "fix" ]; then
 	echo "will attempt to stop any VPN tunnels and restart all network interfaces"
 	killall openvpn
 	
-	/pia/fw-no-forward
+	/pia/include/fw-no-forward
 	
 	# restart networking to get default routes through eth0 working again
 	# service network restart #CentOS

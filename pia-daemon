@@ -3,7 +3,7 @@
 LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
-source '/pia/functions.inc'
+source '/pia/include/functions.inc'
 
 echo "script disabled because it is not done yet. you may remove the \"exit\" if you feel adventurous."
 exit
