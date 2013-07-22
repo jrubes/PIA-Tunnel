@@ -1,0 +1,111 @@
+#!/bin/bash
+# script to monitor the tunnel connection and terminate or restart it if it fails
+LANG=en_US.UTF-8
+export LANG
+source '/pia/settings.conf'
+
+echo "script disabled because it is not done yet. you may remove the \"exit\" if you feel adventurous."
+exit
+
+
+# How it works
+# *) pia-start initiates a connection
+# *) this daemon script is startet which will send one ping every n seconds through the tunnel
+# 	if the ping fails n times the tunnel is closed or restartet
+
+
+# list of VPN connections to use, the first is awlays the primary
+MYVPN[0]="Germany"
+MYVPN[1]="Sweden"
+MYVPN[2]="UK London"
+
+# set action when VPN fails: terminate | failover
+FAIL_ACTION="failover"
+FAIL_RETRY=3
+FAIL_RETRY_DELAY=2
+
+# set timeinterval for checks in seconds. DO NOT SET THIS TOO LOW!
+# script will send one ping every PING_INTERVAL seconds
+PING_INTERVAL=60
+PING_COMMAND="ping -qnw1c1 -I $IF_TUNNEL google.com 2>/dev/null | grep -c \"0% packet loss\""
+
+
+#return variables fro functions
+RET_PING=""
+
+
+#function to ping through the current VPN connection
+function ping_vpn () {
+  TUNNEL_PING=`eval $PING_COMMAND`
+  if [ "$TUNNEL_PING" -eq 1 ]; then
+    RET_PING="OK"
+  else
+    RET_PING="ERROR"
+  fi  
+}
+
+#function to handle switching of failover connections by using the MYVPN array
+function switch_vpn() {
+  for conn in "${MYVPN[@]}"
+  do
+    # create a new VPN connection
+    /pia/pia-start \""$conn"\"
+    
+    # now do the ping check
+    ping_vpn
+    if [ "$RET_PING" = "OK" ]; then
+      break
+    else
+      echo "tried to reconnect to $conn but the connection failed."
+    fi
+  done
+  
+  echo "unable to switch connections because none appears to work. will try again in 5 minutes"
+  sleep 320
+}
+
+
+
+
+
+
+
+
+# this is the outer endless loop #
+##################################
+while true; do
+  #set proper values fro every run
+  RET_PING=""
+
+  
+  ping_vpn
+  if [ "$RET_PING" = "ERROR" ]; then
+    #connection has failed
+    for (( x=1 ; x <= FAIL_RETRY ; x++ ))
+    do
+	# ping again
+	ping_vpn
+	if [ "$RET_PING" = "OK" ]; then
+	  #ping worked this time, back to normal
+	  break
+	fi
+    done
+  fi
+  
+  #check results and do something about it
+  if [ "$RET_PING" = "ERROR" ]; then
+    if [ "$FAIL_ACTION" = "failover" ]; then
+      echo "VPN tunnel has failed - switching to backup."
+      switch_vpn
+    else
+      #/pia/pia-stop
+      #/pia/pia-forward stop quite
+      echo "VPN tunnel has failed - connection terminated!"
+    fi
+  
+  fi
+  
+
+  echo "looping"
+  sleep $PING_INTERVAL
+done
