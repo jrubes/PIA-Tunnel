@@ -25,7 +25,7 @@ if [ ! -f "/pia/settings.conf" ]; then
 	echo '' >> '/pia/settings.conf'
 fi
 
-FILES="pia-start pia-stop pia-status pia-update pia-setup pia-forward fw-forward fw-no-forward"
+FILES="pia-start pia-stop pia-status pia-update pia-setup pia-forward fw-forward fw-no-forward pia-prepare-ovpn"
 for f in $FILES
 do
 	if [ -f "/bin/$f" ]; then
