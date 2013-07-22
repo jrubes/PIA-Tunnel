@@ -13,8 +13,10 @@ if [ "$1" = "start" ]; then
 fi
 
 
-if [ "$1" = "stop" ]; then
-	echo "disabeling port forwarding"
+if [ "$1" = "stop" ] || [ "$2" = "stop" ]; then
+	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
+		echo "disabeling port forwarding"
+	fi
 	/pia/fw-no-forward
 	exit
 fi
