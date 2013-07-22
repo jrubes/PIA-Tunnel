@@ -1,5 +1,6 @@
 #!/bin/bash
 # will delete any cache files and create login.conf and settings.conf
+# this command is named reset-pia on purpose (pia-reset). DO NOT run this for fun!
 
 LANG=en_US.UTF-8
 export LANG
