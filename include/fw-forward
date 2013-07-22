@@ -18,6 +18,7 @@ EXT_IP=`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | 
 EXT_GW=`ip route show | grep "default" | gawk -F" " '{print $3}'`
 
 
+
 #get PIA username and password from /pia/login.conf
 PIA_UN=`sed -n '1p' /pia/login.conf`
 PIA_PW=`sed -n '2p' /pia/login.conf`
@@ -87,11 +88,11 @@ iptables -A INPUT -i $IF_EXT -p tcp --dport 22 -j ACCEPT
 iptables -A OUTPUT -o $IF_EXT -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 
-# setup default routes
+# setup default routes - 2>/dev/null needs to be fixed, check if exists first, then remove or keep
 #echo "E: route delete default dev $IF_EXT"
-route delete default dev $IF_EXT
+route delete default dev $IF_EXT 2>/dev/null
 #echo "E: route add default gw $TUN_GATEWAY dev $IF_TUNNEL"
-route add default gw $TUN_GATEWAY dev $IF_TUNNEL 
+route add default gw $TUN_GATEWAY dev $IF_TUNNEL 2>/dev/null
 
 # Enable forwarding
 echo 1 > /proc/sys/net/ipv4/ip_forward

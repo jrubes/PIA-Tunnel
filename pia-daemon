@@ -22,16 +22,21 @@ MYVPN[2]="UK London"
 
 # set action when VPN fails: terminate | failover
 FAIL_ACTION="failover"
-FAIL_RETRY=3
-FAIL_RETRY_DELAY=2
+FAIL_RETRY=2
+FAIL_RETRY_DELAY=1
 
 # set timeinterval for checks in seconds. DO NOT SET THIS TOO LOW!
 # script will send one ping every PING_INTERVAL seconds
 PING_INTERVAL=60
 PING_COMMAND="ping -qnw1c1 -I $IF_TUNNEL google.com 2>/dev/null | grep -c \"0% packet loss\""
+PING_COMMAND_INTERNET="ping -qnw1c1 -I $IF_EXT google.com 2>/dev/null | grep -c \"0% packet loss\""
 
 # setting verbose to yes will print status notification after each check. any other settings for "background mode"
 VERBOSE="yes"
+
+SLEEP_INTERNET_DOWN=10
+SLEEP_PING_RETEST=1
+SLEEP_RECONNECT_ERROR=10
 
 
 
@@ -43,32 +48,107 @@ VERBOSE="yes"
 
 # this is the outer endless loop #
 ##################################
-while true; do
-	#set proper values fro every run
-	RET_PING=""
-
-  
+while true; do  
 	ping_vpn
 	if [ "$RET_PING" = "ERROR" ]; then
-		#connection has failed
-		for (( x=1 ; x <= FAIL_RETRY ; x++ ))
+		#VPN connection has failed
+		if [ "$VERBOSE" = "yes" ]; then
+			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- VPN appears to have failed"
+		fi
+		for (( x=1 ; x <= $FAIL_RETRY ; x++ ))
 		do
-			# ping again
+			sleep $SLEEP_PING_RETEST
 			ping_vpn
 			if [ "$RET_PING" = "OK" ]; then
 				#ping worked this time, back to normal
 				break
+			else
+				if [ "$VERBOSE" = "yes" ]; then
+					echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+						"- VPN ping failed $x of $FAIL_RETRY"
+				fi
 			fi
 		done
+	else
+		if [ "$VERBOSE" = "yes" ]; then
+			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- VPN is UP"
+		fi
 	fi
+	#end of VPN test
+
+	#check if we Internet is up
+	ping_internet
+	if [ "$RET_PING_INTERNET" = "ERROR" ]; then
+		RAN_FORWARD_FIX="no"
+		while true; do
+			LOOP_TIMEOUT=1
+			
+			ping_internet
+			if [ "$RET_PING_INTERNET" = "OK" ]; then
+				#internet works, keep going
+				if [ "$VERBOSE" = "yes" ]; then
+					echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+						"- Internet is back up after $LOOP_TIMEOUT of 5 attempts"
+				fi
+				break;
+			else
+				if [ "$RAN_FORWARD_FIX" = "no" ]; then
+					#only do this once per internet connection failure
+					echo -e "[\e[1;33m warning \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+						" - Internet connection appears to be down. running pia-forward fix"
+					RAN_FORWARD_FIX="yes"
+					/pia/pia-forward fix quite
+				fi
+			fi
+			
+
+			#endless loop protect, about 5 seconds
+			if [ "$LOOP_TIMEOUT" -eq 5 ]; then
+				echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+					"- Internet IS down. Recheck in $SLEEP_INTERNET_DOWN seconds"
+				echo -e "[\e[1;33m warning \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+					"forwarding will be disabled until Internet is back up."
+				/pia/pia-forward stop quite
+				sleep $SLEEP_INTERNET_DOWN
+				
+				#restarting daemon
+				/pia/pia-daemon shutup
+				exit
+				break
+				
+			else
+				if [ "$VERBOSE" = "yes" ]; then
+					echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+						"- Internet failure $LOOP_TIMEOUT of 5"
+				fi
+				sleep $SLEEP_PING_RETEST
+				LOOP_TIMEOUT=$(($LOOP_TIMEOUT + 1))
+			fi	
+		done
+	else
+		if [ "$VERBOSE" = "yes" ]; then
+			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- Internet ist UP"
+		fi
+	fi
+	#internet check ends here
   
-	#check results and do something about it
+  
+	#sending too many pings! rewrite!
+	ping_vpn
 	if [ "$RET_PING" = "ERROR" ]; then
+		#connection is busted!
 		if [ "$FAIL_ACTION" = "failover" ]; then
 			echo -e "[\e[1;33m warning \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- VPN has failed - switching to backup."
+			
+			#VPN has completely failed. disable port forwarding and reset the firewall until this is fixed
+			/pia/pia-forward stop quite
+			#initiate a VPN switch
 			switch_vpn
-			echo -e "\tswitched"
+
 		else
 			/pia/pia-stop quite
 			/pia/pia-forward stop quite

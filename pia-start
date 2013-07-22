@@ -7,6 +7,9 @@
 LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
+source '/pia/include/functions.inc'
+PING_COMMAND="ping -qnw1c1 -I $IF_TUNNEL google.com 2>/dev/null | grep -c \"0% packet loss\""
+PING_COMMAND_INTERNET="ping -qnw1c1 -I $IF_EXT google.com 2>/dev/null | grep -c \"0% packet loss\""
 
 #show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
@@ -40,12 +43,25 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	fi
 
 
-	
-	#set iptables to something save until pia-fw is executed
-	/pia/pia-forward stop quite
+	#see if we have a tunnel open
+	ping_vpn
+	if [ "$RET_PING" = "OK" ]; then
+		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			" - closing current VPN tunnel."
+		/pia/pia-stop quite
+	else
+		#set iptables to something save until the tunnel is set up
+		/pia/pia-forward stop quite	
+	fi
 
-	echo -e "\ninitiating  VPN connection. see /pia/session.log for details"
+	
+	
+	echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+		"- establishing a VPN connection to $1."
+	echo -e "\tsee /pia/session.log for details"	
 	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
+
+	
 	
 
 	# start the FW script once the VPN is up and running

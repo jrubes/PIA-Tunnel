@@ -63,7 +63,7 @@ fi
 
 
 #print connection details
-echo
+echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is up!"
 echo 
 echo "External IP: $TUN_IP"
 if [ "$PORT_FW" = "enabled" ]; then

@@ -7,15 +7,17 @@ source '/pia/settings.conf'
 if [ "$1" = "start" ]; then
 	#this needs a loop to check if tun0 exists ... later
 	
-	echo "setting up iptables for forwarding"
-	/pia/include/fw-forward	
+	echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+		" - turning port forwarding ON"
+	/pia/include/fw-forward
 	exit
 fi
 
 
 if [ "$1" = "stop" ] || [ "$2" = "stop" ]; then
 	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
-		echo "disabeling port forwarding"
+		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			" - turning port forwarding OFF"
 	fi
 	/pia/include/fw-no-forward
 	exit
@@ -23,15 +25,20 @@ fi
 
 
 if [ "$1" = "fix" ]; then
-	echo "will attempt to stop any VPN tunnels and restart all network interfaces"
-	killall openvpn
+	echo -e "[\e[1;33m warning \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+		" - will attempt to stop any VPN tunnels and restart all network interfaces"
+
+	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
+		killall openvpn 2>/dev/null	
+		/pia/include/fw-no-forward
+		# restart networking to get default routes through eth0 working again
+		# service network restart #CentOS
+		ifdown eth0 && ifup eth0 #Debian
+	else
+		killall openvpn 2>/dev/null	
+		/pia/include/fw-no-forward
+		ifdown eth0 2>/dev/null	 && ifup eth0 2>/dev/null
+	fi
 	
-	/pia/include/fw-no-forward
-	
-	# restart networking to get default routes through eth0 working again
-	# service network restart #CentOS
-	ifdown eth0 && ifup eth0 #Debian
-	echo ""
-	echo "Done! Please try again."
-	exit
+	echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")" - Done! Please try again."
 fi

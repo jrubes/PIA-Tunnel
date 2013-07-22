@@ -4,14 +4,31 @@ export LANG
 
 #return variables for functions
 RET_PING=""
+RET_PING_INTERNET=""
 
 #function to ping through the current VPN connection
 function ping_vpn() {
   TUNNEL_PING=`eval $PING_COMMAND`
-  if [ "$TUNNEL_PING" -eq 1 ]; then
+  #echo $PING_COMMAND
+  if [ "$TUNNEL_PING" = "1" ]; then
     RET_PING="OK"
+	#echo "OK: $TUNNEL_PING---"
   else
     RET_PING="ERROR"
+	#echo "Er: $TUNNEL_PING---"
+  fi  
+}
+
+#function to ping through the external interface
+function ping_internet() {
+  EXT_PING=`eval $PING_COMMAND_INTERNET`
+  #echo $PING_COMMAND_INTERNET
+  if [ "$EXT_PING" = "1" ]; then
+    RET_PING_INTERNET="OK"
+	#echo "OK: $RET_PING_INTERNET---"
+  else
+    RET_PING_INTERNET="ERROR"
+	#echo "Er: $RET_PING_INTERNET---"
   fi  
 }
 
@@ -21,7 +38,8 @@ function switch_vpn() {
 	do
 		if [ "$VERBOSE" = "yes" ]; then
 			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"- establishing a VPN connection to $CONN. see /pia/session.log for details"
+				"- establishing a VPN connection to $CONN."
+			echo -e "\tsee /pia/session.log for details"
 			killall openvpn &> /dev/null
 			openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/session.log &	
 		fi
@@ -31,17 +49,16 @@ function switch_vpn() {
 		while true; do
 			ping_vpn
 			if [ "$RET_PING" = "OK" ]; then
-				echo "ping OK - return"
+				echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+					"- VPN connection established to $CONN"	
+				/pia/pia-forward start
 				return
 			fi
 			
 			#endless loop protect, about 1ß seconds
 			if [ "$LOOP_PROTECT" -eq 10 ]; then
-				echo -e "[\e[1;31m error \e[0m] unable to connect to $CONN. will try next target"
 				killall openvpn 2>/dev/null
 				/pia/pia-forward stop quite
-				
-				echo "over loop - break"
 				break
 			else
 				sleep 1
@@ -55,6 +72,6 @@ function switch_vpn() {
  
 	echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- unable to connect to any backup connection."
-	echo -e "\twill try again in 5 minutes." 
-	sleep 320
+	echo -e "\twill try again in $SLEEP_RECONNECT_ERROR seconds." 
+	sleep $SLEEP_RECONNECT_ERROR
 }
