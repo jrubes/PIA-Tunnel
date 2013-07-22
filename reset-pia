@@ -18,6 +18,7 @@ cd /tmp/ ; rm -rf *
 find /var/log -type f -delete
 
 #delete and recreate dhcpd cache files
+service isc-dhcp-server stop
 cd /var/lib/dhcp/ ; rm -f *.leases
 cd /var/lib/dhcp/ ; rm -f *.leases~
 cd /var/lib/dhcp/ ; touch dhcpd.leases
