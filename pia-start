@@ -6,6 +6,7 @@
 
 LANG=en_US.UTF-8
 export LANG
+source '/pia/settings.conf'
 
 #show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ]; then
@@ -49,7 +50,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	# start the FW script once the VPN is up and running
 	LOOP_PROTECT=0
 	while true; do
-	  TUNNEL_PING=`ping -qnw1c1 -I tun0 google.com 2>/dev/null | grep -c "0% packet loss"`
+	  TUNNEL_PING=`ping -qnw1c1 -I $IF_TUNNEL google.com 2>/dev/null | grep -c "0% packet loss"`
 	  if [ "$TUNNEL_PING" -eq 1 ]; then
 	    /pia/pia-forward start
 	    /pia/pia-status
@@ -57,9 +58,9 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	  fi
 	  sleep 1
 	  
-	  #endless loop protect, about 60 seconds
+	  #endless loop protect, about 30 seconds
 	  LOOP_PROTECT=$(($LOOP_PROTECT + 1))
-	  if [ "$LOOP_PROTECT" -eq 60 ]; then
+	  if [ "$LOOP_PROTECT" -eq 30 ]; then
 	    echo "unable to establish a tunnel. please check /pia/session.log for details"
 	    killall openvpn 2>/dev/null
 	    /pia/pia-forward stop quite
