@@ -36,7 +36,7 @@ do
 done
 
 #handle files in include, these don't get /bin/ links
-FILES="fw-forward fw-no-forward settings.inc"
+FILES="fw-forward fw-no-forward functions.inc"
 for f in $FILES
 do
 	chmod u+x "/pia/include/$f"
