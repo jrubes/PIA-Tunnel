@@ -45,8 +45,8 @@ SLEEP_RECONNECT_ERROR=320
 
 # time (seconds) in between "uptime" checks. every check will send a few pings
 # to some server so please don't flood them or they may block you
-# default 30
-SLEEP_MAIN_LOOP=30
+# default 60
+SLEEP_MAIN_LOOP=60
 
 
 
