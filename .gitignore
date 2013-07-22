@@ -1,2 +1,4 @@
 /login.conf
 /settings.conf
+/session.log
+/client_id
