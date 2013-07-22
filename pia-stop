@@ -5,7 +5,7 @@
 LANG=en_US.UTF-8
 export LANG
 
-killall openvpn
+killall openvpn 2>/dev/null
 
 #disable forwarding
 /pia/pia-forward stop

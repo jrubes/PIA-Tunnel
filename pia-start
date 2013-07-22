@@ -42,11 +42,28 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	#set iptables to something save until pia-fw is executed
 	/pia/pia-forward stop
 
-	
 	echo "initiating  VPN connection. see /pia/session.log for details"
 	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
 	
-	sleep 5
-	/pia/pia-forward start
-	/pia/pia-status
+
+	# start the FW script once the VPN is up and running
+	LOOP_PROTECT=0
+	while true; do
+	  TUNNEL_PING=`ping -qnw1c1 -I tun0 google.com 2>/dev/null | grep -c "0% packet loss"`
+	  if [ "$TUNNEL_PING" -eq 1 ]; then
+	    /pia/pia-forward start
+	    /pia/pia-status
+	    break
+	  fi
+	  sleep 1
+	  
+	  #endless loop protect, about 60 seconds
+	  LOOP_PROTECT=$(($LOOP_PROTECT + 1))
+	  if [ "$LOOP_PROTECT" -eq 60 ]; then
+	    echo "unable to establish a tunnel. please check /pia/session.log for details"
+	    killall openvpn 2>/dev/null
+	    /pia/pia-forward stop quite
+	    exit
+	  fi
+	done
 fi
