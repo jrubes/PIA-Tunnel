@@ -73,7 +73,7 @@ while true; do
   
   fi
   
-
-  echo "looping"
+  echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%S")\
+			" - VPN is up - next check in $PING_INTERVAL seconds..."
   sleep $PING_INTERVAL
 done
