@@ -13,7 +13,6 @@ echo "WARNING: pia-daemon is not done yet and may do unexpected things!"
 # *) this daemon script is startet which will send one ping every n seconds through the tunnel
 # 	if the ping fails n times the tunnel is closed or restartet
 
-
 # list of VPN connections to use, the first is awlays the primary
 MYVPN[0]="Germany"
 MYVPN[1]="Sweden"
@@ -29,7 +28,8 @@ FAIL_RETRY_DELAY=2
 PING_INTERVAL=60
 PING_COMMAND="ping -qnw1c1 -I $IF_TUNNEL google.com 2>/dev/null | grep -c \"0% packet loss\""
 
-
+# setting verbose to yes will print status notification after each check. any other settings for "background mode"
+VERBOSE="yes"
 
 
 
@@ -42,38 +42,41 @@ PING_COMMAND="ping -qnw1c1 -I $IF_TUNNEL google.com 2>/dev/null | grep -c \"0% p
 # this is the outer endless loop #
 ##################################
 while true; do
-  #set proper values fro every run
-  RET_PING=""
+	#set proper values fro every run
+	RET_PING=""
 
   
-  ping_vpn
-  if [ "$RET_PING" = "ERROR" ]; then
-    #connection has failed
-    for (( x=1 ; x <= FAIL_RETRY ; x++ ))
-    do
-	# ping again
 	ping_vpn
-	if [ "$RET_PING" = "OK" ]; then
-	  #ping worked this time, back to normal
-	  break
+	if [ "$RET_PING" = "ERROR" ]; then
+		#connection has failed
+		for (( x=1 ; x <= FAIL_RETRY ; x++ ))
+		do
+			# ping again
+			ping_vpn
+			if [ "$RET_PING" = "OK" ]; then
+				#ping worked this time, back to normal
+				break
+			fi
+		done
 	fi
-    done
-  fi
   
-  #check results and do something about it
-  if [ "$RET_PING" = "ERROR" ]; then
-    if [ "$FAIL_ACTION" = "failover" ]; then
-      echo "VPN tunnel has failed - switching to backup."
-      switch_vpn
-    else
-      #/pia/pia-stop
-      #/pia/pia-forward stop quite
-      echo "VPN tunnel has failed - connection terminated!"
-    fi
+	#check results and do something about it
+	if [ "$RET_PING" = "ERROR" ]; then
+		if [ "$FAIL_ACTION" = "failover" ]; then
+			echo -e "[\e[1;33m warning \e[0m] "$(date +"%Y-%m-%d %H:%S")\
+				" - VPN tunnel has failed - switching to backup."
+			switch_vpn
+		else
+			#/pia/pia-stop
+			#/pia/pia-forward stop quite
+			echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%S")\
+				" - VPN tunnel has failed - connection terminated and forwarding disabled!"
+		fi
+	fi
   
-  fi
-  
-  echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%S")\
+	if [ "$VERBOSE" = "yes" ]; then
+		echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%S")\
 			" - VPN is up - next check in $PING_INTERVAL seconds..."
+	fi
   sleep $PING_INTERVAL
 done
