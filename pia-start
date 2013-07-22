@@ -9,7 +9,7 @@ export LANG
 source '/pia/settings.conf'
 
 #show usage
-if [ "$1" = "list" ] || [ $# -eq 0 ]; then
+if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
 	LIST=`ls -1 /pia/ovpn/ | gawk -F"." '{print $1}'`
 	
 	echo
@@ -40,31 +40,35 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	fi
 
 
+	
 	#set iptables to something save until pia-fw is executed
 	/pia/pia-forward stop quite
 
-	echo "initiating  VPN connection. see /pia/session.log for details"
+	echo -e "\ninitiating  VPN connection. see /pia/session.log for details"
 	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
 	
 
 	# start the FW script once the VPN is up and running
 	LOOP_PROTECT=0
 	while true; do
-	  TUNNEL_PING=`ping -qnw1c1 -I $IF_TUNNEL google.com 2>/dev/null | grep -c "0% packet loss"`
-	  if [ "$TUNNEL_PING" -eq 1 ]; then
+	  ping_vpn
+	  if [ "$RET_PING" = "OK" ]; then
 	    /pia/pia-forward start
 	    /pia/pia-status
 	    break
 	  fi
-	  sleep 1
+	  
 	  
 	  #endless loop protect, about 30 seconds
-	  LOOP_PROTECT=$(($LOOP_PROTECT + 1))
 	  if [ "$LOOP_PROTECT" -eq 30 ]; then
-	    echo "unable to establish a tunnel. please check /pia/session.log for details"
+		echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- VPN connection error - please check /pia/session.log for details."
 	    killall openvpn 2>/dev/null
 	    /pia/pia-forward stop quite
 	    exit
+	  else
+		sleep 1
+		LOOP_PROTECT=$(($LOOP_PROTECT + 1))
 	  fi
 	done
 fi
