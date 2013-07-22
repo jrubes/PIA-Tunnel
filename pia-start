@@ -8,8 +8,7 @@ LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
 source '/pia/include/functions.inc'
-PING_COMMAND="ping -qnw1c1 -I $IF_TUNNEL google.com 2>/dev/null | grep -c \"0% packet loss\""
-PING_COMMAND_INTERNET="ping -qnw1c1 -I $IF_EXT google.com 2>/dev/null | grep -c \"0% packet loss\""
+
 
 #show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
