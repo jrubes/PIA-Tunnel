@@ -67,7 +67,7 @@ function ping_host() {
     PING_COMMAND_INTERNET=`echo "$PING_COMMAND_INTERNET" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
     PING_RESULT=`eval $PING_COMMAND_INTERNET`
   else
-    $PING_COMMAND_VPN=`echo "$PING_COMMAND_VPN" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
+    PING_COMMAND_VPN=`echo "$PING_COMMAND_VPN" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
     PING_RESULT=`eval $PING_COMMAND_VPN`
   fi
 
