@@ -9,6 +9,8 @@ export LANG
 source '/pia/settings.conf'
 source '/pia/include/functions.inc'
 
+# generate a few IPs for the uptime functions
+gen_ip_list
 
 #show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
@@ -43,8 +45,8 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 
 
 	#see if we have a tunnel open
-	ping_vpn
-	if [ "$RET_PING" = "OK" ]; then
+	ping_host "vpn"
+	if [ "$RET_PING_HOST" = "OK" ]; then
 		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
 			" - closing current VPN tunnel."
 		/pia/pia-stop quite
@@ -66,8 +68,8 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	# start the FW script once the VPN is up and running
 	LOOP_PROTECT=0
 	while true; do
-	  ping_vpn
-	  if [ "$RET_PING" = "OK" ]; then
+	  ping_host "vpn"
+	  if [ "$RET_PING_HOST" = "OK" ]; then
 	    /pia/pia-forward start
 	    /pia/pia-status
 	    break

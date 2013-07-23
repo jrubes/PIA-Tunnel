@@ -55,14 +55,14 @@ function ping_internet() {
 # $s2 the IP or Domain to ping
 function ping_host() {
 
-	if [ "$2" = "" ]; then
+	if [ "$2" != "" ]; then
+		host_ip="$2"
+	else
 		#pick one IP from $PING_IP_LIST[] to be used this time
 		ip_count=${#PING_IP_LIST[@]}
 		ip_count=$(($ip_count - 1)) #zero based
 		rand=$[ ( $RANDOM % $ip_count )  + 1 ]
 		host_ip=${PING_IP_LIST[$rand]}
-	else
-		host_ip="$2"
 	fi
   
     
@@ -71,7 +71,7 @@ function ping_host() {
     pingthis=`echo "$PING_COMMAND_INTERNET" | sed -e "s/8.8.8.8/$host_ip/g"`
     PING_RESULT=`eval $pingthis`
   else
-    pingthis=`echo "$pingthis" | sed -e "s/8.8.8.8/$host_ip/g"`
+    pingthis=`echo "$PING_COMMAND_VPN" | sed -e "s/8.8.8.8/$host_ip/g"`
     PING_RESULT=`eval $pingthis`
   fi
 
