@@ -1,0 +1,33 @@
+#!/bin/bash
+# script to generate a list of IPs to be used when pinging
+LANG=en_US.UTF-8
+export LANG
+source '/pia/settings.conf'
+source '/pia/include/functions.inc'
+
+HOSTS="google.com microsoft.com apple.com bing.com amazon.com"
+HOSTS="$HOSTS startpage.com icann.org wikipedia.org internic.net"
+HOSTS="$HOSTS youtube.com wordpress.com amazon.co.uk digg.com google.de"
+HOSTS="$HOSTS cnn.com msn.com ebay.co.uk ebay.de gnu.org live.com"
+HOSTS="$HOSTS amazon.de amazon.co.jp weather.com whitehouse.gov"
+HOSTS="$HOSTS siegel.de thetimes.co.uk nytimes.com"
+
+
+VERBOSE="yes"
+
+#loop over list above and get dig A for each one
+for h in $HOSTS
+do
+
+  #get list of IPs in the domain's A record
+  RET_DIG=`dig "$h" +short A`
+
+  #see if the domain can be pinged
+  ping_host "internet" "$h"
+  if [ "$RET_PING_HOST" = "OK" ]; then
+    #can ping hos
+  
+  fi
+  
+
+done

@@ -2,3 +2,5 @@
 
 # add line as root with crontab -e
 0 6/* * * * ntpd -q > /dev/null
+
+apt-get install dnsutils isc-dhcp-server

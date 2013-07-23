@@ -3,9 +3,11 @@ LANG=en_US.UTF-8
 export LANG
 
 #return variables and static stuff
+RET_PING_HOST=""
 RET_PING_VPN=""
 RET_PING_INTERNET=""
 PING_COMMAND="ping -qnw3c1 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
+PING_COMMAND_VPN="ping -qnw3c1 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
 PING_COMMAND_INTERNET="ping -qnw2c1 -I $IF_EXT 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
 
 #function to ping through the current VPN connection
@@ -41,6 +43,29 @@ function ping_internet() {
   fi  
 }
 
+# new ping function for pinging internet hosts
+# $s1 is either "internet" or "vpn"
+# $s2 the IP or Domain to ping
+function ping_host() {
+  if [ "$1" = "internet" ]; then
+    PING_RESULT=`eval $PING_COMMAND_INTERNET`
+  else
+    PING_RESULT=`eval $PING_COMMAND_VPN`
+  fi
+
+  if [ "$PING_RESULT" = "1" ]; then
+    RET_PING_HOST="OK"
+    #echo "OK: $RET_PING_INTERNET---"
+  else
+    RET_PING_HOST="ERROR"
+    if [ "$VERBOSE" = "yes" ]; then
+      echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+	      "- ping failed!"
+    fi
+  fi      
+
+}
+
 #function to handle switching of failover connections by using the MYVPN array
 function switch_vpn() {
 	for CONN in "${MYVPN[@]}"
@@ -59,7 +84,7 @@ function switch_vpn() {
 			ping_vpn
 			if [ "$RET_PING_VPN" = "OK" ]; then
 				echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-					"- VPN connection established to $CONN"	
+					"- VPN connection established to $CONN"
 				/pia/pia-forward start
 				return
 			fi
