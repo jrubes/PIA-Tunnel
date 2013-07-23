@@ -27,7 +27,7 @@ fi
 
 #check ip cache
 if [ ! -f "/pia/include/ip_list.txt" ]; then
-	apt-get install dnsutils > /dev/null
+	apt-get -y install dnsutils > /dev/null
 	/pia/dev_scripts/build_ping_list
 fi
 
