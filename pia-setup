@@ -30,12 +30,6 @@ if [ ! -f "/pia/settings.conf" ]; then
 	echo '' >> '/pia/settings.conf'
 fi
 
-#check ip cache
-if [ ! -f "/pia/include/ip_list.txt" ]; then
-	echo "Your ip_list.txt does not exist yet/anymore. rebuilding .... this may take a few minutes"
-	/pia/include/build_ping_list
-fi
-
 FILES="pia-start pia-stop pia-status pia-update pia-setup pia-forward  pia-prepare-ovpn pia-daemon"
 for f in $FILES
 do
@@ -47,7 +41,7 @@ do
 done
 
 #handle files in include, these don't get /bin/ links
-FILES="fw-forward fw-no-forward functions.inc"
+FILES="fw-forward fw-no-forward functions.inc build_ping_list"
 for f in $FILES
 do
 	chmod u+x "/pia/include/$f"
@@ -55,7 +49,11 @@ done
 
 
 
-
+#check ip cache
+if [ ! -f "/pia/include/ip_list.txt" ]; then
+	echo "Your ip_list.txt does not exist yet/anymore. rebuilding .... this may take a few minutes"
+	/pia/include/build_ping_list
+fi
 
 
 
