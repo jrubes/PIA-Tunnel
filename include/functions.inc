@@ -57,21 +57,21 @@ function ping_host() {
 
 	if [ "$2" = "" ]; then
 		#pick one IP from $PING_IP_LIST[] to be used this time
-		IP_COUNT=${#PING_IP_LIST[@]}
-		IP_COUNT=$(($IP_COUNT - 1)) #zero based
-		RAND=$[ ( $RANDOM % $IP_COUNT )  + 1 ]
-		PING_HOST_IP=${PING_IP_LIST[$RAND]}
+		ip_count=${#PING_IP_LIST[@]}
+		ip_count=$(($ip_count - 1)) #zero based
+		rand=$[ ( $RANDOM % $ip_count )  + 1 ]
+		host_ip=${PING_IP_LIST[$rand]}
 	else
-		PING_HOST_IP="$2"
+		host_ip="$2"
 	fi
   
     
   if [ "$1" = "internet" ]; then
-    #replace IP in $PING_COMMAND with $PING_HOST_IP
-    pingthis=`echo "$PING_COMMAND_INTERNET" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
+    #replace IP in $PING_COMMAND with $host_ip
+    pingthis=`echo "$PING_COMMAND_INTERNET" | sed -e "s/8.8.8.8/$host_ip/g"`
     PING_RESULT=`eval $pingthis`
   else
-    pingthis=`echo "$pingthis" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
+    pingthis=`echo "$pingthis" | sed -e "s/8.8.8.8/$host_ip/g"`
     PING_RESULT=`eval $pingthis`
   fi
 
@@ -82,7 +82,7 @@ function ping_host() {
     RET_PING_HOST="ERROR"
     if [ "$VERBOSE" = "yes" ]; then
       echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-	      "- ping failed!"
+	      "- ping failed $host_ip!"
     fi
   fi      
 
@@ -104,7 +104,7 @@ function gen_ip_list() {
     THIS_MANY=20
   fi
   #read list of IPs into IP_LIST array
-  IFS=$'\r\n' IP_LIST=($(cat "/pia/include/ip_list.txt"))
+  IFS=$'\r\n' IP_LIST=($(cat "/pia/include/ip_list.txt" | tail -n+2))
   #get array length
   IP_COUNT=${#IP_LIST[@]}
   IP_COUNT=$(($IP_COUNT - 1)) #zero based
