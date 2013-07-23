@@ -65,6 +65,7 @@ function ping_host() {
   if [ "$1" = "internet" ]; then
     #replace IP in $PING_COMMAND with $PING_HOST_IP
     PING_COMMAND_INTERNET=`echo "$PING_COMMAND_INTERNET" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
+	echo "$PING_COMMAND_INTERNET";
     PING_RESULT=`eval $PING_COMMAND_INTERNET`
   else
     PING_COMMAND_VPN=`echo "$PING_COMMAND_VPN" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
