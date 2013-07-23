@@ -25,6 +25,11 @@ if [ ! -f "/pia/settings.conf" ]; then
 	echo '' >> '/pia/settings.conf'
 fi
 
+#check ip cache
+if [ ! -f "/pia/include/ip_list.txt" ]; then
+	/pia/dev_scripts/build_ping_list
+fi
+
 FILES="pia-start pia-stop pia-status pia-update pia-setup pia-forward  pia-prepare-ovpn pia-daemon"
 for f in $FILES
 do

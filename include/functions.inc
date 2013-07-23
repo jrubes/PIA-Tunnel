@@ -88,6 +88,12 @@ function ping_host() {
 # and store them for later in $PING_IP_LIST[]
 function gen_ip_list() {
 
+	if [ ! -f "/pia/include/ip_list.txt" ]; then
+		echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+		  "\"/pia/include/ip_list.txt\" does not exist. Please run pia-setup first"
+		exit
+	fi
+
   if [ ! "$1" = "" ]; then
     THIS_MANY=$1
   else
