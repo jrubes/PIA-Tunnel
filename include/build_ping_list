@@ -43,6 +43,8 @@ else
       "\"$IPCACHE\" is not writable?!?"
     exit
   fi
+  #remove the empty file so aborting the process will not keep an empty file around
+  rm -f "$IPCACHE" 2> /dev/null
 fi
 
 
