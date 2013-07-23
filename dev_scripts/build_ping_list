@@ -12,22 +12,86 @@ HOSTS="$HOSTS cnn.com msn.com ebay.co.uk ebay.de gnu.org live.com"
 HOSTS="$HOSTS amazon.de amazon.co.jp weather.com whitehouse.gov"
 HOSTS="$HOSTS siegel.de thetimes.co.uk nytimes.com"
 
+#will contain a list of IPs that can be pinged
+# source is the A record for the hosts listed above
+IPS=""
 
+#used for debug in this script
 VERBOSE="yes"
+
+IPCACHE="/pia/include/ip_list.txt"
+
+#gen_ip_list
+#ping_host "internet"
+#exit
+
+#check if the IP cache is writable. no point in running if it is not
+if [ -f "$IPCACHE" ]; then
+  if [ ! -w "$IPCACHE" ]; then
+    echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "$IPCACHE is not writable?!?"
+    exit
+  fi
+else
+  touch "$IPCACHE" 2> /dev/null
+  #check exit status 
+  if [ "$?" = "1" ]; then
+    echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "\"$IPCACHE\" is not writable?!?"
+    exit
+  else
+    echo "$?"
+  fi
+fi
+
 
 #loop over list above and get dig A for each one
 for h in $HOSTS
 do
 
+  echo "Checking $h"
+
   #get list of IPs in the domain's A record
   RET_DIG=`dig "$h" +short A`
-
-  #see if the domain can be pinged
-  ping_host "internet" "$h"
-  if [ "$RET_PING_HOST" = "OK" ]; then
-    #can ping hos
-  
-  fi
-  
+  for ip in $RET_DIG
+  do
+    #$ip should now contain one of the records from 'dig'
+    # ping each one and store them if they respond
+    for (( x=0 ; x < 20 ; x++ ))
+    do
+      # ping each host multiple times to ensure they are reliable
+      ping_host "internet" "$ip"
+      if [ "$RET_PING_HOST" = "ERROR" ]; then
+	echo "host failed after $x tests"
+	break #stop on first sign of trouble
+      fi
+    done
+    
+    # or store if the IP is "good"
+    if [ "$RET_PING_HOST" = "OK" ]; then
+      IPS="$IPS $ip"
+    fi
+  done
 
 done
+
+# IPS is now a string over IPs separated by space
+# loop over and write to /pia/include/ip_list.txt
+echo "# generated on "$(date +"%Y-%m-%d %H:%M:%S") > "$IPCACHE"
+COUNT=0
+for ip in $IPS
+do
+  echo "$ip" >> "$IPCACHE"
+  COUNT=$((COUNT + 1))
+done
+
+
+echo "stored $COUNT IPs in ip_list.txt"
+echo "testing list by getting 10 random IPs"
+#testing the generated ping list
+gen_ip_list 10
+for ip in ${PING_IP_LIST[@]}
+do
+  echo "  $ip"
+done
+  

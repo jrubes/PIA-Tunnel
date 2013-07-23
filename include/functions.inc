@@ -6,9 +6,16 @@ export LANG
 RET_PING_HOST=""
 RET_PING_VPN=""
 RET_PING_INTERNET=""
-PING_COMMAND="ping -qnw3c1 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
-PING_COMMAND_VPN="ping -qnw3c1 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
-PING_COMMAND_INTERNET="ping -qnw2c1 -I $IF_EXT 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
+PING_COMMAND="ping -qn -w 3 -c 1 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
+PING_COMMAND_VPN="ping -qn -w 3 -c 1 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
+PING_COMMAND_INTERNET="ping -qn -w 2 -c 1 -I $IF_EXT 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
+
+# fallback list
+PING_IP_LIST[0]="8.8.8.8"
+PING_IP_LIST[1]="8.8.4.4"
+PING_IP_LIST[2]="208.67.222.222"
+PING_IP_LIST[3]="208.67.220.220"
+
 
 #function to ping through the current VPN connection
 function ping_vpn() {
@@ -47,9 +54,20 @@ function ping_internet() {
 # $s1 is either "internet" or "vpn"
 # $s2 the IP or Domain to ping
 function ping_host() {
+
+  #pick one IP from $PING_IP_LIST[] to be used this time
+  IP_COUNT=${#PING_IP_LIST[@]}
+  IP_COUNT=$(($IP_COUNT - 1)) #zero based
+  RAND=$[ ( $RANDOM % $IP_COUNT )  + 1 ]
+  PING_HOST_IP=${PING_IP_LIST[$RAND]}
+  
+    
   if [ "$1" = "internet" ]; then
+    #replace IP in $PING_COMMAND with $PING_HOST_IP
+    PING_COMMAND_INTERNET=`echo "$PING_COMMAND_INTERNET" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
     PING_RESULT=`eval $PING_COMMAND_INTERNET`
   else
+    $PING_COMMAND_VPN=`echo "$PING_COMMAND_VPN" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
     PING_RESULT=`eval $PING_COMMAND_VPN`
   fi
 
@@ -64,6 +82,84 @@ function ping_host() {
     fi
   fi      
 
+}
+
+#function to grab a few IPs from /pia/include/ip_list.txt
+# and store them for later in $PING_IP_LIST[]
+function gen_ip_list() {
+
+  if [ ! "$1" = "" ]; then
+    THIS_MANY=$1
+  else
+    THIS_MANY=20
+  fi
+  #read list of IPs into IP_LIST array
+  IFS=$'\r\n' IP_LIST=($(cat "/pia/include/ip_list.txt"))
+  #get array length
+  IP_COUNT=${#IP_LIST[@]}
+  IP_COUNT=$(($IP_COUNT - 1)) #zero based
+
+  #get THIS_MANY random numbers
+  PING_INDEX=0
+  LOOP_PROTECT=0
+  while true; do
+  #for (( x=0 ; x < $THIS_MANY ; x++ ))
+    AINDEX=$[ ( $RANDOM % $IP_COUNT )  + 1 ]
+    
+    #have indexes now, get the IP for it
+    is_ip_unique ${IP_LIST[$AINDEX]}
+    if [ "$RET_IP_UNIQUE" = "yes" ]; then
+      #IP is unqieu store it!
+      PING_IP_LIST[$PING_INDEX]=${IP_LIST[$AINDEX]}
+      PING_INDEX=$(($PING_INDEX + 1))
+    fi
+    
+    if [ "$PING_INDEX" = "$THIS_MANY" ]; then
+      break # collected enough IPs
+    fi
+    
+    #endless loop protect,
+    if [ "$LOOP_PROTECT" -eq 1000 ]; then
+      echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	      "- unable to select the requestd number of IPs ($THIS_MANY) - tried $LOOP_PROTECT times"
+      break
+    else
+      LOOP_PROTECT=$(($LOOP_PROTECT + 1))
+    fi
+  done
+  
+  # final check
+  if [ "${#PING_IP_LIST[@]}" = "0" ]; then
+      echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	      "- FATAL - PING_IP_LIST is empty. must terminate!"
+      exit
+  fi
+  
+  # $PING_IP_LIST[] now contains a few IPs which may 
+  # be used by other functions  
+}
+
+# checks if $1 is found in the PING_IP_LIST array
+# sets $RET_IP_UNIQUE to "yes" if unique
+function is_ip_unique() {
+
+  if [ "$1" = "" ]; then
+    RET_IP_UNIQUE="no"
+    #echo "debug - not unique $1"
+    return
+  fi
+  
+  for ip in ${PING_IP_LIST[@]}
+  do
+    if [ "$ip" = "$1" ]; then
+      RET_IP_UNIQUE="no"
+      #echo "debug - not unique $1"
+      return
+    fi
+  
+  done
+  
+  RET_IP_UNIQUE="yes"
 }
 
 #function to handle switching of failover connections by using the MYVPN array
