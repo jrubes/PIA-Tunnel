@@ -36,8 +36,6 @@ else
     echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
       "\"$IPCACHE\" is not writable?!?"
     exit
-  else
-    echo "$?"
   fi
 fi
 
