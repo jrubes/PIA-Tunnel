@@ -4,6 +4,11 @@
 LANG=en_US.UTF-8
 export LANG
 
+# the ping functions now require dig
+if [ ! -f "/usr/bin/dig" ]; then
+	apt-get -y install dnsutils > /dev/null
+fi
+
 #create a new login.conf if none exists
 if [ ! -f '/pia/login.conf' ]; then
 	echo "your PIA account name on this line" > '/pia/login.conf'
@@ -27,8 +32,8 @@ fi
 
 #check ip cache
 if [ ! -f "/pia/include/ip_list.txt" ]; then
-	apt-get -y install dnsutils > /dev/null
-	/pia/dev_scripts/build_ping_list
+	echo "Your ip_list.txt does not exist yet/anymore. rebuilding .... this may take a few minutes"
+	/pia/include/build_ping_list
 fi
 
 FILES="pia-start pia-stop pia-status pia-update pia-setup pia-forward  pia-prepare-ovpn pia-daemon"
