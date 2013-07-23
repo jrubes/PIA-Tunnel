@@ -50,7 +50,8 @@ fi
 for h in $HOSTS
 do
 
-  echo "Checking $h"
+  echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+	"- Checking IPs from $h ...."
 
   #get list of IPs in the domain's A record
   RET_DIG=`dig "$h" +short A`
