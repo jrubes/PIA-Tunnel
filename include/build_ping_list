@@ -52,13 +52,14 @@ do
   do
     #$ip should now contain one of the records from 'dig'
     # ping each one and store them if they respond
-    for (( x=0 ; x < 20 ; x++ ))
+    for (( x=0 ; x < 40 ; x++ ))
     do
       # ping each host multiple times to ensure they are reliable
       ping_host "internet" "$ip"
       if [ "$RET_PING_HOST" = "ERROR" ]; then
-	echo "host failed after $x tests"
-	break #stop on first sign of trouble
+		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"ping failed on $x/40 attempts. excluding ip"
+		break #stop on first sign of trouble
       fi
     done
     

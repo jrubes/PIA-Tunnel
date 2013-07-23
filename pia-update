@@ -8,4 +8,6 @@ cd /pia/
 git pull origin
 
 #run pia-setup to fix permissions from git pull
+echo
+echo
 /pia/pia-setup
