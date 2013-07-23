@@ -21,9 +21,6 @@ VERBOSE="yes"
 
 IPCACHE="/pia/include/ip_list.txt"
 
-#gen_ip_list
-#ping_host "internet"
-#exit
 
 #check if the IP cache is writable. no point in running if it is not
 if [ -f "$IPCACHE" ]; then
