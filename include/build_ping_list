@@ -58,7 +58,7 @@ do
       ping_host "internet" "$ip"
       if [ "$RET_PING_HOST" = "ERROR" ]; then
 		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"ping failed on $x/40 attempts. excluding ip"
+			"- ping failed on $x/40 attempts. excluding ip"
 		break #stop on first sign of trouble
       fi
     done
