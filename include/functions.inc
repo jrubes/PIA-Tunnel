@@ -55,21 +55,24 @@ function ping_internet() {
 # $s2 the IP or Domain to ping
 function ping_host() {
 
-  #pick one IP from $PING_IP_LIST[] to be used this time
-  IP_COUNT=${#PING_IP_LIST[@]}
-  IP_COUNT=$(($IP_COUNT - 1)) #zero based
-  RAND=$[ ( $RANDOM % $IP_COUNT )  + 1 ]
-  PING_HOST_IP=${PING_IP_LIST[$RAND]}
+	if [ "$2" = "" ]; then
+		#pick one IP from $PING_IP_LIST[] to be used this time
+		IP_COUNT=${#PING_IP_LIST[@]}
+		IP_COUNT=$(($IP_COUNT - 1)) #zero based
+		RAND=$[ ( $RANDOM % $IP_COUNT )  + 1 ]
+		PING_HOST_IP=${PING_IP_LIST[$RAND]}
+	else
+		PING_HOST_IP="$2"
+	fi
   
     
   if [ "$1" = "internet" ]; then
     #replace IP in $PING_COMMAND with $PING_HOST_IP
-    PING_COMMAND_INTERNET=`echo "$PING_COMMAND_INTERNET" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
-	echo "$PING_COMMAND_INTERNET";
-    PING_RESULT=`eval $PING_COMMAND_INTERNET`
+    pingthis=`echo "$PING_COMMAND_INTERNET" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
+    PING_RESULT=`eval $pingthis`
   else
-    PING_COMMAND_VPN=`echo "$PING_COMMAND_VPN" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
-    PING_RESULT=`eval $PING_COMMAND_VPN`
+    pingthis=`echo "$pingthis" | sed -e "s/8.8.8.8/$PING_HOST_IP/g"`
+    PING_RESULT=`eval $pingthis`
   fi
 
   if [ "$PING_RESULT" = "1" ]; then
