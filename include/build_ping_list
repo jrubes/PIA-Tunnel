@@ -5,12 +5,18 @@ export LANG
 source '/pia/settings.conf'
 source '/pia/include/functions.inc'
 
-HOSTS="google.com microsoft.com apple.com bing.com amazon.com"
+HOSTS="google.com google.degoogle.co.uk google.co.jp"
 HOSTS="$HOSTS startpage.com icann.org wikipedia.org internic.net"
-HOSTS="$HOSTS youtube.com wordpress.com amazon.co.uk digg.com google.de"
-HOSTS="$HOSTS cnn.com msn.com ebay.co.uk ebay.de gnu.org live.com"
-HOSTS="$HOSTS amazon.de amazon.co.jp weather.com whitehouse.gov"
-HOSTS="$HOSTS siegel.de thetimes.co.uk nytimes.com"
+HOSTS="$HOSTS wordpress.com digg.com"
+HOSTS="$HOSTS cnn.com msn.com gnu.org live.com"
+HOSTS="$HOSTS weather.com whitehouse.gov"
+HOSTS="$HOSTS spiegel.de thetimes.co.uk nytimes.com"
+HOSTS="$HOSTS amazon.com amazon.de amazon.co.uk amazon.co.jp"
+HOSTS="$HOSTS youtube.com youtube.de youtube.co.uk youtube.co.jp"
+HOSTS="$HOSTS apple.com apple.de apple.co.uk apple.co.jp"
+HOSTS="$HOSTS bing.com bing.de bing.co.uk bing.co.jp"
+HOSTS="$HOSTS microsoft.com microsoft.de microsoft.co.uk microsoft.co.jp"
+HOSTS="$HOSTS ebay.com ebay.de ebay.co.uk ebay.co.jp"
 
 #will contain a list of IPs that can be pinged
 # source is the A record for the hosts listed above
