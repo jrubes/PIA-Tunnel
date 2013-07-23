@@ -5,7 +5,7 @@ export LANG
 source '/pia/settings.conf'
 source '/pia/include/functions.inc'
 
-HOSTS="google.com google.degoogle.co.uk google.co.jp"
+HOSTS="google.com google.de google.co.uk google.co.jp"
 HOSTS="$HOSTS startpage.com icann.org wikipedia.org internic.net"
 HOSTS="$HOSTS wordpress.com digg.com"
 HOSTS="$HOSTS cnn.com msn.com gnu.org live.com"
@@ -54,6 +54,12 @@ do
 
   #get list of IPs in the domain's A record
   RET_DIG=`dig "$h" +short A`
+  if [ "$?" = "1" ]; then
+	echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+	"- dig failed with $RET_DIG"
+	RET_DIG=""
+  fi
+  
   for ip in $RET_DIG
   do
     #$ip should now contain one of the records from 'dig'
