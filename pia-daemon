@@ -103,7 +103,6 @@ while true; do
 	#check if the Internet is up but only if the VPN is down because
 	# the firewall is configured to block traffic over eth0 while tun0 is active
 	ping_host "internet"
-	$RET_PING_HOST
 	if [ "$RET_PING_HOST" = "ERROR" ] && [ "$vpn_up" = "ERROR" ]; then
 		RAN_FORWARD_FIX="no"
 		LOOP_TIMEOUT=1

@@ -163,8 +163,8 @@ function switch_vpn() {
 		#wait until connection has been established
 		LOOP_PROTECT=0
 		while true; do
-			ping_vpn
-			if [ "$RET_PING_VPN" = "OK" ]; then
+			ping_host "vpn"
+			if [ "$RET_PING_HOST" = "OK" ]; then
 				echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- VPN connection established to $CONN"
 				/pia/pia-forward start
