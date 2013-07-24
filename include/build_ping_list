@@ -80,7 +80,7 @@ do
   do
     #$ip should now contain one of the records from 'dig'
     # ping each one and store them if they respond
-    for (( x=0 ; x < $max_ip_rounds ; x++ ))
+    for (( x=1 ; x <= $max_ip_rounds ; x++ ))
     do
       # ping each host multiple times to ensure they are reliable
       ping_host "internet" "$ip"
