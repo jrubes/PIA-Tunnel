@@ -4,6 +4,7 @@ export LANG
 
 #return variables and static stuff
 RET_PING_HOST=""
+RET_FORWARD_PORT="FALSE"
 PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
 
 # fallback list
@@ -165,8 +166,19 @@ function switch_vpn() {
 		while true; do
 			ping_host "vpn"
 			if [ "$RET_PING_HOST" = "OK" ]; then
+					
+				# get port forwarding info
+				get_forward_port
+				if [ "$RET_FORWARD_PORT" != "FALSE" ]; then
+				  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+				  fw_port_forward="$TUN_IP:$RET_FORWARD_PORT"
+				else
+				  fw_port_forward=""
+				fi
+				
+				# show connection data
 				echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-					"- VPN connection established to $CONN"
+					"- VPN connection to $CONN established $fw_port_forward"				
 				/pia/pia-forward start
 				return
 			fi
@@ -190,4 +202,28 @@ function switch_vpn() {
 		"- unable to connect to any backup connection."
 	echo -e "\twill try again in $SLEEP_RECONNECT_ERROR seconds." 
 	sleep $SLEEP_RECONNECT_ERROR
+}
+
+
+#function to get the port used for port forwarding
+# "returns" RET_FORWARD_PORT with the port number as the value or FALSE
+function get_forward_port() {
+  #check if the client ID has been generated and get it
+  if [ ! -f "/pia/client_id" ]; then
+    head -n 100 /dev/urandom | md5sum | tr -d " -" > "/pia/client_id"
+  fi
+  PIA_CLIENT_ID=`cat /pia/client_id`
+  PIA_UN=`sed -n '1p' /pia/login.conf`
+  PIA_PW=`sed -n '2p' /pia/login.conf`
+  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+
+  #get open port of tunnel connection
+  TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
+
+  #the location may not support port forwarding
+  if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
+    RET_FORWARD_PORT=$TUN_PORT
+  else
+    RET_FORWARD_PORT=FALSE
+  fi
 }
