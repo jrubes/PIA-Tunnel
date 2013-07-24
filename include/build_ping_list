@@ -7,17 +7,12 @@ source '/pia/include/functions.inc'
 
 HOSTS="startpage.com icann.org wikipedia.org internic.net"
 HOSTS="$HOSTS google.com google.de google.co.uk google.co.jp"
-HOSTS="$HOSTS wordpress.com digg.com hosteurope.de 1und1.de"
-HOSTS="$HOSTS cnn.com msn.com gnu.org live.com kernel.org"
-HOSTS="$HOSTS weather.com whitehouse.gov strato.de hetzner.de"
-HOSTS="$HOSTS webhostingtalk.com gandi.net rackspace.com arstechnica.com"
+HOSTS="$HOSTS wordpress.com hosteurope.de 1und1.de"
+HOSTS="$HOSTS gnu.org kernel.org cnet.com zdnet.com arin.net"
+HOSTS="$HOSTS whitehouse.gov strato.de hetzner.de"
+HOSTS="$HOSTS webhostingtalk.com gandi.net rackspace.com"
 HOSTS="$HOSTS spiegel.de thetimes.co.uk nytimes.com slashdot.org"
-HOSTS="$HOSTS amazon.com amazon.de amazon.co.uk amazon.co.jp"
 HOSTS="$HOSTS youtube.com youtube.de youtube.co.uk youtube.co.jp"
-HOSTS="$HOSTS apple.com apple.de apple.co.uk apple.co.jp"
-HOSTS="$HOSTS bing.com bing.de bing.co.uk bing.co.jp"
-HOSTS="$HOSTS microsoft.com microsoft.de microsoft.co.uk microsoft.co.jp"
-HOSTS="$HOSTS ebay.com ebay.de ebay.co.uk ebay.co.jp"
 HOSTS="$HOSTS kaisersoft.net ticket.workorderts.com"
 
 #will contain a list of IPs that can be pinged
@@ -61,6 +56,7 @@ fi
 
 
 #loop over list above and get dig A for each one
+ip_count=0
 for h in $HOSTS
 do
 
@@ -75,7 +71,6 @@ do
 	RET_DIG=""
   fi
   
-  COUNT=0
   for ip in $RET_DIG
   do
     #$ip should now contain one of the records from 'dig'
@@ -95,16 +90,17 @@ do
     # or store if the IP is "good"
     if [ "$RET_PING_HOST" = "OK" ]; then
       IPS="$IPS $ip"
-      COUNT=$((COUNT + 1))
+      ip_count=$((ip_count + 1))
     fi
   done
 
 done
 
-if [ $COUNT -lt 10 ]; then
+if [ $ip_count -lt 10 ]; then
   echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
     "- did not find enough IPs to generate ip_list.txt."
   echo -e "\tplease wait a few minutes then run pia-setup again."
+
 else
   # IPS is now a string over IPs separated by space
   # loop over and write to /pia/include/ip_list.txt
@@ -116,7 +112,7 @@ else
 fi
 
 echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-  "- stored $COUNT IPs in ip_list.txt"
+  "- stored $ip_count IPs in ip_list.txt"
 echo -e "\ttesting list by getting 10 random IPs"
 #testing the generated ping list
 gen_ip_list 10
