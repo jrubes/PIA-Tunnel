@@ -69,7 +69,7 @@ do
   do
     #$ip should now contain one of the records from 'dig'
     # ping each one and store them if they respond
-    $attempts=4
+    attempts=4
     for (( x=0 ; x < $attempts ; x++ ))
     do
       # ping each host multiple times to ensure they are reliable
