@@ -116,6 +116,7 @@ function gen_ip_list() {
 }
 
 # checks if $1 is found in the PING_IP_LIST array
+# $2 may contain a custom array with IPs
 # sets $RET_IP_UNIQUE to "yes" if unique
 function is_ip_unique() {
 
@@ -125,9 +126,17 @@ function is_ip_unique() {
     return
   fi
   
-  for ip in ${PING_IP_LIST[@]}
+  if [ "$2" = "" ]; then
+    ping_array=$PING_IP_LIST
+  else
+    declare -a ping_array=("${!2}")
+  fi
+
+  #loop over array and break once a match has been found
+  for ip_unique in ${ping_array[@]}
   do
-    if [ "$ip" = "$1" ]; then
+    #echo "debug - testing $ip_unique vs $1"
+    if [ "$ip_unique" = "$1" ]; then
       RET_IP_UNIQUE="no"
       #echo "debug - not unique $1"
       return
@@ -135,6 +144,7 @@ function is_ip_unique() {
   
   done
   
+  #echo "debug - unique $1"
   RET_IP_UNIQUE="yes"
 }
 

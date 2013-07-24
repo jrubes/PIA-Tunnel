@@ -6,18 +6,17 @@ source '/pia/settings.conf'
 source '/pia/include/functions.inc'
 
 HOSTS="startpage.com icann.org wikipedia.org internic.net"
-HOSTS="$HOSTS google.com google.de google.co.uk google.co.jp"
+HOSTS="$HOSTS google.com google.de youtube.com"
 HOSTS="$HOSTS wordpress.com hosteurope.de 1und1.de"
-HOSTS="$HOSTS gnu.org kernel.org cnet.com zdnet.com arin.net"
+HOSTS="$HOSTS gnu.org kernel.org cnet.com zdnet.com"
 HOSTS="$HOSTS whitehouse.gov strato.de hetzner.de"
-HOSTS="$HOSTS webhostingtalk.com gandi.net rackspace.com"
+HOSTS="$HOSTS gandi.net rackspace.com arin.net"
 HOSTS="$HOSTS spiegel.de thetimes.co.uk nytimes.com slashdot.org"
-HOSTS="$HOSTS youtube.com youtube.de youtube.co.uk youtube.co.jp"
 HOSTS="$HOSTS kaisersoft.net ticket.workorderts.com"
 
 #will contain a list of IPs that can be pinged
 # source is the A record for the hosts listed above
-IPS=""
+aIPS[0]=""
 
 #used for debug in this script
 VERBOSE="yes"
@@ -61,7 +60,7 @@ for h in $HOSTS
 do
 
   echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-	"- Checking IPs from $h ...."
+	"- Checking IPs for $h ...."
 
   #get list of IPs in the domain's A record
   RET_DIG=`dig A +short +time=3 "$h"`
@@ -89,23 +88,30 @@ do
     
     # or store if the IP is "good"
     if [ "$RET_PING_HOST" = "OK" ]; then
-      IPS="$IPS $ip"
-      ip_count=$((ip_count + 1))
+      #check if IP is unique before adding it to the list
+      is_ip_unique "$ip" aIPS[@]
+      if [ "$RET_IP_UNIQUE" = "yes" ]; then
+	aIPS[$ip_count]="$ip"
+	ip_count=$((ip_count + 1))
+      else
+	echo "debug - IP $ip not unique"
+      fi
     fi
   done
 
 done
 
-if [ $ip_count -lt 10 ]; then
+
+if [ $ip_count -lt 11 ]; then
   echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-    "- did not find enough IPs to generate ip_list.txt."
+    "- did not find enough IPs to generate ip_list.txt. is you Internet working?"
   echo -e "\tplease wait a few minutes then run pia-setup again."
 
 else
   # IPS is now a string over IPs separated by space
   # loop over and write to /pia/include/ip_list.txt
   echo "# generated on "$(date +"%Y-%m-%d %H:%M:%S") > "$IPCACHE"
-  for ip in $IPS
+  for ip in ${aIPS[@]}
   do
     echo "$ip" >> "$IPCACHE"
   done
