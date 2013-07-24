@@ -156,9 +156,9 @@ function switch_vpn() {
 			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- establishing a VPN connection to $CONN."
 			echo -e "\tsee /pia/session.log for details"
-			killall openvpn &> /dev/null
-			openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/session.log &	
 		fi
+		killall openvpn &> /dev/null
+		openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/session.log &	
 
 		#wait until connection has been established
 		LOOP_PROTECT=0
