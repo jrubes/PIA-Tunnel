@@ -5,8 +5,8 @@ export LANG
 source '/pia/settings.conf'
 source '/pia/include/functions.inc'
 
-HOSTS="google.com google.de google.co.uk google.co.jp"
-HOSTS="$HOSTS startpage.com icann.org wikipedia.org internic.net"
+HOSTS="startpage.com icann.org wikipedia.org internic.net"
+HOSTS="$HOSTS google.com google.de google.co.uk google.co.jp"
 HOSTS="$HOSTS wordpress.com digg.com hosteurope.de 1und1.de"
 HOSTS="$HOSTS cnn.com msn.com gnu.org live.com kernel.org"
 HOSTS="$HOSTS weather.com whitehouse.gov strato.de hetzner.de"
@@ -33,7 +33,7 @@ IPCACHE="/pia/include/ip_list.txt"
 if [ -f "$IPCACHE" ]; then
   if [ ! -w "$IPCACHE" ]; then
     echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-      "$IPCACHE is not writable?!?"
+      "- $IPCACHE is not writable?!?"
     exit
   fi
 else
@@ -41,7 +41,7 @@ else
   #check exit status 
   if [ "$?" = "1" ]; then
     echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-      "\"$IPCACHE\" is not writable?!?"
+      "- \"$IPCACHE\" is not writable?!?"
     exit
   fi
   #remove the empty file so aborting the process will not keep an empty file around
@@ -69,13 +69,14 @@ do
   do
     #$ip should now contain one of the records from 'dig'
     # ping each one and store them if they respond
-    for (( x=0 ; x < 20 ; x++ ))
+    $attempts=4
+    for (( x=0 ; x < $attempts ; x++ ))
     do
       # ping each host multiple times to ensure they are reliable
       ping_host "internet" "$ip"
       if [ "$RET_PING_HOST" = "ERROR" ]; then
 		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- ping failed on $x/20 attempts. excluding ip"
+			"- ping failed $x/$attempts attempts - excluding $ip"
 		break #stop on first sign of trouble
       fi
       sleep 0.2
@@ -104,13 +105,13 @@ else
   done
 fi
 
-
-echo "stored $COUNT IPs in ip_list.txt"
-echo "testing list by getting 10 random IPs"
+echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+  "- stored $COUNT IPs in ip_list.txt"
+echo -e "\ttesting list by getting 10 random IPs"
 #testing the generated ping list
 gen_ip_list 10
 for ip in ${PING_IP_LIST[@]}
 do
-  echo "  $ip"
+  echo -e "\t  $ip"
 done
   

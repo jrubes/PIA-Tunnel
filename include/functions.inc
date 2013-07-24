@@ -4,7 +4,7 @@ export LANG
 
 #return variables and static stuff
 RET_PING_HOST=""
-PING_COMMAND="ping -qn -i 0.5 -w 4 -W 1 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
+PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
 
 # fallback list
 PING_IP_LIST[0]="8.8.8.8"
