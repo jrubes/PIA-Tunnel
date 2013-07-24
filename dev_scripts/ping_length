@@ -4,8 +4,9 @@ LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
 
-PING_COMMAND_VPN="ping -qn -w 3 -c 1 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
-PING_COMMAND_INTERNET="ping -qn -w 1 -c 1 -I $IF_EXT 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
+PING_COMMAND_VPN="ping -qn -i 0.5 -w 1 -W 0.5 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
+PING_COMMAND_INTERNET="ping -qn -i 0.5 -w 1 -W 0.5 -I $IF_EXT 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
+
 
 #read list of IPs into IP_LIST array
 IFS=$'\r\n' IP_LIST=($(cat "/pia/include/ip_list.txt" | tail -n+2))
