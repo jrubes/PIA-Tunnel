@@ -4,11 +4,7 @@ export LANG
 
 #return variables and static stuff
 RET_PING_HOST=""
-RET_PING_VPN=""
-RET_PING_INTERNET=""
-PING_COMMAND="ping -qn -w 3 -c 1 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
-PING_COMMAND_VPN="ping -qn -w 3 -c 1 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
-PING_COMMAND_INTERNET="ping -qn -w 2 -c 1 -I $IF_EXT 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
+PING_COMMAND="ping -qrn -i 0.5 -w 4 -W 1 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
 
 # fallback list
 PING_IP_LIST[0]="8.8.8.8"
@@ -17,38 +13,6 @@ PING_IP_LIST[2]="208.67.222.222"
 PING_IP_LIST[3]="208.67.220.220"
 
 
-#function to ping through the current VPN connection
-function ping_vpn() {
-  TUNNEL_PING=`eval $PING_COMMAND`
-  #echo $TUNNEL_PING
-  if [ "$TUNNEL_PING" = "1" ]; then
-    RET_PING_VPN="OK"
-	#echo "OK: $TUNNEL_PING---"
-  else
-    RET_PING_VPN="ERROR"
-	if [ "$VERBOSE" = "yes" ]; then
-		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- VPN ping failed!"
-		#echo -e "\t"$PING_COMMAND
-	fi
-  fi  
-}
-
-#function to ping through the external interface
-function ping_internet() {
-  EXT_PING=`eval $PING_COMMAND_INTERNET`
-  #echo $PING_COMMAND_INTERNET
-  if [ "$EXT_PING" = "1" ]; then
-    RET_PING_INTERNET="OK"
-	#echo "OK: $RET_PING_INTERNET---"
-  else
-    RET_PING_INTERNET="ERROR"
-	if [ "$VERBOSE" = "yes" ]; then
-		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- Internet ping failed!"
-	fi
-  fi  
-}
 
 # new ping function for pinging internet hosts
 # $s1 is either "internet" or "vpn"
@@ -68,10 +32,12 @@ function ping_host() {
     
   if [ "$1" = "internet" ]; then
     #replace IP in $PING_COMMAND with $host_ip
-    pingthis=`echo "$PING_COMMAND_INTERNET" | sed -e "s/8.8.8.8/$host_ip/g"`
+    pingthis=`echo "$PING_COMMAND" | sed -e "s/IP2TOPING/$host_ip/g"`
+    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_EXT/g"`
     PING_RESULT=`eval $pingthis`
   else
-    pingthis=`echo "$PING_COMMAND_VPN" | sed -e "s/8.8.8.8/$host_ip/g"`
+    pingthis=`echo "$PING_COMMAND" | sed -e "s/IP2TOPING/$host_ip/g"`
+    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_TUNNEL/g"`
     PING_RESULT=`eval $pingthis`
   fi
 
