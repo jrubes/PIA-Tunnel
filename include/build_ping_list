@@ -18,6 +18,7 @@ HOSTS="$HOSTS apple.com apple.de apple.co.uk apple.co.jp"
 HOSTS="$HOSTS bing.com bing.de bing.co.uk bing.co.jp"
 HOSTS="$HOSTS microsoft.com microsoft.de microsoft.co.uk microsoft.co.jp"
 HOSTS="$HOSTS ebay.com ebay.de ebay.co.uk ebay.co.jp"
+HOSTS="$HOSTS kaisersoft.net ticket.workorderts.com"
 
 #will contain a list of IPs that can be pinged
 # source is the A record for the hosts listed above
@@ -27,6 +28,16 @@ IPS=""
 VERBOSE="yes"
 
 IPCACHE="/pia/include/ip_list.txt"
+
+
+
+#allow user to specify the ping rounds used to recheck IPs before they
+# are stored in ip_list.txt
+if [ "$1" != "" ]; then
+  max_ip_rounds=$1
+else
+  max_ip_rounds=1
+fi
 
 
 #check if the IP cache is writable. no point in running if it is not
@@ -69,14 +80,13 @@ do
   do
     #$ip should now contain one of the records from 'dig'
     # ping each one and store them if they respond
-    attempts=4
-    for (( x=0 ; x < $attempts ; x++ ))
+    for (( x=0 ; x < $max_ip_rounds ; x++ ))
     do
       # ping each host multiple times to ensure they are reliable
       ping_host "internet" "$ip"
       if [ "$RET_PING_HOST" = "ERROR" ]; then
 		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- ping failed $x/$attempts attempts - excluding $ip"
+			"- ping failed $x/$max_ip_rounds attempts - excluding $ip"
 		break #stop on first sign of trouble
       fi
       sleep 0.2
