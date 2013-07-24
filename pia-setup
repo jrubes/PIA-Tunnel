@@ -53,7 +53,7 @@ done
 if [ ! -f "/pia/include/ip_list.txt" ]; then
 	echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- Your ip_list.txt does not exist yet/anymore"
-	echo -e "\trebuilding .... this may take a few minutes"
+	echo -e "\trebuilding! this will take a couple of minutes...."
 	/pia/include/build_ping_list
 fi
 

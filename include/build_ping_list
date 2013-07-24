@@ -57,7 +57,7 @@ do
 	"- Checking IPs from $h ...."
 
   #get list of IPs in the domain's A record
-  RET_DIG=`dig "$h" +short A`
+  RET_DIG=`dig A +short +time=3 "$h"`
   if [ "$?" = "1" ]; then
 	echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
 	"- dig failed with $RET_DIG"
