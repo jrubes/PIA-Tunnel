@@ -64,6 +64,7 @@ do
 	RET_DIG=""
   fi
   
+  COUNT=0
   for ip in $RET_DIG
   do
     #$ip should now contain one of the records from 'dig'
@@ -83,20 +84,25 @@ do
     # or store if the IP is "good"
     if [ "$RET_PING_HOST" = "OK" ]; then
       IPS="$IPS $ip"
+      COUNT=$((COUNT + 1))
     fi
   done
 
 done
 
-# IPS is now a string over IPs separated by space
-# loop over and write to /pia/include/ip_list.txt
-echo "# generated on "$(date +"%Y-%m-%d %H:%M:%S") > "$IPCACHE"
-COUNT=0
-for ip in $IPS
-do
-  echo "$ip" >> "$IPCACHE"
-  COUNT=$((COUNT + 1))
-done
+if [ $COUNT -lt 10 ]; then
+  echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+    "- did not find enough IPs to generate ip_list.txt."
+  echo -e "\tplease wait a few minutes then run pia-setup again."
+else
+  # IPS is now a string over IPs separated by space
+  # loop over and write to /pia/include/ip_list.txt
+  echo "# generated on "$(date +"%Y-%m-%d %H:%M:%S") > "$IPCACHE"
+  for ip in $IPS
+  do
+    echo "$ip" >> "$IPCACHE"
+  done
+fi
 
 
 echo "stored $COUNT IPs in ip_list.txt"
