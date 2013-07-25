@@ -28,25 +28,26 @@ if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
 	exit
 fi
 
-#ensure internet works before going further
-check_repair_internet
-
 
 #execute if .ovpn file exists with name passed
 if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	#check the for default value
 	PIA_UN=`sed -n '1p' /pia/login.conf`
 	if [ "$PIA_UN" = "your PIA account name on this line" ]; then
-	        echo
-	        echo "Please add your Private Internet Access account information"
-	        echo "to /pia/login.conf"
-	        echo "Try"
-	        echo -e "\tvi /pia/login.conf"
-	        echo "or"
-	        echo -e "\tnano /pia/login.conf"
-	        echo
-        	exit
+		echo
+		echo "Please add your Private Internet Access account information"
+		echo "to /pia/login.conf"
+		echo "Try"
+		echo -e "\tvi /pia/login.conf"
+		echo "or"
+		echo -e "\tnano /pia/login.conf"
+		echo
+		exit
 	fi
+
+	
+	#ensure internet works before going further
+	check_repair_internet
 
 
 	#see if we have a tunnel open
@@ -60,8 +61,8 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 		/pia/pia-forward stop quite	
 	fi
 
-	
-	
+
+
 	echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- establishing a VPN connection to $1."
 	echo -e "\tsee /pia/session.log for details"	
