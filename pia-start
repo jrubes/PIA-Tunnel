@@ -87,7 +87,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	    
 		# show connection data
 		echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- VPN connection to $CONN established"$fw_port_forward
+			"- VPN connection to $1 established"$fw_port_forward
 	    
 	    /pia/pia-forward start quite
 	    #/pia/pia-status
