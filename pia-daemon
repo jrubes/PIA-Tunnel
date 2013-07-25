@@ -121,7 +121,7 @@ while true; do
 				if [ "$RAN_FORWARD_FIX" = "no" ]; then
 					#only do this once per internet connection failure
 					echo -e "[\e[1;33m warning \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-						" - Internet connection appears to be down. running pia-forward fix"
+						"- Internet connection appears to be down. running pia-forward fix"
 					RAN_FORWARD_FIX="yes"
 					/pia/pia-forward fix quite
 				fi

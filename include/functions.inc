@@ -48,8 +48,14 @@ function ping_host() {
   else
     RET_PING_HOST="ERROR"
     if [ "$VERBOSE" = "yes" ]; then
-      echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-	      "- ping failed $host_ip!"
+		if [ "$1" = "internet" ]; then
+			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- Internet ping failed $host_ip!"
+		else
+			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- VPN ping failed $host_ip!"
+		fi
+      
     fi
   fi      
 

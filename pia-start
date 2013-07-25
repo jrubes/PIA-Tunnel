@@ -48,7 +48,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	ping_host "vpn"
 	if [ "$RET_PING_HOST" = "OK" ]; then
 		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			" - closing current VPN tunnel."
+			"- closing current VPN tunnel."
 		/pia/pia-stop quite
 	else
 		#set iptables to something save until the tunnel is set up
