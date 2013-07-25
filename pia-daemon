@@ -207,6 +207,6 @@ while true; do
 	sleep $SLEEP_MAIN_LOOP
 	
 	#call self for now to allow auto update during dev
-	/pia/pia-daemon shutup
-	exit
+	#/pia/pia-daemon shutup
+	#exit
 done
