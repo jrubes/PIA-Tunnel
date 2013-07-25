@@ -41,16 +41,16 @@ fi
 if [ ! -f /pia/client_id ]; then
 	head -n 100 /dev/urandom | md5sum | tr -d " -" > /pia/client_id
 fi
-PIA_CLIENT_ID=`cat /pia/client_id`
+PIA_CLIENT_ID=`cat "/pia/client_id"`
 
 #get open port of tunnel connection
 TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
 
 #the location may not support port forwarding
 if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
-	PORT_FW=enabled
+	PORT_FW="enabled"
 else
-	PORT_FW=disabled
+	PORT_FW="disabled"
 fi
 
 #apply iptables settings
@@ -69,6 +69,9 @@ if [ "$PORT_FW" = "enabled" ]; then
 	iptables -A PREROUTING -t nat -p udp --dport $TUN_PORT -j DNAT --to 192.168.10.101
 	iptables -A FORWARD -i $IF_TUNNEL -p tcp --dport $TUN_PORT -d 192.168.10.101 -j ACCEPT
 	iptables -A FORWARD -i $IF_TUNNEL -p udp --dport $TUN_PORT -d 192.168.10.101 -j ACCEPT
+	echo "debug -- fw enabled"
+else
+	echo "debug -- fw disabled"
 fi
 
 #forward all internal traffic to tunnel
