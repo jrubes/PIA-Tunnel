@@ -1,5 +1,6 @@
 #!/bin/bash
-# script to display the current status of the VPN connection ... still needs work when things don't work
+#script to get the current status of the VPN connection and store it in a cache file
+#the cache file is periodically refreshed by the caching function
 LANG=en_US.UTF-8
 export LANG
 
@@ -19,6 +20,37 @@ if [ ! -f "/pia/settings.conf" ]; then
 fi
 source '/pia/settings.conf'
 
+STATUSCACHEFILE='/pia/status.txt'
+#check if the cache is writable. no point in running if it is not
+if [ -f "$STATUSCACHEFILE" ]; then
+  if [ ! -w "$STATUSCACHEFILE" ]; then
+    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- $STATUSCACHEFILE is not writable?!?"
+    exit
+  fi
+else
+  touch "$STATUSCACHEFILE" 2> /dev/null
+  #check exit status 
+  if [ "$?" = "1" ]; then
+    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- \"$STATUSCACHEFILE\" is not writable?!?"
+    exit
+  fi
+  #remove the empty file so aborting the process will not keep an empty file around
+  rm -f "$STATUSCACHEFILE" 2> /dev/null
+fi
+
+#get current age of file
+date_string=`head -n1 $STATUSCACHEFILE | gawk -F" " '{print $4" "$5}'`
+#convert date into timestamp
+cache_ts=`date -d "$date_string" "+%s"`
+cache_ts_expired=`date -d "30 minutes ago" "+%s"` 
+if [ $cache_ts -lt $cache_ts_expired ]; then
+	echo "Cache has expired, refreshing"
+fi
+
+
+exit
 #get default gateway of tunnel interface using "ip"
 #get IP of tunnel Gateway
 TUN_GATEWAY=`/sbin/ip route show | grep "0.0.0.0/1" | gawk -F" " '{print $3}'`
