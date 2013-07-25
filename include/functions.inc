@@ -143,7 +143,7 @@ function gen_ip_list() {
     fi
     
     #endless loop protect,
-    if [ "$LOOP_PROTECT" -eq 100000 ]; then
+    if [ "$LOOP_PROTECT" -eq 5000 ]; then
       echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	      "- unable to select the requestd number of IPs ($THIS_MANY) - tried $LOOP_PROTECT times"
       break
