@@ -194,9 +194,6 @@ done
 
 #function to remove an item from any array and rebuilding the array without the item
 # keys will not be preserved
-# NOTE: the generating function may have a bug because debug will sometimes show
-#		3-4 same IPs in the main list. This should habe been filtered out during generation
-#		Since generation is using the same function it should have never happened .... investigate
 function remove_ip_from_array() {
   unset RET_MODIFIED_ARRAY #clear contents
   
