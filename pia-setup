@@ -8,6 +8,10 @@ export LANG
 if [ ! -f "/usr/bin/dig" ]; then
 	apt-get -y install dnsutils > /dev/null
 fi
+# pia-daemon will need screen soon
+if [ ! -f "/usr/bin/screen" ]; then
+	apt-get -y install screen > /dev/null
+fi
 
 #create a new login.conf if none exists
 if [ ! -f '/pia/login.conf' ]; then
@@ -52,7 +56,7 @@ done
 #check ip cache
 if [ ! -f "/pia/include/ip_list.txt" ]; then
 	echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-	  "- Your ip_list.txt does not exist yet/anymore - rebuilding!"
+	  "- ip_list.txt does not exist - rebuilding!"
 	echo -e "\tthis will take a couple of minutes...."
 	/pia/include/build_ping_list
 fi
