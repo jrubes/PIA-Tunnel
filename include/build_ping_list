@@ -6,7 +6,7 @@ source '/pia/settings.conf'
 source '/pia/include/functions.inc'
 
 HOSTS="startpage.com icann.org wikipedia.org internic.net"
-HOSTS="$HOSTS google.com google.de youtube.com"
+HOSTS="$HOSTS google.com google.de"
 HOSTS="$HOSTS wordpress.com hosteurope.de 1und1.de"
 HOSTS="$HOSTS gnu.org kernel.org cnet.com zdnet.com"
 HOSTS="$HOSTS whitehouse.gov strato.de hetzner.de"
