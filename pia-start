@@ -53,7 +53,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	#see if we have a tunnel open
 	ping_host "vpn"
 	if [ "$RET_PING_HOST" = "OK" ]; then
-		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- closing current VPN tunnel."
 		/pia/pia-stop quite
 	else
@@ -63,7 +63,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 
 
 
-	echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- establishing a VPN connection to $1."
 	echo -e "\tsee /pia/session.log for details"	
 	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
@@ -80,7 +80,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 		get_forward_port
 		if [ "$RET_FORWARD_PORT" != "FALSE" ]; then
 		  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-		  fw_port_forward="\n[ info ] "$(date +"%Y-%m-%d %H:%M:%S")" - IP: $TUN_IP Port: $RET_FORWARD_PORT"
+		  fw_port_forward="\n[info] "$(date +"%Y-%m-%d %H:%M:%S")" - IP: $TUN_IP Port: $RET_FORWARD_PORT"
 		else
 		  fw_port_forward=""
 		fi
@@ -97,8 +97,8 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	  
 	  #endless loop protect, about 30 seconds
 	  if [ "$LOOP_PROTECT" -eq 30 ]; then
-		echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- VPN connection error - please check /pia/session.log for details."
+		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- VPN connectionfail- please check /pia/session.log for details."
 	    killall openvpn 2>/dev/null
 	    /pia/pia-forward stop quite
 	    exit

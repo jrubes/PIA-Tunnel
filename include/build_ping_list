@@ -37,7 +37,7 @@ fi
 #check if the IP cache is writable. no point in running if it is not
 if [ -f "$IPCACHE" ]; then
   if [ ! -w "$IPCACHE" ]; then
-    echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
       "- $IPCACHE is not writable?!?"
     exit
   fi
@@ -45,7 +45,7 @@ else
   touch "$IPCACHE" 2> /dev/null
   #check exit status 
   if [ "$?" = "1" ]; then
-    echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
       "- \"$IPCACHE\" is not writable?!?"
     exit
   fi
@@ -59,13 +59,13 @@ ip_count=0
 for h in $HOSTS
 do
 
-  echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 	"- Checking IPs for $h ...."
 
   #get list of IPs in the domain's A record
   RET_DIG=`dig A +short +time=3 "$h"`
   if [ "$?" = "1" ]; then
-	echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 	"- dig failed with $RET_DIG"
 	RET_DIG=""
   fi
@@ -79,7 +79,7 @@ do
       # ping each host multiple times to ensure they are reliable
       ping_host "internet" "$ip"
       if [ "$RET_PING_HOST" = "ERROR" ]; then
-		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- ping failed $x/$max_ip_rounds attempts - excluding $ip"
 		break #stop on first sign of trouble
       fi
@@ -105,7 +105,7 @@ ip_count=$((ip_count - 1))  #adjust since the last operation is to
 
 
 if [ $ip_count -lt 11 ]; then
-  echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+  echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
     "- did not find enough IPs to generate ip_list.txt. is you Internet working?"
   echo -e "\tplease wait a few minutes then run pia-setup again."
 
@@ -119,7 +119,7 @@ else
   done
 fi
 
-echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
   "- stored $ip_count IPs in ip_list.txt"
 echo -e "\ttesting list by getting 10 random IPs"
 #testing the generated ping list

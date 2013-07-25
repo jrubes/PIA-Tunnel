@@ -55,7 +55,7 @@ done
 
 #check ip cache
 if [ ! -f "/pia/include/ip_list.txt" ]; then
-	echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- ip_list.txt does not exist - rebuilding!"
 	echo -e "\tthis will take a couple of minutes...."
 	/pia/include/build_ping_list
