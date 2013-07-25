@@ -237,15 +237,16 @@ function switch_vpn() {
 				get_forward_port
 				if [ "$RET_FORWARD_PORT" != "FALSE" ]; then
 				  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-				  fw_port_forward="$TUN_IP:$RET_FORWARD_PORT"
+				  fw_port_forward="\n[ info ] "$(date +"%Y-%m-%d %H:%M:%S")" - IP: $TUN_IP Port: $RET_FORWARD_PORT"
 				else
 				  fw_port_forward=""
 				fi
 				
 				# show connection data
 				echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-					"- VPN connection to $CONN established $fw_port_forward"				
-				/pia/pia-forward start
+					"- VPN connection to $CONN established"$fw_port_forward
+				/pia/pia-forward start quite
+				RAN_FORWARD_FIX="no" #reset on working connection
 				return
 			fi
 			
@@ -260,7 +261,7 @@ function switch_vpn() {
 			fi		
 		done
 
-		echo -e "[\e[1;33m warning \e[0m] tried to reconnect to $CONN but the connection failed."
+		echo -e "[\e[1;33m warn \e[0m] tried to reconnect to $CONN but the connection failed."
 	done
  
  
@@ -294,4 +295,51 @@ function get_forward_port() {
   else
     RET_FORWARD_PORT="FALSE"
   fi
+}
+
+# checks if the internet is up by pining, will restart networking once if the internet is down
+# the restart will fix the routing table and is hopefully only required once. needs testing :)
+function check_repair_internet() {
+	RAN_FORWARD_FIX="no"
+	LOOP_TIMEOUT=1
+	while true; do
+		
+		ping_host "internet"
+		if [ "$RET_PING_HOST" = "OK" ]; then
+			#internet works, keep going
+			if [ "$VERBOSE" = "yes" ]; then
+				echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+					"- Internet is back up after $LOOP_TIMEOUT of 5 attempts"
+			fi
+			break;
+			
+		else
+			if [ "$RAN_FORWARD_FIX" = "no" ]; then
+				#only do this once per internet connection failure
+				echo -e "[\e[1;33m warn \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+					"- Internet connection appears to be down"
+				echo -e "\trunning pia-forward fix"
+				RAN_FORWARD_FIX="yes"
+				/pia/pia-forward fix quite
+			fi
+		fi
+		
+
+		#ping loop timeout
+		if [ "$LOOP_TIMEOUT" -gt $FAIL_RETRY_INTERNET ]; then
+			echo -e "[\e[1;33m warn \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"forwarding disabled until the VPN is back up."
+			echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
+			/pia/pia-forward stop quite
+			exit			
+		else
+			if [ "$VERBOSE" = "yes" ]; then
+				echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+					"- Internet failure $LOOP_TIMEOUT of $FAIL_RETRY_INTERNET"
+			fi
+			sleep $SLEEP_PING_RETEST
+			LOOP_TIMEOUT=$(($LOOP_TIMEOUT + 1))
+		fi	
+	done
 }
