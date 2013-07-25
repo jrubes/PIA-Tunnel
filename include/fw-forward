@@ -48,9 +48,9 @@ TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_
 
 #the location may not support port forwarding
 if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
-	PORT_FW=enabled
+	PORT_FW="enabled"
 else
-	PORT_FW=disabled
+	PORT_FW="disabled"
 fi
 
 #apply iptables settings
