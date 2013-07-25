@@ -183,13 +183,13 @@ function switch_vpn() {
 				return
 			fi
 			
-			#endless loop protect, about 10 seconds
-			if [ "$LOOP_PROTECT" -eq 10 ]; then
+			#endless loop protect, about 40 seconds
+			if [ "$LOOP_PROTECT" -eq 20 ]; then
 				killall openvpn 2>/dev/null
 				/pia/pia-forward stop quite
 				break
 			else
-				sleep 1
+				sleep 2
 				LOOP_PROTECT=$(($LOOP_PROTECT + 1))
 			fi		
 		done
