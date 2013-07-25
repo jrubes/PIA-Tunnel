@@ -8,6 +8,8 @@ LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
 source '/pia/include/functions.inc'
+FAIL_RETRY_INTERNET=3
+SLEEP_PING_RETEST=4
 
 # generate a few IPs for the uptime functions
 gen_ip_list
@@ -25,6 +27,9 @@ if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
 	echo -e "\tpia-start \"UK London\""
 	exit
 fi
+
+#ensure internet works before going further
+check_repair_internet
 
 
 #execute if .ovpn file exists with name passed
@@ -48,7 +53,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	ping_host "vpn"
 	if [ "$RET_PING_HOST" = "OK" ]; then
 		echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			" - closing current VPN tunnel."
+			"- closing current VPN tunnel."
 		/pia/pia-stop quite
 	else
 		#set iptables to something save until the tunnel is set up
@@ -70,19 +75,20 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	while true; do
 	  ping_host "vpn"
 	  if [ "$RET_PING_HOST" = "OK" ]; then	    
-	    # get port forwarding info
-	    get_forward_port
-	    if [ "$RET_FORWARD_PORT" != "FALSE" ]; then
-	      TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-	      fw_port_forward="$TUN_IP:$RET_FORWARD_PORT"
-	    else
-	      fw_port_forward=""
-	    fi
+		# get port forwarding info
+		get_forward_port
+		if [ "$RET_FORWARD_PORT" != "FALSE" ]; then
+		  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+		  fw_port_forward="\n[ info ] "$(date +"%Y-%m-%d %H:%M:%S")" - IP: $TUN_IP Port: $RET_FORWARD_PORT"
+		else
+		  fw_port_forward=""
+		fi
 	    
-	    # show connection data
-	    echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-		    "- VPN connection to $1 established $fw_port_forward"				    
-	    /pia/pia-forward start
+		# show connection data
+		echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- VPN connection to $CONN established"$fw_port_forward
+	    
+	    /pia/pia-forward start quite
 	    #/pia/pia-status
 	    break
 	  fi

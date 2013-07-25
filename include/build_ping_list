@@ -6,7 +6,7 @@ source '/pia/settings.conf'
 source '/pia/include/functions.inc'
 
 HOSTS="startpage.com icann.org wikipedia.org internic.net"
-HOSTS="$HOSTS google.com google.de youtube.com"
+HOSTS="$HOSTS google.com google.de"
 HOSTS="$HOSTS wordpress.com hosteurope.de 1und1.de"
 HOSTS="$HOSTS gnu.org kernel.org cnet.com zdnet.com"
 HOSTS="$HOSTS whitehouse.gov strato.de hetzner.de"
@@ -91,15 +91,17 @@ do
       #check if IP is unique before adding it to the list
       is_ip_unique "$ip" aIPS[@]
       if [ "$RET_IP_UNIQUE" = "yes" ]; then
-	aIPS[$ip_count]="$ip"
-	ip_count=$((ip_count + 1))
+		aIPS[$ip_count]="$ip"
+		ip_count=$((ip_count + 1))
       else
-	echo "debug - IP $ip not unique"
+		echo "debug - IP $ip not unique"
       fi
     fi
   done
 
 done
+ip_count=$((ip_count - 1))  #adjust since the last operation is to 
+							#increment the count for the next array
 
 
 if [ $ip_count -lt 11 ]; then
