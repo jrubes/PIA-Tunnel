@@ -4,7 +4,7 @@ export LANG
 
 #return variables and static stuff
 RET_PING_HOST=""
-RET_MODIFIED_ARRAY[0]=""
+declare -a RET_MODIFIED_ARRAY
 RET_FORWARD_PORT="FALSE"
 PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
 
@@ -14,92 +14,41 @@ PING_IP_LIST[1]="8.8.4.4"
 PING_IP_LIST[2]="208.67.222.222"
 PING_IP_LIST[3]="208.67.220.220"
 
+VERBOSE_DEBUG="NO" #yes/no
 
 
-# new ping function for pinging internet hosts
-# $s1 is either "internet" or "vpn"
-# $s2 the IP or Domain to ping
-function ping_host() {
-
-	if [ "$2" != "" ]; then
-		host_ip="$2"
-	else
-		#check PING_IP_LIST and ensure that it still has enough IPs since
-		# failed IPs get removed from the array further down
-		if [ "${#PING_IP_LIST[@]}" -lt "5" ];then
-			echo "debug -- PING_IP_LIST only has 5 entries left. rebuilding"
-			gen_ip_list
-		fi
-		
-		#pick one IP from $PING_IP_LIST[] to be used this time
-		ip_count=${#PING_IP_LIST[@]}
-		ip_count=$((ip_count - 1)) #zero based
-		rand=$[ ( $RANDOM % $ip_count )  + 1 ]
-		host_ip=${PING_IP_LIST[$rand]}
-	fi
-  
-    
-  if [ "$1" = "internet" ]; then
-    #replace IP in $PING_COMMAND with $host_ip
-    pingthis=`echo "$PING_COMMAND" | sed -e "s/IP2TOPING/$host_ip/g"`
-    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_EXT/g"`
-    PING_RESULT=`eval $pingthis`
-  else
-    pingthis=`echo "$PING_COMMAND" | sed -e "s/IP2TOPING/$host_ip/g"`
-    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_TUNNEL/g"`
-    PING_RESULT=`eval $pingthis`
-  fi
-
-  if [ "$PING_RESULT" = "1" ]; then
-    RET_PING_HOST="OK"
-
-  else
-    RET_PING_HOST="ERROR"
-    if [ "$VERBOSE" = "yes" ]; then
-		if [ "$1" = "internet" ]; then
-			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"- Internet ping failed $host_ip!"
-		else
-			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"- VPN ping failed $host_ip!"
-		fi
-    fi
-	
-	#ping failed remove the IP from the random ping pool PING_IP_LIST
-	remove_ip_from_array PING_IP_LIST[@] "$host_ip"
-	PING_IP_LIST=("${RET_MODIFIED_ARRAY[@]}")
-	
-  fi      
-
-}
-
-#function to remove an item from any array and rebuilding the array without the item
-# keys will not be preserved
-function remove_ip_from_array() {
+# checks if $1 is found in the PING_IP_LIST array
+# $2 may contain a custom array with IPs
+# sets $RET_IP_UNIQUE to "yes" if unique
+function is_ip_unique() {
 
   if [ "$1" = "" ]; then
-    echo "FATAL SCRIPT ERROR, an array is required here!"
-	return
-  else
-    declare -a source_array=("${!1}")
-  fi
-
-  if [ "$2" = "" ]; then
+    RET_IP_UNIQUE="no"
+    #echo "debug - not unique $1"
     return
   fi
   
-  new_count=0
-  for item in ${source_array[@]}
+  if [ "$2" = "" ]; then
+    ping_array=("${PING_IP_LIST[@]}")
+	#echo "using PING_IP_LIST"
+  else
+    declare -a ping_array=("${!2}")
+  fi
+
+  #loop over array and break once a match has been found
+  for ip_unique in ${ping_array[@]}
   do
-	if [ "$item" != "$2" ]; then
-		RET_MODIFIED_ARRAY[$new_count]="$item"
-		new_count=$((new_count + 1))
-	else
-		echo "MATCH $2"
-	fi
+    #echo "debug - testing $ip_unique vs $1"
+    if [ "$ip_unique" = "$1" ]; then
+      RET_IP_UNIQUE="no"
+      #echo "debug - not unique $1"
+      return
+    fi
+  
   done
   
-  #RET_MODIFIED_ARRAY is now the new array
+  #echo "debug - unique $1"
+  RET_IP_UNIQUE="yes"
 }
 
 #function to grab a few IPs from /pia/include/ip_list.txt
@@ -115,8 +64,14 @@ function gen_ip_list() {
   if [ ! "$1" = "" ]; then
     THIS_MANY=$1
   else
-    THIS_MANY=20
+    THIS_MANY=10
   fi
+  if [ "$VERBOSE_DEBUG" = "yes" ]; then
+	echo -e "[ debug ] "$(date +"%Y-%m-%d %H:%M:%S")\
+		"- generating $THIS_MANY fresh IPs"
+		
+  fi
+  
   #read list of IPs into IP_LIST array
   IFS=$'\r\n' IP_LIST=($(cat "/pia/include/ip_list.txt" | tail -n+2))
   #get array length
@@ -163,39 +118,117 @@ function gen_ip_list() {
   # be used by other functions  
 }
 
-# checks if $1 is found in the PING_IP_LIST array
-# $2 may contain a custom array with IPs
-# sets $RET_IP_UNIQUE to "yes" if unique
-function is_ip_unique() {
+# new ping function for pinging internet hosts
+# $s1 is either "internet" or "vpn"
+# $s2 the IP or Domain to ping
+function ping_host() {
+	RET_PING_HOST="ERROR"
 
+	if [ "$2" != "" ]; then
+		host_ip="$2"
+	else
+		#check PING_IP_LIST and ensure that it still has enough IPs since
+		# failed IPs get removed from the array further down
+		if [ ${#PING_IP_LIST[@]} -lt 2 ];then
+			if [ "$VERBOSE_DEBUG" = "yes" ]; then
+				echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+					"debug -- PING_IP_LIST only has 1 entry left - rebuilding"
+			fi
+			for fghjd in ${#PING_IP_LIST[@]}
+			do
+				echo "$fghjd"
+			done
+			gen_ip_list
+		fi
+		
+		#pick one IP from $PING_IP_LIST[] to be used this time
+		ip_count=${#PING_IP_LIST[@]}
+		ip_count=$((ip_count - 1)) #zero based
+		rand=$[ ( $RANDOM % $ip_count )  + 1 ]
+		host_ip=${PING_IP_LIST[$rand]}
+	fi
+  
+    
+  if [ "$1" = "internet" ]; then
+    #replace IP in $PING_COMMAND with $host_ip
+    pingthis=`echo "$PING_COMMAND" | sed -e "s/IP2TOPING/$host_ip/g"`
+    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_EXT/g"`
+    PING_RESULT=`eval $pingthis`
+  else
+    pingthis=`echo "$PING_COMMAND" | sed -e "s/IP2TOPING/$host_ip/g"`
+    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_TUNNEL/g"`
+    PING_RESULT=`eval $pingthis`
+  fi
+
+  if [ "$PING_RESULT" = "1" ]; then
+    RET_PING_HOST="OK"
+
+  else
+    RET_PING_HOST="ERROR"
+    if [ "$VERBOSE_DEBUG" = "yes" ]; then
+		if [ "$1" = "internet" ]; then
+			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- Internet ping failed $host_ip!"
+		else
+			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- VPN ping failed $host_ip!"
+		fi
+    fi
+
+for poo in 	${PING_IP_LIST[@]}
+do
+	echo "  $poo"
+done
+	
+	#ping failed remove the IP from the random ping pool PING_IP_LIST
+	remove_ip_from_array PING_IP_LIST[@] "$host_ip"
+	PING_IP_LIST=("${RET_MODIFIED_ARRAY[@]}")
+for poo in 	${PING_IP_LIST[@]}
+do
+	echo "  $poo"
+done
+	sleep 5
+  fi      
+
+}
+
+#function to remove an item from any array and rebuilding the array without the item
+# keys will not be preserved
+# NOTE: the generating function may have a bug because debug will sometimes show
+#		3-4 same IPs in the main list. This should habe been filtered out during generation
+#		Since generation is using the same function it should have never happened .... investigate
+function remove_ip_from_array() {
+  unset RET_MODIFIED_ARRAY #clear contents
+  
   if [ "$1" = "" ]; then
-    RET_IP_UNIQUE="no"
-    #echo "debug - not unique $1"
+    echo "FATAL SCRIPT ERROR, an array is required here!"
+	return
+  else
+    declare -a source_array=("${!1}")
+  fi
+
+  if [ "$2" = "" ]; then
     return
   fi
   
-  if [ "$2" = "" ]; then
-    ping_array=("${PING_IP_LIST[@]}")
-	#echo "using PING_IP_LIST"
-  else
-    declare -a ping_array=("${!2}")
-  fi
-
-  #loop over array and break once a match has been found
-  for ip_unique in ${ping_array[@]}
+  new_count=0
+  for item in ${source_array[@]}
   do
-    #echo "debug - testing $ip_unique vs $1"
-    if [ "$ip_unique" = "$1" ]; then
-      RET_IP_UNIQUE="no"
-      #echo "debug - not unique $1"
-      return
-    fi
-  
+	if [ "$item" != "$2" ]; then
+		RET_MODIFIED_ARRAY[$new_count]="$item"
+		new_count=$((new_count + 1))
+	else
+		if [ "$VERBOSE_DEBUG" = "yes" ]; then
+			echo -e "[ debug ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- removed $2 from IP array"
+			
+		fi
+	fi
   done
   
-  #echo "debug - unique $1"
-  RET_IP_UNIQUE="yes"
+  #RET_MODIFIED_ARRAY is now the new array
 }
+
 
 #function to handle switching of failover connections by using the MYVPN array
 function switch_vpn() {
@@ -256,6 +289,8 @@ function switch_vpn() {
 #function to get the port used for port forwarding
 # "returns" RET_FORWARD_PORT with the port number as the value or FALSE
 function get_forward_port() {
+  RET_FORWARD_PORT="FALSE"
+  
   #check if the client ID has been generated and get it
   if [ ! -f "/pia/client_id" ]; then
     head -n 100 /dev/urandom | md5sum | tr -d " -" > "/pia/client_id"
@@ -272,6 +307,6 @@ function get_forward_port() {
   if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
     RET_FORWARD_PORT=$TUN_PORT
   else
-    RET_FORWARD_PORT=FALSE
+    RET_FORWARD_PORT="FALSE"
   fi
 }

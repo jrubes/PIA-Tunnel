@@ -29,6 +29,7 @@ FAIL_RETRY_DELAY=1
 
 # setting verbose to yes will print status notification after each check. any other settings for "background mode"
 VERBOSE="yes"
+VERBOSE_DEBUG="yes"
 
 # time in seconds to wait before rechecking a down Internet connection
 # each run takes a few seconds to complete so don't go too low!
@@ -53,7 +54,7 @@ SLEEP_MAIN_LOOP=30
 
 
 # generate a few IPs for the uptime functions
-gen_ip_list 5
+gen_ip_list 10
 
 
 
