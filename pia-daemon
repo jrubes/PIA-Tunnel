@@ -53,7 +53,7 @@ SLEEP_MAIN_LOOP=30
 
 
 # generate a few IPs for the uptime functions
-gen_ip_list
+gen_ip_list 5
 
 
 

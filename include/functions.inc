@@ -4,6 +4,7 @@ export LANG
 
 #return variables and static stuff
 RET_PING_HOST=""
+RET_MODIFIED_ARRAY[0]=""
 RET_FORWARD_PORT="FALSE"
 PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
 
@@ -23,9 +24,16 @@ function ping_host() {
 	if [ "$2" != "" ]; then
 		host_ip="$2"
 	else
+		#check PING_IP_LIST and ensure that it still has enough IPs since
+		# failed IPs get removed from the array further down
+		if [ "${#PING_IP_LIST[@]}" -lt "5" ];then
+			echo "debug -- PING_IP_LIST only has 5 entries left. rebuilding"
+			gen_ip_list
+		fi
+		
 		#pick one IP from $PING_IP_LIST[] to be used this time
 		ip_count=${#PING_IP_LIST[@]}
-		ip_count=$(($ip_count - 1)) #zero based
+		ip_count=$((ip_count - 1)) #zero based
 		rand=$[ ( $RANDOM % $ip_count )  + 1 ]
 		host_ip=${PING_IP_LIST[$rand]}
 	fi
@@ -44,7 +52,7 @@ function ping_host() {
 
   if [ "$PING_RESULT" = "1" ]; then
     RET_PING_HOST="OK"
-    #echo "OK: $RET_PING_INTERNET---"
+
   else
     RET_PING_HOST="ERROR"
     if [ "$VERBOSE" = "yes" ]; then
@@ -55,14 +63,47 @@ function ping_host() {
 			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- VPN ping failed $host_ip!"
 		fi
-      
     fi
+	
+	#ping failed remove the IP from the random ping pool PING_IP_LIST
+	remove_ip_from_array PING_IP_LIST[@] "$host_ip"
+	PING_IP_LIST=("${RET_MODIFIED_ARRAY[@]}")
+	
   fi      
 
 }
 
+#function to remove an item from any array and rebuilding the array without the item
+# keys will not be preserved
+function remove_ip_from_array() {
+
+  if [ "$1" = "" ]; then
+    echo "FATAL SCRIPT ERROR, an array is required here!"
+	return
+  else
+    declare -a source_array=("${!1}")
+  fi
+
+  if [ "$2" = "" ]; then
+    return
+  fi
+  
+  new_count=0
+  for item in ${source_array[@]}
+  do
+	if [ "$item" != "$2" ]; then
+		RET_MODIFIED_ARRAY[$new_count]="$item"
+		new_count=$((new_count + 1))
+	else
+		echo "MATCH $2"
+	fi
+  done
+  
+  #RET_MODIFIED_ARRAY is now the new array
+}
+
 #function to grab a few IPs from /pia/include/ip_list.txt
-# and store them for later in $PING_IP_LIST[]
+# and store them for later in $PING_eIP_LIST[]
 function gen_ip_list() {
 
 	if [ ! -f "/pia/include/ip_list.txt" ]; then
@@ -80,7 +121,7 @@ function gen_ip_list() {
   IFS=$'\r\n' IP_LIST=($(cat "/pia/include/ip_list.txt" | tail -n+2))
   #get array length
   IP_COUNT=${#IP_LIST[@]}
-  IP_COUNT=$(($IP_COUNT - 1)) #zero based
+  IP_COUNT=$((IP_COUNT - 1)) #zero based
 
   #get THIS_MANY random numbers
   PING_INDEX=0
@@ -94,7 +135,7 @@ function gen_ip_list() {
     if [ "$RET_IP_UNIQUE" = "yes" ]; then
       #IP is unqieu store it!
       PING_IP_LIST[$PING_INDEX]=${IP_LIST[$AINDEX]}
-      PING_INDEX=$(($PING_INDEX + 1))
+      PING_INDEX=$((PING_INDEX + 1))
     fi
     
     if [ "$PING_INDEX" = "$THIS_MANY" ]; then
@@ -102,12 +143,12 @@ function gen_ip_list() {
     fi
     
     #endless loop protect,
-    if [ "$LOOP_PROTECT" -eq 1000 ]; then
+    if [ "$LOOP_PROTECT" -eq 100000 ]; then
       echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	      "- unable to select the requestd number of IPs ($THIS_MANY) - tried $LOOP_PROTECT times"
       break
     else
-      LOOP_PROTECT=$(($LOOP_PROTECT + 1))
+      LOOP_PROTECT=$((LOOP_PROTECT + 1))
     fi
   done
   
@@ -134,7 +175,8 @@ function is_ip_unique() {
   fi
   
   if [ "$2" = "" ]; then
-    ping_array=$PING_IP_LIST
+    ping_array=("${PING_IP_LIST[@]}")
+	#echo "using PING_IP_LIST"
   else
     declare -a ping_array=("${!2}")
   fi
@@ -196,7 +238,7 @@ function switch_vpn() {
 				break
 			else
 				sleep 1
-				LOOP_PROTECT=$(($LOOP_PROTECT + 1))
+				LOOP_PROTECT=$((LOOP_PROTECT + 1))
 			fi		
 		done
 
