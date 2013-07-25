@@ -6,7 +6,7 @@ source '/pia/settings.conf'
 source '/pia/include/functions.inc'
 
 if [ ! "$1" = "shutup" ]; then
-	echo -e "[\e[1;33m warn \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- pia-daemon is EXPERIMENTAL!"
 fi
 
@@ -80,7 +80,7 @@ while true; do
 	if [ "$RET_PING_HOST" = "ERROR" ]; then
 		#VPN connection has failed
 		if [ "$VERBOSE" = "yes" ]; then
-			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- VPN appears to have failed"
 		fi
 		for (( x=1 ; x <= $FAIL_RETRY_VPN ; x++ ))
@@ -90,13 +90,13 @@ while true; do
 			vpn_up=$RET_PING_HOST
 			if [ "$RET_PING_HOST" = "OK" ]; then
 				if [ "$VERBOSE" = "yes" ]; then
-					echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+					echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 						"- VPN ping worked this time...."
 				fi
 				break
 			else
 				if [ "$VERBOSE" = "yes" ]; then
-					echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+					echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 						"- VPN ping failed $x of $FAIL_RETRY_VPN"
 				fi
 			fi
@@ -107,7 +107,7 @@ while true; do
 		
 	else
 		if [ "$VERBOSE_DEBUG" = "yes" ]; then
-			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- VPN is UP"
 		fi
 	fi
@@ -127,7 +127,7 @@ while true; do
 			if [ "$RET_PING_HOST" = "OK" ]; then
 				#internet works, keep going
 				if [ "$VERBOSE" = "yes" ]; then
-					echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+					echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 						"- Internet is back up after $LOOP_TIMEOUT of 5 attempts"
 				fi
 				break;
@@ -135,7 +135,7 @@ while true; do
 			else
 				if [ "$RAN_FORWARD_FIX" = "no" ]; then
 					#only do this once per internet connection failure
-					echo -e "[\e[1;33m warn \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+					echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 						"- Internet connection appears to be down"
 					echo -e "\trunning pia-forward fix"
 					RAN_FORWARD_FIX="yes"
@@ -146,9 +146,9 @@ while true; do
 
 			#ping loop timeout
 			if [ "$LOOP_TIMEOUT" -gt $FAIL_RETRY_INTERNET ]; then
-				echo -e "[\e[1;33m warn \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+				echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"forwarding disabled until the VPN is back up."
-				echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+				echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
 				/pia/pia-forward stop quite
 				sleep $SLEEP_INTERNET_DOWN
@@ -160,7 +160,7 @@ while true; do
 				
 			else
 				if [ "$VERBOSE" = "yes" ]; then
-					echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+					echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 						"- Internet failure $LOOP_TIMEOUT of $FAIL_RETRY_INTERNET"
 				fi
 				sleep $SLEEP_PING_RETEST
@@ -170,7 +170,7 @@ while true; do
 	else
 		if [ "$vpn_up" = "ERROR" ]; then
 			if [ "$VERBOSE" = "yes" ]; then
-				echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet ist UP"
 			fi
 		fi
@@ -183,7 +183,7 @@ while true; do
 	if [ "$vpn_up" = "ERROR" ]; then
 		#connection is busted!
 		if [ "$FAIL_ACTION" = "failover" ]; then
-			echo -e "[\e[1;33m warn \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+			echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- VPN has failed - switching to backup."
 			
 			#initiate a VPN switch
@@ -192,7 +192,7 @@ while true; do
 		else
 			/pia/pia-stop quite
 			/pia/pia-forward stop quite
-			echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+			echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- VPN has failed - connection terminated and forwarding disabled!"
 			exit
 		fi

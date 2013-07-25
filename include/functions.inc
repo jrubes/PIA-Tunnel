@@ -56,7 +56,7 @@ function is_ip_unique() {
 function gen_ip_list() {
 
 	if [ ! -f "/pia/include/ip_list.txt" ]; then
-		echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 		  "- \"/pia/include/ip_list.txt\" does not exist. Please run pia-setup first"
 		exit
 	fi
@@ -99,7 +99,7 @@ function gen_ip_list() {
     
     #endless loop protect,
     if [ "$LOOP_PROTECT" -eq 5000 ]; then
-      echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	      "- unable to select the requestd number of IPs ($THIS_MANY) - tried $LOOP_PROTECT times"
       break
     else
@@ -109,7 +109,7 @@ function gen_ip_list() {
   
   # final check
   if [ "${#PING_IP_LIST[@]}" = "0" ]; then
-      echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	      "- FATAL - PING_IP_LIST is empty. must terminate!"
       exit
   fi
@@ -163,10 +163,10 @@ function ping_host() {
     RET_PING_HOST="ERROR"
     if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		if [ "$1" = "internet" ]; then
-			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- Internet ping failed $host_ip!"
 		else
-			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- VPN ping failed $host_ip!"
 		fi
     fi
@@ -185,7 +185,7 @@ function remove_ip_from_array() {
   unset RET_MODIFIED_ARRAY #clear contents
   
   if [ "$1" = "" ]; then
-	echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- FATAL SCRIPT ERROR, an array is required here!"
 	return
   else
@@ -220,7 +220,7 @@ function switch_vpn() {
 	for CONN in "${MYVPN[@]}"
 	do
 		if [ "$VERBOSE" = "yes" ]; then
-			echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- establishing a VPN connection to $CONN."
 			echo -e "\tsee /pia/session.log for details"
 		fi
@@ -237,7 +237,7 @@ function switch_vpn() {
 				get_forward_port
 				if [ "$RET_FORWARD_PORT" != "FALSE" ]; then
 				  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-				  fw_port_forward="\n[ info ] "$(date +"%Y-%m-%d %H:%M:%S")" - IP: $TUN_IP Port: $RET_FORWARD_PORT"
+				  fw_port_forward="\n[info] "$(date +"%Y-%m-%d %H:%M:%S")" - IP: $TUN_IP Port: $RET_FORWARD_PORT"
 				else
 				  fw_port_forward=""
 				fi
@@ -261,11 +261,11 @@ function switch_vpn() {
 			fi		
 		done
 
-		echo -e "[\e[1;33m warn \e[0m] tried to reconnect to $CONN but the connection failed."
+		echo -e "[\e[1;33mwarn\e[0m] tried to reconnect to $CONN but the connection failed."
 	done
  
  
-	echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- unable to connect to any backup connection."
 	echo -e "\twill try again in $SLEEP_RECONNECT_ERROR seconds." 
 	sleep $SLEEP_RECONNECT_ERROR
@@ -308,7 +308,7 @@ function check_repair_internet() {
 		if [ "$RET_PING_HOST" = "OK" ]; then
 			#internet works, keep going
 			if [ "$VERBOSE" = "yes" ]; then
-				echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet is back up after $LOOP_TIMEOUT of 5 attempts"
 			fi
 			break;
@@ -316,7 +316,7 @@ function check_repair_internet() {
 		else
 			if [ "$RAN_FORWARD_FIX" = "no" ]; then
 				#only do this once per internet connection failure
-				echo -e "[\e[1;33m warn \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+				echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet connection appears to be down"
 				echo -e "\trunning pia-forward fix"
 				RAN_FORWARD_FIX="yes"
@@ -327,15 +327,15 @@ function check_repair_internet() {
 
 		#ping loop timeout
 		if [ "$LOOP_TIMEOUT" -gt $FAIL_RETRY_INTERNET ]; then
-			echo -e "[\e[1;33m warn \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+			echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"forwarding disabled until the VPN is back up."
-			echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+			echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
 			/pia/pia-forward stop quite
 			exit			
 		else
 			if [ "$VERBOSE" = "yes" ]; then
-				echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet failure $LOOP_TIMEOUT of $FAIL_RETRY_INTERNET"
 			fi
 			sleep $SLEEP_PING_RETEST
