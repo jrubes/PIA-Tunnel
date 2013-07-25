@@ -57,7 +57,7 @@ function gen_ip_list() {
 
 	if [ ! -f "/pia/include/ip_list.txt" ]; then
 		echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-		  "\"/pia/include/ip_list.txt\" does not exist. Please run pia-setup first"
+		  "- \"/pia/include/ip_list.txt\" does not exist. Please run pia-setup first"
 		exit
 	fi
 
@@ -131,13 +131,9 @@ function ping_host() {
 		# failed IPs get removed from the array further down
 		if [ ${#PING_IP_LIST[@]} -lt 2 ];then
 			if [ "$VERBOSE_DEBUG" = "yes" ]; then
-				echo -e "[ info ] "$(date +"%Y-%m-%d %H:%M:%S")\
-					"debug -- PING_IP_LIST only has 1 entry left - rebuilding"
+				echo -e "[ debug ] "$(date +"%Y-%m-%d %H:%M:%S")\
+					"- PING_IP_LIST only has 1 entry left - rebuilding"
 			fi
-			for fghjd in ${#PING_IP_LIST[@]}
-			do
-				echo "$fghjd"
-			done
 			gen_ip_list
 		fi
 		
@@ -175,19 +171,10 @@ function ping_host() {
 		fi
     fi
 
-for poo in 	${PING_IP_LIST[@]}
-do
-	echo "  $poo"
-done
 	
 	#ping failed remove the IP from the random ping pool PING_IP_LIST
 	remove_ip_from_array PING_IP_LIST[@] "$host_ip"
 	PING_IP_LIST=("${RET_MODIFIED_ARRAY[@]}")
-for poo in 	${PING_IP_LIST[@]}
-do
-	echo "  $poo"
-done
-	sleep 5
   fi      
 
 }
@@ -198,7 +185,8 @@ function remove_ip_from_array() {
   unset RET_MODIFIED_ARRAY #clear contents
   
   if [ "$1" = "" ]; then
-    echo "FATAL SCRIPT ERROR, an array is required here!"
+	echo -e "[\e[1;31m error \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	  "- FATAL SCRIPT ERROR, an array is required here!"
 	return
   else
     declare -a source_array=("${!1}")
