@@ -67,7 +67,7 @@ function gen_ip_list() {
     THIS_MANY=10
   fi
   if [ "$VERBOSE_DEBUG" = "yes" ]; then
-	echo -e "[ debug ] "$(date +"%Y-%m-%d %H:%M:%S")\
+	echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- generating $THIS_MANY fresh IPs"
 		
   fi
@@ -131,7 +131,7 @@ function ping_host() {
 		# failed IPs get removed from the array further down
 		if [ ${#PING_IP_LIST[@]} -lt 2 ];then
 			if [ "$VERBOSE_DEBUG" = "yes" ]; then
-				echo -e "[ debug ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- PING_IP_LIST only has 1 entry left - rebuilding"
 			fi
 			gen_ip_list 15
@@ -204,7 +204,7 @@ function remove_ip_from_array() {
 		new_count=$((new_count + 1))
 	else
 		if [ "$VERBOSE_DEBUG" = "yes" ]; then
-			echo -e "[ debug ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- removed $2 from IP array"
 			
 		fi
@@ -342,4 +342,83 @@ function check_repair_internet() {
 			LOOP_TIMEOUT=$(($LOOP_TIMEOUT + 1))
 		fi	
 	done
+}
+
+function maintain_status_cache() {
+  maint_cache_file="$1"
+
+  #check if the cache is writable. no point in running if it is not
+  if [ -f "$maint_cache_file" ]; then
+    if [ ! -w "$maint_cache_file" ]; then
+      echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	"- $maint_cache_file is not writable?!?"
+      exit
+    fi
+  else
+    touch "$maint_cache_file" 2> /dev/null
+    #check exit status 
+    if [ "$?" = "1" ]; then
+      echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	"- \"$maint_cache_file\" is not writable?!?"
+      exit
+    fi
+    #remove the empty file so aborting the process will not keep an empty file around
+    rm -f "$maint_cache_file" 2> /dev/null
+  fi  
+  
+  if [ -f "$maint_cache_file" ]; then
+    date_string=`head -n1 $maint_cache_file | gawk -F" " '{print $4" "$5}'`
+    #convert date into timestamp
+    cache_ts=`date -d "$date_string" "+%s"`
+    cache_ts_expired=`date -d "30 minutes ago" "+%s"` 
+    if [ $cache_ts -gt $cache_ts_expired ]; then
+      return
+    fi
+  fi
+
+  if [ "$VERBOSE_DEBUG" = "yes" ]; then
+	  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+		  "- rebuilding cache"
+  fi
+
+  #get default gateway of tunnel interface using "ip"
+  #get IP of tunnel Gateway
+  TUN_GATEWAY=`/sbin/ip route show | grep "0.0.0.0/1" | gawk -F" " '{print $3}'`
+  #get tunnel IP
+  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  INT_IP=`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  EXT_IP=`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+
+  #get PIA username and password from /pia/login.conf
+  PIA_UN=`sed -n '1p' /pia/login.conf`
+  PIA_PW=`sed -n '2p' /pia/login.conf`
+
+
+  #check if the client ID has been generated and get it
+  if [ ! -f /pia/client_id ]; then
+    head -n 100 /dev/urandom | md5sum | tr -d " -" > /pia/client_id
+  fi
+  PIA_CLIENT_ID=`cat /pia/client_id`
+
+
+  #get open port of tunnel connection
+  TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
+
+  #the location may not support port forwarding
+  if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
+	  PORT_FW="enabled"
+  else
+	  PORT_FW="disabled"
+  fi
+  
+  #write info to cache file
+  echo "# generated on "$(date +"%Y-%m-%d %H:%M:%S") > "$maint_cache_file"
+  echo "VPNIP:$TUN_IP" >> "$maint_cache_file"
+  if [ "$PORT_FW" = "enabled" ]; then
+    echo "VPNPORT:$TUN_PORT" >> "$maint_cache_file"
+  else
+    echo "VPNPORT:none" >> "$maint_cache_file"
+  fi
+  echo "INTIP:$INT_IP" >> "$maint_cache_file"
+  echo "INTERNETIP:$EXT_IP" >> "$maint_cache_file"
 }

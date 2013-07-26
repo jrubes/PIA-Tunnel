@@ -19,89 +19,52 @@ if [ ! -f "/pia/settings.conf" ]; then
 	echo '' >> '/pia/settings.conf'
 fi
 source '/pia/settings.conf'
-
-STATUSCACHEFILE='/pia/status.txt'
-#check if the cache is writable. no point in running if it is not
-if [ -f "$STATUSCACHEFILE" ]; then
-  if [ ! -w "$STATUSCACHEFILE" ]; then
-    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-      "- $STATUSCACHEFILE is not writable?!?"
-    exit
-  fi
-else
-  touch "$STATUSCACHEFILE" 2> /dev/null
-  #check exit status 
-  if [ "$?" = "1" ]; then
-    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-      "- \"$STATUSCACHEFILE\" is not writable?!?"
-    exit
-  fi
-  #remove the empty file so aborting the process will not keep an empty file around
-  rm -f "$STATUSCACHEFILE" 2> /dev/null
-fi
-
-#get current age of file
-date_string=`head -n1 $STATUSCACHEFILE | gawk -F" " '{print $4" "$5}'`
-#convert date into timestamp
-cache_ts=`date -d "$date_string" "+%s"`
-cache_ts_expired=`date -d "30 minutes ago" "+%s"` 
-if [ $cache_ts -lt $cache_ts_expired ]; then
-	echo "Cache has expired, refreshing"
-fi
-
-
-exit
-#get default gateway of tunnel interface using "ip"
-#get IP of tunnel Gateway
-TUN_GATEWAY=`/sbin/ip route show | grep "0.0.0.0/1" | gawk -F" " '{print $3}'`
-#get tunnel IP
-TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-
-
-#get PIA username and password from /pia/login.conf
-PIA_UN=`sed -n '1p' /pia/login.conf`
-PIA_PW=`sed -n '2p' /pia/login.conf`
+source '/pia/include/functions.inc'
 
 #check the for default value
 if [ "$PIA_UN" = "your PIA account name on this line" ]; then
-	killall openvpn
-	echo
-	echo "Please add your Private Internet Access account information"
-	echo "to /pia/login.conf"
-	echo "Try"
-	echo -e "\tvi /pia/login.conf"
-	echo "or"
-	echo -e "\tnano /pia/login.conf"
-	echo
-	exit
+  killall openvpn
+  echo
+  echo "Please add your Private Internet Access account information"
+  echo "to /pia/login.conf"
+  echo "Try"
+  echo -e "\tvi /pia/login.conf"
+  echo "or"
+  echo -e "\tnano /pia/login.conf"
+  echo
+  exit
 fi
 
-#check if the client ID has been generated and get it
-if [ ! -f /pia/client_id ]; then
-	head -n 100 /dev/urandom | md5sum | tr -d " -" > /pia/client_id
+
+
+# create and or maintain the status cache file
+maintain_status_cache '/pia/include/status.txt'
+if [ "$?" != "0" ]; then
+  echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+    "- error during status cache maintenance\n\tpia-status will not work"
+  exit
 fi
-PIA_CLIENT_ID=`cat /pia/client_id`
 
 
-#get open port of tunnel connection
-TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
-
-#the location may not support port forwarding
-if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
-	PORT_FW=enabled
-else
-	PORT_FW=disabled
-fi
 
 
 #print connection details
-echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is up!"
-echo 
-echo "External IP: $TUN_IP"
-if [ "$PORT_FW" = "enabled" ]; then
-	echo "External Port: $TUN_PORT"
+ping_host "vpn"
+vpn_up=$RET_PING_HOST
+if [ "$RET_PING_HOST" = "OK" ]; then
+  echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is UP!"
+  port=`cat "include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+  if [ "$port" = "none" ]; then
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`cat "include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`" Port: location does not support forwarding"
+  else
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`cat "include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`" Port: $port"
+  fi
+  
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Internet IP: "`cat "include/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - LAN IP: "`cat "include/status.txt" | grep "INTIP" | gawk -F":" '{print $2}'`
 else
-	echo "Notice: Location does not support port forwarding"
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is DOWN!"
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Internet IP: "`cat "include/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - LAN IP: "`cat "include/status.txt" | grep "INTIP" | gawk -F":" '{print $2}'`
 fi
-echo
-echo 
+

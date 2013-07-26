@@ -105,11 +105,6 @@ while true; do
 		#VPN has completely failed. disable port forwarding and reset the firewall until this is fixed
 		/pia/pia-forward stop quite
 		
-	else
-		if [ "$VERBOSE_DEBUG" = "yes" ]; then
-			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"- VPN is UP"
-		fi
 	fi
 	#end of VPN test
 
@@ -199,10 +194,24 @@ while true; do
 	fi
   
   
+	# create and or maintain the status cache file
+	maintain_status_cache '/pia/include/status.txt'
+	if [ "$?" != "0" ]; then
+	  echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	    "- error during status cache maintenance\n\tpia-status will not work"
+	  exit
+	fi
   
 	if [ "$VERBOSE" = "yes" ]; then
-		echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- VPN is UP - next check in $SLEEP_MAIN_LOOP seconds..."
+	  vpn_port=`cat "include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+	  vpn_ip=`cat "include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+	  if [ "$vpn_port" = "none" ]; then
+	    echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+		    "- VPN is UP - VPN IP: $vpn_ip Port: no support"
+	  else
+	    echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+		    "- VPN is UP - VPN IP: $vpn_ip Port: $vpn_port"
+	  fi
 	fi
 	sleep $SLEEP_MAIN_LOOP
 	
