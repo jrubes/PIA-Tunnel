@@ -16,6 +16,8 @@ PING_IP_LIST[3]="208.67.220.220"
 
 VERBOSE_DEBUG="no" #yes/no
 
+RET_FILE_IS_WRITABLE="no"
+
 
 # checks if $1 is found in the PING_IP_LIST array
 # $2 may contain a custom array with IPs
@@ -374,38 +376,85 @@ function check_repair_internet() {
 	done
 }
 
+#checks if a file exists and is writeable or if the file can be created
+# $1 is the file name
+# returns RET_FILE_IS_WRITABLE either "yes" or "no"
+function file_is_writable() {
+	file_rw_permission_check="$1"
+	if [ "$2" = "return" ]; then
+		e_cond="return"
+	else
+		e_cond="exit"
+	fi
+
+  #check if the cache is writable. no point in running if it is not
+  if [ -f "$file_rw_permission_check" ]; then
+    if [ ! -w "$file_rw_permission_check" ]; then
+		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- $file_rw_permission_check is not writable?!?"
+	
+		RET_FILE_IS_WRITABLE="no"
+		return
+    fi
+  else
+    touch "$file_rw_permission_check" 2> /dev/null
+    #check exit status 
+    if [ "$?" = "1" ]; then
+		RET_FILE_IS_WRITABLE="no"
+		return
+    fi
+    #remove the empty file so aborting the process will not keep an empty file around
+    rm -f "$file_rw_permission_check" 2> /dev/null
+	RET_FILE_IS_WRITABLE="yes"
+  fi
+}
+
+#run an age check on a cache file
+# s1 is the filename
+# s2 how many minutes ago as integer, defaults to 30
+# returns RET_CACHE_AGE_CHECK "OK", "EXPIRED", "NOT FOUND"
+function cache_age_check() {
+	cache_age_check_time_passed=30
+	if [ "$2" != "" ]; then
+		cache_age_check_time_passed="$2"
+	fi
+
+	if [ -f "$1" ]; then
+		date_string=`head -n1 $maint_cache_file | gawk -F" " '{print $4" "$5}'`
+		#convert date into timestamp
+		cache_ts=`date -d "$date_string" "+%s"`
+		cache_ts_expired=`date -d "$cache_age_check_time_passed minutes ago" "+%s"` 
+		if [ $cache_ts -gt $cache_ts_expired ]; then
+			RET_CACHE_AGE_CHECK="OK"
+			return
+		else
+			RET_CACHE_AGE_CHECK="EXPIRED"
+			return
+		fi
+	else
+		RET_CACHE_AGE_CHECK="NOT FOUND"
+		return
+	fi
+}
+
 function maintain_status_cache() {
   maint_cache_file="$1"
 
   #check if the cache is writable. no point in running if it is not
-  if [ -f "$maint_cache_file" ]; then
-    if [ ! -w "$maint_cache_file" ]; then
+  file_is_writable "$1"
+  if [ "$RET_FILE_IS_WRITABLE" = "no" ]; then
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-	"- $maint_cache_file is not writable?!?"
+		"- $maint_cache_file is not writable?!?"
       exit
-    fi
-  else
-    touch "$maint_cache_file" 2> /dev/null
-    #check exit status 
-    if [ "$?" = "1" ]; then
-      echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-	"- \"$maint_cache_file\" is not writable?!?"
-      exit
-    fi
-    #remove the empty file so aborting the process will not keep an empty file around
-    rm -f "$maint_cache_file" 2> /dev/null
   fi  
   
-  if [ -f "$maint_cache_file" ]; then
-    date_string=`head -n1 $maint_cache_file | gawk -F" " '{print $4" "$5}'`
-    #convert date into timestamp
-    cache_ts=`date -d "$date_string" "+%s"`
-    cache_ts_expired=`date -d "30 minutes ago" "+%s"` 
-    if [ $cache_ts -gt $cache_ts_expired ]; then
-      return
-    fi
+  #check the age of the cache file
+  cache_age_check
+  if [ "$RET_CACHE_AGE_CHECK" = "OK" ]; then
+	return
   fi
 
+  # rebuilding cache from here on #
   if [ "$VERBOSE_DEBUG" = "yes" ]; then
 	  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 		  "- rebuilding cache"
