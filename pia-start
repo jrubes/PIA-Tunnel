@@ -54,7 +54,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 
 
 	#see if we have a tunnel open
-	ping_host "vpn"
+	ping_host "vpn" "quick"
 	if [ "$RET_PING_HOST" = "OK" ]; then
 		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- closing current VPN tunnel."
@@ -71,14 +71,14 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	echo -e "\tsee /pia/session.log for details"	
 	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
 
-	
-	
+
+
 
 	# start the FW script once the VPN is up and running
 	LOOP_PROTECT=0
 	while true; do
 	  ping_host "vpn"
-	  if [ "$RET_PING_HOST" = "OK" ]; then	    
+	  if [ "$RET_PING_HOST" = "OK" ]; then
 		# get port forwarding info
 		get_forward_port
 		if [ "$RET_FORWARD_PORT" != "FALSE" ]; then
@@ -87,17 +87,16 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 		else
 		  fw_port_forward=""
 		fi
-	    
+
 		# show connection data
 		echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- VPN connection to $1 established"$fw_port_forward
-	    
+
 	    /pia/pia-forward start quite
-	    #/pia/pia-status
 	    break
 	  fi
-	  
-	  
+
+
 	  #endless loop protect, about 30 seconds
 	  if [ "$LOOP_PROTECT" -eq 30 ]; then
 		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\

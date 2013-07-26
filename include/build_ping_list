@@ -77,7 +77,7 @@ do
     for (( x=1 ; x <= $max_ip_rounds ; x++ ))
     do
       # ping each host multiple times to ensure they are reliable
-      ping_host "internet" "$ip"
+      ping_host "any" "$ip"
       if [ "$RET_PING_HOST" = "ERROR" ]; then
 		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- ping failed $x/$max_ip_rounds attempts - excluding $ip"

@@ -7,6 +7,7 @@ RET_PING_HOST=""
 declare -a RET_MODIFIED_ARRAY
 RET_FORWARD_PORT="FALSE"
 PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
+PING_COMMAND_QUICK="ping -qn -c 1 -w 1 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
 
 # fallback list
 PING_IP_LIST[0]="8.8.8.8"
@@ -14,7 +15,7 @@ PING_IP_LIST[1]="8.8.4.4"
 PING_IP_LIST[2]="208.67.222.222"
 PING_IP_LIST[3]="208.67.220.220"
 
-VERBOSE_DEBUG="NO" #yes/no
+VERBOSE_DEBUG="no" #yes/no
 
 
 # checks if $1 is found in the PING_IP_LIST array
@@ -119,14 +120,22 @@ function gen_ip_list() {
 }
 
 # new ping function for pinging internet hosts
-# $s1 is either "internet" or "vpn"
+# $s1 is either "internet", "vpn" or "any"
+#  "any" means either one or both, let the function figure it out
 # $s2 the IP or Domain to ping
 function ping_host() {
 	RET_PING_HOST="ERROR"
 
-	if [ "$2" != "" ]; then
-		host_ip="$2"
-	else
+	host_ip="not set"
+	if [ "$2" != "" ] || [ "$3" != "" ]; then
+		if [ "$2" != "quick" ]; then
+			host_ip="$2"
+		elif [ "$2" = "quick" ] && [ "$3" != "" ]; then
+			host_ip="$3"		
+		fi
+	fi
+	
+	if [ "$host_ip" = "not set" ]; then
 		#check PING_IP_LIST and ensure that it still has enough IPs since
 		# failed IPs get removed from the array further down
 		if [ ${#PING_IP_LIST[@]} -lt 2 ];then
@@ -144,16 +153,47 @@ function ping_host() {
 		host_ip=${PING_IP_LIST[$rand]}
 	fi
   
+
+	#shall we make this a "quick" ping?
+	if [ "$2" = "quick" ] || [ "$3" = "quick" ]; then
+		pingthis=`echo "$PING_COMMAND" | sed -e "s/-i 0.5 -w 4 -W 0.5/-c 1 -w 1/g"`
+		if [ "$VERBOSE_DEBUG" = "yes" ]; then
+			echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- using \"quick\" ping command"
+		fi
+	else
+		pingthis=$PING_COMMAND
+	fi
     
+  
   if [ "$1" = "internet" ]; then
     #replace IP in $PING_COMMAND with $host_ip
-    pingthis=`echo "$PING_COMMAND" | sed -e "s/IP2TOPING/$host_ip/g"`
+    pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
     pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_EXT/g"`
-    PING_RESULT=`eval $pingthis`
-  else
-    pingthis=`echo "$PING_COMMAND" | sed -e "s/IP2TOPING/$host_ip/g"`
+	PING_RESULT=`eval $pingthis`
+	
+  elif [ "$1" = "vpn" ]; then
+    pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
     pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_TUNNEL/g"`
     PING_RESULT=`eval $pingthis`
+	
+  else
+	#use self to ping via VPN first then via Internet
+	# return "OK" on first success or "ERROR" on complete failure
+	ping_host "vpn" "$host_ip"
+	if [ "$RET_PING_HOST" = "OK" ]; then
+		RET_PING_HOST="OK" #ping via VPN was good
+		return
+	else
+		ping_host "internet" "$host_ip"
+		if [ "$RET_PING_HOST" = "OK" ]; then
+			RET_PING_HOST="OK" #ping via Internet was good
+			return
+		else
+			RET_PING_HOST="ERROR" #VPN and Internet are down
+			return
+		fi
+	fi
   fi
 
   if [ "$PING_RESULT" = "1" ]; then
