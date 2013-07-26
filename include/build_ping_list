@@ -94,7 +94,11 @@ do
 		aIPS[$ip_count]="$ip"
 		ip_count=$((ip_count + 1))
       else
-		echo "debug - IP $ip not unique"
+	if [ "$VERBOSE_DEBUG" = "yes" ]; then
+	      echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+		      "- $ip not unique"
+		      
+	fi      	
       fi
     fi
   done
