@@ -7,7 +7,6 @@ RET_PING_HOST=""
 declare -a RET_MODIFIED_ARRAY
 RET_FORWARD_PORT="FALSE"
 PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
-PING_COMMAND_QUICK="ping -qn -c 1 -w 1 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
 
 # fallback list
 PING_IP_LIST[0]="8.8.8.8"
