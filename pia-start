@@ -93,7 +93,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 			"- VPN connection to $1 established"$fw_port_forward
 	    
 	    /pia/pia-forward start quite
-	    /pia/pia-status
+	    #/pia/pia-status
 	    break
 	  fi
 	  
