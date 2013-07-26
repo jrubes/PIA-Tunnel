@@ -14,6 +14,9 @@ SLEEP_PING_RETEST=4
 # generate a few IPs for the uptime functions
 gen_ip_list
 
+# remove old status.txt
+rm -r '/pia/include/status.txt'
+
 #show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
 	LIST=`ls -1 /pia/ovpn/ | gawk -F"." '{print $1}'`
@@ -90,7 +93,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 			"- VPN connection to $1 established"$fw_port_forward
 	    
 	    /pia/pia-forward start quite
-	    #/pia/pia-status
+	    /pia/pia-status
 	    break
 	  fi
 	  

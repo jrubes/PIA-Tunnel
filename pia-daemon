@@ -51,7 +51,8 @@ SLEEP_RECONNECT_ERROR=320
 SLEEP_MAIN_LOOP=30
 
 
-
+# remove old status.txt
+rm -r '/pia/include/status.txt'
 
 
 # generate a few IPs for the uptime functions

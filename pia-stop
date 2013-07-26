@@ -21,3 +21,6 @@ else
 	/pia/pia-forward stop quite
 	ifdown eth0 2>/dev/null && ifup eth0 2>/dev/null #Debian
 fi
+
+# remove old status.txt
+rm -r '/pia/include/status.txt'
