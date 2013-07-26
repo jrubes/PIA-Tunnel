@@ -232,19 +232,10 @@ function switch_vpn() {
 		while true; do
 			ping_host "vpn"
 			if [ "$RET_PING_HOST" = "OK" ]; then
-					
-				# get port forwarding info
-				get_forward_port
-				if [ "$RET_FORWARD_PORT" != "FALSE" ]; then
-				  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-				  fw_port_forward="\n[info] "$(date +"%Y-%m-%d %H:%M:%S")" - IP: $TUN_IP Port: $RET_FORWARD_PORT"
-				else
-				  fw_port_forward=""
-				fi
 				
 				# show connection data
 				echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-					"- VPN connection to $CONN established"$fw_port_forward
+					"- VPN connection to $CONN established"
 				/pia/pia-forward start quite
 				RAN_FORWARD_FIX="no" #reset on working connection
 				return
