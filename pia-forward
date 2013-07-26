@@ -8,7 +8,7 @@ if [ "$1" = "start" ]; then
 	#this needs a loop to check if tun0 exists ... later
 	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
 		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-			" - turning port forwarding ON"
+			"- turning port forwarding ON"
 	fi
 	
 	/pia/include/fw-forward
@@ -19,7 +19,7 @@ fi
 if [ "$1" = "stop" ] || [ "$2" = "stop" ]; then
 	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
 		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-			" - turning port forwarding OFF"
+			"- turning port forwarding OFF"
 	fi
 	/pia/include/fw-no-forward
 	exit
@@ -28,7 +28,7 @@ fi
 
 if [ "$1" = "fix" ]; then
 	echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-		" - will attempt to stop any VPN tunnels \n\tand restart all network interfaces"
+		"- will attempt to stop any VPN tunnels \n\tand restart all network interfaces"
 
 	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
 		killall openvpn 2>/dev/null	
