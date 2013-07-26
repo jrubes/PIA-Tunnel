@@ -15,7 +15,7 @@ SLEEP_PING_RETEST=4
 gen_ip_list
 
 # remove old status.txt
-rm -r '/pia/include/status.txt'
+rm -r '/pia/include/status.txt' 2>/dev/null
 
 #show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then

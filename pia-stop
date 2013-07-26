@@ -23,4 +23,4 @@ else
 fi
 
 # remove old status.txt
-rm -r '/pia/include/status.txt'
+rm -r '/pia/include/status.txt' 2>/dev/null

@@ -52,7 +52,7 @@ SLEEP_MAIN_LOOP=30
 
 
 # remove old status.txt
-rm -r '/pia/include/status.txt'
+rm -r '/pia/include/status.txt' 2>/dev/null
 
 
 # generate a few IPs for the uptime functions
