@@ -446,7 +446,7 @@ function maintain_status_cache() {
   fi  
   
   #check the age of the cache file
-  cache_age_check
+  cache_age_check "$maint_cache_file"
   if [ "$RET_CACHE_AGE_CHECK" = "OK" ]; then
 	return
   fi
@@ -454,7 +454,7 @@ function maintain_status_cache() {
   # rebuilding cache from here on #
   if [ "$VERBOSE_DEBUG" = "yes" ]; then
 	  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-		  "- rebuilding cache"
+		  "- rebuilding cache $maint_cache_file"
   fi
 
   #get default gateway of tunnel interface using "ip"
