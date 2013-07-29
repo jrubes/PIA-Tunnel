@@ -77,8 +77,10 @@ while true; do
 	if [ "$vpn_up" = "ERROR" ]; then
 	  #VPN has completely failed. 
 	  # disable port forwarding and reset the firewall until this is fixed
-	  echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-		"- VPN has failed, about to stop all FORWARDING!"	  
+	  if [ "$VERBOSE_DEBUG" = "yes" ]; then
+	    echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+		  "- VPN has failed, about to stop all FORWARDING!"	  
+	  fi
 	  /pia/pia-forward stop quite
 	fi
 	#end of VPN test
@@ -117,13 +119,14 @@ while true; do
 			#ping loop timeout
 			if [ "$LOOP_TIMEOUT" -gt $FAIL_RETRY_INTERNET ]; then
 				echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-					"forwarding disabled until the VPN is back up."
+					"- forwarding disabled until the VPN is back up."
 				echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
 				/pia/pia-forward stop quite
 				sleep $SLEEP_INTERNET_DOWN
 
-				#restarting pia-daemon
+				#restarting pia-daemon because there is no goto :(
+				# will have to rewrite this script with support for contitions
 				/pia/pia-daemon shutup
 				exit
 				break

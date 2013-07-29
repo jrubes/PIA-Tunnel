@@ -361,7 +361,7 @@ function check_repair_internet() {
 		#ping loop timeout
 		if [ "$LOOP_TIMEOUT" -gt $FAIL_RETRY_INTERNET ]; then
 			echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"forwarding disabled until the VPN is back up."
+				"- forwarding disabled until the VPN is back up."
 			echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
 			/pia/pia-forward stop quite
