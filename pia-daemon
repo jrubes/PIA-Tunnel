@@ -101,7 +101,7 @@ while true; do
 					#only do this once per internet connection failure
 					echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 						"- Internet connection appears to be down"
-					echo -e "\trunning \"pia-forward fix\""
+					echo -e "\trunning ${bold}pia-forward fix${normal}"
 					RAN_FORWARD_FIX="yes"
 					/pia/pia-forward fix quite
 				fi
