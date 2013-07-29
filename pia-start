@@ -17,6 +17,14 @@ gen_ip_list
 # remove old status.txt
 rm -r '/pia/include/status.txt' 2>/dev/null
 
+#for pretty print
+bold=`tput bold`
+normal=`tput sgr0`
+
+
+
+
+
 #show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
 	LIST=`ls -1 /pia/ovpn/ | gawk -F"." '{print $1}'`
@@ -49,10 +57,6 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	fi
 
 	
-	#ensure internet works before going further
-	check_repair_internet
-
-
 	#see if we have a tunnel open
 	ping_host "vpn" "quick"
 	if [ "$RET_PING_HOST" = "OK" ]; then
@@ -64,6 +68,8 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 		/pia/pia-forward stop quite	
 	fi
 
+	#ensure internet works before going further
+	check_repair_internet
 
 
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
@@ -109,4 +115,8 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 		LOOP_PROTECT=$(($LOOP_PROTECT + 1))
 	  fi
 	done
+else
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+	  "- no connection with name $1."
+  echo -e "\ttry ${bold}pia-start list${normal} for a list of connections."	
 fi
