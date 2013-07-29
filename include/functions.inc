@@ -420,7 +420,7 @@ function cache_age_check() {
 	fi
 
 	if [ -f "$1" ]; then
-		date_string=`head -n1 $maint_cache_file | gawk -F" " '{print $4" "$5}'`
+		date_string=`head -n1 $1 | gawk -F" " '{print $4" "$5}'`
 		#convert date into timestamp
 		cache_ts=`date -d "$date_string" "+%s"`
 		cache_ts_expired=`date -d "$cache_age_check_time_passed minutes ago" "+%s"` 

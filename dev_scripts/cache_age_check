@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# script to check age checking functions
+
+LANG=en_US.UTF-8
+export LANG
+source '/pia/settings.conf'
+source '/pia/include/functions.inc'
+
+
+filechk="/pia/include/ip_list.txt"
+cache_age_check "$filechk"
+echo "$filechk has $RET_CACHE_AGE_CHECK"
+
+filechk="/pia/include/status.txt"
+cache_age_check "$filechk"
+echo "$filechk has $RET_CACHE_AGE_CHECK"
