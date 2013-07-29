@@ -276,8 +276,10 @@ function switch_vpn() {
 			if [ "$RET_PING_HOST" = "OK" ]; then
 				
 				# show connection data
+				vpn_port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+				vpn_ip=`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'
 				echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-					"- VPN connection to $CONN established"
+					"- VPN connection to $CONN established\n\tVPN IP: $vpn_ip Port:$vpn_port"
 				/pia/pia-forward start quite
 				RAN_FORWARD_FIX="no" #reset on working connection
 				return
@@ -499,7 +501,7 @@ function maintain_status_cache() {
   if [ "$PORT_FW" = "enabled" ]; then
     echo "VPNPORT:$TUN_PORT" >> "$maint_cache_file"
   else
-    echo "VPNPORT:none" >> "$maint_cache_file"
+    echo "VPNPORT:no support" >> "$maint_cache_file"
   fi
   echo "INTIP:$INT_IP" >> "$maint_cache_file"
   echo "INTERNETIP:$EXT_IP" >> "$maint_cache_file"
