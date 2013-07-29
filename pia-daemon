@@ -104,9 +104,11 @@ while true; do
 			fi
 		done
 
-		#VPN has completely failed. disable port forwarding and reset the firewall until this is fixed
-		/pia/pia-forward stop quite
-
+	fi
+	if [ "$vpn_up" = "ERROR" ]; then
+	  #VPN has completely failed. 
+	  # disable port forwarding and reset the firewall until this is fixed  
+	  /pia/pia-forward stop quite
 	fi
 	#end of VPN test
 
