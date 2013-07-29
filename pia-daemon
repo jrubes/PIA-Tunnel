@@ -172,8 +172,8 @@ while true; do
 	fi
 
 	if [ "$VERBOSE" = "yes" ]; then
-	  vpn_port=`cat "include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
-	  vpn_ip=`cat "include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+	  vpn_port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+	  vpn_ip=`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
 	  if [ "$vpn_port" = "none" ]; then
 	    echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 		    "- VPN is UP - VPN IP: $vpn_ip Port: no support"
