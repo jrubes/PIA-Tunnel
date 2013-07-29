@@ -4,8 +4,11 @@ export LANG
 
 #return variables and static stuff
 RET_PING_HOST=""
+RET_FILE_IS_WRITABLE="no"
 declare -a RET_MODIFIED_ARRAY
 RET_FORWARD_PORT="FALSE"
+
+# WARNING DO NOT CHANGE the ping command! ping_host uses sed to modify the string
 PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
 
 # fallback list
@@ -14,9 +17,7 @@ PING_IP_LIST[1]="8.8.4.4"
 PING_IP_LIST[2]="208.67.222.222"
 PING_IP_LIST[3]="208.67.220.220"
 
-VERBOSE_DEBUG="no" #yes/no
 
-RET_FILE_IS_WRITABLE="no"
 
 
 # checks if $1 is found in the PING_IP_LIST array
@@ -350,7 +351,7 @@ function check_repair_internet() {
 				#only do this once per internet connection failure
 				echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet connection appears to be down"
-				echo -e "\trunning pia-forward fix"
+				echo -e "\trunning ${bold}pia-forward fix${normal}"
 				RAN_FORWARD_FIX="yes"
 				/pia/pia-forward fix quite
 			fi
@@ -380,32 +381,28 @@ function check_repair_internet() {
 # $1 is the file name
 # returns RET_FILE_IS_WRITABLE either "yes" or "no"
 function file_is_writable() {
-	file_rw_permission_check="$1"
-	if [ "$2" = "return" ]; then
-		e_cond="return"
-	else
-		e_cond="exit"
-	fi
+  file_rw_permission_check="$1"
 
   #check if the cache is writable. no point in running if it is not
   if [ -f "$file_rw_permission_check" ]; then
     if [ ! -w "$file_rw_permission_check" ]; then
-		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- $file_rw_permission_check is not writable?!?"
-	
-		RET_FILE_IS_WRITABLE="no"
-		return
+      RET_FILE_IS_WRITABLE="no"
+      return
+    else
+      RET_FILE_IS_WRITABLE="yes"
+      return    
     fi
   else
     touch "$file_rw_permission_check" 2> /dev/null
     #check exit status 
     if [ "$?" = "1" ]; then
-		RET_FILE_IS_WRITABLE="no"
-		return
+      RET_FILE_IS_WRITABLE="no"
+      return
     fi
     #remove the empty file so aborting the process will not keep an empty file around
     rm -f "$file_rw_permission_check" 2> /dev/null
 	RET_FILE_IS_WRITABLE="yes"
+	return
   fi
 }
 
@@ -441,10 +438,10 @@ function maintain_status_cache() {
   maint_cache_file="$1"
 
   #check if the cache is writable. no point in running if it is not
-  file_is_writable "$1"
+  file_is_writable "$maint_cache_file"
   if [ "$RET_FILE_IS_WRITABLE" = "no" ]; then
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-		"- $maint_cache_file is not writable?!?"
+		"- $maint_cache_file is not writable?!? $RET_FILE_IS_WRITABLE"
       exit
   fi  
   
@@ -463,10 +460,16 @@ function maintain_status_cache() {
   #get default gateway of tunnel interface using "ip"
   #get IP of tunnel Gateway
   TUN_GATEWAY=`/sbin/ip route show | grep "0.0.0.0/1" | gawk -F" " '{print $3}'`
-  #get tunnel IP
-  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  #get IPs of interfaces
   INT_IP=`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
   EXT_IP=`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  
+  interface_exists "$IF_TUNNEL"
+  if [ "$RET_INTERFACE_EXISTS" = "yes" ]; then
+    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  else
+    TUN_IP=""
+  fi
 
   #get PIA username and password from /pia/login.conf
   PIA_UN=`sed -n '1p' /pia/login.conf`
@@ -500,4 +503,24 @@ function maintain_status_cache() {
   fi
   echo "INTIP:$INT_IP" >> "$maint_cache_file"
   echo "INTERNETIP:$EXT_IP" >> "$maint_cache_file"
+}
+
+
+# function to check if a network interface exists
+# $1 name of network interface as string
+# returns RET_INTERFACE_EXISTS "yes" or "no"
+function interface_exists() {
+  if [ -z ${1} ]; then
+    RET_INTERFACE_EXISTS="no"
+    return
+  fi
+  
+  check=`ip addr show $1 2>&1 | grep -c "does not exist"`
+  if [ "$check" = "0" ]; then
+    RET_INTERFACE_EXISTS="yes"
+    return
+  else
+    RET_INTERFACE_EXISTS="no"
+    return
+  fi
 }
