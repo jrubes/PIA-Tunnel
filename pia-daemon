@@ -16,39 +16,6 @@ fi
 # *) this daemon script is startet which will send one ping every n seconds through the tunnel
 # 	if the ping fails n times the tunnel is closed or restartet
 
-# list of VPN connections to use, the first is awlays the primary
-MYVPN[0]="Germany"
-MYVPN[1]="Sweden"
-MYVPN[2]="Romania"
-
-# set action when VPN fails: terminate | failover
-FAIL_ACTION="failover"
-FAIL_RETRY_VPN=4
-FAIL_RETRY_INTERNET=3
-FAIL_RETRY_DELAY=1
-
-
-# setting verbose to yes will print status notification after each check. any other settings for "background mode"
-VERBOSE="yes"
-VERBOSE_DEBUG="no"
-
-# time in seconds to wait before rechecking a down Internet connection
-# each run takes a few seconds to complete so don't go too low!
-# default 320 (5 minutes)
-SLEEP_INTERNET_DOWN=320
-
-# time in seconds to wait before attempting to ping a resource again
-# default 4
-SLEEP_PING_RETEST=4
-
-# time in seconds between retries when none of the PIA Gateways can be reached
-# default 320 (5 minutes)
-SLEEP_RECONNECT_ERROR=320
-
-# time (seconds) in between "uptime" checks. every check will send a few pings
-# to some server so please don't flood them or they may block you
-# default 30
-SLEEP_MAIN_LOOP=30
 
 
 # remove old status.txt

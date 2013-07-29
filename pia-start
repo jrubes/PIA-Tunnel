@@ -17,11 +17,6 @@ gen_ip_list
 # remove old status.txt
 rm -r '/pia/include/status.txt' 2>/dev/null
 
-#for pretty print
-bold=`tput bold`
-normal=`tput sgr0`
-
-
 
 
 

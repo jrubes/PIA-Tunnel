@@ -25,6 +25,9 @@ if [ ! -f "/pia/settings.conf" ]; then
 	echo 'LANG=en_US.UTF-8' >> '/pia/settings.conf'
 	echo 'export LANG' >> '/pia/settings.conf'
 	echo '' >> '/pia/settings.conf'
+	echo '' >> '/pia/settings.conf'
+	echo '# interface and network settings' >> '/pia/settings.conf'
+	echo '#####' >> '/pia/settings.conf'
 	echo '# name of your external interface. this connects to the Internet/Router' >> '/pia/settings.conf'
 	echo 'IF_EXT="eth0"' >> '/pia/settings.conf'
 	echo '# name of your internal interface. this if for the private VM network' >> '/pia/settings.conf'
@@ -34,7 +37,8 @@ if [ ! -f "/pia/settings.conf" ]; then
 	echo '' >> '/pia/settings.conf'
 fi
 
-FILES="pia-start pia-stop pia-status pia-update pia-setup pia-forward  pia-prepare-ovpn pia-daemon"
+FILES="pia-start pia-stop pia-status pia-update"
+FILES="$FILES pia-setup pia-forward  pia-prepare-ovpn pia-daemon"
 for f in $FILES
 do
 	if [ -f "/bin/$f" ]; then
@@ -60,6 +64,11 @@ if [ ! -f "/pia/include/ip_list.txt" ]; then
 	echo -e "\tthis will take a couple of minutes...."
 	/pia/include/build_ping_list
 fi
+
+
+
+#add missing settings to settings.conf
+/pia/include/fix_settings
 
 
 
