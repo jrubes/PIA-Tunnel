@@ -62,6 +62,8 @@ while true; do
 					echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 						"- VPN ping worked this time...."
 				fi
+				/pia/pia-forward start quite #need to add a check for active
+							     #iptables rules soon
 				break
 			else
 				if [ "$VERBOSE" = "yes" ]; then
@@ -71,9 +73,13 @@ while true; do
 			fi
 		done
 
-		#VPN has completely failed. disable port forwarding and reset the firewall until this is fixed
-		/pia/pia-forward stop quite
-
+	fi
+	if [ "$vpn_up" = "ERROR" ]; then
+	  #VPN has completely failed. 
+	  # disable port forwarding and reset the firewall until this is fixed
+	  echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+		"- VPN has failed, about to stop all FORWARDING!"	  
+	  /pia/pia-forward stop quite
 	fi
 	#end of VPN test
 
