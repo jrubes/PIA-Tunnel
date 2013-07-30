@@ -124,7 +124,7 @@ function gen_ip_list() {
 # new ping function for pinging internet hosts
 # $s1 is either "internet", "vpn" or "any"
 #  "any" means either one or both, let the function figure it out
-# $s2 the IP or Domain to ping
+# $2 the IP or Domain to ping
 function ping_host() {
 	RET_PING_HOST="ERROR"
 
@@ -256,6 +256,16 @@ function remove_ip_from_array() {
   #RET_MODIFIED_ARRAY is now the new array
 }
 
+# will print out details about VPN connection using status cache
+# $1 connection name
+function echo_conn_established() {
+  # show connection data
+  maintain_status_cache '/pia/include/status.txt'
+  vpn_port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+  vpn_ip=`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+  echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	  "- VPN connection to $1 established\n\tVPN IP: $vpn_ip Port:$vpn_port"
+}
 
 #function to handle switching of failover connections by using the MYVPN array
 function switch_vpn() {
@@ -264,7 +274,7 @@ function switch_vpn() {
 		if [ "$VERBOSE" = "yes" ]; then
 			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- establishing a VPN connection to $CONN."
-			echo -e "\tsee /pia/session.log for details"
+			echo -e "\tsee ${bold}/pia/session.log${normal} for details"
 		fi
 		killall openvpn &> /dev/null
 		openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/session.log &	
@@ -276,11 +286,8 @@ function switch_vpn() {
 			if [ "$RET_PING_HOST" = "OK" ]; then
 				
 				# show connection data
-				maintain_status_cache '/pia/include/status.txt'
-				vpn_port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
-				vpn_ip=`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
-				echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-					"- VPN connection to $CONN established\n\tVPN IP: $vpn_ip Port:$vpn_port"
+				echo_conn_established $CONN
+				#start firewall and enable forwarding
 				/pia/pia-forward start quite
 				RAN_FORWARD_FIX="no" #reset on working connection
 				return
