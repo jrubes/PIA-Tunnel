@@ -125,15 +125,16 @@ function gen_ip_list() {
 # $s1 is either "internet", "vpn" or "any"
 #  "any" means either one or both, let the function figure it out
 # $2 the IP or Domain to ping
+# $3 or $4 "quick" for a fast ping or "keep" to keep the IP in the IP cache
 function ping_host() {
 	RET_PING_HOST="ERROR"
 
 	host_ip="not set"
 	if [ "$2" != "" ] || [ "$3" != "" ]; then
-		if [ "$2" != "quick" ]; then
+		if [ "$2" != "quick" ] && [ "$2" != "keep" ]; then
 			host_ip="$2"
-		elif [ "$2" = "quick" ] && [ "$3" != "" ]; then
-			host_ip="$3"		
+		elif [ "$2" = "quick" ] && [ "$3" != "keep" ] && [ "$3" != "" ]; then
+			host_ip="$3"
 		fi
 	fi
 	
@@ -182,12 +183,12 @@ function ping_host() {
   else
 	#use self to ping via VPN first then via Internet
 	# return "OK" on first success or "ERROR" on complete failure
-	ping_host "vpn" "$host_ip"
+	ping_host "vpn" "$host_ip" "keep"
 	if [ "$RET_PING_HOST" = "OK" ]; then
 		RET_PING_HOST="OK" #ping via VPN was good
 		return
 	else
-		ping_host "internet" "$host_ip"
+		ping_host "internet" "$host_ip" "keep"
 		if [ "$RET_PING_HOST" = "OK" ]; then
 			RET_PING_HOST="OK" #ping via Internet was good
 			return
@@ -206,17 +207,19 @@ function ping_host() {
     if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		if [ "$1" = "internet" ]; then
 			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"- Internet ping failed $host_ip!"
+				"- Internet ping failed $host_ip"
 		else
 			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"- VPN ping failed $host_ip!"
+				"- VPN ping failed $host_ip"
 		fi
     fi
 
 	
-	#ping failed remove the IP from the random ping pool PING_IP_LIST
-	remove_ip_from_array PING_IP_LIST[@] "$host_ip"
-	PING_IP_LIST=("${RET_MODIFIED_ARRAY[@]}")
+	if [ "$2" != "keep" ] && [ "$3" != "keep" ] && [ "$4" != "keep" ]; then
+	  #ping failed remove the IP from the random ping pool PING_IP_LIST
+	  remove_ip_from_array PING_IP_LIST[@] "$host_ip"
+	  PING_IP_LIST=("${RET_MODIFIED_ARRAY[@]}")
+	fi
   fi      
 
 }
@@ -282,7 +285,8 @@ function switch_vpn() {
 		#wait until connection has been established
 		LOOP_PROTECT=0
 		while true; do
-			ping_host "vpn"
+			ping_host "vpn" "keep" #keep here since the ping will
+					       #fail until the connection stands
 			if [ "$RET_PING_HOST" = "OK" ]; then
 				
 				# show connection data
