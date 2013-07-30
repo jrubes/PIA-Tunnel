@@ -276,6 +276,7 @@ function switch_vpn() {
 			if [ "$RET_PING_HOST" = "OK" ]; then
 				
 				# show connection data
+				maintain_status_cache '/pia/include/status.txt'
 				vpn_port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
 				vpn_ip=`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
 				echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
