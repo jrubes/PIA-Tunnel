@@ -11,6 +11,10 @@ APT::Install-Recommends "0" ; APT::Install-Suggests "0" ;
     update-rc.d  ntp remove
     update-rc.d  mpt-statusd remove
     
+2.4)  avoid using SWAP 
+      echo "0" > /proc/sys/vm/swappiness
+    
+    
 2.5) vi /etc/dhcp/dhclient.conf
   on line 21 add
     supersede domain-name-servers 8.8.8.8, 208.67.222.222, 8.8.4.4, 208.67.220.220;

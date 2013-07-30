@@ -267,7 +267,7 @@ function echo_conn_established() {
   vpn_port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
   vpn_ip=`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
   echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-	  "- VPN connection to $1 established\n\tVPN IP: $vpn_ip Port:$vpn_port"
+	  "- VPN connection to $1 established\n\tVPN IP: $vpn_ip Port: $vpn_port"
 }
 
 #function to handle switching of failover connections by using the MYVPN array

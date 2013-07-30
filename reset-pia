@@ -50,8 +50,8 @@ echo 'IF_TUNNEL="tun0"' >> '/pia/settings.conf'
 echo '' >> '/pia/settings.conf'
 
 
-
-
+# clear cache and SWAP
+sync && /sbin/sysctl vm.drop_caches=3 && swapoff -a && swapon -a
 
 
 
@@ -59,3 +59,4 @@ echo '' >> '/pia/settings.conf'
 chown -R root.root /pia
 chmod -R og-rwx /pia
 chmod u+x /pia/pia-*
+echo "Done, reboot or shutdown now!"
