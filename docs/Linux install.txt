@@ -7,7 +7,7 @@
 APT::Install-Recommends "0" ; APT::Install-Suggests "0" ;
 
 
-2) apt-get install openvpn screen dnsutils isc-dhcp-server vim git-core ntp open-vm-tools
+2) apt-get install openvpn screen dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc
     update-rc.d  ntp remove
     update-rc.d  mpt-statusd remove
     
@@ -101,5 +101,7 @@ do
 done
 depmod -a ; update-initramfs -u
 
+
+11) /pia/reset-pia ; halt
 
 
