@@ -70,10 +70,37 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 			Connect client VMs to this LAN segment and remove or disable their other network cards.
 			
 	4.b) ESXi
-		* to be added -- use the OVF Template!
+		* In vSphere Client
+		1) Setup a private VM LAN segment
+		  * select your ESXi server and choose "Configuration"
+		  * Click on "Networking" => "Add Networking..."
+		  * "Virtual Machine" => "Create a vSphere standard switch" uncheck any selected interfaces!
+		    The preview must list "No adapters" on the "Physical Adapters" side!
+		  * Enter a network name, I use "VPN Network - PIA"
+		      Double check the preview, it should look like this
+		      https://github.com/KaiserSoft/PIA-Tunnel/blob/master/docs/esxi_private_network.png
+		
+		2) Import the OVF Image
+		  * Extract the file you downloaded. You should now have a folder with tree files
+		  * "File" => "Deploy OVF Template..."
+		  * Browse to the extraced files and select "PIA Tunnel.ovf" => "Next" => "Next"
+		  * Give the VM a name and select a datastore to keep the machine on => "Next"
+		  * I use "Thin Provision" since the VM will not change much
+		  * Select your external Network on the "Network Mapping" screen
+		  * Do not auto power the machine once deployment is complete
+		
+		3) Configure VM
+		  * Select the VM => "Edit Settings"
+		  * Make sure that "Network adapter 1" is connected to the network with Internet access
+		    and that "Network adapter 2" is connected to the private LAN segment you created
+		    in step 1 above.
+		  * RAM should be set to at least 92MB RAM. I have never seen the VM SWAP so 92MB is 
+		    tight but enough.
+		  * Save the changes and power the VM on
+		
 
-5) Check that the machine has one CPU and around 80MB of RAM. 
-   PIA Tunnel VM will use around 53MB after a fresh boot so you should use your RAM elsewhere.
+5) Check that the machine has one CPU and around 92MB of RAM. 
+   PIA Tunnel VM will use around 56MB after a fresh boot so you should use your RAM elsewhere.
 
 6) Start the VM. When asked if you moved or copied it, select "I copied it".
 

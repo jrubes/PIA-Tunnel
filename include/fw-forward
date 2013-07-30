@@ -70,13 +70,13 @@ if [ "$PORT_FW" = "enabled" ]; then
 	iptables -A FORWARD -i $IF_TUNNEL -p tcp --dport $TUN_PORT -d 192.168.10.101 -j ACCEPT
 	iptables -A FORWARD -i $IF_TUNNEL -p udp --dport $TUN_PORT -d 192.168.10.101 -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
-		echo -e "[ debug ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- firewall forwarding has been enabled, really!"
+		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- port forwaring $IF_TUNNEL => 192.168.10.101:$TUN_PORT has been enabled"
 	fi
 else
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
-		echo -e "[ debug ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- firewall forwarding has NOT NOT NOT been enabled!"
+		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- port forwaring $IF_TUNNEL => 192.168.10.101 has NOT been enabled"
 	fi
 fi
 

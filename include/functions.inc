@@ -4,8 +4,11 @@ export LANG
 
 #return variables and static stuff
 RET_PING_HOST=""
+RET_FILE_IS_WRITABLE="no"
 declare -a RET_MODIFIED_ARRAY
 RET_FORWARD_PORT="FALSE"
+
+# WARNING DO NOT CHANGE the ping command! ping_host uses sed to modify the string
 PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
 
 # fallback list
@@ -14,7 +17,7 @@ PING_IP_LIST[1]="8.8.4.4"
 PING_IP_LIST[2]="208.67.222.222"
 PING_IP_LIST[3]="208.67.220.220"
 
-VERBOSE_DEBUG="no" #yes/no
+
 
 
 # checks if $1 is found in the PING_IP_LIST array
@@ -121,16 +124,17 @@ function gen_ip_list() {
 # new ping function for pinging internet hosts
 # $s1 is either "internet", "vpn" or "any"
 #  "any" means either one or both, let the function figure it out
-# $s2 the IP or Domain to ping
+# $2 the IP or Domain to ping
+# $3 or $4 "quick" for a fast ping or "keep" to keep the IP in the IP cache
 function ping_host() {
 	RET_PING_HOST="ERROR"
 
 	host_ip="not set"
 	if [ "$2" != "" ] || [ "$3" != "" ]; then
-		if [ "$2" != "quick" ]; then
+		if [ "$2" != "quick" ] && [ "$2" != "keep" ]; then
 			host_ip="$2"
-		elif [ "$2" = "quick" ] && [ "$3" != "" ]; then
-			host_ip="$3"		
+		elif [ "$2" = "quick" ] && [ "$3" != "keep" ] && [ "$3" != "" ]; then
+			host_ip="$3"
 		fi
 	fi
 	
@@ -179,12 +183,12 @@ function ping_host() {
   else
 	#use self to ping via VPN first then via Internet
 	# return "OK" on first success or "ERROR" on complete failure
-	ping_host "vpn" "$host_ip"
+	ping_host "vpn" "$host_ip" "keep"
 	if [ "$RET_PING_HOST" = "OK" ]; then
 		RET_PING_HOST="OK" #ping via VPN was good
 		return
 	else
-		ping_host "internet" "$host_ip"
+		ping_host "internet" "$host_ip" "keep"
 		if [ "$RET_PING_HOST" = "OK" ]; then
 			RET_PING_HOST="OK" #ping via Internet was good
 			return
@@ -203,17 +207,19 @@ function ping_host() {
     if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		if [ "$1" = "internet" ]; then
 			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"- Internet ping failed $host_ip!"
+				"- Internet ping failed $host_ip"
 		else
 			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"- VPN ping failed $host_ip!"
+				"- VPN ping failed $host_ip"
 		fi
     fi
 
 	
-	#ping failed remove the IP from the random ping pool PING_IP_LIST
-	remove_ip_from_array PING_IP_LIST[@] "$host_ip"
-	PING_IP_LIST=("${RET_MODIFIED_ARRAY[@]}")
+	if [ "$2" != "keep" ] && [ "$3" != "keep" ] && [ "$4" != "keep" ]; then
+	  #ping failed remove the IP from the random ping pool PING_IP_LIST
+	  remove_ip_from_array PING_IP_LIST[@] "$host_ip"
+	  PING_IP_LIST=("${RET_MODIFIED_ARRAY[@]}")
+	fi
   fi      
 
 }
@@ -253,6 +259,16 @@ function remove_ip_from_array() {
   #RET_MODIFIED_ARRAY is now the new array
 }
 
+# will print out details about VPN connection using status cache
+# $1 connection name
+function echo_conn_established() {
+  # show connection data
+  maintain_status_cache '/pia/include/status.txt'
+  vpn_port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+  vpn_ip=`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+  echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	  "- VPN connection to $1 established\n\tVPN IP: $vpn_ip Port: $vpn_port"
+}
 
 #function to handle switching of failover connections by using the MYVPN array
 function switch_vpn() {
@@ -261,7 +277,7 @@ function switch_vpn() {
 		if [ "$VERBOSE" = "yes" ]; then
 			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- establishing a VPN connection to $CONN."
-			echo -e "\tsee /pia/session.log for details"
+			echo -e "\tsee ${bold}/pia/session.log${normal} for details"
 		fi
 		killall openvpn &> /dev/null
 		openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/session.log &	
@@ -269,12 +285,13 @@ function switch_vpn() {
 		#wait until connection has been established
 		LOOP_PROTECT=0
 		while true; do
-			ping_host "vpn"
+			ping_host "vpn" "keep" #keep here since the ping will
+					       #fail until the connection stands
 			if [ "$RET_PING_HOST" = "OK" ]; then
 				
 				# show connection data
-				echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-					"- VPN connection to $CONN established"
+				echo_conn_established $CONN
+				#start firewall and enable forwarding
 				/pia/pia-forward start quite
 				RAN_FORWARD_FIX="no" #reset on working connection
 				return
@@ -348,7 +365,7 @@ function check_repair_internet() {
 				#only do this once per internet connection failure
 				echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet connection appears to be down"
-				echo -e "\trunning pia-forward fix"
+				echo -e "\trunning ${bold}pia-forward fix${normal}"
 				RAN_FORWARD_FIX="yes"
 				/pia/pia-forward fix quite
 			fi
@@ -358,7 +375,7 @@ function check_repair_internet() {
 		#ping loop timeout
 		if [ "$LOOP_TIMEOUT" -gt $FAIL_RETRY_INTERNET ]; then
 			echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"forwarding disabled until the VPN is back up."
+				"- forwarding disabled until the VPN is back up."
 			echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
 			/pia/pia-forward stop quite
@@ -374,50 +391,99 @@ function check_repair_internet() {
 	done
 }
 
+#checks if a file exists and is writeable or if the file can be created
+# $1 is the file name
+# returns RET_FILE_IS_WRITABLE either "yes" or "no"
+function file_is_writable() {
+  file_rw_permission_check="$1"
+
+  #check if the cache is writable. no point in running if it is not
+  if [ -f "$file_rw_permission_check" ]; then
+    if [ ! -w "$file_rw_permission_check" ]; then
+      RET_FILE_IS_WRITABLE="no"
+      return
+    else
+      RET_FILE_IS_WRITABLE="yes"
+      return    
+    fi
+  else
+    touch "$file_rw_permission_check" 2> /dev/null
+    #check exit status 
+    if [ "$?" = "1" ]; then
+      RET_FILE_IS_WRITABLE="no"
+      return
+    fi
+    #remove the empty file so aborting the process will not keep an empty file around
+    rm -f "$file_rw_permission_check" 2> /dev/null
+	RET_FILE_IS_WRITABLE="yes"
+	return
+  fi
+}
+
+#run an age check on a cache file
+# s1 is the filename
+# s2 how many minutes ago as integer, defaults to 30
+# returns RET_CACHE_AGE_CHECK "OK", "EXPIRED", "NOT FOUND"
+function cache_age_check() {
+	cache_age_check_time_passed=30
+	if [ "$2" != "" ]; then
+		cache_age_check_time_passed="$2"
+	fi
+
+	if [ -f "$1" ]; then
+		date_string=`head -n1 $1 | gawk -F" " '{print $4" "$5}'`
+		#convert date into timestamp
+		cache_ts=`date -d "$date_string" "+%s"`
+		cache_ts_expired=`date -d "$cache_age_check_time_passed minutes ago" "+%s"` 
+		if [ $cache_ts -gt $cache_ts_expired ]; then
+			RET_CACHE_AGE_CHECK="OK"
+			return
+		else
+			RET_CACHE_AGE_CHECK="EXPIRED"
+			return
+		fi
+	else
+		RET_CACHE_AGE_CHECK="NOT FOUND"
+		return
+	fi
+}
+
 function maintain_status_cache() {
   maint_cache_file="$1"
 
   #check if the cache is writable. no point in running if it is not
-  if [ -f "$maint_cache_file" ]; then
-    if [ ! -w "$maint_cache_file" ]; then
+  file_is_writable "$maint_cache_file"
+  if [ "$RET_FILE_IS_WRITABLE" = "no" ]; then
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-	"- $maint_cache_file is not writable?!?"
+		"- $maint_cache_file is not writable?!? $RET_FILE_IS_WRITABLE"
       exit
-    fi
-  else
-    touch "$maint_cache_file" 2> /dev/null
-    #check exit status 
-    if [ "$?" = "1" ]; then
-      echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-	"- \"$maint_cache_file\" is not writable?!?"
-      exit
-    fi
-    #remove the empty file so aborting the process will not keep an empty file around
-    rm -f "$maint_cache_file" 2> /dev/null
   fi  
   
-  if [ -f "$maint_cache_file" ]; then
-    date_string=`head -n1 $maint_cache_file | gawk -F" " '{print $4" "$5}'`
-    #convert date into timestamp
-    cache_ts=`date -d "$date_string" "+%s"`
-    cache_ts_expired=`date -d "30 minutes ago" "+%s"` 
-    if [ $cache_ts -gt $cache_ts_expired ]; then
-      return
-    fi
+  #check the age of the cache file
+  cache_age_check "$maint_cache_file"
+  if [ "$RET_CACHE_AGE_CHECK" = "OK" ]; then
+	return
   fi
 
+  # rebuilding cache from here on #
   if [ "$VERBOSE_DEBUG" = "yes" ]; then
 	  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-		  "- rebuilding cache"
+		  "- rebuilding cache $maint_cache_file"
   fi
 
   #get default gateway of tunnel interface using "ip"
   #get IP of tunnel Gateway
   TUN_GATEWAY=`/sbin/ip route show | grep "0.0.0.0/1" | gawk -F" " '{print $3}'`
-  #get tunnel IP
-  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  #get IPs of interfaces
   INT_IP=`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
   EXT_IP=`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  
+  interface_exists "$IF_TUNNEL"
+  if [ "$RET_INTERFACE_EXISTS" = "yes" ]; then
+    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  else
+    TUN_IP=""
+  fi
 
   #get PIA username and password from /pia/login.conf
   PIA_UN=`sed -n '1p' /pia/login.conf`
@@ -447,8 +513,28 @@ function maintain_status_cache() {
   if [ "$PORT_FW" = "enabled" ]; then
     echo "VPNPORT:$TUN_PORT" >> "$maint_cache_file"
   else
-    echo "VPNPORT:none" >> "$maint_cache_file"
+    echo "VPNPORT:no support" >> "$maint_cache_file"
   fi
   echo "INTIP:$INT_IP" >> "$maint_cache_file"
   echo "INTERNETIP:$EXT_IP" >> "$maint_cache_file"
+}
+
+
+# function to check if a network interface exists
+# $1 name of network interface as string
+# returns RET_INTERFACE_EXISTS "yes" or "no"
+function interface_exists() {
+  if [ -z ${1} ]; then
+    RET_INTERFACE_EXISTS="no"
+    return
+  fi
+  
+  check=`ip addr show $1 2>&1 | grep -c "does not exist"`
+  if [ "$check" = "0" ]; then
+    RET_INTERFACE_EXISTS="yes"
+    return
+  else
+    RET_INTERFACE_EXISTS="no"
+    return
+  fi
 }

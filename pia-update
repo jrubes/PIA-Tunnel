@@ -3,6 +3,7 @@
 LANG=en_US.UTF-8
 export LANG
 
+clear
 echo "getting updates from https://github.com/KaiserSoft/PIA-Tunnel"
 cd /pia/
 git pull origin
@@ -10,3 +11,7 @@ git pull origin
 #run pia-setup to fix permissions from git pull
 echo
 /pia/pia-setup
+
+
+echo "Showing the last 3 commit messages"
+git log -n 3 --pretty="format:by: %cn on %ci%n>> %s <<%n"

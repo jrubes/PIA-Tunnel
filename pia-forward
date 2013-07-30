@@ -27,10 +27,10 @@ fi
 
 
 if [ "$1" = "fix" ]; then
-	echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-		"- will attempt to stop any VPN tunnels \n\tand restart all network interfaces"
-
 	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
+		echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- will attempt to stop any VPN tunnels \n\tand restart all network interfaces"
+
 		killall openvpn 2>/dev/null	
 		/pia/include/fw-no-forward
 		# restart networking to get default routes through eth0 working again

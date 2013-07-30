@@ -16,39 +16,6 @@ fi
 # *) this daemon script is startet which will send one ping every n seconds through the tunnel
 # 	if the ping fails n times the tunnel is closed or restartet
 
-# list of VPN connections to use, the first is awlays the primary
-MYVPN[0]="Germany"
-MYVPN[1]="Sweden"
-MYVPN[2]="Romania"
-
-# set action when VPN fails: terminate | failover
-FAIL_ACTION="failover"
-FAIL_RETRY_VPN=4
-FAIL_RETRY_INTERNET=3
-FAIL_RETRY_DELAY=1
-
-
-# setting verbose to yes will print status notification after each check. any other settings for "background mode"
-VERBOSE="yes"
-VERBOSE_DEBUG="no"
-
-# time in seconds to wait before rechecking a down Internet connection
-# each run takes a few seconds to complete so don't go too low!
-# default 320 (5 minutes)
-SLEEP_INTERNET_DOWN=320
-
-# time in seconds to wait before attempting to ping a resource again
-# default 4
-SLEEP_PING_RETEST=4
-
-# time in seconds between retries when none of the PIA Gateways can be reached
-# default 320 (5 minutes)
-SLEEP_RECONNECT_ERROR=320
-
-# time (seconds) in between "uptime" checks. every check will send a few pings
-# to some server so please don't flood them or they may block you
-# default 30
-SLEEP_MAIN_LOOP=30
 
 
 # remove old status.txt
@@ -58,6 +25,15 @@ rm -r '/pia/include/status.txt' 2>/dev/null
 # generate a few IPs for the uptime functions
 gen_ip_list 15
 
+
+# run this when the user hits control_c
+function control_c() {
+  echo #or ^C will make it ugly
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+	  "- stopping pia-daemon and closing open connections"
+  /pia/pia-stop "quite"
+  exit "$?"
+}
 
 
 #final check before the loop starts
@@ -95,6 +71,8 @@ while true; do
 					echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 						"- VPN ping worked this time...."
 				fi
+				/pia/pia-forward start quite #need to add a check for active
+							     #iptables rules soon
 				break
 			else
 				if [ "$VERBOSE" = "yes" ]; then
@@ -107,6 +85,10 @@ while true; do
 	fi
 	if [ "$vpn_up" = "ERROR" ]; then
 	  #VPN has completely failed. 
+	  if [ "$VERBOSE_DEBUG" = "yes" ]; then
+	    echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+		  "- VPN has failed, about to stop all FORWARDING!"	  
+	  fi
 	  # disable port forwarding and reset the firewall until this is fixed  
 	  /pia/pia-forward stop quite
 	fi
@@ -116,7 +98,7 @@ while true; do
 
 	#check if the Internet is up but only if the VPN is down because
 	# the firewall is configured to block traffic over eth0 while tun0 is active
-	ping_host "internet"
+	ping_host "internet" "keep" #keep first IP because this will always fail when the VPN is active. something for pia.daemon 2
 	if [ "$RET_PING_HOST" = "ERROR" ] && [ "$vpn_up" = "ERROR" ]; then
 		RAN_FORWARD_FIX="no"
 		LOOP_TIMEOUT=1
@@ -136,7 +118,7 @@ while true; do
 					#only do this once per internet connection failure
 					echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 						"- Internet connection appears to be down"
-					echo -e "\trunning \"pia-forward fix\""
+					echo -e "\trunning ${bold}pia-forward fix${normal}"
 					RAN_FORWARD_FIX="yes"
 					/pia/pia-forward fix quite
 				fi
@@ -146,13 +128,14 @@ while true; do
 			#ping loop timeout
 			if [ "$LOOP_TIMEOUT" -gt $FAIL_RETRY_INTERNET ]; then
 				echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-					"forwarding disabled until the VPN is back up."
+					"- forwarding disabled until the VPN is back up."
 				echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
 				/pia/pia-forward stop quite
 				sleep $SLEEP_INTERNET_DOWN
 
-				#restarting pia-daemon
+				#restarting pia-daemon because there is no goto :(
+				# will have to rewrite this script with support for contitions
 				/pia/pia-daemon shutup
 				exit
 				break
@@ -183,7 +166,7 @@ while true; do
 		#connection is busted!
 		if [ "$FAIL_ACTION" = "failover" ]; then
 			echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"- VPN has failed - switching to backup."
+				"- VPN has failed - switching to backup"
 
 			#initiate a VPN switch
 			switch_vpn
@@ -207,17 +190,25 @@ while true; do
 	fi
 
 	if [ "$VERBOSE" = "yes" ]; then
-	  vpn_port=`cat "include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
-	  vpn_ip=`cat "include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+	  vpn_port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+	  vpn_ip=`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
 	  if [ "$vpn_port" = "none" ]; then
-	    echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 		    "- VPN is UP - VPN IP: $vpn_ip Port: no support"
 	  else
-	    echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 		    "- VPN is UP - VPN IP: $vpn_ip Port: $vpn_port"
 	  fi
 	fi
+	
+	# trap keyboard interrupt (control-c)
+	trap control_c SIGINT
+	
 	sleep $SLEEP_MAIN_LOOP
+	if [ "$VERBOSE_DEBUG" = "yes" ]; then
+	  echo #print empty lines in debug mode to prevent cross eyes :)
+	  echo #print empty lines in debug mode to prevent cross eyes :)
+	fi
 
 	#call self for now to allow auto update during dev
 	#/pia/pia-daemon shutup

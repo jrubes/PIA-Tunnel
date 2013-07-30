@@ -17,6 +17,9 @@ gen_ip_list
 # remove old status.txt
 rm -r '/pia/include/status.txt' 2>/dev/null
 
+
+
+
 #show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
 	LIST=`ls -1 /pia/ovpn/ | gawk -F"." '{print $1}'`
@@ -49,26 +52,24 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	fi
 
 	
-	#ensure internet works before going further
-	check_repair_internet
-
-
 	#see if we have a tunnel open
 	ping_host "vpn" "quick"
 	if [ "$RET_PING_HOST" = "OK" ]; then
 		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- closing current VPN tunnel."
+			"- closing current VPN tunnel"
 		/pia/pia-stop quite
 	else
 		#set iptables to something save until the tunnel is set up
 		/pia/pia-forward stop quite	
 	fi
 
+	#ensure internet works before going further
+	check_repair_internet
 
 
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- establishing a VPN connection to $1."
-	echo -e "\tsee /pia/session.log for details"	
+	echo -e "\tsee ${bold}/pia/session.log${normal} for details"	
 	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
 
 
@@ -79,19 +80,9 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	while true; do
 	  ping_host "vpn"
 	  if [ "$RET_PING_HOST" = "OK" ]; then
-		# get port forwarding info
-		get_forward_port
-		if [ "$RET_FORWARD_PORT" != "FALSE" ]; then
-		  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-		  fw_port_forward="\n[info] "$(date +"%Y-%m-%d %H:%M:%S")" - IP: $TUN_IP Port: $RET_FORWARD_PORT"
-		else
-		  fw_port_forward=""
-		fi
-
-		# show connection data
-		echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- VPN connection to $1 established"$fw_port_forward
-
+	    # show connection data
+	    echo_conn_established $1
+	    #start firewall and enable forwarding
 	    /pia/pia-forward start quite
 	    break
 	  fi
@@ -109,4 +100,8 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 		LOOP_PROTECT=$(($LOOP_PROTECT + 1))
 	  fi
 	done
+else
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+	  "- no connection with name $1."
+  echo -e "\ttry ${bold}pia-start list${normal} for a list of connections."	
 fi
