@@ -109,3 +109,5 @@ depmod -a ; update-initramfs -u
 11) /pia/reset-pia ; halt
 
 
+12) Export to OVF Template and compress with 
+    7z a -mx9 -m0=LZMA -t7z "PIA_Tunnel2-1.7z" "PIA Tunnel 2/"
