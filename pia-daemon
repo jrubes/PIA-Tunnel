@@ -26,6 +26,15 @@ rm -r '/pia/include/status.txt' 2>/dev/null
 gen_ip_list 15
 
 
+# run this when the user hits control_c
+function control_c() {
+  echo #or ^C will make it ugly
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+	  "- stopping pia-daemon and closing open connections"
+  /pia/pia-stop "quite"
+  exit "$?"
+}
+
 
 #final check before the loop starts
 PIA_UN=`sed -n '1p' /pia/login.conf`
@@ -191,6 +200,9 @@ while true; do
 		    "- VPN is UP - VPN IP: $vpn_ip Port: $vpn_port"
 	  fi
 	fi
+	
+	# trap keyboard interrupt (control-c)
+	trap control_c SIGINT
 	
 	sleep $SLEEP_MAIN_LOOP
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
