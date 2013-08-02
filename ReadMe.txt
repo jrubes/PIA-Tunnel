@@ -22,8 +22,8 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 
 * Features
     * requires 1 CPU, 92MB RAM and a little over 1GB hard drive space
-		* Edit: I changed the RAM to 92MB because the VM does not always start up. Using LVN may not have
-		  been a good idea. Will try and rebuild the VM soon.
+		* Edit: The VM will run with as little as 64MB but will rarely look after the boot loader screen
+				I don't know what is causing it but 92MB appears to be a good value.
     * primary network adapter pulls IP from your LAN so the VM is "start and use" once setup
     * the secondary network adapter is running on 192.168.10.1 and is handing out IPs
 	  in the range 192.168.10.101 to 192.168.10.151
@@ -32,13 +32,12 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 
 
 * Linux details 
-	* the VM is running a minimal Debian 7 installation with minor modifications.
+	* the VM is running a minimal Debian 7 installation. See for /pia/docs/
 	* root is the only account. The password is "pia" without quotes.
 		* change the root password before you do anything else!!!!
 	* dhcpd is running on eth1 but only 192.168.10.101 will be configured
 	  for automatic port forwarding
 	* ntpd is disabled but a cronjob executes ntpd -q
-	* mtp-status removed
 	* open-vmware-tools have been installed
 	* installed openvpn and disabled the service
 	* sshd running and allowing root logins
@@ -50,53 +49,58 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 # SETUP #
 #########
 
-1) Download the compressed VMware Image from 
-	 https://mega.co.nz/#!DARHnQra!SYUGKjeHjV3osOkVKPmcRDK8GYtHZMDomrzL3E_QClQ
-   Or the VMware OVF Template from the following link (for ESXi and advanced users)
+1) Download the compressed VMware OVF Template
      https://mega.co.nz/#!WNgFHD5b!VHE9Sg6-jrAYTMwKqvSQ7VpZF3ta-Ab7bJ5D19a7nLU
 
+2) Extract the 7-Zip archive. 7-Zip can be found here: http://www.7-zip.org/
 
-2) Extract and copy into your "Virtual Machines" directory
+3) Workstation and Player
+3.a) Add OVF Template to VMware Workstation or Player
+	* The easy way: Double click on "PIA Tunnel.ovf" then on "Import" goto step 3.b)
+	*
+	* The hard way....
+	* Start Player/Workstation and click File => Open...
+	* Change file type to "All Files" (lower right corner above OK)
+	* Select "PIA Tunnel.ovf" and click "Open" then "Import"
+	
+3.b) Ensure that the second network adapter is a member of a private vLAN segment
+	* Select "Network Adapter 2"
+	* Click "LAN Segments" => "Add"
+	* Enter name of LAN segment. I use "VPN Bridge"
+	* Click OK to close
+	* Use Dropdown to select the LAN segment you just created and click OK
+		Connect client VMs to this LAN segment and remove or disable their other network cards.
+	* goto step 5
 
-3) Add VM to VMware Player or Workstation
+4) ESXi
+4.a) Setup private VM LAN segment first
+	* In vSphere Client
+	1) Setup a private VM LAN segment
+	  * select your ESXi server and choose "Configuration"
+	  * Click on "Networking" => "Add Networking..."
+	  * "Virtual Machine" => "Create a vSphere standard switch" uncheck any selected interfaces!
+		The preview must list "No adapters" on the "Physical Adapters" side!
+	  * Enter a network name, I use "VPN Network - PIA"
+		  Double check the preview, it should look like this
+		  https://github.com/KaiserSoft/PIA-Tunnel/blob/master/docs/esxi_private_network.png
 
-4) Ensure that the second network adapter is a member of a private vLAN segment
-	4.a) Workstation and Player
-		* Select "Network Adapter 2"
-		* Click "LAN Segments" => "Add"
-		* Enter name of LAN segment. I use "VPN Bridge"
-		* Click OK to close
-		* Use Dropdown to select the LAN segment you just created and click OK
-			Connect client VMs to this LAN segment and remove or disable their other network cards.
-			
-	4.b) ESXi
-		* In vSphere Client
-		1) Setup a private VM LAN segment
-		  * select your ESXi server and choose "Configuration"
-		  * Click on "Networking" => "Add Networking..."
-		  * "Virtual Machine" => "Create a vSphere standard switch" uncheck any selected interfaces!
-		    The preview must list "No adapters" on the "Physical Adapters" side!
-		  * Enter a network name, I use "VPN Network - PIA"
-		      Double check the preview, it should look like this
-		      https://github.com/KaiserSoft/PIA-Tunnel/blob/master/docs/esxi_private_network.png
+4.b) Import the OVF Image
+	  * Extract the file you downloaded. You should now have a folder with tree files
+	  * "File" => "Deploy OVF Template..."
+	  * Browse to the extraced files and select "PIA Tunnel.ovf" => "Next" => "Next"
+	  * Give the VM a name and select a datastore to keep the machine on => "Next"
+	  * I use "Thin Provision" since the VM will not change much
+	  * Select your external Network on the "Network Mapping" screen
+	  * Do not auto power the machine once deployment is complete
 		
-		2) Import the OVF Image
-		  * Extract the file you downloaded. You should now have a folder with tree files
-		  * "File" => "Deploy OVF Template..."
-		  * Browse to the extraced files and select "PIA Tunnel.ovf" => "Next" => "Next"
-		  * Give the VM a name and select a datastore to keep the machine on => "Next"
-		  * I use "Thin Provision" since the VM will not change much
-		  * Select your external Network on the "Network Mapping" screen
-		  * Do not auto power the machine once deployment is complete
-		
-		3) Configure VM
-		  * Select the VM => "Edit Settings"
-		  * Make sure that "Network adapter 1" is connected to the network with Internet access
-		    and that "Network adapter 2" is connected to the private LAN segment you created
-		    in step 1 above.
-		  * RAM should be set to at least 92MB RAM. I have never seen the VM SWAP so 92MB is 
-		    tight but enough.
-		  * Save the changes and power the VM on
+4.c) Configure VM
+	  * Select the VM => "Edit Settings"
+	  * Make sure that "Network adapter 1" is connected to the network with Internet access
+		and that "Network adapter 2" is connected to the private LAN segment you created
+		in step 1 above.
+	  * RAM should be set to at least 92MB RAM. I have never seen the VM SWAP so 92MB is 
+		tight but enough.
+	  * Save the changes and power the VM on
 		
 
 5) Check that the machine has one CPU and around 92MB of RAM. 
@@ -112,7 +116,7 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 	passwd
 
 9) Generate new SSL certificates by running
-	/pia/clear_settings
+	/pia/reset-pia
 
 10) reboot the VM with the following command! yes, really, just do it :)
 	reboot
@@ -166,8 +170,16 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 		
 
 * Advanced Tips and Tricks
-	* add "/pia/pia-start <SomeLocation>" to /etc/rc.local to have the VM create a tunnel when booting.
+	* configure the MYVPN settings in /pia/settings.conf then see /etc/rc.local how to enable pia-daemon
+	  automatically after a system boot.
 	  The IP and port will be printed on the console or use "pia-status" if you use remote access.
+
+	* Use the "screen" command to start pia-daemon over an ssh connection. screen will keep pia-daemon
+	  running after you disconnect.
+			screen pia-daemon
+	  detach by pressing CTRL+A CTRL+D
+	  and reattach with
+			screen -r
 	  
 	  
 	  
