@@ -5,11 +5,6 @@ export LANG
 source '/pia/settings.conf'
 source '/pia/include/functions.inc'
 
-if [ ! "$1" = "shutup" ]; then
-	echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-		"- pia-daemon is EXPERIMENTAL!"
-fi
-
 
 # How it works
 # *) pia-start initiates a connection
