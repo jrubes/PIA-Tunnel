@@ -5,6 +5,8 @@ how to setup a private LAN segment on NIC 2
 Once setup you should boot the VM, login (root:pia) and ensure that you are online. Ping something!
 The rest ist really simple...
 
+0) Run "dpkg-reconfigure keyboard-configuration" to change the keyboard setting
+
 1) Run pia-update
    This command will pull the latest scripts and will start the creation process of your IP cache.
    The IP cache takes 3-5 minutes to build and is REQUIRED so please give the script 

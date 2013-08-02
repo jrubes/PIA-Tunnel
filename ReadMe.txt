@@ -106,6 +106,8 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 
 7) You should see the login prompt after a few minutes. Login with "root" and password "pia", no quotes.
 
+7.5) Run "dpkg-reconfigure keyboard-configuration" to change the keyboard setting. Default is German layout
+
 8) Change your root password with the following command
 	passwd
 
