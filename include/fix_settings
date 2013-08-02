@@ -56,7 +56,7 @@ if [ -z ${VERBOSE} ]; then
   echo '# output level and debug settings' >> '/pia/settings.conf'
   echo '#####' >> '/pia/settings.conf'
   echo '# setting verbose to yes will print status notification after each check. any other settings for "background mode"' >> '/pia/settings.conf'
-  echo 'VERBOSE="yes"' >> '/pia/settings.conf'
+  echo 'VERBOSE="no"' >> '/pia/settings.conf'
   echo 'VERBOSE_DEBUG="no"' >> '/pia/settings.conf'
   echo '' >> '/pia/settings.conf'
 fi

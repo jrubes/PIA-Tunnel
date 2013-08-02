@@ -14,4 +14,4 @@ echo
 
 
 echo "Showing the last 3 commit messages"
-git log -n 3 --pretty="format:by: %cn on %ci%n>> %s <<%n"
+git --no-pager log -n 3 --pretty="format:by: %cn on %ci%n>> %s <<%n"
