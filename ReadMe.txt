@@ -13,22 +13,18 @@
 	All rights reserved.
 */
 
-*WARNING* I have only been working on this for the past couple of days so the "PIA Tunnel VM" is still
-in development mode. It will listen on port 22 (SSH) and will allow root logins!
-! You have been warned !
-
-
 The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player or ESXi. It bridges a private VMware LAN segment to the PIA VPN Network, totally isolating any VMs on that private LAN segment from your LAN and Internet connection. This should prevent any traffic from bypassing the VPN tunnel, getting on the LAN and out your Internet connection.
 
 * Features
     * requires 1 CPU, 92MB RAM and a little over 1GB hard drive space
-		* Edit: The VM will run with as little as 64MB but will rarely look after the boot loader screen
-		  I don't know what is causing it but 92MB appears to be a good value.
+		* Edit: The VM will run with as little as 64MB but will rarely lock up after the boot loader screen
+		  I don't know what is causing it but 92MB prevents this.
     * primary network adapter pulls IP from your LAN so the VM is "start and use" once setup
     * the secondary network adapter is running on 192.168.10.1 and is handing out IPs
 	  in the range 192.168.10.101 to 192.168.10.151
     * the VM supports port forwarding and will route the port assigned by PIA to 192.168.10.101
     * the external IP and port can be checked at any time with the command "pia-status"
+	* ssh running on eth0
 
 
 * Linux details 
