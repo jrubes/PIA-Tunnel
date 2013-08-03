@@ -6,6 +6,7 @@
 1.5)   vi /etc/apt/apt.conf.d/70debconf
 APT::Install-Recommends "0" ; APT::Install-Suggests "0" ;
 
+1.6) delete non root user with userdel -r USER
 
 2) apt-get install psmisc openvpn screen dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc
     update-rc.d  ntp remove
