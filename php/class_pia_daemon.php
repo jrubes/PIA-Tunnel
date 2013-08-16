@@ -68,7 +68,7 @@ class PiaDaemon {
    * @param string $input info sent by user
    */
   function switch_input( &$input ){
-    $daemon_cmd = $input[0];
+    $daemon_cmd = strtoupper($input[0]);
     switch( $daemon_cmd )
     {
         case 'ST':    //DEBUG COMMAND
@@ -83,6 +83,9 @@ class PiaDaemon {
         case 'CONNECT';
           $this->input_connect($input);
           break;
+        case 'STATUS';
+          $this->input_satus();
+          break;
         case 'SHUTDOWN';
           $this->shutdown();
           break;
@@ -90,6 +93,34 @@ class PiaDaemon {
           $this->input_invalid($daemon_cmd);
           break;
     }
+  }
+
+  private function input_satus(){
+    global $CONF;
+    $ret = array();
+
+    print "\n".date($CONF['date_format'])." user requested status. here is a copy for the console.";
+    exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+    $msg = "Internet IP: ".$ret[0];
+    print "\n$msg";
+    $this->socket->write($this->client_index, $msg);
+    unset($ret);
+
+    exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+    $msg = "VM private IP: ".$ret[0];
+    print "\n$msg";
+    $this->socket->write($this->client_index, $msg);
+    unset($ret);
+
+    exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+    if( array_key_exists( '0', $ret) !== true ){
+      $msg = "VPN is DOWN";
+    }else{
+      $msg = "VPN IP: ".$ret[0];
+    }
+    print "\n$msg";
+    $this->socket->write($this->client_index, $msg);
+    unset($ret);
   }
 
   /**
@@ -104,7 +135,7 @@ class PiaDaemon {
 
     /* 0 must be connect and 1 must be a valid VPN name */
     $l = mb_strlen($input_array[1]);
-    if( $input_array[0] === 'CONNECT' && $l > 0 && $l < 26 ){
+    if( strtoupper($input_array[0]) === 'CONNECT' && $l > 0 && $l < 26 ){
       //check if the specified .ovpn file exists
       reset($this->ovpn_array);
       foreach( $this->ovpn_array as $ovpn ){
@@ -220,6 +251,7 @@ class PiaDaemon {
 
     print "\n".date($CONF['date_format'])." good by cruel world...";
     exec('/pia/pia-stop');
+    exec('/pia/pia-forward fix quite'); //close stuck sockets ... think I need to close all clients first
     socket_close($this->socket->socket);
     exit;
   }
