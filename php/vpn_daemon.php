@@ -44,9 +44,10 @@ if( !session_id()) session_start();
 $inc_dir = './';
 require_once $inc_dir.'class_socket.php';
 require_once $inc_dir.'class_pia_daemon.php';
+require_once $inc_dir.'class_files/class_files.php';
 
 /* configuration */
-$CONF['server_ip'] = '127.0.0.1';
+$CONF['server_ip'] = '192.168.192.136';
 $CONF['server_port'] = '6666';
 $CONF['server_ver'] = '0.0.1';
 $CONF['admin_pw'] = 'admin';
@@ -184,7 +185,7 @@ while (true)
                   $a_inp = explode(" ", trim($input));
                   if( $_daemon->pass_client_index($i) === true ) //$i is the index in _client array
                   {
-                    $_daemon->switch_input($a_inp[0]);
+                    $_daemon->switch_input($a_inp);
                   }
                 }
             }

@@ -1,0 +1,107 @@
+#!/bin/bash
+# starts a specific VPN connection
+# The argument must be the name of the .ovpn file without .ovpn
+#	./start-vpn Germany
+# get a list of connection names with ./start-vpn list
+
+LANG=en_US.UTF-8
+export LANG
+source '/pia/settings.conf'
+source '/pia/include/functions.inc'
+FAIL_RETRY_INTERNET=3
+SLEEP_PING_RETEST=4
+
+# generate a few IPs for the uptime functions
+gen_ip_list
+
+# remove old status.txt
+rm -r '/pia/include/status.txt' 2>/dev/null
+
+
+
+
+#show usage
+if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
+	LIST=`ls -1 /pia/ovpn/ | gawk -F"." '{print $1}'`
+	
+	echo
+	echo "Listing available VPN connections:"
+	echo "$LIST"
+	echo
+	echo "Examples:"
+	echo -e "\tpia-start Germany"
+	echo -e "\tpia-start \"UK London\""
+	exit
+fi
+
+
+#execute if .ovpn file exists with name passed
+if [ -f "/pia/ovpn/$1.ovpn" ]; then
+	#check the for default value
+	PIA_UN=`sed -n '1p' /pia/login.conf`
+	if [ "$PIA_UN" = "your PIA account name on this line" ]; then
+		echo
+		echo "Please add your Private Internet Access account information"
+		echo "to /pia/login.conf"
+		echo "Try"
+		echo -e "\tvi /pia/login.conf"
+		echo "or"
+		echo -e "\tnano /pia/login.conf"
+		echo
+		exit
+	fi
+
+	
+	#see if we have a tunnel open
+	ping_host "vpn" "quick"
+	if [ "$RET_PING_HOST" = "OK" ]; then
+		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- closing current VPN tunnel"
+		/pia/pia-stop quite
+	else
+		#set iptables to something save until the tunnel is set up
+		/pia/pia-forward stop quite	
+	fi
+
+	#ensure internet works before going further
+	check_repair_internet
+
+
+	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+		"- establishing a VPN connection to $1."
+	echo -e "\tsee ${bold}/pia/session.log${normal} for details"	
+	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
+
+
+
+
+	# start the FW script once the VPN is up and running
+	LOOP_PROTECT=0
+	while true; do
+	  ping_host "vpn"
+	  if [ "$RET_PING_HOST" = "OK" ]; then
+	    # show connection data
+	    echo_conn_established $1
+	    #start firewall and enable forwarding
+	    /pia/pia-forward start quite
+	    break
+	  fi
+
+
+	  #endless loop protect, about 30 seconds
+	  if [ "$LOOP_PROTECT" -eq 30 ]; then
+		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- VPN connectionfail- please check /pia/session.log for details."
+	    killall openvpn 2>/dev/null
+	    /pia/pia-forward stop quite
+	    exit
+	  else
+		sleep 1
+		LOOP_PROTECT=$(($LOOP_PROTECT + 1))
+	  fi
+	done
+else
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+	  "- no connection with name $1."
+  echo -e "\ttry ${bold}pia-start list${normal} for a list of connections."	
+fi

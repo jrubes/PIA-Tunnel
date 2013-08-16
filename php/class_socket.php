@@ -8,6 +8,9 @@
  * I wrote this socket class for my own dice test server but it should work for the PIA daemon as well
  * This is pretty much how I write it back then. Need to go over it when I have time and see where it can be optimized
  *
+ * NOTE for later: This may work with an ssh client instead of telnet
+ *        http://php.net/manual/en/function.stream-socket-enable-crypto.php
+ *
  * @author Mirko Kaiser
  */
 class Socket {

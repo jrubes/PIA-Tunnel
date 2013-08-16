@@ -8,10 +8,48 @@
 class PiaDaemon {
   var $socket;
   var $client_index;
+  var $ovpn_array;
+  private $state; //holds current state of the daemon
+    /*
+     * states:
+     *  none - doing nothing
+     *  connecting vpn - bash script will attempt to connect to vpn. need to check for an established connection now
+     *  connected - VPN is/should be up
+     *  checking vpn - checking if VPN is up
+     *  checking internet - checking if Internet is up
+     *  offline vpn - vpn is offline but internet is up
+     *  offline internet - internet and vpn are down
+     *  sleeping n - sleeping for n seconds
+     *
+     */
+
+
+  function __construct() {
+    $this->socket = false;
+    $this->client_index = false;
+    $this->state = 'none';
+
+    $this->populate_ovpn_array();
+  }
 
   /* pass the socket object */
   function pass_socket( &$socket ){
     $this->socket = $socket;
+  }
+
+  /**
+   * reads /pia/ovpn/*.ovpn and store the conent in an array.
+   * the file names will be used as the VPN name by the connect function
+   */
+  private function populate_ovpn_array(){
+    if( is_dir('/pia/ovpn') ){
+      $_files = new FilesystemOperations();
+
+      $tmp = array('ovpn');
+      $_files->set_ls_filter($tmp, 2);
+      $_files->set_ls_filter_mode('include');
+      $this->ovpn_array = $_files->ls('/pia/ovpn');
+    }
   }
 
   /**
@@ -30,7 +68,8 @@ class PiaDaemon {
    * @param string $input info sent by user
    */
   function switch_input( &$input ){
-    switch( $input )
+    $daemon_cmd = $input[0];
+    switch( $daemon_cmd )
     {
         case 'ST':    //DEBUG COMMAND
           $this->input_st();
@@ -39,15 +78,66 @@ class PiaDaemon {
           $this->input_help();
           break;
         case 'EXIT';
-          $this->disconnect_client();
+          $this->input_exit();
+          break;
+        case 'CONNECT';
+          $this->input_connect($input);
+          break;
+        case 'SHUTDOWN';
+          $this->shutdown();
           break;
         default:
-          $this->input_invalid($input);
-            break;
+          $this->input_invalid($daemon_cmd);
+          break;
     }
   }
 
-  private function disconnect_client(){
+  /**
+   * method to estabish a VPN connection
+   * WARNING VPN connection must be less than 26 chars
+   * @param array $input_array user supplied input after explode(" ", trim($USERINPUT));
+   * @return bool true,false true when a match has been found and the connection shell script has been started
+   */
+  private function input_connect($input_array){
+    global $_client;
+    global $CONF;
+
+    /* 0 must be connect and 1 must be a valid VPN name */
+    $l = mb_strlen($input_array[1]);
+    if( $input_array[0] === 'CONNECT' && $l > 0 && $l < 26 ){
+      //check if the specified .ovpn file exists
+      reset($this->ovpn_array);
+      foreach( $this->ovpn_array as $ovpn ){
+        if( strtolower($ovpn) === strtolower($input_array[1].'.ovpn') )
+        {
+          //match found! initiate a VPN connection and break
+          $exec_ovpn = substr($ovpn, 0, (mb_strlen($ovpn)-5)); // -5 for .ovpn - NEVER use user supplied input when you don't have to!!!
+          print "\n".date($CONF['date_format'])." Establishing a new VPN connection to $exec_ovpn";
+          exec("/pia/php/shell/pia-connect \"$exec_ovpn\" > /dev/null 2>/dev/null &"); //calling my bash scripts - this should work :)
+          $this->state = 'connecting '.$exec_ovpn;
+
+          return true;
+        }
+      }
+      print "\n".date($CONF['date_format'])." User supplied invalid VPN connection name: ".$input_array[1];
+      $msg = "Invalid VPN connection name! ".$input_array[1];
+      $this->socket->write($this->client_index, $msg);
+      $_client[$this->client_index]['cmd_error_cnt']++;
+
+    }else{
+      print "\n".date($CONF['date_format'])." User supplied invalid VPN connection name";
+      $msg = "Invalid VPN connection name!";
+      $this->socket->write($this->client_index, $msg);
+      $_client[$this->client_index]['cmd_error_cnt']++;
+    }
+  }
+
+
+  /**
+   * disconnect a connection
+   * @global type $_client
+   */
+  private function input_exit(){
     global $_client;
 
     $msg = "Good bye.\r\n".chr(0);
@@ -58,12 +148,13 @@ class PiaDaemon {
 
   private function input_invalid( &$input ){
     global $_client;
+    global $CONF;
 
     $msg = "UNKOWN COMMAND $input";
     $this->socket->write($this->client_index, $msg);
     $msg = "try HELP for a list of commands";
     $this->socket->write($this->client_index, $msg);
-    print "Debug - Received unknown input: $input\r\n";
+    print "\n".date($CONF['date_format'])." Debug - Received unknown input: $input";
     $_client[$this->client_index]['cmd_error_cnt']++;
   }
 
@@ -72,7 +163,7 @@ class PiaDaemon {
     global $_client;
     global $CONF;
 
-    print date($CONF['date_format'])." Received request say something.\r\n";
+    print "\n".date($CONF['date_format'])." Received request say something.\r\n";
     $msg = date($CONF['date_format'])." Say something....\r\n";
     socket_write($_client[$this->client_index]['sock'], $msg, strlen($msg));
   }
@@ -124,7 +215,14 @@ class PiaDaemon {
     $_client[$this->client_index]['time_con'] = microtime(true);
   }
 
+  private function shutdown(){
+    global $CONF;
 
+    print "\n".date($CONF['date_format'])." good by cruel world...";
+    exec('/pia/pia-stop');
+    socket_close($this->socket->socket);
+    exit;
+  }
 
 
 }
