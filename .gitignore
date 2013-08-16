@@ -4,3 +4,5 @@
 /session.log
 /client_id
 /include/ip_list.txt
+/nbproject/
+/php/PHP_sessions/
