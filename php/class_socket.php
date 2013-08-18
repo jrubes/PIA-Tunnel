@@ -26,11 +26,12 @@ class Socket {
     function create($host,$port)
     {
         //Create a socket and store in $this->socket
-        $this->socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\r\n");
+        $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP) or die("Could not create socket\r\n");
+
 
         //This solves the problem with a stuck socket when the server crashes.
         if (!socket_set_option($this->socket, SOL_SOCKET, SO_REUSEADDR, 1)) {
-            echo socket_strerror(socket_last_error($socket));
+            echo socket_strerror(socket_last_error($this->socket));
             exit;
         }
 
@@ -145,7 +146,10 @@ class Socket {
         }
 
         if(get_resource_type($socket) == 'Socket')
-            socket_close($socket);
+            socket_shutdown($socket, 1);//close but allow host to read
+            usleep(500);//wait remote host
+            socket_shutdown($socket, 0);//close reading as well
+            socket_close($socket); //now close the socket
     }
 }
 ?>

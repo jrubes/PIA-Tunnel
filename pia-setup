@@ -14,7 +14,7 @@ if [ ! -f "/usr/bin/screen" ]; then
 fi
 # add php5-cli for pia-daemon 2.0
 if [ ! -f "/usr/bin/php" ]; then
-    apt-get -y install php5-cli
+    apt-get -y install php5-cli php5-curl
 fi
 
 #create a new login.conf if none exists

@@ -87,7 +87,7 @@ class PiaDaemon {
           $this->input_connect($input);
           break;
         case 'STATUS';
-          $this->input_satus();
+          $this->input_status();
           break;
         case 'SHUTDOWN';
           $this->shutdown();
@@ -101,55 +101,35 @@ class PiaDaemon {
     }
   }
 
-  private function input_satus(){
+  private function input_status(){
     global $CONF;
 
     print date($CONF['date_format'])." user requested status. here is a copy for the console.\r\n";
-    $status = $this->get_vpn_status();
 
-    if( $status == false ){
-      //fall back on executing some commands ourselfs
-      exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-      $msg = "Internet IP: ".$ret[0];
-      print "$msg\r\n";
-      $this->socket->write($this->client_index, $msg);
-      unset($ret);
+    //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
+    exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+    $msg = "Internet IP: ".$ret[0];
+    print "$msg\r\n";
+    $this->socket->write($this->client_index, $msg);
+    unset($ret);
 
-      exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-      $msg = "VM private IP: ".$ret[0];
-      print "$msg\r\n";
-      $this->socket->write($this->client_index, $msg);
-      unset($ret);
+    exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+    $msg = "VM private IP: ".$ret[0];
+    print "$msg\r\n";
+    $this->socket->write($this->client_index, $msg);
+    unset($ret);
 
-      exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-      if( array_key_exists( '0', $ret) !== true ){
-        $msg = "VPN is DOWN";
-      }else{
-        $msg = "VPN IP: ".$ret[0];
-      }
-      print "$msg\r\n";
-      $this->socket->write($this->client_index, $msg);
-      unset($ret);
-
+    exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+    if( array_key_exists( '0', $ret) !== true ){
+      $msg = "VPN is DOWN";
     }else{
-      //use /pia/include/status.txt as it is maintained by the shell scripts
-      $msg = "Internet IP: ".$status['INTERNETIP'];
-      print "$msg\r\n";
-      $this->socket->write($this->client_index, $msg);
-
-      $msg = "VM private IP: ".$status['INTIP'];
-      print "$msg\r\n";
-      $this->socket->write($this->client_index, $msg);
-
-      exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-      if( array_key_exists( '0', $ret) !== true ){
-        $msg = "VPN is DOWN";
-      }else{
-        $msg = "VPN IP: $status[VPNIP] Port: $status[VPNPORT]";
-      }
-      print "$msg\r\n";
-      $this->socket->write($this->client_index, $msg);
+      $port = $this->vpn_get_port();
+      $msg = "VPN IP: ".$ret[0].' Port: ';
+      $msg = ($port != '') ? $msg.$port : $msg.'no forwarding';
     }
+    print "$msg\r\n";
+    $this->socket->write($this->client_index, $msg);
+    unset($ret);
 
     $this->update_client_timeout();
   }
@@ -192,9 +172,14 @@ class PiaDaemon {
         {
           //match found! initiate a VPN connection and break
           $exec_ovpn = substr($ovpn, 0, (mb_strlen($ovpn)-5)); // -5 for .ovpn - NEVER use user supplied input when you don't have to!!!
-          print date($CONF['date_format'])." Establishing a new VPN connection to $exec_ovpn\r\n";
+
+          $msg = "Establishing a new VPN connection to $exec_ovpn";
+          print date($CONF['date_format'])." $msg\r\n";
           exec("/pia/php/shell/pia-connect \"$exec_ovpn\" > /dev/null 2>/dev/null &"); //calling my bash scripts - this should work :)
           $this->state = 'connecting vpn';
+
+          //let use know that the connection script has been called
+          $this->socket->write($this->client_index, $msg);
 
           $this->update_client_timeout();
           return true;
@@ -310,9 +295,10 @@ class PiaDaemon {
     global $CONF;
 
     print date($CONF['date_format'])." good by cruel world...\r\n";
-    exec('/pia/pia-stop');
+    exec('/pia/pia-stop quite');
     exec('/pia/pia-forward fix quite'); //close stuck sockets ... think I need to close all clients first
-    socket_close($this->socket->socket);
+    socket_shutdown($this->socket->socket, 2);//close but allow host to read
+    socket_close($this->socket->socket); //now close the socket
     exit;
   }
 
@@ -329,6 +315,12 @@ class PiaDaemon {
           exec("/pia/pia-daemon > /dev/null 2>/dev/null &"); //this will check if the VPN is up and keep it that way
           $this->state = 'connected';
           print date($CONF['date_format'])." pia-daemon has been started\r\n";
+
+          //connect stands, print network details to user console
+          $msg = "VPN connection is up and pia-daemon is set to keep it that way\r\n";
+          $msg .= "*Warning* the forwarding port may change if the VPN connection failsover.\r\n";
+          $this->socket->write($this->client_index, $msg);
+          $this->input_status();
           return;
         }
 
@@ -387,7 +379,8 @@ class PiaDaemon {
    */
   private function get_status_file_contents(){
     $filepath = '/pia/include/status.txt';
-    if( is_file($filepath) ){
+    clearstatcache();
+    if( file_exists($filepath) ){
       $contents = $this->_file->readfile($filepath);
       if( $contents !== false ){
         //process file contants
@@ -412,6 +405,84 @@ class PiaDaemon {
     return str_replace("\r", "\n", str_replace("\r\n", "\r", $string) );
   }
 
+
+  /**
+   * having trouble reading status.txt right after connection so I am doing it myself ... grr
+   */
+  function vpn_get_port(){
+
+    if( array_key_exists('PIA_port', $_SESSION) !== true )
+    {
+      //get username and password from file or SESSION
+      if( array_key_exists('login.conf', $_SESSION) !== true ){
+        $c = $this->_file->readfile('/pia/login.conf');
+        if( $c !== false ){
+          $c = explode( "\n", $this->eol($c));
+          $un = ( mb_strlen($c[0]) > 1 ) ? $c[0] : '';
+          $pw = ( mb_strlen($c[1]) > 1 ) ? $c[1] : '';
+          if( $un == '' || $pw == '' ){
+            return false;
+          }
+          $_SESSION['login.conf'] = array( 'username' => $un , 'password' => $pw); //store for later
+        }else{
+          return false;
+        }
+      }
+
+      //get the client ID
+      if( array_key_exists('client_id', $_SESSION) !== true ){
+        $c = $this->_file->readfile('/pia/client_id');
+        if( $c !== false ){
+          if( mb_strlen($c) < 1 ){
+            return false;
+          }
+          $_SESSION['client_id'] = $c; //store for later
+        }else{
+          return false;
+        }
+      }
+
+
+
+      // create a new cURL resource
+      $ch = curl_init();
+
+      $PIA_UN = urlencode($_SESSION['login.conf']['username']);
+      $PIA_PW = urlencode($_SESSION['login.conf']['password']);
+      $PIA_CLIENT_ID = urlencode($_SESSION['client_id']);
+      $ret = array();
+      exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+      if( array_key_exists( '0', $ret) !== true ){
+        //VPN  is down, can not continue to check for open ports
+        return false;
+      }else{
+        $TUN_IP = $ret[0];
+      }
+
+      $post_vars = "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP";
+
+      // set URL and other appropriate options
+      curl_setopt($ch, CURLOPT_URL, 'https://www.privateinternetaccess.com/vpninfo/port_forward_assignment');
+      curl_setopt($ch, CURLOPT_HEADER, 0);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      curl_setopt($ch,CURLOPT_POST, count(explode('&', $post_vars)));
+      curl_setopt($ch,CURLOPT_POSTFIELDS, $post_vars);
+
+      // grab URL and pass it to the browser
+      $return = curl_exec($ch);
+
+      // close cURL resource, and free up system resources
+      curl_close($ch);
+
+      $pia_ret = json_decode($return, true);
+      if( is_int($pia_ret['port']) === true && $pia_ret['port'] > 0 && $pia_ret['port'] < 65536 ){
+        $_SESSION['PIA_port'] = $pia_ret['port']; //needs to be refreshed later on
+      }else{
+        return false;
+      }
+    }
+    return $_SESSION['PIA_port'];
+  }
 
 }
 
