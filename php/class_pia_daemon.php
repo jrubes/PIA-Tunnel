@@ -89,10 +89,13 @@ class PiaDaemon {
         case 'STATUS';
           $this->input_status();
           break;
+        case 'SETUP';
+          $this->setup_login($input);
+          break;
         case 'SHUTDOWN';
           $this->shutdown();
           break;
-        case 'FORWARD2';
+        case 'FORWARD_IP';
           $this->input_forward($input);
           break;
         case 'DISCONNECT';
@@ -104,6 +107,53 @@ class PiaDaemon {
     }
   }
 
+
+  /**
+   * method to setup/create login.conf
+   * @global array $CONF
+   * @return bool true on success or false on failure
+   */
+  private function setup_login( &$input ){
+    global $CONF;
+
+    if( !array_key_exists('1', $input) ){
+      $msg = "# PIA VPN Network Setup #\r\n";
+      $msg .= "Please enter the following command to update your VPN username:\r\n";
+      $msg .= "\tSETUP USERNAME YourVPNusername\r\n";
+      $msg .= "\r\n";
+      $msg .= "Please enter the following command to update your VPN password:\r\n";
+      $msg .= "\tSETUP PASSWORD YourVPNpassword\r\n";
+      $this->socket->write($this->client_index, $msg);
+    }else{
+      if( strtolower($input[1]) === 'username' &&  $input[2] != '' ){
+        //login.conf contains the username on line 1 and password on line 2 - nothing else
+        $login_file = '/pia/login.conf';
+        clearstatcache();
+        if( file_exists($login_file) ){
+          $c = $this->_file->readfile($login_file);
+          $ct = explode( "\n", $this->eol($c));
+          $content = "$input[2]\n$ct[1]"; //write new username with old password
+          $this->_file->writefile($login_file, $content); //back to login.conf
+          print date($CONF['date_format'])." VPN username has been updated from '$ct[0]' to '$input[2]'\r\n";
+          $msg = "Username updated\r\n";
+          $this->socket->write($this->client_index, $msg);
+        }
+      }elseif( strtolower($input[1]) === 'password' &&  $input[2] != '' ){
+        //login.conf contains the username on line 1 and password on line 2 - nothing else
+        $login_file = '/pia/login.conf';
+        clearstatcache();
+        if( file_exists($login_file) ){
+          $c = $this->_file->readfile($login_file);
+          $ct = explode( "\n", $this->eol($c));
+          $content = "$ct[0]\n$input[2]"; //write new password with old username
+          $this->_file->writefile($login_file, $content); //back to login.conf
+          print date($CONF['date_format'])." VPN password has been updated from '$ct[1]' to '$input[2]'\r\n";
+          $msg = "Password updated\r\n";
+          $this->socket->write($this->client_index, $msg);
+        }
+      }
+    }
+  }
 
   /**
    * method to register an IP for forwarding and write it to settings.conf
@@ -296,7 +346,10 @@ class PiaDaemon {
     $msg = "  STATUS \t show status information and network configuration";
     $this->socket->write($this->client_index, $msg);
 
-    $msg = "  FORWARD2 \"IP\"  \t setup port forwarding to specified IP";
+    $msg = "  SETUP \t will ask a few questions to generate configuration file";
+    $this->socket->write($this->client_index, $msg);
+
+    $msg = "  FORWARD_IP \"IP\"  \t setup port forwarding to specified IP";
     $this->socket->write($this->client_index, $msg);
 
     $msg = "  AUTH \"username\" \"password\" \t authenticate yourself with username and password";
