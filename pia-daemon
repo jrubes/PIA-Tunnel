@@ -13,9 +13,6 @@ source '/pia/include/functions.inc'
 
 
 
-# remove old status.txt
-rm -r '/pia/include/status.txt' 2>/dev/null
-
 
 # generate a few IPs for the uptime functions
 gen_ip_list 15
@@ -79,12 +76,12 @@ while true; do
 
 	fi
 	if [ "$vpn_up" = "ERROR" ]; then
-	  #VPN has completely failed. 
+	  #VPN has completely failed.
 	  if [ "$VERBOSE_DEBUG" = "yes" ]; then
 	    echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-		  "- VPN has failed, about to stop all FORWARDING!"	  
+		  "- VPN has failed, about to stop all FORWARDING!"
 	  fi
-	  # disable port forwarding and reset the firewall until this is fixed  
+	  # disable port forwarding and reset the firewall until this is fixed
 	  /pia/pia-forward stop quite
 	fi
 	#end of VPN test
@@ -195,10 +192,10 @@ while true; do
 		    "- VPN is UP - VPN IP: $vpn_ip Port: $vpn_port"
 	  fi
 	fi
-	
+
 	# trap keyboard interrupt (control-c)
 	trap control_c SIGINT
-	
+
 	sleep $SLEEP_MAIN_LOOP
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 	  echo #print empty lines in debug mode to prevent cross eyes :)
