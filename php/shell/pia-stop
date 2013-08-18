@@ -1,0 +1,28 @@
+#!/bin/bash
+# script to end the tunnel and reset the system back to normal
+# note: restarting the network to get the default route back in place
+
+LANG=en_US.UTF-8
+export LANG
+
+
+if [ ! "$1" = "quite" ]; then
+	killall openvpn
+	
+	#disable forwarding
+	/pia/pia-forward stop
+	
+	# restart networking to get default routes through eth0 working again
+	# service network restart #CentOS
+	ifdown eth0 && ifup eth0 #Debian
+	
+else
+	killall openvpn 2>/dev/null
+	/pia/pia-forward stop quite
+	ifdown eth0 2>/dev/null && ifup eth0 2>/dev/null #Debian
+fi
+
+# remove old status.txt
+rm -r '/pia/include/status.txt' 2>/dev/null
+
+exit 0

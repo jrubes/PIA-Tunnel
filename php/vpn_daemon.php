@@ -51,14 +51,14 @@ $CONF['server_ip'] = '192.168.192.136';
 $CONF['server_port'] = '6666';
 $CONF['server_ver'] = '0.0.1';
 $CONF['admin_pw'] = 'admin';
-$CONF['server_name'] = 'PIA Tunnel Daemon';
+$CONF['server_name'] = 'PIA Tunnel Control Daemon';
 $CONF['server_welcome'] = $CONF['server_name'].' is ready.';
 $CONF['timeout_client'] = 20; //Time the client has to respond in seconds
 $CONF['timeout_unauth'] = 10;   //n sec to AUTH if not KICK
 $CONF['show_server_msg'] = false;
 $CONF['show_server_msg_welcome_ack'] = true;
-$CONF['max_clients'] = 10; //Allow this many simulatious connections
-$CONF['backlog'] = 20; //A maximum of backlog incoming connections will be queued for processing
+$CONF['max_clients'] = 1; //Allow this many simulatious connections
+$CONF['backlog'] = 1; //A maximum of backlog incoming connections will be queued for processing
 $CONF['token_length'] = 20; //Length of string to generate which will be MD5'd  md5(microtime(true).token);
 $CONF['date_format'] = 'H:i:s'; //PHP date() format
 $CONF['inc_dir'] = $inc_dir;
@@ -81,16 +81,8 @@ $_client = array();  // This multidimensional array will contain client socket i
 
 $_SESSION = array(); //Multidimensional array to hold player related information including game stats
     //$_SESSION['token']['some_option']   'token' links to $_client[n]['token']
-    //['match_token']          //This ID will link two bots to one match. Both bots will have the same ID here
-    //['name']              //Bot name
-    //['points_total']     //Total points for this match
-    //['points_round']     //Points for this round
-    //['match_rounds']     //Rounds this bot has played in the match
-    //['game_status']      //Is this bot playing or waiting? Values P or W
     //['last_cmd']         //Keep track of the client's last command so we know what to expect next
     //['cmd_error_cnt']    //Count of communication errors with bot
-    //['throws']           //How many dice rolls did the player execute
-    //['save']             //How many times did the player save?
     //['time_con']          //Time when the bot first connected, can be used to clear out forgotten bots
     //['time_last_cmd_sent'] //Time of last command sent by the server in microtime
     //['time_last_cmd_rec'] //Time of last command received by the server in microtime
@@ -103,11 +95,14 @@ $_daemon = new PiaDaemon();
 $_socket->create($CONF['server_ip'],$CONF['server_port']);
 $_daemon->pass_socket($_socket);
 
+
+/* print goes to the local console */
 print "\r\n\r\n".$CONF['server_name']." v:$CONF[server_ver] is starting up at ".date($CONF['date_format'])."\r\n";
 print "The server will accept connections on $CONF[server_ip]:$CONF[server_port]\r\n";
 print "max clients:$CONF[max_clients] client timeout:$CONF[timeout_client] show server msg: ".(($CONF['show_server_msg']===true)?"yes":"no")."\r\n";
 print "Welcome msg: $CONF[server_welcome]\r\n";
 print "------------------------------------ \r\n\r\n";
+
 
 
 /* main loop starts here */
@@ -154,7 +149,7 @@ while (true)
 
 
 
-    /* process server commands here */
+    /* process server commands sent by the client */
     for ($i = 0; $i < $CONF['max_clients']; $i++) // for each client
     {
 
@@ -174,7 +169,6 @@ while (true)
                 }else
                     $input = false;
                 if( $input === false ){
-                    echo "client removed";
                     unset($_client[$i]);
                 }
 
@@ -183,8 +177,7 @@ while (true)
                 if( $input != '' )
                 {
                   $a_inp = explode(" ", trim($input));
-                  if( $_daemon->pass_client_index($i) === true ) //$i is the index in _client array
-                  {
+                  if( $_daemon->pass_client_index($i) === true ){ //$i is the index in _client array
                     $_daemon->switch_input($a_inp);
                   }
                 }
@@ -192,6 +185,10 @@ while (true)
         }
 
     }
+
+    /* do daemon stuff here - things like checking state, working on the command queue and so on */
+    //check current state and see if there is something that needs to be done
+    $_daemon->check_state();
 
 }
 socket_close($_socket->socket);
