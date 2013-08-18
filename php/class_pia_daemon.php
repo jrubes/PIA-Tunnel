@@ -164,11 +164,19 @@ class PiaDaemon {
 
     /* 0 must be connect and 1 must be a valid VPN name */
     $l = mb_strlen($input_array[1]);
+
+    //vpn connection name may contain a space and will be spilt up in [1]-n, reassemble
+    $vpn_name = '';
+    for( $x=1 ; $x < count($input_array) ; ++$x ){
+      if( $vpn_name !== '' ){ $vpn_name .= ' '; }
+      $vpn_name .= $input_array[$x];
+    }
+
     if( strtoupper($input_array[0]) === 'CONNECT' && $l > 0 && $l < 26 ){
       //check if the specified .ovpn file exists
       reset($this->ovpn_array);
       foreach( $this->ovpn_array as $ovpn ){
-        if( strtolower($ovpn) === strtolower($input_array[1].'.ovpn') )
+        if( strtolower($ovpn) === strtolower($vpn_name.'.ovpn') )
         {
           //match found! initiate a VPN connection and break
           $exec_ovpn = substr($ovpn, 0, (mb_strlen($ovpn)-5)); // -5 for .ovpn - NEVER use user supplied input when you don't have to!!!
@@ -185,8 +193,8 @@ class PiaDaemon {
           return true;
         }
       }
-      print date($CONF['date_format'])." User supplied invalid VPN connection name: {$input_array[1]}\r\n";
-      $msg = "Invalid VPN connection name! ".$input_array[1];
+      print date($CONF['date_format'])." User supplied invalid VPN connection name: $vpn_name\r\n";
+      $msg = "Invalid VPN connection name! $vpn_name";
       $this->socket->write($this->client_index, $msg);
       $_client[$this->client_index]['cmd_error_cnt']++;
 
