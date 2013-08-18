@@ -92,6 +92,9 @@ class PiaDaemon {
         case 'SHUTDOWN';
           $this->shutdown();
           break;
+        case 'FORWARD2';
+          $this->input_forward($input);
+          break;
         case 'DISCONNECT';
           $this->input_disconnect();
           break;
@@ -101,6 +104,22 @@ class PiaDaemon {
     }
   }
 
+
+  /**
+   * method to register an IP for forwarding and write it to settings.conf
+   * @param type $input
+   */
+  private function input_forward(&$input){
+    exec('/pia/pia-settings "FORWARD_IP" "'.$input[1].'"');
+    $msg = "Port updated";
+    print "$msg\r\n";
+    $this->socket->write($this->client_index, $msg);
+  }
+
+  /**
+   * method to display the current network info for all interfaces to the user and console
+   * @global type $CONF
+   */
   private function input_status(){
     global $CONF;
 
@@ -277,7 +296,7 @@ class PiaDaemon {
     $msg = "  STATUS \t show status information and network configuration";
     $this->socket->write($this->client_index, $msg);
 
-    $msg = "  FORWARD \"IP\"  \t setup port forwarding to specified IP";
+    $msg = "  FORWARD2 \"IP\"  \t setup port forwarding to specified IP";
     $this->socket->write($this->client_index, $msg);
 
     $msg = "  AUTH \"username\" \"password\" \t authenticate yourself with username and password";
@@ -303,6 +322,7 @@ class PiaDaemon {
     global $CONF;
 
     print date($CONF['date_format'])." good by cruel world...\r\n";
+    exec('killall pia-daemon 2>/dev/null');
     exec('/pia/pia-stop quite');
     exec('/pia/pia-forward fix quite'); //close stuck sockets ... think I need to close all clients first
     socket_shutdown($this->socket->socket, 2);//close but allow host to read

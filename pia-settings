@@ -1,0 +1,13 @@
+#!/bin/bash
+# script to update settings.conf
+# use like this:
+#		pia-settings "NAME_OF_SETTING" "VALUE_OF_SETTING"
+LANG=en_US.UTF-8
+export LANG
+source '/pia/settings.conf'
+
+
+if [ ! "$1" = "" ] && [ ! "$2" = "" ]; then
+	#update settings
+	sed -i "s/$1=.*/$1=$2/" /pia/settings.conf
+fi
