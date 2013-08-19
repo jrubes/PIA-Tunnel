@@ -10,7 +10,7 @@ source '/pia/settings.conf'
 #check if settings exist in settings.conf and add their default
 
 
-if [ -z ${MYVPN[0]} ]; then
+if [ -z "${MYVPN[0]}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# pia-daemon settings' >> '/pia/settings.conf'
   echo '#####' >> '/pia/settings.conf'
