@@ -55,21 +55,21 @@ if [ "$RET_PING_HOST" = "OK" ]; then
   echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is UP!"
   port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
   if [ "$port" = "none" ]; then
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`" Port: not supported"
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`cat "/pia/include/status.txt" 2> /dev/null | grep "VPNIP" | gawk -F":" '{print $2}'`" Port: not supported"
   else
     echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`" Port: $port"
   fi
   
-  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Internet IP: "`cat "/pia/include/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/pia/include/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`cat "/pia/include/status.txt" | grep "INTIP" | gawk -F":" '{print $2}'`
 else
-	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is DOWN!"
-	if [ ! -f '/pia/include/status.txt' ]; then
-		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Internet IP: "`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-	else
-		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Internet IP: "`cat "include/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
-		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`cat "include/status.txt" | grep 	"INTIP" | gawk -F":" '{print $2}'`
-	fi
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is DOWN!"
+  if [ ! -f '/pia/include/status.txt' ]; then
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  else
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/pia/include/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`cat "/pia/include/status.txt" | grep 	"INTIP" | gawk -F":" '{print $2}'`
+  fi
 fi
 

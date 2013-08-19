@@ -92,11 +92,8 @@ host statichost {
 8) pia-setup
  
 9) vi /etc/rc.local
-#start system with default firewall and forwarding disabled
-/pia/pia-forward stop
-
-#enable auto connect after boot by adding something like this
-#/pia/pia-start "UK London"
+#execute PIA start scripts
+/pia/include/autostart
 
 10) paste the block below into a bash terminal
 BLMODS="psmouse snd snd_pcm snd_pcsp snd_timer parport parport_pc pcspkr floppy"
