@@ -38,7 +38,7 @@ fi
 
 
 # create and or maintain the status cache file
-maintain_status_cache '/pia/include/status.txt'
+maintain_status_cache '/pia/cache/status.txt'
 if [ "$?" != "0" ]; then
   echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
     "- error during status cache maintenance\n\tpia-status will not work"
@@ -53,23 +53,23 @@ ping_host "vpn" "quick"
 vpn_up=$RET_PING_HOST
 if [ "$RET_PING_HOST" = "OK" ]; then
   echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is UP!"
-  port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+  port=`cat "/pia/cache/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
   if [ "$port" = "none" ]; then
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`cat "/pia/include/status.txt" 2> /dev/null | grep "VPNIP" | gawk -F":" '{print $2}'`" Port: not supported"
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`cat "/pia/cache/status.txt" 2> /dev/null | grep "VPNIP" | gawk -F":" '{print $2}'`" Port: not supported"
   else
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`" Port: $port"
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`cat "/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`" Port: $port"
   fi
-  
-  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/pia/include/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
-  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`cat "/pia/include/status.txt" | grep "INTIP" | gawk -F":" '{print $2}'`
+
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/pia/cache/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`cat "/pia/cache/status.txt" | grep "INTIP" | gawk -F":" '{print $2}'`
 else
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is DOWN!"
-  if [ ! -f '/pia/include/status.txt' ]; then
+  if [ ! -f '/pia/cache/status.txt' ]; then
     echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
     echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
   else
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/pia/include/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`cat "/pia/include/status.txt" | grep 	"INTIP" | gawk -F":" '{print $2}'`
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/pia/cache/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`cat "/pia/cache/status.txt" | grep 	"INTIP" | gawk -F":" '{print $2}'`
   fi
 fi
 

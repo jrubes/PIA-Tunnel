@@ -461,11 +461,11 @@ class PiaDaemon {
   }
 
   /**
-   * reads /pia/include/status.txt and returns it as a string with \n line endings
+   * reads /pia/cache/status.txt and returns it as a string with \n line endings
    * @return string,boolean FALSE if the files does not exist or is not readable, else the contents of the file
    */
   private function get_status_file_contents(){
-    $filepath = '/pia/include/status.txt';
+    $filepath = '/pia/cache/status.txt';
     clearstatcache();
     if( file_exists($filepath) ){
       $contents = $this->_file->readfile($filepath);

@@ -9,15 +9,15 @@ PING_COMMAND_INTERNET="ping -qn -i 0.5 -w 1 -W 0.5 -I $IF_EXT 8.8.8.8 2>/dev/nul
 
 
 #read list of IPs into IP_LIST array
-IFS=$'\r\n' IP_LIST=($(cat "/pia/include/ip_list.txt" | tail -n+2))
+IFS=$'\r\n' IP_LIST=($(cat "/pia/cache/ip_list.txt" | tail -n+2))
 
 stat_cnt_ok=0
 stat_cnt_er=0
 for ip in ${IP_LIST[@]}
 do
-	
+
 	pingthis=`echo "$PING_COMMAND_INTERNET" | sed -e "s/8.8.8.8/$ip/g"`
-	
+
 	for (( x=1 ; x <= 50 ; x++ ))
 	do
 		res=`eval $pingthis`
@@ -28,7 +28,7 @@ do
 			stat_cnt_er=$(($stat_cnt_er + 1))
 		else
 			stat_cnt_ok=$(($stat_cnt_ok + 1))
-		fi 
+		fi
 	done
 done
 

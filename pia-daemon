@@ -174,7 +174,7 @@ while true; do
 
 
 	# create and or maintain the status cache file
-	maintain_status_cache '/pia/include/status.txt'
+	maintain_status_cache '/pia/cache/status.txt'
 	if [ "$?" != "0" ]; then
 	  echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	    "- error during status cache maintenance\n\tpia-status will not work"
@@ -182,8 +182,8 @@ while true; do
 	fi
 
 	if [ "$VERBOSE" = "yes" ]; then
-	  vpn_port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
-	  vpn_ip=`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+	  vpn_port=`cat "/pia/cache/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+	  vpn_ip=`cat "/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
 	  if [ "$vpn_port" = "none" ]; then
 	    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 		    "- VPN is UP - VPN IP: $vpn_ip Port: no support"

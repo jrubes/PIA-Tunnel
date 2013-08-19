@@ -4,6 +4,12 @@
 LANG=en_US.UTF-8
 export LANG
 
+#set file permissions as needed
+chmod 0770 /pia
+find /pia -type d -exec chmod 0770 {} \;
+find /pia -type f -exec chmod 0660 {} \;
+
+
 # the ping functions now require dig
 if [ ! -f "/usr/bin/dig" ]; then
 	apt-get -y install dnsutils > /dev/null
@@ -51,20 +57,20 @@ do
 		rm "/bin/$f"
 	fi
 	ln -s "/pia/$f" "/bin/$f"
-	chmod u+x "/pia/$f"
+	chmod ug+x "/pia/$f"
 done
 
 #handle files in include, these don't get /bin/ links
-FILES="fw-forward fw-no-forward functions.inc build_ping_list"
+FILES="fw-forward fw-no-forward functions.inc build_ping_list fix_settings"
 for f in $FILES
 do
-	chmod u+x "/pia/include/$f"
+	chmod ug+x "/pia/include/$f"
 done
 
 
 
 #check ip cache
-if [ ! -f "/pia/include/ip_list.txt" ]; then
+if [ ! -f "/pia/cache/ip_list.txt" ]; then
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- ip_list.txt does not exist - rebuilding!"
 	echo -e "\tthis will take a couple of minutes...."
@@ -86,5 +92,5 @@ find /var/www -type f -exec chmod 0640 {} \;
 
 
 #ALWAYS RUN THIS LAST
-chown -R root.root /pia
-chmod -R og-rwx /pia
+chown -R root.vpnvm /pia
+chmod -R o-rwx /pia

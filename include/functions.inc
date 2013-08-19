@@ -30,7 +30,7 @@ function is_ip_unique() {
     #echo "debug - not unique $1"
     return
   fi
-  
+
   if [ "$2" = "" ]; then
     ping_array=("${PING_IP_LIST[@]}")
 	#echo "using PING_IP_LIST"
@@ -47,20 +47,20 @@ function is_ip_unique() {
       #echo "debug - not unique $1"
       return
     fi
-  
+
   done
-  
+
   #echo "debug - unique $1"
   RET_IP_UNIQUE="yes"
 }
 
-#function to grab a few IPs from /pia/include/ip_list.txt
+#function to grab a few IPs from /pia/cache/ip_list.txt
 # and store them for later in $PING_eIP_LIST[]
 function gen_ip_list() {
 
-	if [ ! -f "/pia/include/ip_list.txt" ]; then
+	if [ ! -f "/pia/cache/ip_list.txt" ]; then
 		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-		  "- \"/pia/include/ip_list.txt\" does not exist. Please run pia-setup first"
+		  "- \"/pia/cache/ip_list.txt\" does not exist. Please run pia-setup first"
 		exit
 	fi
 
@@ -72,11 +72,11 @@ function gen_ip_list() {
   if [ "$VERBOSE_DEBUG" = "yes" ]; then
 	echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- generating $THIS_MANY fresh IPs"
-		
+
   fi
-  
+
   #read list of IPs into IP_LIST array
-  IFS=$'\r\n' IP_LIST=($(cat "/pia/include/ip_list.txt" | tail -n+2))
+  IFS=$'\r\n' IP_LIST=($(cat "/pia/cache/ip_list.txt" | tail -n+2))
   #get array length
   IP_COUNT=${#IP_LIST[@]}
   IP_COUNT=$((IP_COUNT - 1)) #zero based
@@ -87,7 +87,7 @@ function gen_ip_list() {
   while true; do
   #for (( x=0 ; x < $THIS_MANY ; x++ ))
     AINDEX=$[ ( $RANDOM % $IP_COUNT )  + 1 ]
-    
+
     #have indexes now, get the IP for it
     is_ip_unique ${IP_LIST[$AINDEX]}
     if [ "$RET_IP_UNIQUE" = "yes" ]; then
@@ -95,11 +95,11 @@ function gen_ip_list() {
       PING_IP_LIST[$PING_INDEX]=${IP_LIST[$AINDEX]}
       PING_INDEX=$((PING_INDEX + 1))
     fi
-    
+
     if [ "$PING_INDEX" = "$THIS_MANY" ]; then
       break # collected enough IPs
     fi
-    
+
     #endless loop protect,
     if [ "$LOOP_PROTECT" -eq 5000 ]; then
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
@@ -109,16 +109,16 @@ function gen_ip_list() {
       LOOP_PROTECT=$((LOOP_PROTECT + 1))
     fi
   done
-  
+
   # final check
   if [ "${#PING_IP_LIST[@]}" = "0" ]; then
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	      "- FATAL - PING_IP_LIST is empty. must terminate!"
       exit
   fi
-  
-  # $PING_IP_LIST[] now contains a few IPs which may 
-  # be used by other functions  
+
+  # $PING_IP_LIST[] now contains a few IPs which may
+  # be used by other functions
 }
 
 # new ping function for pinging internet hosts
@@ -137,7 +137,7 @@ function ping_host() {
 			host_ip="$3"
 		fi
 	fi
-	
+
 	if [ "$host_ip" = "not set" ]; then
 		#check PING_IP_LIST and ensure that it still has enough IPs since
 		# failed IPs get removed from the array further down
@@ -148,14 +148,14 @@ function ping_host() {
 			fi
 			gen_ip_list 15
 		fi
-		
+
 		#pick one IP from $PING_IP_LIST[] to be used this time
 		ip_count=${#PING_IP_LIST[@]}
 		ip_count=$((ip_count - 1)) #zero based
 		rand=$[ ( $RANDOM % $ip_count )  + 1 ]
 		host_ip=${PING_IP_LIST[$rand]}
 	fi
-  
+
 
 	#shall we make this a "quick" ping?
 	if [ "$2" = "quick" ] || [ "$3" = "quick" ]; then
@@ -167,19 +167,19 @@ function ping_host() {
 	else
 		pingthis=$PING_COMMAND
 	fi
-    
-  
+
+
   if [ "$1" = "internet" ]; then
     #replace IP in $PING_COMMAND with $host_ip
     pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
     pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_EXT/g"`
 	PING_RESULT=`eval $pingthis`
-	
+
   elif [ "$1" = "vpn" ]; then
     pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
     pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_TUNNEL/g"`
     PING_RESULT=`eval $pingthis`
-	
+
   else
 	#use self to ping via VPN first then via Internet
 	# return "OK" on first success or "ERROR" on complete failure
@@ -214,13 +214,13 @@ function ping_host() {
 		fi
     fi
 
-	
+
 	if [ "$2" != "keep" ] && [ "$3" != "keep" ] && [ "$4" != "keep" ]; then
 	  #ping failed remove the IP from the random ping pool PING_IP_LIST
 	  remove_ip_from_array PING_IP_LIST[@] "$host_ip"
 	  PING_IP_LIST=("${RET_MODIFIED_ARRAY[@]}")
 	fi
-  fi      
+  fi
 
 }
 
@@ -228,7 +228,7 @@ function ping_host() {
 # keys will not be preserved
 function remove_ip_from_array() {
   unset RET_MODIFIED_ARRAY #clear contents
-  
+
   if [ "$1" = "" ]; then
 	echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- FATAL SCRIPT ERROR, an array is required here!"
@@ -240,7 +240,7 @@ function remove_ip_from_array() {
   if [ "$2" = "" ]; then
     return
   fi
-  
+
   new_count=0
   for item in ${source_array[@]}
   do
@@ -251,11 +251,11 @@ function remove_ip_from_array() {
 		if [ "$VERBOSE_DEBUG" = "yes" ]; then
 			echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- removed $2 from IP array"
-			
+
 		fi
 	fi
   done
-  
+
   #RET_MODIFIED_ARRAY is now the new array
 }
 
@@ -263,9 +263,9 @@ function remove_ip_from_array() {
 # $1 connection name
 function echo_conn_established() {
   # show connection data
-  maintain_status_cache '/pia/include/status.txt'
-  vpn_port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
-  vpn_ip=`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+  maintain_status_cache '/pia/cache/status.txt'
+  vpn_port=`cat "/pia/cache/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+  vpn_ip=`cat "/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
   echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- VPN connection to $1 established\n\tVPN IP: $vpn_ip Port: $vpn_port"
 }
@@ -280,7 +280,7 @@ function switch_vpn() {
 			echo -e "\tsee ${bold}/pia/session.log${normal} for details"
 		fi
 		killall openvpn &> /dev/null
-		openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/session.log &	
+		openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/session.log &
 
 		#wait until connection has been established
 		LOOP_PROTECT=0
@@ -288,7 +288,7 @@ function switch_vpn() {
 			ping_host "vpn" "keep" #keep here since the ping will
 					       #fail until the connection stands
 			if [ "$RET_PING_HOST" = "OK" ]; then
-				
+
 				# show connection data
 				echo_conn_established $CONN
 				#start firewall and enable forwarding
@@ -296,7 +296,7 @@ function switch_vpn() {
 				RAN_FORWARD_FIX="no" #reset on working connection
 				return
 			fi
-			
+
 			#endless loop protect, about 40 seconds
 			if [ "$LOOP_PROTECT" -eq 20 ]; then
 				killall openvpn 2>/dev/null
@@ -305,16 +305,16 @@ function switch_vpn() {
 			else
 				sleep 2
 				LOOP_PROTECT=$((LOOP_PROTECT + 1))
-			fi		
+			fi
 		done
 
 		echo -e "[\e[1;33mwarn\e[0m] tried to reconnect to $CONN but the connection failed."
 	done
- 
- 
+
+
 	echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- unable to connect to any backup connection."
-	echo -e "\twill try again in $SLEEP_RECONNECT_ERROR seconds." 
+	echo -e "\twill try again in $SLEEP_RECONNECT_ERROR seconds."
 	sleep $SLEEP_RECONNECT_ERROR
 }
 
@@ -323,7 +323,7 @@ function switch_vpn() {
 # "returns" RET_FORWARD_PORT with the port number as the value or FALSE
 function get_forward_port() {
   RET_FORWARD_PORT="FALSE"
-  
+
   #check if the client ID has been generated and get it
   if [ ! -f "/pia/client_id" ]; then
     head -n 100 /dev/urandom | md5sum | tr -d " -" > "/pia/client_id"
@@ -350,7 +350,7 @@ function check_repair_internet() {
 	RAN_FORWARD_FIX="no"
 	LOOP_TIMEOUT=1
 	while true; do
-		
+
 		ping_host "internet"
 		if [ "$RET_PING_HOST" = "OK" ]; then
 			#internet works, keep going
@@ -359,7 +359,7 @@ function check_repair_internet() {
 					"- Internet is back up after $LOOP_TIMEOUT of 5 attempts"
 			fi
 			break;
-			
+
 		else
 			if [ "$RAN_FORWARD_FIX" = "no" ]; then
 				#only do this once per internet connection failure
@@ -370,7 +370,7 @@ function check_repair_internet() {
 				/pia/pia-forward fix quite
 			fi
 		fi
-		
+
 
 		#ping loop timeout
 		if [ "$LOOP_TIMEOUT" -gt $FAIL_RETRY_INTERNET ]; then
@@ -379,7 +379,7 @@ function check_repair_internet() {
 			echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
 			/pia/pia-forward stop quite
-			exit			
+			exit
 		else
 			if [ "$VERBOSE" = "yes" ]; then
 				echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
@@ -387,7 +387,7 @@ function check_repair_internet() {
 			fi
 			sleep $SLEEP_PING_RETEST
 			LOOP_TIMEOUT=$(($LOOP_TIMEOUT + 1))
-		fi	
+		fi
 	done
 }
 
@@ -404,11 +404,11 @@ function file_is_writable() {
       return
     else
       RET_FILE_IS_WRITABLE="yes"
-      return    
+      return
     fi
   else
     touch "$file_rw_permission_check" 2> /dev/null
-    #check exit status 
+    #check exit status
     if [ "$?" = "1" ]; then
       RET_FILE_IS_WRITABLE="no"
       return
@@ -434,7 +434,7 @@ function cache_age_check() {
 		date_string=`head -n1 $1 | gawk -F" " '{print $4" "$5}'`
 		#convert date into timestamp
 		cache_ts=`date -d "$date_string" "+%s"`
-		cache_ts_expired=`date -d "$cache_age_check_time_passed minutes ago" "+%s"` 
+		cache_ts_expired=`date -d "$cache_age_check_time_passed minutes ago" "+%s"`
 		if [ $cache_ts -gt $cache_ts_expired ]; then
 			RET_CACHE_AGE_CHECK="OK"
 			return
@@ -457,8 +457,8 @@ function maintain_status_cache() {
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- $maint_cache_file is not writable?!? $RET_FILE_IS_WRITABLE"
       exit
-  fi  
-  
+  fi
+
   #check the age of the cache file
   cache_age_check "$maint_cache_file"
   if [ "$RET_CACHE_AGE_CHECK" = "OK" ]; then
@@ -477,7 +477,7 @@ function maintain_status_cache() {
   #get IPs of interfaces
   INT_IP=`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
   EXT_IP=`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-  
+
   interface_exists "$IF_TUNNEL"
   if [ "$RET_INTERFACE_EXISTS" = "yes" ]; then
     TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
@@ -506,7 +506,7 @@ function maintain_status_cache() {
   else
 	  PORT_FW="disabled"
   fi
-  
+
   #write info to cache file
   echo "# generated on "$(date +"%Y-%m-%d %H:%M:%S") > "$maint_cache_file"
   echo "VPNIP:$TUN_IP" >> "$maint_cache_file"
@@ -528,7 +528,7 @@ function interface_exists() {
     RET_INTERFACE_EXISTS="no"
     return
   fi
-  
+
   check=`ip addr show $1 2>&1 | grep -c "does not exist"`
   if [ "$check" = "0" ]; then
     RET_INTERFACE_EXISTS="yes"

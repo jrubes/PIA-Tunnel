@@ -16,6 +16,10 @@ update-rc.d  mpt-statusd remove
 update-rc.d lighttpd enable
 lighttpd-enable-mod fastcgi fastcgi-php
 /etc/init.d/lighttpd force-reload
+addgroup vpnvm
+usermod -G vpnvm www-data
+usermod -G vpnvm root
+
 
 2.4)  avoid using SWAP
       echo "0" > /proc/sys/vm/swappiness

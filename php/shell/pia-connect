@@ -15,7 +15,7 @@ SLEEP_PING_RETEST=4
 gen_ip_list
 
 # remove old status.txt
-rm -r '/pia/include/status.txt' 2>/dev/null
+rm -r '/pia/cache/status.txt' 2>/dev/null
 
 
 
@@ -23,7 +23,7 @@ rm -r '/pia/include/status.txt' 2>/dev/null
 #show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
 	LIST=`ls -1 /pia/ovpn/ | gawk -F"." '{print $1}'`
-	
+
 	echo
 	echo "Listing available VPN connections:"
 	echo "$LIST"
@@ -51,7 +51,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 		exit
 	fi
 
-	
+
 	#see if we have a tunnel open
 	ping_host "vpn" "quick"
 	if [ "$RET_PING_HOST" = "OK" ]; then
@@ -60,7 +60,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 		/pia/pia-stop quite
 	else
 		#set iptables to something save until the tunnel is set up
-		/pia/pia-forward stop quite	
+		/pia/pia-forward stop quite
 	fi
 
 	#ensure internet works before going further
@@ -69,7 +69,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- establishing a VPN connection to $1."
-	echo -e "\tsee ${bold}/pia/session.log${normal} for details"	
+	echo -e "\tsee ${bold}/pia/session.log${normal} for details"
 	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
 
 
@@ -103,5 +103,5 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 else
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- no connection with name $1."
-  echo -e "\ttry ${bold}pia-start list${normal} for a list of connections."	
+  echo -e "\ttry ${bold}pia-start list${normal} for a list of connections."
 fi

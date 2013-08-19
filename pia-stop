@@ -8,7 +8,7 @@ export LANG
 
 if [ ! "$1" = "quite" ]; then
 	killall openvpn
-    rm -f /pia/include/status.txt
+    rm -f /pia/cache/status.txt
 
 	#disable forwarding
 	/pia/pia-forward stop
@@ -19,12 +19,12 @@ if [ ! "$1" = "quite" ]; then
 
 else
 	killall openvpn 2>/dev/null
-    rm -f /pia/include/status.txt 2>/dev/null
+    rm -f /pia/cache/status.txt 2>/dev/null
 	/pia/pia-forward stop quite
 	ifdown eth0 2>/dev/null && ifup eth0 2>/dev/null #Debian
 fi
 
 # remove old status.txt
-rm -r '/pia/include/status.txt' 2>/dev/null
+rm -r '/pia/cache/status.txt' 2>/dev/null
 
 exit 0
