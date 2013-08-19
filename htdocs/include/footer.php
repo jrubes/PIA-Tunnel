@@ -1,0 +1,5 @@
+<?php
+
+$disp_footer = '';
+
+?>

@@ -1,0 +1,60 @@
+/* 
+    Document   : style
+    Created on : 19.08.2013, 14:04:12
+    Author     : mirkokaiser
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+  display: block;
+}
+
+.mainmenu{
+  clear: both;
+  margin-top: 0.5em;
+  padding-bottom: 1em;
+}
+.mainmenu  a{
+  margin: 2px 2px;
+  height: 2em;
+  line-height: 2em;
+  float: left;
+  width: 12em;
+  display: block;
+  border: 0.1em solid #dcdce9;
+  color: #0d2474;
+  text-decoration: none;
+  text-align: center;
+  padding: 2px;
+  font-size: 1.2em;
+}
+.mainmenu  a:hover{
+  border-color: blue;
+}
+
+.inline{
+  display: inline;
+  margin-right: 0.5em;
+}
+
+#highlight a{
+  /*background-color: #E9BDBD; */
+  border-color: green;
+  font-weight: bold;
+}
+
+.content{
+  clear: both;
+  margin-top: 0.5em;
+  padding: 0 0.5em 1em 0.5em;
+  border-style: solid; /* just for dev */
+  font-size: 1.2em;
+}
+.content h2{
+  display: block;
+  font-size: 1.5em;
+  margin: 0.5em 0 0.5em 0;
+  border-bottom: solid;
+  width: 10em;
+}

@@ -72,6 +72,13 @@ if [ ! -f "/pia/include/ip_list.txt" ]; then
 fi
 
 
+#copy htdocs to /var/www
+cp -r /pia/htdocs/* /var/www
+rm -f /var/www/README.txt
+chown -R www-data.www-data /var/www
+find /var/www -type d -exec chmod 0750 {} \;
+find /var/www -type f -exec chmod 0640 {} \;
+
 
 #add missing settings to settings.conf
 /pia/include/fix_settings
