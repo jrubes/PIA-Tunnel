@@ -267,14 +267,50 @@ function load_login(){
   $c = $_files->readfile('/pia/login.conf');
   if( $c !== false ){
     $c = explode( "\n", eol($c));
-    $un = ( mb_strlen($c[0]) > 1 ) ? $c[0] : '';
-    $pw = ( mb_strlen($c[1]) > 1 ) ? $c[1] : '';
+    $un = ( mb_strlen($c[0]) > 0 ) ? $c[0] : '';
+    $pw = ( mb_strlen($c[1]) > 0 ) ? $c[1] : '';
     if( $un == '' || $pw == '' ){
       return false;
     }
     $_SESSION['login.conf'] = array( 'username' => $un , 'password' => $pw); //store for later
     return $_SESSION['login.conf'];
   }else{
+    return false;
+  }
+}
+
+/**
+ * this function loads settings.conf into an array without comments, stores it in session and return it
+ * ['SETTING'] == $VALUE
+ * @return array,boolean or false on failure
+ */
+function load_settings(){
+  global $_files;
+  $ret = array();
+
+  $c = $_files->readfile('/pia/settings.conf');
+  if( $c !== false ){
+    $c = explode( "\n", eol($c));
+    foreach( $c as $line ){
+      //ignore a lot of stuff - quick hack for now
+      if(substr($line, 0, 1) != '#'
+              && trim($line) != ''
+              && substr($line, 0, 4) != 'LANG'
+              && substr($line, 0, 1) != '#'
+              && substr($line, 0, 11) != 'export LANG'
+              && substr($line, 0, 4) != 'bold'
+              && substr($line, 0, 6) != 'normal'  ){
+        $set = explode('=', $line);
+        $ret[$set[0]] = trim($set[1], '"'); //this should now be one setting per key with setting name as key
+      }
+    }
+
+    if( count($ret) > 0 ){
+      $_SESSION['settings.conf'] = $ret;
+      return $_SESSION['settings.conf'];
+    }
+  }else{
+    unset($_SESSION['settings.conf']);
     return false;
   }
 }
