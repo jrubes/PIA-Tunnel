@@ -90,6 +90,12 @@ class PiaDaemon {
           $this->input_status();
           break;
         case 'SETUP';
+          $msg = "# PIA VPN Setup Overview #\r\n";
+          $msg .= "\r\n";
+          $msg .= "This command will list your current settings:\r\n";
+          $msg .= "\tSETUP SHOW SETTINGS\r\n";
+          $msg .= "\r\n";
+          $this->socket->write($this->client_index, $msg);
           $this->setup_login($input);
           break;
         case 'SHUTDOWN';
@@ -118,10 +124,10 @@ class PiaDaemon {
 
     if( !array_key_exists('1', $input) ){
       $msg = "# PIA VPN Network Setup #\r\n";
-      $msg .= "Please enter the following command to update your VPN username:\r\n";
+      $msg .= "This command will update your VPN username:\r\n";
       $msg .= "\tSETUP USERNAME YourVPNusername\r\n";
       $msg .= "\r\n";
-      $msg .= "Please enter the following command to update your VPN password:\r\n";
+      $msg .= "This command will update your VPN password:\r\n";
       $msg .= "\tSETUP PASSWORD YourVPNpassword\r\n";
       $this->socket->write($this->client_index, $msg);
     }else{
