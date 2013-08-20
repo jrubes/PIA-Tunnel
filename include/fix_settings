@@ -80,14 +80,38 @@ if [ -z ${FORWARD_IP} ]; then
   echo 'FORWARD_IP="192.168.10.101"' >> '/pia/settings.conf'
 fi
 
-if [ -z "${FORWARD_IP_ENABLED}" ]; then
+if [ -z "${FORWARD_PORT_ENABLED}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# Enable/Disable forwarding yes/no' >> '/pia/settings.conf'
-  echo 'FORWARD_IP_ENABLED="yes"' >> '/pia/settings.conf'
+  echo 'FORWARD_PORT_ENABLED="yes"' >> '/pia/settings.conf'
 fi
 
 if [ -z "${DAEMON_ENABLED}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# Enable/Disable pia-daemon yes/no' >> '/pia/settings.conf'
   echo 'DAEMON_ENABLED="no"' >> '/pia/settings.conf'
+fi
+
+if [ -z "${FORWARD_VM_LAN}" ]; then
+  echo '' >> '/pia/settings.conf'
+  echo '# Enable/Disable forwarding for private VM LAN yes/no' >> '/pia/settings.conf'
+  echo 'FORWARD_VM_LAN="yes"' >> '/pia/settings.conf'
+fi
+
+if [ -z "${FORWARD_PUBLIC_LAN}" ]; then
+  echo '' >> '/pia/settings.conf'
+  echo '# Enable/Disable forwarding for public LAN yes/no' >> '/pia/settings.conf'
+  echo 'FORWARD_PUBLIC_LAN="yes"' >> '/pia/settings.conf'
+fi
+
+if [ -z "${FIREWALL_IF_SSH}" ]; then
+  echo '' >> '/pia/settings.conf'
+  echo '# Enable ssh on the following interfaces' >> '/pia/settings.conf'
+  echo 'FIREWALL_IF_SSH="eth0,eth1"' >> '/pia/settings.conf'
+fi
+
+if [ -z "${FIREWALL_IF_WEB}" ]; then
+  echo '' >> '/pia/settings.conf'
+  echo '# Enable web UI on the following interfaces' >> '/pia/settings.conf'
+  echo 'FIREWALL_IF_WEB="eth0,eth1"' >> '/pia/settings.conf'
 fi

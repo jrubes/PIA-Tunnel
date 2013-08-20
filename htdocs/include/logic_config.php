@@ -59,19 +59,35 @@ function update_network_settings(){
 
   $disp_body = '';
   foreach( $settings as $key => $val ){
-    if( array_key_exists($key, $_POST) === true && $val != $_POST[$key] ){
+    $hash = md5($key); //hash the key to avoid array issues with PHP
+    if( array_key_exists($hash, $_POST) === true && $val != $_POST[$hash] ){
+      
+      //update setting
       $k = escapeshellarg($key);
-      $v = escapeshellarg($_POST[$key]);
+      $v = escapeshellarg($_POST[$hash]);
       exec("/pia/pia-settings $k $v");
+      //$disp_body .= "$k is now $v<br>\n"; //dev stuff
       ++$upcnt;
       
-      //$disp_body .= "$k is now $v<br>\n"; //dev stuff
+    }elseif( array_key_exists($hash.'_del', $_POST) === true ){
+        //delete this setting from the file
+        $disp_body .= "<div class=\"feedback\">delete not yet implemented</div>\n";
     }
   }
   
   /* now update things with logic */
-  if( $_POST['fw_enabled'] == 0 ){
-    exec("/pia/pia-settings 'FORWARD_IP_ENABLED 'OFF'"); //disable forwarding by clearing the IP
+  $hash = md5('MYVPN[add]');
+  if( array_key_exists($hash, $_POST) === true && $_POST[$hash] !== '' ){
+    //get largest array index in settings.conf to append the new one
+    
+    $ret = array();
+    exec('grep -c "MYVPN" /pia/settings.conf', $ret);
+    if( $ret[0] > 0 ){ //config must always contain an entry!
+      //this ia a new failover VPN so append to end of file
+      $index = $ret[0];
+      $val = $_POST[$hash];
+      exec("echo 'MYVPN[$index]=\'$val\'' >> '/pia/settings.conf'"); //disable forwarding      
+    }
   }
   
   if( $upcnt > 0 ){ $disp_body .= "<div class=\"feedback\">Settings updated</div>\n"; }
@@ -178,43 +194,53 @@ function disp_network_default(){
         );
   $disp_body .= '<tr><td>VPN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
   $sel = array(
-          'id' => 'FORWARD_IP_ENABLED',
-          'selected' =>  $settings['FORWARD_IP_ENABLED'],
+          'id' => 'FORWARD_PORT_ENABLED',
+          'selected' =>  $settings['FORWARD_PORT_ENABLED'],
           array( 'yes', 'yes'),
           array( 'no', 'no')
         );
   $disp_body .= '<tr><td>Enable Port Forwarding</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $disp_body .= '<tr><td>Forward IP</td><td><input type="text" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'"</td></tr>'."\n";
+  $hash = md5('FORWARD_IP');
+  $disp_body .= '<tr><td>Forward IP</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['FORWARD_IP']).'"</td></tr>'."\n";
 
   //VM LAN segment forwarding
   $sel = array(
-            'id' => 'vm_lan_enabled',
-            'selected' =>  'yes',
+            'id' => 'FORWARD_VM_LAN',
+            'selected' =>  $settings['FORWARD_VM_LAN'],
             array( 'yes', 'yes'),
             array( 'no', 'no')
           );
   $disp_body .= '<tr><td>VPN Gateway for VM LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
   //use public LAN segment for forwarding
   $sel = array(
-            'id' => 'fw_public_lan_enabled',
-            'selected' =>  'yes',
+            'id' => 'FORWARD_PUBLIC_LAN',
+            'selected' =>  $settings['FORWARD_PUBLIC_LAN'],
             array( 'yes', 'yes'),
             array( 'no', 'no')
           );
-  $disp_body .= '<tr><td>VPN Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";  
+  $disp_body .= '<tr><td>VPN Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+  
+  //management stuff
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";  
+  $hash = md5('FIREWALL_IF_SSH');
+#  $disp_body .= '<tr><td>Allow ssh logins on</td><td><input type="checkbox" name="ssh_enable_eth0" value="1"> eth0 <input type="checkbox" name="ssh_enable_eth1" value="1"> eth1</td></tr>'."\n";
+  $disp_body .= '<tr><td>Allow ssh logins on</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['FIREWALL_IF_SSH']).'"</td></tr>'."\n";
+  $hash = md5('FIREWALL_IF_WEB');  
+#$disp_body .= '<tr><td>Allow web UI on</td><td><input type="checkbox" name="ssh_enable_eth0" value="1"> eth0 <input type="checkbox" name="ssh_enable_eth1" value="1"> eth1</td></tr>'."\n";
+  $disp_body .= '<tr><td>Allow web UI on</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['FIREWALL_IF_WEB']).'"</td></tr>'."\n";
   
   //command line stuff
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $sel = array(
             'id' => 'VERBOSE',
-            'selected' =>  'no',
+            'selected' =>  $settings['VERBOSE'],
             array( 'yes', 'yes'),
             array( 'no', 'no')
           );
   $disp_body .= '<tr><td>Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
   $sel = array(
             'id' => 'VERBOSE_DEBUG',
-            'selected' =>  'no',
+            'selected' =>  $settings['VERBOSE_DEBUG'],
             array( 'yes', 'yes'),
             array( 'no', 'no')
           );
@@ -242,12 +268,13 @@ function disp_network_default(){
   $fovers = 0;
   for( $x = 0 ; $x < 10 ; ++$x ){
     if( array_key_exists('MYVPN['.$x.']', $settings) === true ){
-      $ovpn = VPN_get_connections('MYVPN['.$x.']', array( 'selected' => $settings['MYVPN['.$x.']'], array('','')));
-      $disp_body .= '<tr><td>Failover '.$x.'</td><td>'.$ovpn.'</td></tr>'."\n";
+      $ovpn = VPN_get_connections('MYVPN['.$x.']', array( 'selected' => $settings['MYVPN['.$x.']']));
+      $hash = md5('MYVPN['.$x.']').'_del';
+      $disp_body .= '<tr><td>Failover '.$x.'</td><td>'.$ovpn.' <input type="checkbox" name="'.$hash.'" value="1"> delete</td></tr>'."\n";
       ++$fovers;
     }
   }
- $ovpn = VPN_get_connections('MYVPN['.$fovers.']', array('initial' => 'empty'));
+ $ovpn = VPN_get_connections('MYVPN[add]', array('initial' => 'empty'));
  $disp_body .= '<tr><td>Add Failover</td><td>'.$ovpn.'</td></tr>'."\n";
   
   

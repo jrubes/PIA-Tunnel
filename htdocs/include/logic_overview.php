@@ -15,8 +15,8 @@ if(array_key_exists('ovpn', $_SESSION) !== true ){
 switch($_REQUEST['cmd']){
   case 'connect':
     //check if passed VPN name is valid and pass to command line if it is
-    if( VPN_is_valid_connection($_POST['vpn_connections']) === true ){
-      $arg = escapeshellarg($_POST['vpn_connections']);
+    if( VPN_is_valid_connection($_POST[md5('vpn_connections')]) === true ){
+      $arg = escapeshellarg($_POST[md5('vpn_connections')]);
       
       //looks good, delete old session.log
       $f = '/pia/cache/session.log';
@@ -87,6 +87,16 @@ function disp_default(){
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="disconnect">';
   $disp_body .= '<input type="submit" name="disconnect_vpn" value="Disconnect VPN">'
+                .'</form>';
+  //Firewall on
+  $disp_body .= '<br>Firewall control: ';
+  $disp_body .= '<form class="inline" action="/" method="post">';
+  $disp_body .= '<input type="hidden" name="cmd" value="firewall_enable">';
+  $disp_body .= '<input type="submit" name="fw_enable" value="Enable firewall">'
+                .'</form>';
+  $disp_body .= '<form class="inline" action="/" method="post">';
+  $disp_body .= '<input type="hidden" name="cmd" value="firewall_disable">';
+  $disp_body .= '<input type="submit" name="fw_disable" value="Disable firewall">'
                 .'</form>';
 
   /* show network status */

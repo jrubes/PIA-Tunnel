@@ -53,7 +53,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 
 
 	#see if we have a tunnel open
-	ping_host "vpn" "quick"
+	ping_host "vpn" "quick" "keep"
 	if [ "$RET_PING_HOST" = "OK" ]; then
 		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- closing current VPN tunnel"
@@ -78,7 +78,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	# start the FW script once the VPN is up and running
 	LOOP_PROTECT=0
 	while true; do
-	  ping_host "vpn"
+	  ping_host "vpn" "keep"
 	  if [ "$RET_PING_HOST" = "OK" ]; then
 	    # show connection data
 	    echo_conn_established $1

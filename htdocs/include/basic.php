@@ -392,7 +392,9 @@ function load_settings(){
  * @return string containing complete select element as HTMl source
  */
 function build_select( &$content, $double=false ){
-  $head = '<select id="'.$content['id'].'" name="'.$content['id']."\">\n";
+  
+  $hash = md5($content['id']); //hash this to avoid problems with MYVPN[0] and PHP
+  $head = '<select id="'.$hash.'" name="'.$hash."\">\n";
   
   /* 'selected' is option */
   if( array_key_exists('selected', $content) === true ){

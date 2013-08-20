@@ -7,7 +7,10 @@ export LANG
 source '/pia/settings.conf'
 
 
-if [ ! "$1" = "" ] && [ ! "$2" = "" ]; then
-	#update settings
-	sed -i "s/$1=.*/$1='$2'/" /pia/settings.conf
+if [ ! "$1" = "" ]; then
+    #escape arrays or sed will fail MYVPN[0] => MYVPN\[0]
+    escaped=`echo "$1" | sed -e 's/\[/\\\[/g'`
+
+    #update settings
+    sed -i "s/$escaped=.*/$escaped='$2'/" /pia/settings.conf
 fi

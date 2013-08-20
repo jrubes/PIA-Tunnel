@@ -3,13 +3,19 @@
 LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
+RET_FORWARD_PORT="FALSE"
 
 #get default gateway of tunnel interface using "ip"
 #get IP of tunnel Gateway
 TUN_GATEWAY=`/sbin/ip route show | grep "0.0.0.0/1" | gawk -F" " '{print $3}'`
 
 #get tunnel IP
-TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+TUN_IP=`/sbin/ip addr show $IF_TUNNEL 2> /dev/null | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+if [ "$TUN_IP" = "" ]; then
+	echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+	  "- FATAL SCRIPT ERROR, tunnel interface: '$IF_TUNNEL' does not exist!"
+    exit 1;
+fi
 
 #get IP of external interface
 EXT_IP=`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
@@ -37,6 +43,31 @@ if [ "$PIA_UN" = "your PIA account name on this line" ]; then
 	exit
 fi
 
+#function to get the port used for port forwarding
+# "returns" RET_FORWARD_PORT with the port number as the value or FALSE
+function get_forward_port() {
+  RET_FORWARD_PORT="FALSE"
+
+  #check if the client ID has been generated and get it
+  if [ ! -f "/pia/client_id" ]; then
+    head -n 100 /dev/urandom | md5sum | tr -d " -" > "/pia/client_id"
+  fi
+  PIA_CLIENT_ID=`cat /pia/client_id`
+  PIA_UN=`sed -n '1p' /pia/login.conf`
+  PIA_PW=`sed -n '2p' /pia/login.conf`
+  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+
+  #get open port of tunnel connection
+  TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
+
+  #the location may not support port forwarding
+  if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
+    RET_FORWARD_PORT=$TUN_PORT
+  else
+    RET_FORWARD_PORT="FALSE"
+  fi
+}
+
 #get open port of tunnel connection
 get_forward_port
 TUN_PORT=$RET_FORWARD_PORT
@@ -55,10 +86,43 @@ iptables -t mangle -F
 iptables -t mangle -X
 iptables -P INPUT DROP
 iptables -P OUTPUT DROP
-iptables -P FORWARD DROP 
+iptables -P FORWARD DROP
+
+#allow outgoing traffic from this machine as long as it is sent over the VPN
+iptables -A OUTPUT -o $IF_TUNNEL -j ACCEPT
+
+#allow incoming on this machine as long as it is related
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+#enable POSTROUTING?
+if [ "$FORWARD_PUBLIC_LAN" = 'yes' ] || [ "$FORWARD_PUBLIC_LAN" = 'yes' ] || [ "$FORWARD_PORT_ENABLED" = 'yes' ] ; then
+  iptables -A POSTROUTING -t nat -o $IF_TUNNEL -j MASQUERADE
+fi
+
+#setup forwarding for public LAN
+if [ "$FORWARD_PUBLIC_LAN" = 'yes' ]; then
+  #iptables -A POSTROUTING -t nat -o $IF_TUNNEL -j MASQUERADE
+  iptables -A FORWARD -i $IF_EXT -o $IF_TUNNEL -j ACCEPT
+  iptables -A FORWARD -i $IF_TUNNEL -o $IF_EXT -m state --state RELATED,ESTABLISHED -j ACCEPT
+  if [ "$VERBOSE_DEBUG" = "yes" ]; then
+      echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+          "- forwarding $IF_TUNNEL => $IF_EXT has been enabled"
+  fi
+fi
+
+#setup forwarding for private VM LAN
+if [ "$FORWARD_VM_LAN" = 'yes' ]; then
+  #iptables -A POSTROUTING -t nat -o $IF_TUNNEL -j MASQUERADE
+  iptables -A FORWARD -i $IF_INT -o $IF_TUNNEL -j ACCEPT
+  iptables -A FORWARD -i $IF_TUNNEL -o $IF_INT -m state --state RELATED,ESTABLISHED -j ACCEPT
+  if [ "$VERBOSE_DEBUG" = "yes" ]; then
+      echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+          "- forwarding $IF_TUNNEL => $IF_INT has been enabled"
+  fi
+fi
 
 #setup port forwarding
-if [ "$PORT_FW" = "enabled" ] && [ ! -z "$FORWARD_IP"]; then
+if [ "$PORT_FW" = 'enabled' ] && [ "$FORWARD_PORT_ENABLED" = 'yes' ]; then
 	iptables -A PREROUTING -t nat -p tcp --dport $TUN_PORT -j DNAT --to "$FORWARD_IP"
 	iptables -A PREROUTING -t nat -p udp --dport $TUN_PORT -j DNAT --to "$FORWARD_IP"
 	iptables -A FORWARD -i $IF_TUNNEL -p tcp --dport $TUN_PORT -d "$FORWARD_IP" -j ACCEPT
@@ -74,26 +138,19 @@ else
 	fi
 fi
 
-#forward all internal traffic to tunnel
-iptables -A POSTROUTING -t nat -o $IF_TUNNEL -j MASQUERADE
-iptables -A FORWARD -i $IF_INT -o $IF_TUNNEL -j ACCEPT
-iptables -A FORWARD -i $IF_TUNNEL -o $IF_INT -m state --state RELATED,ESTABLISHED -j ACCEPT
-
-#allow outgoing traffic from this machine as long as it is sent over the VPN
-iptables -A OUTPUT -o $IF_TUNNEL -j ACCEPT
-
-#allow incoming on this machine as long as it is related
-iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-
-
 #development rules, need to think about port 22
-iptables -A INPUT -i $IF_EXT -p tcp --dport 22 -j ACCEPT
-iptables -A OUTPUT -o $IF_EXT -m state --state RELATED,ESTABLISHED -j ACCEPT
+if [ ! "$FIREWALL_IF_SSH" = "" ]; then
+  iptables -A INPUT -i "$FIREWALL_IF_SSH" -p tcp --dport 22 -j ACCEPT
+  iptables -A OUTPUT -o "$FIREWALL_IF_SSH" -m state --state RELATED,ESTABLISHED -j ACCEPT
+fi
 
 #allowing incoming traffic to pia-daemon
-iptables -A INPUT -i $IF_EXT -p tcp --dport 80 -j ACCEPT
-iptables -A INPUT -i $IF_EXT -p tcp --dport 6666 -j ACCEPT
-iptables -A INPUT -i $IF_INT -p tcp --dport 80 -j ACCEPT
+if [ ! "$FIREWALL_IF_WEB" = "" ]; then
+  iptables -A INPUT -i "$FIREWALL_IF_WEB" -p tcp --dport 80 -j ACCEPT
+  iptables -A OUTPUT -o "$FIREWALL_IF_WEB" -m state --state RELATED,ESTABLISHED -j ACCEPT
+fi
+
+
 
 # setup default routes - 2>/dev/null needs to be fixed, check if exists first, then remove or keep
 #echo "E: route delete default dev $IF_EXT"
