@@ -115,7 +115,6 @@ function VPN_get_settings_array($name){
     //check $key with substring - remove [?]
     $len = strpos($key, '['); // length or string upto [
     if(substr($key, 0, $len) == $name ){
-      echo "match - $key";
       $ret[$key] = $val;
     }
   }

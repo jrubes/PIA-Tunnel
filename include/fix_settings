@@ -107,11 +107,13 @@ fi
 if [ -z "${FIREWALL_IF_SSH}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# Enable ssh on the following interfaces' >> '/pia/settings.conf'
-  echo 'FIREWALL_IF_SSH="eth0,eth1"' >> '/pia/settings.conf'
+  echo 'FIREWALL_IF_SSH[0]="eth0"' >> '/pia/settings.conf'
+  echo 'FIREWALL_IF_SSH[1]="eth1"' >> '/pia/settings.conf'
 fi
 
 if [ -z "${FIREWALL_IF_WEB}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# Enable web UI on the following interfaces' >> '/pia/settings.conf'
-  echo 'FIREWALL_IF_WEB="eth0,eth1"' >> '/pia/settings.conf'
+  echo 'FIREWALL_IF_WEB[0]="eth0"' >> '/pia/settings.conf'
+  echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/pia/settings.conf'
 fi

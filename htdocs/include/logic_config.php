@@ -64,16 +64,38 @@ function update_network_settings(){
       //update setting
       $k = escapeshellarg($key);
       $v = escapeshellarg($_POST[$hash]);
-      //exec("/pia/pia-settings $k $v");
-      $disp_body .= "$k is now $v<br>\n"; //dev stuff
+      exec("/pia/pia-settings $k $v");
+      //$disp_body .= "$k is now $v<br>\n"; //dev stuff
       ++$upcnt;
 
     }elseif( array_key_exists($hash.'_del', $_POST) === true ){
         //delete this setting from the file
         $disp_body .= "<div class=\"feedback\">delete not yet implemented</div>\n";
     }elseif( array_key_exists($hash.'_combined', $_POST) === true ){
-        //delete this setting from the file
-        $disp_body .= "<div class=\"feedback\">combined not yet implemented</div>\n";
+        //store array values passed comma separated
+
+        /* remove old values */
+        $ret =  array();
+        //get line numbers of current settings
+        $config_value = substr($key, 0, strpos($key, '[') ); //this is the value of $key without [n]. this is used for the array name when writing it back
+        exec('grep -n  "'.$config_value.'" /pia/settings.conf | cut -d: -f1', $ret); // $ret[] will contain line number with current settings
+
+        //loop over returned values and remove the lines
+        for( $x = count($ret)-1 ; $x >= 0 ; --$x ){ //go backwards or line numbers need to be adjusted
+          $hhh = array();
+          exec('sed "'.$ret[$x].'d" /pia/settings.conf > /pia/settings.conf.back');
+          exec('mv /pia/settings.conf.back /pia/settings.conf');
+          //echo 'sed "'.$ret[$x].'d" /pia/settings.conf > /pia/settings.conf'.'<br>';
+          ++$upcnt;
+        }
+
+        //now add the settings back at the bottom of the file
+        $values = explode(',', $_POST[$hash.'_combined']); // "combined" is comma separated so explode by it
+        for( $x = 0 ; $x < count($values) ; ++$x ){ //yes count in a loop - only doing it since this is a single user script -- ohh yeah, sue me!
+          //echo("echo '".$config_value.'['.$x."]=\"".$values[$x]."\"' >> '/pia/settings.conf'".'<br>');
+          exec("echo '".$config_value.'['.$x."]=\"".$values[$x]."\"' >> '/pia/settings.conf'");
+          ++$upcnt;
+        }
     }
   }
 
@@ -231,7 +253,6 @@ function disp_network_default(){
     $c = count($fw_ssh);
     $t='';
     for( $x=0 ; $x < $c ; ++$x ){
-      echo "hasing ".$use.'['.$x.']'.'<br>';
       $hash = md5($use.'['.$x.']');
       #  $disp_body .= '<tr><td>Allow ssh logins on</td><td><input type="checkbox" name="ssh_enable_eth0" value="1"> eth0 <input type="checkbox" name="ssh_enable_eth1" value="1"> eth1</td></tr>'."\n";
       $t .= htmlspecialchars($settings[$use.'['.$x.']']).",";
@@ -246,7 +267,6 @@ function disp_network_default(){
     $c = count($fw_ssh);
     $t='';
     for( $x=0 ; $x < $c ; ++$x ){
-      echo "hasing ".$use.'['.$x.']'.'<br>';
       $hash = md5($use.'['.$x.']');
       #  $disp_body .= '<tr><td>Allow ssh logins on</td><td><input type="checkbox" name="ssh_enable_eth0" value="1"> eth0 <input type="checkbox" name="ssh_enable_eth1" value="1"> eth1</td></tr>'."\n";
       $t .= htmlspecialchars($settings[$use.'['.$x.']']).",";
