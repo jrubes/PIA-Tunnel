@@ -140,14 +140,22 @@ fi
 
 #development rules, need to think about port 22
 if [ ! "$FIREWALL_IF_SSH" = "" ]; then
-  iptables -A INPUT -i "$FIREWALL_IF_SSH" -p tcp --dport 22 -j ACCEPT
-  iptables -A OUTPUT -o "$FIREWALL_IF_SSH" -m state --state RELATED,ESTABLISHED -j ACCEPT
+  IFS=","
+  for int in "$FIREWALL_IF_SSH"
+  do
+    iptables -A INPUT -i "$int" -p tcp --dport 22 -j ACCEPT
+    iptables -A OUTPUT -o "$int" -m state --state RELATED,ESTABLISHED -j ACCEPT
+  done
 fi
 
 #allowing incoming traffic to pia-daemon
 if [ ! "$FIREWALL_IF_WEB" = "" ]; then
-  iptables -A INPUT -i "$FIREWALL_IF_WEB" -p tcp --dport 80 -j ACCEPT
-  iptables -A OUTPUT -o "$FIREWALL_IF_WEB" -m state --state RELATED,ESTABLISHED -j ACCEPT
+  IFS=","
+  for int in "$FIREWALL_IF_WEB"
+  do
+    iptables -A INPUT -i "$int" -p tcp --dport 80 -j ACCEPT
+    iptables -A OUTPUT -o "$int" -m state --state RELATED,ESTABLISHED -j ACCEPT
+  done
 fi
 
 
