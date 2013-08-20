@@ -17,7 +17,7 @@ switch($_REQUEST['cmd']){
     //check if passed VPN name is valid and pass to command line if it is
     if( VPN_is_valid_connection($_POST[md5('vpn_connections')]) === true ){
       $arg = escapeshellarg($_POST[md5('vpn_connections')]);
-      
+
       //looks good, delete old session.log
       $f = '/pia/cache/session.log';
       $_files->rm($f);
@@ -26,9 +26,10 @@ switch($_REQUEST['cmd']){
 
       //time to initiate the connection
        //calling my bash scripts - this should work :)
+      //echo("sudo bash -c \"/pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &");
       exec("sudo bash -c \"/pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &"); //using bash allows this to happen in the background
       $_SESSION['connecting2'] = $arg; //store for messages
-      
+
       $disp_body .= "<div class=\"feedback\">Establishing a VPN connection to $arg</div>\n";
       $disp_body .= disp_default();
     }
@@ -38,8 +39,8 @@ switch($_REQUEST['cmd']){
       $_files->rm('/pia/cache/session.log');
       exec("sudo bash -c \"/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
       $_SESSION['connecting2'] = '';
-      
-      $disp_body .= "<div class=\"feedback\">Disconnecting VPN connection</div>\n";
+
+      $disp_body .= "<div class=\"feedback\">Disconnecting VPN</div>\n";
       $disp_body .= disp_default();
     break;
   default :
@@ -102,7 +103,7 @@ function disp_default(){
   /* show network status */
   $disp_body .= '<h2>Network Status</h2>';
   $disp_body .= VM_get_status();
-  $disp_body .= "</div>";  
+  $disp_body .= "</div>";
 
   $disp_body .= "</div>";
   return $disp_body;

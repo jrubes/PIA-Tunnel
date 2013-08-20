@@ -50,9 +50,9 @@ function load_menu(){
   $source = array(
       /* 'URL Name', 'URL target', 'URL ID' */
       array( 'name' => 'Overview', 'url' => '/?page=main', 'id' => ''),
-      array( 'name' => 'VPN Config', 'url' => '/?page=config&amp;cmd=vpn', 'id' => 'cvpn'),
-      array( 'name' => 'Network Config', 'url' => '/?page=config&amp;cmd=network', 'id' => 'cnet'),
       array( 'name' => 'Tools', 'url' => '/?page=tools', 'id' => 'tools'),
+      array( 'name' => 'Network Config', 'url' => '/?page=config&amp;cmd=network', 'id' => 'cnet'),
+      array( 'name' => 'VPN Config', 'url' => '/?page=config&amp;cmd=vpn', 'id' => 'cvpn'),
       array( 'name' => 'Logout', 'url' => '/?page=logout', 'id' => 'logout')
   );
 
@@ -197,11 +197,11 @@ function VM_get_status(){
   $ret_str .= "<tr><td>Status</td>";
   switch( $session_status[0] ){
     case 'connected':
-      $_SESSION[connecting2] = ($_SESSION[connecting2] != '') ? $_SESSION[connecting2] : 'ERROR 5642';
+      $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
       $ret_str .= "<td>Connected to $_SESSION[connecting2]</td></tr>";
       break;
     case 'connecting':
-      $_SESSION[connecting2] = ($_SESSION[connecting2] != '') ? $_SESSION[connecting2] : 'ERROR 5642';
+      $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
       $ret_str .= "<td>Connecting to $_SESSION[connecting2]</td></tr>";
       break;
     case 'disconnected':

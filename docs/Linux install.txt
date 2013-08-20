@@ -96,7 +96,7 @@ host statichost {
 
 6.5) vi /etc/sudoers
   Add this on line 21
-    www-data pia-tunnel = NOPASSWD: /pia/*
+    www-data pia-tunnel = NOPASSWD: /pia/*,/bin/bash
 
 
 7) mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
