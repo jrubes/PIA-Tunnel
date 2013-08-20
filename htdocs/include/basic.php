@@ -95,6 +95,37 @@ function VPN_is_valid_connection($val2check){
 }
 
 /**
+ * method to get an entire settings array
+ * @param string $name name of array
+ * @return string/bool string containing HTML formated as <select> or FALSE
+ */
+function VPN_get_settings_array($name){
+  $ret = array();
+
+  if(array_key_exists('settings.conf', $_SESSION) !== true ){
+    if( load_settings() === false ){
+      echo "FATAL ERROR: Unable to get list of settings!";
+      return false;
+    }
+  }
+
+
+  /* loop over settings strings and find all with $name* */
+  foreach( $_SESSION['settings.conf'] as $key => $val ){
+    //check $key with substring - remove [?]
+    $len = strpos($key, '['); // length or string upto [
+    if(substr($key, 0, $len) == $name ){
+      echo "match - $key";
+      $ret[$key] = $val;
+    }
+  }
+
+
+  if( count($ret) == 0 ){ return false; }
+  return $ret;
+}
+
+/**
  * method to get a list of valid VPN connection
  * currently only supporting PIA so I simply index the .ovpn files
  *  - used build_select()
@@ -123,7 +154,8 @@ function VPN_get_connections($name, $build_options=array()){
 
   if( $ret == '' ){ return false; }
 
-  $assembled = build_select(array_merge($sel, $ret));
+  $t = array_merge($sel, $ret);
+  $assembled = build_select($t);
   //return "<select name=\"vpn_connections\">\n$ret</select>\n";
   return $assembled;
 }
@@ -181,7 +213,7 @@ function VM_get_status(){
       break;
     default:
       var_dump($session_status);
-  }  
+  }
 
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
   $ret = array();
@@ -202,7 +234,7 @@ function VM_get_status(){
     $ret_str .= "<tr><td>VPN IP</td><td>$ret[0]</td></tr>";
     $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported</td></tr>";
   }
-  
+
   $ret_str .= "</table>\n";
 
   return $ret_str;
@@ -216,7 +248,7 @@ function VM_get_status(){
  */
 function VPN_sessionlog_status(){
   global $_files;
-  
+
   $content = $_files->readfile('/pia/cache/session.log');
   if( $content === false ){
     return array('disconnected');
@@ -236,7 +268,7 @@ function VPN_sessionlog_status(){
       return array('unkown status');
     }
   }
-  
+
 }
 
  /**
@@ -392,31 +424,34 @@ function load_settings(){
  * @return string containing complete select element as HTMl source
  */
 function build_select( &$content, $double=false ){
-  
+
   $hash = md5($content['id']); //hash this to avoid problems with MYVPN[0] and PHP
   $head = '<select id="'.$hash.'" name="'.$hash."\">\n";
-  
+
   /* 'selected' is option */
   if( array_key_exists('selected', $content) === true ){
     $cnt = count($content)-2;//skip id & selected
   }else{
     $cnt = count($content)-1;//skip only id
   }
-  
+  if( array_key_exists('initial', $content) === true ){
+    --$cnt; //-1 more if initial is set
+  }
+
   /* first line empty or filled */
   if( array_key_exists('initial', $content) === true && $content['initial'] === 'empty' ){
     $head .= '<option value="">&nbsp;</option>';
   }
-  
+
   /* time to build the rest */
   $sel = '';
   $opts = '';
   for( $x=0 ; $x < $cnt ; ++$x ){
     $val = htmlspecialchars($content[$x][0]);
     $dis = htmlspecialchars($content[$x][1]);
-    
+
     /* handle default selection */
-    if( array_key_exists('selected', $content) === true 
+    if( array_key_exists('selected', $content) === true
             && $content[$x][0] === $content['selected'] ){
       $sel = "<option value=\"$val\">$dis</option>\n";
       if( $double !== false ){
@@ -426,8 +461,8 @@ function build_select( &$content, $double=false ){
       $opts .= "<option value=\"$val\">$dis</option>\n";
     }
   }
-    
+
   /* return it all */
-  return $head.$sel.$opts.'</select>'; 
+  return $head.$sel.$opts.'</select>';
 }
 ?>
