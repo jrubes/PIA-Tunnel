@@ -17,12 +17,11 @@ require_once $inc_dir.'footer.php';
 /* deliver the finished page */
 echo "<html>\n"
       ."<head>\n"
-      .$disp_header
+      .$disp_header."\n"
     ."</head>\n"
     ."<body>\n"
-      .$disp_body
-      ."\n"
-      .$disp_footer
+      .$disp_body."\n"
+      .$disp_footer."\n"
     ."</body>\n"
     ."</html>";
 ?>
