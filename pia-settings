@@ -9,5 +9,5 @@ source '/pia/settings.conf'
 
 if [ ! "$1" = "" ] && [ ! "$2" = "" ]; then
 	#update settings
-	sed -i "s/$1=.*/$1=$2/" /pia/settings.conf
+	sed -i "s/$1=.*/$1='$2'/" /pia/settings.conf
 fi

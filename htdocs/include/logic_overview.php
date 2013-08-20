@@ -29,7 +29,7 @@ switch($_REQUEST['cmd']){
       exec("sudo bash -c \"/pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &"); //using bash allows this to happen in the background
       $_SESSION['connecting2'] = $arg; //store for messages
       
-      //sleep(1); //allow status to update
+      $disp_body .= "<div class=\"feedback\">Establishing a VPN connection to $arg</div>\n";
       $disp_body .= disp_default();
     }
     break;
@@ -38,6 +38,8 @@ switch($_REQUEST['cmd']){
       $_files->rm('/pia/cache/session.log');
       exec("sudo bash -c \"/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
       $_SESSION['connecting2'] = '';
+      
+      $disp_body .= "<div class=\"feedback\">Disconnecting VPN connection</div>\n";
       $disp_body .= disp_default();
     break;
   default :

@@ -5,7 +5,7 @@ unset($_SESSION['settings.conf']);
 /* load list of available connections into SESSION */
 if(array_key_exists('ovpn', $_SESSION) !== true ){
   if( VPN_ovpn_to_session() !== true ){
-    echo "FATAL ERROR: Unable to get list of VPN connections!";
+    echo "<div class=\"feedback\">FATAL ERROR: Unable to get list of VPN connections!</div>\n";
     return false;
   }
 }
@@ -54,6 +54,7 @@ switch($_REQUEST['cmd']){
  */
 function update_network_settings(){
   global $_files;
+  $upcnt = 0;
   $settings = VPN_get_settings();
 
   $disp_body = '';
@@ -61,10 +62,20 @@ function update_network_settings(){
     if( array_key_exists($key, $_POST) === true && $val != $_POST[$key] ){
       $k = escapeshellarg($key);
       $v = escapeshellarg($_POST[$key]);
-      //exec('/pia/pia-settings $k $v');
-      $disp_body .= "$k is now $v<br>\n";
+      exec("/pia/pia-settings $k $v");
+      ++$upcnt;
+      
+      //$disp_body .= "$k is now $v<br>\n"; //dev stuff
     }
   }
+  
+  /* now update things with logic */
+  if( $_POST['fw_enabled'] == 0 ){
+    exec("/pia/pia-settings 'FORWARD_IP_ENABLED 'OFF'"); //disable forwarding by clearing the IP
+  }
+  
+  if( $upcnt > 0 ){ $disp_body .= "<div class=\"feedback\">Settings updated</div>\n"; }
+  unset($_SESSION['settings.conf']);
   return $disp_body;
 }
 
@@ -89,7 +100,7 @@ function update_user_settings(){
       if( $username !== $ct[0] ){
         $content = "$username\n$ct[1]"; //write new username with old password
         $_files->writefile($login_file, $content); //back to login.conf
-        $ret .= "<p>Username updated</p>";
+        $ret .= "<div class=\"feedback\">Username updated</div>\n";
       }
     }
   }
@@ -100,7 +111,7 @@ function update_user_settings(){
       if( $password !== $ct[1] ){
         $content = "$ct[0]\n$password"; //write old username with new password
         $_files->writefile($login_file, $content); //back to login.conf
-        $ret .= "<p>Password updated</p>";
+        $ret .= "<div class=\"feedback\">Password updated</div>\n";
       }
     }
   }
@@ -142,28 +153,136 @@ function disp_network_default(){
   $disp_body .= "<table>\n";
 
   //interface and network
-  $disp_body .= '<tr><td>IF_EXT</td><td><select name="IF_EXT"><option value="eth0">eth0</option><option value="eth1">eth1</option><option value="tun0">tun0</option></select></td></tr>'."\n";
-  $disp_body .= '<tr><td>IF_INT</td><td><select name="IF_INT"><option value="eth1">eth1</option><option value="eth0">eth0</option><option value="tun0">tun0</option></select></td></tr>'."\n";
-  $disp_body .= '<tr><td>IF_TUNNEL</td><td><select name="IF_TUNNEL"><option value="tun0">tun0</option><option value="eth0">eth0</option><option value="eth1">eth1</option></select></td></tr>'."\n";
+  $sel = array(
+          'id' => 'IF_EXT',
+          'selected' =>  $settings['IF_EXT'],
+          array( 'eth0', 'eth0'),
+          array( 'eth1', 'eth1'),
+          array( 'tun0', 'tun0')
+        );
+  $disp_body .= '<tr><td>Public LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $sel = array(
+          'id' => 'IF_INT',
+          'selected' =>  $settings['IF_INT'],
+          array( 'eth0', 'eth0'),
+          array( 'eth1', 'eth1'),
+          array( 'tun0', 'tun0')
+        );
+  $disp_body .= '<tr><td>VM LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $sel = array(
+          'id' => 'IF_TUNNEL',
+          'selected' =>  $settings['IF_TUNNEL'],
+          array( 'eth0', 'eth0'),
+          array( 'eth1', 'eth1'),
+          array( 'tun0', 'tun0')
+        );
+  $disp_body .= '<tr><td>VPN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $sel = array(
+          'id' => 'FORWARD_IP_ENABLED',
+          'selected' =>  $settings['FORWARD_IP_ENABLED'],
+          array( 'yes', 'yes'),
+          array( 'no', 'no')
+        );
+  $disp_body .= '<tr><td>Enable Port Forwarding</td><td>'.build_select($sel).'</td></tr>'."\n";
   $disp_body .= '<tr><td>Forward IP</td><td><input type="text" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'"</td></tr>'."\n";
 
   //command line stuff
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $disp_body .= '<tr><td>Verbose</td><td><select name="VERBOSE"><option value="no">no</option><option value="yes">yes</option></select></td></tr>'."\n";
-  $disp_body .= '<tr><td>Extra Verbose</td><td><select name="VERBOSE_DEBUG"><option value="no">no</option><option value="yes">yes</option></select></td></tr>'."\n";
+  $sel = array(
+            'id' => 'VERBOSE',
+            'selected' =>  'no',
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $sel = array(
+            'id' => 'VERBOSE_DEBUG',
+            'selected' =>  'no',
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>Extra Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
+  
 
 //  foreach( $settings as $key => $val ){
 //    $disp_body .= '<tr><td>'.htmlspecialchars($key).'</td><td><input type="text" name="'.htmlspecialchars($key).'" value="'.htmlspecialchars($val)."\"></td></tr>\n";
 //  }
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $disp_body .= "</table>\n";
+  
+  
+  $disp_body .= '<h2>PIA Firewall &amp; Settings</h2>'."\n";
+  $disp_body .= "<table>\n";  //iptables options
+  
+  //VM LAN segment forwarding
+  $sel = array(
+            'id' => 'vm_lan_enabled',
+            'selected' =>  'yes',
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>Enable VM LAN Segment</td><td>'.build_select($sel).'</td></tr>'."\n";
+  //use public LAN segment for forwarding
+  $sel = array(
+            'id' => 'fw_public_lan_enabled',
+            'selected' =>  'yes',
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+  
+  $disp_body .= "</table>\n";
 
 
-  $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= "</form></div>";
   return $disp_body;
 }
 
+
+/**
+ * function to build a select element based on a source array
+ * @param array $content array with following structure
+ * <ul><li>['id'] = "foo"; name and id of select element created</li>
+ * <li>['selected'] = "male"; Otional - specify top item from list by option value</li>
+ * <li>array( 'option value', 'option display')</li>
+ * <li>array( 'option value2', 'option display2')</li>
+ * </ul>
+ * @param boolean $double false will not list a 'selected' option twice, true will
+ * @return string containing complete select element as HTMl source
+ */
+function build_select( &$content, $double=false ){
+  $head = '<select id="'.$content['id'].'" name="'.$content['id']."\">\n";
+  
+  /* 'selected' is option */
+  if( array_key_exists('selected', $content) === true ){
+    $cnt = count($content)-2;//skip id & selected
+  }else{
+    $cnt = count($content)-1;//skip only id
+  }
+  
+  /* time to build */
+  $sel = '';
+  $opts = '';
+  for( $x=0 ; $x < $cnt ; ++$x ){
+    $val = htmlspecialchars($content[$x][0]);
+    $dis = htmlspecialchars($content[$x][1]);
+    
+    /* handle default selection */
+    if( array_key_exists('selected', $content) === true 
+            && $content[$x][0] === $content['selected'] ){
+      $sel = "<option value=\"$val\">$dis</option>\n";
+      if( $double !== false ){
+        $opts .= "<option value=\"$val\">$dis</option>\n";
+      }
+    }else{
+      $opts .= "<option value=\"$val\">$dis</option>\n";
+    }
+  }
+    
+  /* return it all */
+  return $head.$sel.$opts.'</select>'; 
+}
 
 /**
  * method read /pia/login.conf into an array

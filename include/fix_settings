@@ -78,3 +78,9 @@ if [ -z ${FORWARD_IP} ]; then
   echo '# IP of target computer for port forwarding - if supported by location' >> '/pia/settings.conf'
   echo 'FORWARD_IP="192.168.10.101"' >> '/pia/settings.conf'
 fi
+
+if [ -z "${FORWARD_IP_ENABLED}" ]; then
+  echo '' >> '/pia/settings.conf'
+  echo '# Enable/Disable forwarding yes/no' >> '/pia/settings.conf'
+  echo 'FORWARD_IP_ENABLED="yes"' >> '/pia/settings.conf'
+fi

@@ -354,7 +354,7 @@ function load_settings(){
               && substr($line, 0, 4) != 'bold'
               && substr($line, 0, 6) != 'normal'  ){
         $set = explode('=', $line);
-        $ret[$set[0]] = trim($set[1], '"'); //this should now be one setting per key with setting name as key
+        $ret[$set[0]] = trim($set[1], '"\''); //this should now be one setting per key with setting name as key
       }
     }
 
