@@ -14,6 +14,7 @@ if [ -z "${MYVPN[0]}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# pia-daemon settings' >> '/pia/settings.conf'
   echo '#####' >> '/pia/settings.conf'
+  echo 'DAEMON_ENABLED="no"' >> '/pia/settings.conf'
   echo '# list of VPN connections to use, the first is awlays the primary' >> '/pia/settings.conf'
   echo 'MYVPN[0]="CA Toronto"' >> '/pia/settings.conf'
   echo 'MYVPN[1]="Switzerland"' >> '/pia/settings.conf'
@@ -83,4 +84,10 @@ if [ -z "${FORWARD_IP_ENABLED}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# Enable/Disable forwarding yes/no' >> '/pia/settings.conf'
   echo 'FORWARD_IP_ENABLED="yes"' >> '/pia/settings.conf'
+fi
+
+if [ -z "${DAEMON_ENABLED}" ]; then
+  echo '' >> '/pia/settings.conf'
+  echo '# Enable/Disable pia-daemon yes/no' >> '/pia/settings.conf'
+  echo 'DAEMON_ENABLED="no"' >> '/pia/settings.conf'
 fi

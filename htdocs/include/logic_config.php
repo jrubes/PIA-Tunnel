@@ -149,9 +149,9 @@ function disp_network_default(){
   /* show Username and Password fields - expand this for more VPN providers */
   $disp_body .= '<div><h2>PIA Network Settings</h2>'."\n";
   $disp_body .= '<form action="/?page=config&amp;cmd=network_store&amp;cid=cnetwork" method="post">'."\n";
-
   $disp_body .= "<table>\n";
 
+  
   //interface and network
   $sel = array(
           'id' => 'IF_EXT',
@@ -186,6 +186,23 @@ function disp_network_default(){
   $disp_body .= '<tr><td>Enable Port Forwarding</td><td>'.build_select($sel).'</td></tr>'."\n";
   $disp_body .= '<tr><td>Forward IP</td><td><input type="text" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'"</td></tr>'."\n";
 
+  //VM LAN segment forwarding
+  $sel = array(
+            'id' => 'vm_lan_enabled',
+            'selected' =>  'yes',
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>VPN Gateway for VM LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+  //use public LAN segment for forwarding
+  $sel = array(
+            'id' => 'fw_public_lan_enabled',
+            'selected' =>  'yes',
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>VPN Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";  
+  
   //command line stuff
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $sel = array(
@@ -204,32 +221,35 @@ function disp_network_default(){
   $disp_body .= '<tr><td>Extra Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
   
 
-//  foreach( $settings as $key => $val ){
-//    $disp_body .= '<tr><td>'.htmlspecialchars($key).'</td><td><input type="text" name="'.htmlspecialchars($key).'" value="'.htmlspecialchars($val)."\"></td></tr>\n";
-//  }
+
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $disp_body .= "</table>\n";
   
   
-  $disp_body .= '<h2>PIA Firewall &amp; Settings</h2>'."\n";
+  $disp_body .= '<h2>PIA Daemon Settings</h2>'."\n";
   $disp_body .= "<table>\n";  //iptables options
   
   //VM LAN segment forwarding
   $sel = array(
-            'id' => 'vm_lan_enabled',
-            'selected' =>  'yes',
+            'id' => 'DAEMON_ENABLED',
+            'selected' =>  $settings['DAEMON_ENABLED'],
             array( 'yes', 'yes'),
             array( 'no', 'no')
           );
-  $disp_body .= '<tr><td>Enable VM LAN Segment</td><td>'.build_select($sel).'</td></tr>'."\n";
-  //use public LAN segment for forwarding
-  $sel = array(
-            'id' => 'fw_public_lan_enabled',
-            'selected' =>  'yes',
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>Enable pia-daemon</td><td>'.build_select($sel).'</td></tr>'."\n";
+  
+  //Failover connection selection - offer 10 entires
+  $fovers = 0;
+  for( $x = 0 ; $x < 10 ; ++$x ){
+    if( array_key_exists('MYVPN['.$x.']', $settings) === true ){
+      $ovpn = VPN_get_connections('MYVPN['.$x.']', array( 'selected' => $settings['MYVPN['.$x.']'], array('','')));
+      $disp_body .= '<tr><td>Failover '.$x.'</td><td>'.$ovpn.'</td></tr>'."\n";
+      ++$fovers;
+    }
+  }
+ $ovpn = VPN_get_connections('MYVPN['.$fovers.']', array('initial' => 'empty'));
+ $disp_body .= '<tr><td>Add Failover</td><td>'.$ovpn.'</td></tr>'."\n";
+  
   
   $disp_body .= "</table>\n";
 
@@ -237,51 +257,6 @@ function disp_network_default(){
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= "</form></div>";
   return $disp_body;
-}
-
-
-/**
- * function to build a select element based on a source array
- * @param array $content array with following structure
- * <ul><li>['id'] = "foo"; name and id of select element created</li>
- * <li>['selected'] = "male"; Otional - specify top item from list by option value</li>
- * <li>array( 'option value', 'option display')</li>
- * <li>array( 'option value2', 'option display2')</li>
- * </ul>
- * @param boolean $double false will not list a 'selected' option twice, true will
- * @return string containing complete select element as HTMl source
- */
-function build_select( &$content, $double=false ){
-  $head = '<select id="'.$content['id'].'" name="'.$content['id']."\">\n";
-  
-  /* 'selected' is option */
-  if( array_key_exists('selected', $content) === true ){
-    $cnt = count($content)-2;//skip id & selected
-  }else{
-    $cnt = count($content)-1;//skip only id
-  }
-  
-  /* time to build */
-  $sel = '';
-  $opts = '';
-  for( $x=0 ; $x < $cnt ; ++$x ){
-    $val = htmlspecialchars($content[$x][0]);
-    $dis = htmlspecialchars($content[$x][1]);
-    
-    /* handle default selection */
-    if( array_key_exists('selected', $content) === true 
-            && $content[$x][0] === $content['selected'] ){
-      $sel = "<option value=\"$val\">$dis</option>\n";
-      if( $double !== false ){
-        $opts .= "<option value=\"$val\">$dis</option>\n";
-      }
-    }else{
-      $opts .= "<option value=\"$val\">$dis</option>\n";
-    }
-  }
-    
-  /* return it all */
-  return $head.$sel.$opts.'</select>'; 
 }
 
 /**

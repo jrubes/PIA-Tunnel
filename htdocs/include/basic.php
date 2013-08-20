@@ -97,10 +97,17 @@ function VPN_is_valid_connection($val2check){
 /**
  * method to get a list of valid VPN connection
  * currently only supporting PIA so I simply index the .ovpn files
+ *  - used build_select()
+ * @param string $name name and id of element as a string
+ * @param array $build_options *Optional* additional build_select() as array (besides name)
  * @return string/bool string containing HTML formated as <select> or FALSE
  */
-function VPN_get_connections(){
-  $ret = '';
+function VPN_get_connections($name, $build_options=array()){
+  $ret = array();
+  $sel = array();
+  $sel['id'] = $name;
+  if( count($build_options) > 0 ){ $sel = array_merge($sel,$build_options); }
+
 
   if(array_key_exists('ovpn', $_SESSION) !== true ){
     echo "FATAL ERROR: Unable to get list of VPN connections!";
@@ -110,11 +117,15 @@ function VPN_get_connections(){
   //loop over session to generate options
   foreach( $_SESSION['ovpn'] as $ovpn ){
     $html = htmlentities($ovpn);
-    $ret .= "<option value=\"$html\">$html</option>\n";
+    //$ret .= "<option value=\"$html\">$html</option>\n";
+    $ret[] = array( $html, $html);
   }
 
   if( $ret == '' ){ return false; }
-  return "<select name=\"vpn_connections\">\n$ret</select>\n";
+
+  $assembled = build_select(array_merge($sel, $ret));
+  //return "<select name=\"vpn_connections\">\n$ret</select>\n";
+  return $assembled;
 }
 
 /**
@@ -366,5 +377,55 @@ function load_settings(){
     unset($_SESSION['settings.conf']);
     return false;
   }
+}
+
+/**
+ * function to build a select element based on a source array
+ * @param array $content array with following structure
+ * <ul><li>['id'] = "foo"; name and id of select element created</li>
+ * <li>['initial'] = "empty|filled"; empty to have initial selection of nothing or filled to use [0]
+ * <li>['selected'] = "male"; Otional - specify top item from list by option value</li>
+ * <li>array( 'option value', 'option display')</li>
+ * <li>array( 'option value2', 'option display2')</li>
+ * </ul>
+ * @param boolean $double false will not list a 'selected' option twice, true will
+ * @return string containing complete select element as HTMl source
+ */
+function build_select( &$content, $double=false ){
+  $head = '<select id="'.$content['id'].'" name="'.$content['id']."\">\n";
+  
+  /* 'selected' is option */
+  if( array_key_exists('selected', $content) === true ){
+    $cnt = count($content)-2;//skip id & selected
+  }else{
+    $cnt = count($content)-1;//skip only id
+  }
+  
+  /* first line empty or filled */
+  if( array_key_exists('initial', $content) === true && $content['initial'] === 'empty' ){
+    $head .= '<option value="">&nbsp;</option>';
+  }
+  
+  /* time to build the rest */
+  $sel = '';
+  $opts = '';
+  for( $x=0 ; $x < $cnt ; ++$x ){
+    $val = htmlspecialchars($content[$x][0]);
+    $dis = htmlspecialchars($content[$x][1]);
+    
+    /* handle default selection */
+    if( array_key_exists('selected', $content) === true 
+            && $content[$x][0] === $content['selected'] ){
+      $sel = "<option value=\"$val\">$dis</option>\n";
+      if( $double !== false ){
+        $opts .= "<option value=\"$val\">$dis</option>\n";
+      }
+    }else{
+      $opts .= "<option value=\"$val\">$dis</option>\n";
+    }
+  }
+    
+  /* return it all */
+  return $head.$sel.$opts.'</select>'; 
 }
 ?>

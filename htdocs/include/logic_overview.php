@@ -80,7 +80,7 @@ function disp_default(){
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="page" value="">';
   $disp_body .= '<input type="hidden" name="cmd" value="connect">';
-  $disp_body .= VPN_get_connections();
+  $disp_body .= VPN_get_connections('vpn_connections');
   $disp_body .= '<input type="submit" name="connect_vpn" value="Connect VPN">'
                 .'</form>';
   //disconnect button
