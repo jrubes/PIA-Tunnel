@@ -69,8 +69,8 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 		"- establishing a VPN connection to $1."
-	echo -e "\tsee ${bold}/pia/session.log${normal} for details"
-	openvpn "/pia/ovpn/$1.ovpn" &> /pia/session.log &
+	echo -e "\tsee ${bold}/pia/cache/session.log${normal} for details"
+	openvpn "/pia/ovpn/$1.ovpn" &> /pia/cache/session.log &
 
 
 
@@ -91,7 +91,7 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	  #endless loop protect, about 30 seconds
 	  if [ "$LOOP_PROTECT" -eq 30 ]; then
 		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- VPN connectionfail- please check /pia/session.log for details."
+			"- VPN connectionfail- please check /pia/cache/session.log for details."
 	    killall openvpn 2>/dev/null
 	    /pia/pia-forward stop quite
 	    exit

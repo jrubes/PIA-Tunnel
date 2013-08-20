@@ -277,10 +277,10 @@ function switch_vpn() {
 		if [ "$VERBOSE" = "yes" ]; then
 			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- establishing a VPN connection to $CONN."
-			echo -e "\tsee ${bold}/pia/session.log${normal} for details"
+			echo -e "\tsee ${bold}/pia/cache/session.log${normal} for details"
 		fi
 		killall openvpn &> /dev/null
-		openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/session.log &
+		openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/cache/session.log &
 
 		#wait until connection has been established
 		LOOP_PROTECT=0

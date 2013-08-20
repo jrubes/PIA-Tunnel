@@ -25,6 +25,7 @@ else
 fi
 
 # remove old status.txt
-rm -r '/pia/cache/status.txt' 2>/dev/null
+rm -f '/pia/cache/status.txt' 2>/dev/null
+rm -f '/pia/cache/session.log' 2>/dev/null
 
 exit 0

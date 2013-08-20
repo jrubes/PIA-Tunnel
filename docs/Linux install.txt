@@ -10,7 +10,7 @@ APT::Install-Recommends "0" ; APT::Install-Suggests "0" ;
 
 1.6) delete non root user with userdel -r USER
 
-2) apt-get install psmisc openvpn screen dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt
+2) apt-get install psmisc openvpn screen dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt sudo
 update-rc.d  ntp remove
 update-rc.d  mpt-statusd remove
 update-rc.d lighttpd enable
@@ -93,6 +93,10 @@ host statichost {
   1:2345:respawn:/sbin/getty 38400 tty1
   with
   1:2345:respawn:/sbin/getty --noclear 38400 tty1
+
+6.5) vi /etc/sudoers
+  Add this on line 21
+    www-data pia-tunnel = NOPASSWD: /pia/*
 
 
 7) mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;

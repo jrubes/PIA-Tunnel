@@ -16,10 +16,29 @@ switch($_REQUEST['cmd']){
   case 'connect':
     //check if passed VPN name is valid and pass to command line if it is
     if( VPN_is_valid_connection($_POST['vpn_connections']) === true ){
-      //looks good, pass along
       $arg = escapeshellarg($_POST['vpn_connections']);
-      exec("/pia/pia-connect \"$arg\" > /dev/null 2>/dev/null &"); //calling my bash scripts - this should work :)
+      
+      //looks good, delete old session.log
+      $f = '/pia/cache/session.log';
+      $_files->rm($f);
+      $c = "Connecting to $arg\n\n";
+      $_files->writefile( $f, $c ); //write file so status overview works right away
+
+      //time to initiate the connection
+       //calling my bash scripts - this should work :)
+      exec("sudo bash -c \"/pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &"); //using bash allows this to happen in the background
+      $_SESSION['connecting2'] = $arg; //store for messages
+      
+      //sleep(1); //allow status to update
+      $disp_body .= disp_default();
     }
+    break;
+  case 'disconnect':
+      //looks good, delete old session.log
+      $_files->rm('/pia/cache/session.log');
+      exec("sudo bash -c \"/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
+      $_SESSION['connecting2'] = '';
+      $disp_body .= disp_default();
     break;
   default :
     $disp_body .= disp_default();
@@ -53,10 +72,6 @@ switch($_REQUEST['cmd']){
 function disp_default(){
   $disp_body = '';
   /* show VM network and VPN overview */
-  $disp_body .= '<div><h2>Network Status</h2>';
-  $disp_body .= VM_get_status();
-  $disp_body .= "</div>";
-
 
   /* offer connect and disconnect buttons */
   $disp_body .= '<div><h2>Network Control</h2>';
@@ -66,12 +81,16 @@ function disp_default(){
   $disp_body .= VPN_get_connections();
   $disp_body .= '<input type="submit" name="connect_vpn" value="Connect VPN">'
                 .'</form>';
-  //disconnect
+  //disconnect button
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="disconnect">';
   $disp_body .= '<input type="submit" name="disconnect_vpn" value="Disconnect VPN">'
                 .'</form>';
 
+  /* show network status */
+  $disp_body .= '<h2>Network Status</h2>';
+  $disp_body .= VM_get_status();
+  $disp_body .= "</div>";  
 
   $disp_body .= "</div>";
   return $disp_body;

@@ -150,6 +150,27 @@ function VPN_ovpn_to_session(){
 function VM_get_status(){
   $ret_str = '<table id="vm_status">';
 
+  //check session.log if for current status
+  $session_status = VPN_sessionlog_status();
+  $ret_str .= "<tr><td>Status</td>";
+  switch( $session_status[0] ){
+    case 'connected':
+      $_SESSION[connecting2] = ($_SESSION[connecting2] != '') ? $_SESSION[connecting2] : 'ERROR 5642';
+      $ret_str .= "<td>Connected to $_SESSION[connecting2]</td></tr>";
+      break;
+    case 'connecting':
+      $_SESSION[connecting2] = ($_SESSION[connecting2] != '') ? $_SESSION[connecting2] : 'ERROR 5642';
+      $ret_str .= "<td>Connecting to $_SESSION[connecting2]</td></tr>";
+      break;
+    case 'disconnected':
+      $ret_str .= "<td>VPN Disconnected</td></tr>";
+      break;
+    case 'error':
+      $ret_str .= "<td>Error: $session_status[1]</td></tr>";
+      break;
+    default:
+      var_dump($session_status);
+  }  
 
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
   $ret = array();
@@ -164,15 +185,47 @@ function VM_get_status(){
 
   exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if( array_key_exists( '0', $ret) !== true ){
-    $ret_str .= "<tr><td>VPN</td><td>DOWN</td></tr>";
+    $ret_str .= "<tr><td>VPN</td><td>down</td></tr>";
   }else{
     $port = VPN_get_port();
     $ret_str .= "<tr><td>VPN IP</td><td>$ret[0]</td></tr>";
     $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported</td></tr>";
   }
+  
   $ret_str .= "</table>\n";
 
   return $ret_str;
+}
+
+/**
+ * function checks /pia/cache/session.log for specific words and returns an array with
+ * the status at [0] and any errors at [1]
+ * @global object $_files
+ * @return array [0]='connected', [0]='connecting', [0]='error',[1]=message
+ */
+function VPN_sessionlog_status(){
+  global $_files;
+  
+  $content = $_files->readfile('/pia/cache/session.log');
+  if( $content === false ){
+    return array('disconnected');
+  }else{
+    //check for 'connected'
+    if( strpos($content, 'Initialization Sequence Completed') !== false
+            && strpos($content, 'TUN/TAP device tun0 opened') !== false ){
+      return array('connected');
+    }elseif( strpos($content, 'Received AUTH_FAILED control message') !== false ){
+      return array('error', 'Authentication error. Please check your username and password.');
+    }elseif( strpos($content, 'process exiting') !== false ){
+      return array('disconnected');
+    }elseif( strpos($content, 'UDPv4 link remote: [AF_INET]') !== false
+            || strpos($content, 'Connecting to') !== false ){ //needs to be after error checks!
+      return array('connecting');
+    }else{
+      return array('unkown status');
+    }
+  }
+  
 }
 
  /**
