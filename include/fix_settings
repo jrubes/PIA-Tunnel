@@ -101,7 +101,7 @@ fi
 if [ -z "${FORWARD_PUBLIC_LAN}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# Enable/Disable forwarding for public LAN yes/no' >> '/pia/settings.conf'
-  echo 'FORWARD_PUBLIC_LAN="yes"' >> '/pia/settings.conf'
+  echo 'FORWARD_PUBLIC_LAN="no"' >> '/pia/settings.conf'
 fi
 
 if [ -z "${FIREWALL_IF_SSH[0]}" ]; then
