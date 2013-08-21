@@ -131,7 +131,7 @@ if [ -z "${IF_ETH0_DHCP}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# Interface settings' >> '/pia/settings.conf'
   echo 'IF_ETH0_DHCP="yes"' >> '/pia/settings.conf'
-  echo 'IF_ETH0_DHCP_SERVER="yes"' >> '/pia/settings.conf'
+  echo 'IF_ETH0_DHCP_SERVER="no"' >> '/pia/settings.conf'
   echo 'IF_ETH0_IP=""' >> '/pia/settings.conf'
   echo 'IF_ETH0_SUB=""' >> '/pia/settings.conf'
   echo 'IF_ETH0_GW=""' >> '/pia/settings.conf'

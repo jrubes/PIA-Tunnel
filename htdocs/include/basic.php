@@ -8,7 +8,6 @@ if( !array_key_exists('page', $_REQUEST) ){ $_REQUEST['page'] = ''; }
 if( !array_key_exists('cmd', $_REQUEST) ){ $_REQUEST['cmd'] = ''; }
 if( !array_key_exists('cid', $_GET) ){ $_GET['cid'] = ''; }
 
-
 require_once $inc_dir.'class_loader.php';
 require_once $inc_dir.'classes/class_files/class_files.php';
 
@@ -222,7 +221,11 @@ function VM_get_status(){
 
   $ret = array();
   exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  $ret_str .= "<tr><td>Private IP</td><td>$ret[0]</td></tr>";
+  if(array_key_exists('0', $ret) ){
+    $ret_str .= "<tr><td>Private IP</td><td>$ret[0]</td></tr>";
+  }else{
+    $ret_str .= "<tr><td>Private IP</td><td>please refresh the page</td></tr>";
+  }
   unset($ret);
 
   exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
@@ -252,6 +255,14 @@ function VPN_sessionlog_status(){
   if( $content === false ){
     return array('disconnected');
   }else{
+    //get name of current connection and store in SESSION
+    if(array_key_exists('connecting2', $_SESSION) !== true && strpos($content, 'connecting to') !== false ){
+      //get name of current connection for status overview
+      $lines = explode("\n", $content);
+      $location = substr($lines[0], strpos($content, 'connecting to')+13 ); //+13 to remove 'connecting to'
+      $_SESSION['connecting2'] = $location;
+    }    
+    
     //check for 'connected'
     if( strpos($content, 'Initialization Sequence Completed') !== false
             && strpos($content, 'TUN/TAP device tun0 opened') !== false ){
@@ -261,7 +272,7 @@ function VPN_sessionlog_status(){
     }elseif( strpos($content, 'process exiting') !== false ){
       return array('disconnected');
     }elseif( strpos($content, 'UDPv4 link remote: [AF_INET]') !== false
-            || strpos($content, 'Connecting to') !== false ){ //needs to be after error checks!
+            || strpos($content, 'connecting to') !== false ){ //needs to be after error checks!
       return array('connecting');
     }else{
       return array('unkown status');

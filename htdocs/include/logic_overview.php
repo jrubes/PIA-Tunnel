@@ -21,7 +21,7 @@ switch($_REQUEST['cmd']){
       //looks good, delete old session.log
       $f = '/pia/cache/session.log';
       $_files->rm($f);
-      $c = "Connecting to $arg\n\n";
+      $c = "connecting to $arg\n\n";
       $_files->writefile( $f, $c ); //write file so status overview works right away
 
       //time to initiate the connection
@@ -34,6 +34,7 @@ switch($_REQUEST['cmd']){
       $disp_body .= disp_default();
     }
     break;
+    
   case 'disconnect':
       //looks good, delete old session.log
       $_files->rm('/pia/cache/session.log');
@@ -43,6 +44,20 @@ switch($_REQUEST['cmd']){
       $disp_body .= "<div class=\"feedback\">Disconnecting VPN</div>\n";
       $disp_body .= disp_default();
     break;
+  
+  case 'firewall_enable':
+    VPN_forward('stop');
+    VPN_forward('start');
+    $disp_body .= "<div class=\"feedback\">Firewall has been started</div>\n";
+    $disp_body .= disp_default();
+    break;
+  
+  case 'firewall_disable':
+    VPN_forward('stop');
+    $disp_body .= "<div class=\"feedback\">Firewall has been stopped</div>\n";
+    $disp_body .= disp_default();
+    break;
+  
   default :
     $disp_body .= disp_default();
 }
@@ -69,6 +84,18 @@ switch($_REQUEST['cmd']){
 
 
 /**
+ * method to execute pia-forward start/stop - control the firewall
+ * @param string $command "start" or "stop"
+ */
+function VPN_forward($command){
+  if( $command === 'start' )
+    exec('sudo /pia/pia-forward start &>/dev/null &');
+  else{
+    exec('sudo /pia/pia-forward stop &>/dev/null &');
+  }
+}
+
+/**
  * returns the default UI for this page
  * @return string string with HTML for body of this page
  */
@@ -76,29 +103,48 @@ function disp_default(){
   $disp_body = '';
   /* show VM network and VPN overview */
 
-  /* offer connect and disconnect buttons */
+  //VPN control UI
   $disp_body .= '<div><h2>Network Control</h2>';
+  $disp_body .= "<div>\n";
   $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= '<input type="hidden" name="page" value="">';
-  $disp_body .= '<input type="hidden" name="cmd" value="connect">';
-  $disp_body .= VPN_get_connections('vpn_connections');
-  $disp_body .= '<input type="submit" name="connect_vpn" value="Connect VPN">'
-                .'</form>';
-  //disconnect button
+  $disp_body .= " <span>\n";
+  $disp_body .=   VPN_get_connections('vpn_connections')."\n";
+  $disp_body .= " </span>\n";
+  $disp_body .= " <span>\n";
+  $disp_body .= '   <input type="hidden" name="page" value="">';
+  $disp_body .= '   <input type="hidden" name="cmd" value="connect">';
+  $disp_body .= '   <input type="submit" style="width: 9em;" name="connect_vpn" value="Connect VPN">';
+  $disp_body .= " </span>\n";
+  $disp_body .= "</form>\n";
   $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= '<input type="hidden" name="cmd" value="disconnect">';
-  $disp_body .= '<input type="submit" name="disconnect_vpn" value="Disconnect VPN">'
-                .'</form>';
-  //Firewall on
-  $disp_body .= '<br>Firewall control: ';
+  $disp_body .= " <span>\n";
+  $disp_body .= '     <input type="hidden" name="cmd" value="disconnect">';
+  $disp_body .= '     <input type="submit" style="width: 9em;" name="disconnect_vpn" value="Disconnect VPN">';
+  $disp_body .= " </span>\n";
+  $disp_body .= " </form>\n";
+  $disp_body .= "</div>\n";
+  
+  //firewall control UI
+  $disp_body .= "<div>\n";
   $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= '<input type="hidden" name="cmd" value="firewall_enable">';
-  $disp_body .= '<input type="submit" name="fw_enable" value="Enable firewall">'
-                .'</form>';
+  $disp_body .= " <span>\n";
+  $disp_body .=   "Firewall control\n";
+  $disp_body .= " </span>\n";
+  $disp_body .= " <span>\n";
+  $disp_body .= ' <input type="hidden" name="cmd" value="firewall_enable">';
+  $disp_body .= ' <input type="submit" style="width: 9em;" name="fw_enable" value="Enable firewall">';
+  $disp_body .= " </span>\n";
+  $disp_body .= "</form>\n";
   $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= '<input type="hidden" name="cmd" value="firewall_disable">';
-  $disp_body .= '<input type="submit" name="fw_disable" value="Disable firewall">'
-                .'</form>';
+  $disp_body .= " <span>\n";
+  $disp_body .= ' <input type="hidden" name="cmd" value="firewall_disable">';
+  $disp_body .= ' <input type="submit" style="width: 9em;" name="fw_disable" value="Disable firewall">';
+  $disp_body .= " </span>\n";
+  $disp_body .= " </form>\n";
+  $disp_body .= "</div>\n";
+  
+  
+
 
   /* show network status */
   $disp_body .= '<h2>Network Status</h2>';

@@ -34,5 +34,5 @@ if( $plen > 1 && $plen < 20 && isset($_REQUEST['page']) ){
 $disp_body .= "</div>\n";
 
 
-$disp_body .= "<body>\n";
+
 ?>

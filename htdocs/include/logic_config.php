@@ -394,16 +394,18 @@ function disp_network_default(){
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";  
   
   $sel = array(
-          'id' => 'dhcp_server_eth0',
-          array( 'disabled', 'disabled'),
-          array( 'enabled', 'enabled')
+          'id' => 'IF_ETH0_DHCP_SERVER',
+          'selected' => $settings['IF_ETH0_DHCP_SERVER'],
+          array( 'no', 'disabled'),
+          array( 'yes', 'enabled')
         );
   $disp_body .= '<tr><td>DHCP server on eth0</td><td>'.build_select($sel).'</td></tr>'."\n";
   
   $sel = array(
-          'id' => 'dhcp_server_eth1',
-          array( 'enabled', 'enabled'),
-          array( 'disabled', 'disabled')
+          'id' => 'IF_ETH1_DHCP_SERVER',
+          'selected' => $settings['IF_ETH1_DHCP_SERVER'],
+          array( 'no', 'disabled'),
+          array( 'yes', 'enabled')
         );
   $disp_body .= '<tr><td>DHCP server on eth1</td><td>'.build_select($sel).'</td></tr>'."\n";
   
