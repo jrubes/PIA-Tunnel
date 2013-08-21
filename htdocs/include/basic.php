@@ -76,6 +76,31 @@ function load_menu(){
 }
 
 
+/**
+ * method to shutdown the VM
+ */
+function VM_shutdown(){
+  exec('sudo /sbin/shutdown -h now &>/dev/null &');
+}
+
+/**
+ * method to reboot the VM
+ */
+function VM_restart(){
+  exec('sudo /sbin/shutdown -r now &>/dev/null &');
+}
+
+/**
+ * method to execute pia-forward start/stop - control the firewall
+ * @param string $command "start" or "stop"
+ */
+function VPN_forward($command){
+  if( $command === 'start' )
+    exec('sudo /pia/pia-forward start &>/dev/null &');
+  else{
+    exec('sudo /pia/pia-forward stop &>/dev/null &');
+  }
+}
 
 
 function VPN_is_valid_connection($val2check){
@@ -261,8 +286,8 @@ function VPN_sessionlog_status(){
       $lines = explode("\n", $content);
       $location = substr($lines[0], strpos($content, 'connecting to')+13 ); //+13 to remove 'connecting to'
       $_SESSION['connecting2'] = $location;
-    }    
-    
+    }
+
     //check for 'connected'
     if( strpos($content, 'Initialization Sequence Completed') !== false
             && strpos($content, 'TUN/TAP device tun0 opened') !== false ){

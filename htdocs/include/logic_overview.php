@@ -34,7 +34,7 @@ switch($_REQUEST['cmd']){
       $disp_body .= disp_default();
     }
     break;
-    
+
   case 'disconnect':
       //looks good, delete old session.log
       $_files->rm('/pia/cache/session.log');
@@ -44,20 +44,30 @@ switch($_REQUEST['cmd']){
       $disp_body .= "<div class=\"feedback\">Disconnecting VPN</div>\n";
       $disp_body .= disp_default();
     break;
-  
+
   case 'firewall_enable':
     VPN_forward('stop');
     VPN_forward('start');
     $disp_body .= "<div class=\"feedback\">Firewall has been started</div>\n";
     $disp_body .= disp_default();
     break;
-  
+
   case 'firewall_disable':
     VPN_forward('stop');
     $disp_body .= "<div class=\"feedback\">Firewall has been stopped</div>\n";
     $disp_body .= disp_default();
     break;
-  
+
+  case 'vm_shutdown':
+    VM_shutdown();
+    $disp_body .= "<div class=\"feedback\">The System is about to shut down</div>\n";
+    break;
+
+  case 'vm_restart':
+    VM_restart();
+    $disp_body .= "<div class=\"feedback\">The System is about to restart</div>\n";
+    break;
+
   default :
     $disp_body .= disp_default();
 }
@@ -84,18 +94,6 @@ switch($_REQUEST['cmd']){
 
 
 /**
- * method to execute pia-forward start/stop - control the firewall
- * @param string $command "start" or "stop"
- */
-function VPN_forward($command){
-  if( $command === 'start' )
-    exec('sudo /pia/pia-forward start &>/dev/null &');
-  else{
-    exec('sudo /pia/pia-forward stop &>/dev/null &');
-  }
-}
-
-/**
  * returns the default UI for this page
  * @return string string with HTML for body of this page
  */
@@ -104,7 +102,7 @@ function disp_default(){
   /* show VM network and VPN overview */
 
   //VPN control UI
-  $disp_body .= '<div><h2>Network Control</h2>';
+  $disp_body .= '<h2>Network Control</h2>';
   $disp_body .= "<div>\n";
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= " <span>\n";
@@ -123,7 +121,7 @@ function disp_default(){
   $disp_body .= " </span>\n";
   $disp_body .= " </form>\n";
   $disp_body .= "</div>\n";
-  
+
   //firewall control UI
   $disp_body .= "<div>\n";
   $disp_body .= '<form class="inline" action="/" method="post">';
@@ -142,16 +140,33 @@ function disp_default(){
   $disp_body .= " </span>\n";
   $disp_body .= " </form>\n";
   $disp_body .= "</div>\n";
-  
-  
+
+  //OS control UI
+  $disp_body .= "<div>\n";
+  $disp_body .= '<form class="inline" action="/" method="post">';
+  $disp_body .= " <span>\n";
+  $disp_body .=   "OS control\n";
+  $disp_body .= " </span>\n";
+  $disp_body .= " <span>\n";
+  $disp_body .= ' <input type="hidden" name="cmd" value="vm_restart">';
+  $disp_body .= ' <input type="submit" style="width: 9em;" name="vm_restart" value="Restart PIA-VM">';
+  $disp_body .= " </span>\n";
+  $disp_body .= "</form>\n";
+  $disp_body .= '<form class="inline" action="/" method="post">';
+  $disp_body .= " <span>\n";
+  $disp_body .= ' <input type="hidden" name="cmd" value="vm_shutdown">';
+  $disp_body .= ' <input type="submit" style="width: 9em;" name="vm_shutdown" value="Shutdown PIA-VM">';
+  $disp_body .= " </span>\n";
+  $disp_body .= " </form>\n";
+  $disp_body .= "</div>\n";
+
+
 
 
   /* show network status */
   $disp_body .= '<h2>Network Status</h2>';
   $disp_body .= VM_get_status();
-  $disp_body .= "</div>";
 
-  $disp_body .= "</div>";
   return $disp_body;
 }
 ?>

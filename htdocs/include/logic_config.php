@@ -22,12 +22,22 @@ switch($_REQUEST['cmd']){
     //show inout forms again
     $disp_body .= disp_vpn_default();
     break;
+
   case 'network':
     $disp_body .= disp_network_default();
     break;
+
   case 'network_store';
-    //update user settings
-    $disp_body .= update_network_settings();
+    //restart the network or store settings
+    if( array_key_exists('restart_firewall', $_POST ) === true && $_POST['restart_firewall'] != '' ){
+      VPN_forward('stop');
+      VPN_forward('start');
+      $disp_body .= "<div class=\"feedback\">Firewall has been started</div>\n";
+    }else{
+      //update user settings
+      $disp_body .= update_network_settings();
+    }
+
     //show inout forms again
     $disp_body .= disp_network_default();
     break;
@@ -118,16 +128,16 @@ function update_network_settings(){
     //refresh /etc/networking/interfaces - just in case
     $foo = array();
     exec('sudo /pia/include/network_interfaces.sh', $foo);
-      
+
     $disp_body .= "<div class=\"feedback\">Settings updated</div>\n";
   }
-  
+
   //how about a network restart?
   if( array_key_exists('restart_network', $_POST) && $_POST['restart_network'] === 'Full Network Restart'){
     exec('sudo /pia/include/network_restart.sh');
     $disp_body .= "<div class=\"feedback\">Network restarted</div>\n";
   }
-  
+
   unset($_SESSION['settings.conf']);
   return $disp_body;
 }
@@ -200,7 +210,8 @@ function disp_network_default(){
 
   $disp_body = '';
   /* show Username and Password fields - expand this for more VPN providers */
-  $disp_body .= '<div><h2>PIA Network Settings</h2>'."\n";
+  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<h2>PIA Network Settings</h2>'."\n";
   $disp_body .= '<form action="/?page=config&amp;cmd=network_store&amp;cid=cnetwork" method="post">'."\n";
   $disp_body .= "<table>\n";
 
@@ -309,12 +320,14 @@ function disp_network_default(){
   //$disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firwall">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firewall">';
+  $disp_body .= '</div>';
 
 
+
+  $disp_body .= '<div class="options_box">';
   $disp_body .= '<h2>PIA Daemon Settings</h2>'."\n";
   $disp_body .= "<table>\n";  //iptables options
-
   //VM LAN segment forwarding
   $sel = array(
             'id' => 'DAEMON_ENABLED',
@@ -340,13 +353,14 @@ function disp_network_default(){
 
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
-  
-  
-  
+  $disp_body .= '</div>';
+
+
   /* system settings */
+  $disp_body .= '<div class="options_box">';
   $disp_body .= '<h2>VM System Settings</h2>'."\n";
   $disp_body .= "<table>\n";  //iptables options
-  
+
   //eth0
   $disabled = ($settings['IF_ETH0_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
   $sel = array(
@@ -362,7 +376,7 @@ function disp_network_default(){
   $disp_body .= '<tr><td>eth1 Subnet</td><td><input '.$disabled.' type="text" name="'.$hash.'" value="'.$settings['IF_ETH0_SUB'].'"></td></tr>'."\n";
   $hash = md5('IF_ETH0_GW');
   $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" name="'.$hash.'" value="'.$settings['IF_ETH0_GW'].'"></td></tr>'."\n";
-  
+
   //eth1
   $disabled = ($settings['IF_ETH1_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
@@ -380,7 +394,7 @@ function disp_network_default(){
   $hash = md5('IF_ETH1_GW');
   $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" name="'.$hash.'" value="'.$settings['IF_ETH1_GW'].'"></td></tr>'."\n";
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  
+
   //DNS
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $hash = md5('DNS[0]');
@@ -391,8 +405,8 @@ function disp_network_default(){
   $disp_body .= '<tr><td>DNS 3</td><td><input type="text" name="'.$hash.'" value="'.$settings['DNS[2]'].'"></td></tr>'."\n";
   $hash = md5('DNS[3]');
   $disp_body .= '<tr><td>DNS 4</td><td><input type="text" name="'.$hash.'" value="'.$settings['DNS[3]'].'"></td></tr>'."\n";
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";  
-  
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+
   $sel = array(
           'id' => 'IF_ETH0_DHCP_SERVER',
           'selected' => $settings['IF_ETH0_DHCP_SERVER'],
@@ -400,7 +414,7 @@ function disp_network_default(){
           array( 'yes', 'enabled')
         );
   $disp_body .= '<tr><td>DHCP server on eth0</td><td>'.build_select($sel).'</td></tr>'."\n";
-  
+
   $sel = array(
           'id' => 'IF_ETH1_DHCP_SERVER',
           'selected' => $settings['IF_ETH1_DHCP_SERVER'],
@@ -408,12 +422,13 @@ function disp_network_default(){
           array( 'yes', 'enabled')
         );
   $disp_body .= '<tr><td>DHCP server on eth1</td><td>'.build_select($sel).'</td></tr>'."\n";
-  
+
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Full Network Restart">';
-  
-  $disp_body .= "</form></div>";
+
+  $disp_body .= "</form>";
+  $disp_body .= '</div>';
   return $disp_body;
 }
 

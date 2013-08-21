@@ -65,3 +65,16 @@ root {
   border-style: solid;
   border-width: 2px;
 }
+
+.options_box{
+  width: 420px;
+  display: inline;
+  float: left;
+  margin-top: 1em;
+  padding-left: 0.5em;
+  padding-bottom: 1em;
+  border-right-style: solid;
+  border-right-width: 0.1px;
+  border-bottom-width: 0.1px;
+  border-bottom-style: solid;
+}
