@@ -257,14 +257,39 @@ function VM_get_status(){
   if( array_key_exists( '0', $ret) !== true ){
     $ret_str .= "<tr><td>VPN</td><td>down</td></tr>";
   }else{
+    //VPN is enabled. Display info
     $port = VPN_get_port();
     $ret_str .= "<tr><td>VPN IP</td><td>$ret[0]</td></tr>";
     $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported</td></tr>";
+
+    //show forwarding info
+    $settings = VPN_get_settings();
+    if( $settings['FORWARD_VM_LAN'] == 'yes' ){
+      $ret_str .= "<tr><td>Forwarding</td><td>$settings[IF_INT] => $settings[IF_TUNNEL]</td></tr>";
+    }
+    if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
+      $ret_str .= "<tr><td>Forwarding</td><td>$settings[IF_EXT] => $settings[IF_TUNNEL]</td></tr>";
+    }
   }
 
   $ret_str .= "</table>\n";
 
   return $ret_str;
+}
+
+/**
+ * method read /pia/login.conf into an array
+ * @return array,bool array with ['name'], ['password'] OR FALSE on failure
+ */
+function VPN_get_settings(){
+  //get settings stored in settings.con
+  if( array_key_exists('settings.conf', $_SESSION) !== true ){
+    $ret = load_settings();
+    if( $ret !== false ){
+      return $ret;
+    }
+  }
+  return $_SESSION['settings.conf'];
 }
 
 /**

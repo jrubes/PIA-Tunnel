@@ -436,23 +436,6 @@ function disp_network_default(){
  * method read /pia/login.conf into an array
  * @return array,bool array with ['name'], ['password'] OR FALSE on failure
  */
-function VPN_get_settings(){
-  //get settings stored in settings.con
-  if( array_key_exists('settings.conf', $_SESSION) !== true ){
-    $ret = load_settings();
-    if( $ret !== false ){
-      return $ret;
-    }
-  }
-  return $_SESSION['settings.conf'];
-}
-
-
-
-/**
- * method read /pia/login.conf into an array
- * @return array,bool array with ['name'], ['password'] OR FALSE on failure
- */
 function VPN_get_user(){
   //get username and password from file or SESSION
   if( array_key_exists('login.conf', $_SESSION) !== true ){
