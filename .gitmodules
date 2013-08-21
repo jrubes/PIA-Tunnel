@@ -1,6 +1,0 @@
-[submodule "php/class_files"]
-	path = php/class_files
-	url = git@n6yfaenemc.dyndns.org:PHP_class_files
-[submodule "htdocs/include/classes/class_files"]
-	path = htdocs/include/classes/class_files
-	url = git@n6yfaenemc.dyndns.org:PHP_class_files
