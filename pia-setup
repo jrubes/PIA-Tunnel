@@ -73,7 +73,8 @@ do
 done
 
 #handle files in include, these don't get /bin/ links
-FILES="fw-forward fw-no-forward functions.inc build_ping_list fix_settings"
+FILES="fw-forward fw-no-forward functions.inc build_ping_list fix_settings network_interfaces.sh"
+FILES="$FILES network_restart.sh"
 for f in $FILES
 do
 	chmod ug+x "/pia/include/$f"

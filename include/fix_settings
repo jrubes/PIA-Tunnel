@@ -32,7 +32,7 @@ if [ -z "${MYVPN[0]}" ]; then
   echo '' >> '/pia/settings.conf'
 fi
 
-if [ -z ${SLEEP_INTERNET_DOWN} ]; then
+if [ -z "${SLEEP_INTERNET_DOWN}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# General Time and Delay Settings' >> '/pia/settings.conf'
   echo '#####' >> '/pia/settings.conf'
@@ -56,7 +56,7 @@ if [ -z ${SLEEP_INTERNET_DOWN} ]; then
   echo '' >> '/pia/settings.conf'
 fi
 
-if [ -z ${VERBOSE} ]; then
+if [ -z "${VERBOSE}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# output level and debug settings' >> '/pia/settings.conf'
   echo '#####' >> '/pia/settings.conf'
@@ -66,7 +66,7 @@ if [ -z ${VERBOSE} ]; then
   echo '' >> '/pia/settings.conf'
 fi
 
-if [ -z ${bold} ]; then
+if [ -z "${bold}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '#for pretty print' >> '/pia/settings.conf'
   echo '#####' >> '/pia/settings.conf'
@@ -74,7 +74,7 @@ if [ -z ${bold} ]; then
   echo 'normal=`tput sgr0`' >> '/pia/settings.conf'
 fi
 
-if [ -z ${FORWARD_IP} ]; then
+if [ -z "${FORWARD_IP}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# IP of target computer for port forwarding - if supported by location' >> '/pia/settings.conf'
   echo 'FORWARD_IP="192.168.10.101"' >> '/pia/settings.conf'
@@ -104,16 +104,45 @@ if [ -z "${FORWARD_PUBLIC_LAN}" ]; then
   echo 'FORWARD_PUBLIC_LAN="yes"' >> '/pia/settings.conf'
 fi
 
-if [ -z "${FIREWALL_IF_SSH}" ]; then
+if [ -z "${FIREWALL_IF_SSH[0]}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# Enable ssh on the following interfaces' >> '/pia/settings.conf'
   echo 'FIREWALL_IF_SSH[0]="eth0"' >> '/pia/settings.conf'
   echo 'FIREWALL_IF_SSH[1]="eth1"' >> '/pia/settings.conf'
 fi
 
-if [ -z "${FIREWALL_IF_WEB}" ]; then
+if [ -z "${FIREWALL_IF_WEB[0]}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# Enable web UI on the following interfaces' >> '/pia/settings.conf'
   echo 'FIREWALL_IF_WEB[0]="eth0"' >> '/pia/settings.conf'
   echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/pia/settings.conf'
+fi
+
+if [ -z "${DNS[0]}" ]; then
+  echo '' >> '/pia/settings.conf'
+  echo '# DNS Servers to use' >> '/pia/settings.conf'
+  echo 'DNS[0]="8.8.8.8"' >> '/pia/settings.conf'
+  echo 'DNS[1]="208.67.222.222"' >> '/pia/settings.conf'
+  echo 'DNS[2]="8.8.4.4"' >> '/pia/settings.conf'
+  echo 'DNS[3]="208.67.220.220"' >> '/pia/settings.conf'
+fi
+
+if [ -z "${IF_ETH0_DHCP}" ]; then
+  echo '' >> '/pia/settings.conf'
+  echo '# Interface settings' >> '/pia/settings.conf'
+  echo 'IF_ETH0_DHCP="yes"' >> '/pia/settings.conf'
+  echo 'IF_ETH0_DHCP_SERVER="yes"' >> '/pia/settings.conf'
+  echo 'IF_ETH0_IP=""' >> '/pia/settings.conf'
+  echo 'IF_ETH0_SUB=""' >> '/pia/settings.conf'
+  echo 'IF_ETH0_GW=""' >> '/pia/settings.conf'
+fi
+
+if [ -z "${IF_ETH1_DHCP}" ]; then
+  echo '' >> '/pia/settings.conf'
+  echo '# Interface settings' >> '/pia/settings.conf'
+  echo 'IF_ETH1_DHCP="no"' >> '/pia/settings.conf'
+  echo 'IF_ETH1_DHCP_SERVER="yes"' >> '/pia/settings.conf'
+  echo 'IF_ETH1_IP="192.168.10.1"' >> '/pia/settings.conf'
+  echo 'IF_ETH1_SUB="255.255.255.0"' >> '/pia/settings.conf'
+  echo 'IF_ETH1_GW=""' >> '/pia/settings.conf'
 fi

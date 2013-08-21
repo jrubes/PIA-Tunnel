@@ -114,7 +114,20 @@ function update_network_settings(){
     }
   }
 
-  if( $upcnt > 0 ){ $disp_body .= "<div class=\"feedback\">Settings updated</div>\n"; }
+  if( $upcnt > 0 ){ //settings have been changed
+    //refresh /etc/networking/interfaces - just in case
+    $foo = array();
+    exec('sudo /pia/include/network_interfaces.sh', $foo);
+      
+    $disp_body .= "<div class=\"feedback\">Settings updated</div>\n";
+  }
+  
+  //how about a network restart?
+  if( array_key_exists('restart_network', $_POST) && $_POST['restart_network'] === 'Full Network Restart'){
+    exec('sudo /pia/include/network_restart.sh');
+    $disp_body .= "<div class=\"feedback\">Network restarted</div>\n";
+  }
+  
   unset($_SESSION['settings.conf']);
   return $disp_body;
 }
@@ -291,12 +304,12 @@ function disp_network_default(){
             array( 'yes', 'yes'),
             array( 'no', 'no')
           );
-  $disp_body .= '<tr><td>Extra Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>Debug Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
 
-
-
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  //$disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $disp_body .= "</table>\n";
+  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firwall">';
 
 
   $disp_body .= '<h2>PIA Daemon Settings</h2>'."\n";
@@ -326,9 +339,78 @@ function disp_network_default(){
 
 
   $disp_body .= "</table>\n";
-
-
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  
+  
+  
+  /* system settings */
+  $disp_body .= '<h2>VM System Settings</h2>'."\n";
+  $disp_body .= "<table>\n";  //iptables options
+  
+  //eth0
+  $disabled = ($settings['IF_ETH0_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
+  $sel = array(
+          'id' => 'IF_ETH0_DHCP',
+          'selected' => $settings['IF_ETH0_DHCP'],
+          array( 'yes', 'yes'),
+          array( 'no', 'no')
+        );
+  $disp_body .= '<tr><td>eth0 use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $hash = md5('IF_ETH0_IP');
+  $disp_body .= '<tr><td>eth1 IP</td><td><input '.$disabled.' type="text" name="'.$hash.'" value="'.$settings['IF_ETH0_IP'].'"></td></tr>'."\n";
+  $hash = md5('IF_ET0_SUB');
+  $disp_body .= '<tr><td>eth1 Subnet</td><td><input '.$disabled.' type="text" name="'.$hash.'" value="'.$settings['IF_ETH0_SUB'].'"></td></tr>'."\n";
+  $hash = md5('IF_ETH0_GW');
+  $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" name="'.$hash.'" value="'.$settings['IF_ETH0_GW'].'"></td></tr>'."\n";
+  
+  //eth1
+  $disabled = ($settings['IF_ETH1_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $sel = array(
+          'id' => 'IF_ETH1_DHCP',
+          'selected' => $settings['IF_ETH1_DHCP'],
+          array( 'yes', 'yes'),
+          array( 'no', 'no')
+        );
+  $disp_body .= '<tr><td>eth1 use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $hash = md5('IF_ETH1_IP');
+  $disp_body .= '<tr><td>eth1 IP</td><td><input '.$disabled.' type="text" name="'.$hash.'" value="'.$settings['IF_ETH1_IP'].'"></td></tr>'."\n";
+  $hash = md5('IF_ETH1_SUB');
+  $disp_body .= '<tr><td>eth1 Subnet</td><td><input '.$disabled.' type="text" name="'.$hash.'" value="'.$settings['IF_ETH1_SUB'].'"></td></tr>'."\n";
+  $hash = md5('IF_ETH1_GW');
+  $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" name="'.$hash.'" value="'.$settings['IF_ETH1_GW'].'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  
+  //DNS
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $hash = md5('DNS[0]');
+  $disp_body .= '<tr><td>DNS 1</td><td><input type="text" name="'.$hash.'" value="'.$settings['DNS[0]'].'"></td></tr>'."\n";
+  $hash = md5('DNS[1]');
+  $disp_body .= '<tr><td>DNS 2</td><td><input type="text" name="'.$hash.'" value="'.$settings['DNS[1]'].'"></td></tr>'."\n";
+  $hash = md5('DNS[2]');
+  $disp_body .= '<tr><td>DNS 3</td><td><input type="text" name="'.$hash.'" value="'.$settings['DNS[2]'].'"></td></tr>'."\n";
+  $hash = md5('DNS[3]');
+  $disp_body .= '<tr><td>DNS 4</td><td><input type="text" name="'.$hash.'" value="'.$settings['DNS[3]'].'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";  
+  
+  $sel = array(
+          'id' => 'dhcp_server_eth0',
+          array( 'disabled', 'disabled'),
+          array( 'enabled', 'enabled')
+        );
+  $disp_body .= '<tr><td>DHCP server on eth0</td><td>'.build_select($sel).'</td></tr>'."\n";
+  
+  $sel = array(
+          'id' => 'dhcp_server_eth1',
+          array( 'enabled', 'enabled'),
+          array( 'disabled', 'disabled')
+        );
+  $disp_body .= '<tr><td>DHCP server on eth1</td><td>'.build_select($sel).'</td></tr>'."\n";
+  
+  $disp_body .= "</table>\n";
+  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Full Network Restart">';
+  
   $disp_body .= "</form></div>";
   return $disp_body;
 }
@@ -338,7 +420,7 @@ function disp_network_default(){
  * @return array,bool array with ['name'], ['password'] OR FALSE on failure
  */
 function VPN_get_settings(){
-  //get username and password from file or SESSION
+  //get settings stored in settings.con
   if( array_key_exists('settings.conf', $_SESSION) !== true ){
     $ret = load_settings();
     if( $ret !== false ){
