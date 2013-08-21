@@ -49,7 +49,7 @@ if [ ! -f "/pia/settings.conf" ]; then
     echo '# Enable/Disable forwarding yes/no' >> '/pia/settings.conf'
     echo 'FORWARD_PORT_ENABLED="yes"' >> '/pia/settings.conf'
     echo '# Enable/Disable forwarding for public LAN yes/no' >> '/pia/settings.conf'
-    echo 'FORWARD_PUBLIC_LAN="yes"' >> '/pia/settings.conf'
+    echo 'FORWARD_PUBLIC_LAN="no"' >> '/pia/settings.conf'
     echo '# Enable/Disable forwarding for private VM LAN yes/no' >> '/pia/settings.conf'
     echo 'FORWARD_VM_LAN="yes"' >> '/pia/settings.conf'
     echo '# Enable ssh UI on the following interfaces' >> '/pia/settings.conf'
