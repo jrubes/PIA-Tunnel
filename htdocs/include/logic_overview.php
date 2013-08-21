@@ -45,27 +45,30 @@ switch($_REQUEST['cmd']){
       $disp_body .= disp_default();
     break;
 
-  case 'firewall_enable':
-    VPN_forward('stop');
-    VPN_forward('start');
-    $disp_body .= "<div class=\"feedback\">Firewall has been started</div>\n";
+  case 'firewall_control':
+    if( array_key_exists('firewall_enable', $_POST) === true ){
+      VPN_forward('stop');
+      VPN_forward('start');
+      $disp_body .= "<div class=\"feedback\">Firewall has been started</div>\n";
+
+    }elseif( array_key_exists('firewall_disable', $_POST) === true ){
+      VPN_forward('stop');
+      $disp_body .= "<div class=\"feedback\">Firewall has been stopped</div>\n";
+      $disp_body .= disp_default();
+    }
     $disp_body .= disp_default();
     break;
 
-  case 'firewall_disable':
-    VPN_forward('stop');
-    $disp_body .= "<div class=\"feedback\">Firewall has been stopped</div>\n";
-    $disp_body .= disp_default();
-    break;
-
-  case 'vm_shutdown':
-    VM_shutdown();
-    $disp_body .= "<div class=\"feedback\">The System is about to shut down</div>\n";
-    break;
-
-  case 'vm_restart':
-    VM_restart();
-    $disp_body .= "<div class=\"feedback\">The System is about to restart</div>\n";
+  case 'os_control':
+    if( array_key_exists('vm_shutdown', $_POST) === true ){
+      VM_shutdown();
+      $disp_body .= "<div class=\"feedback\">The System is about to shut down</div>\n";
+      break;
+    }elseif( array_key_exists('vm_restart', $_POST) === true ){
+      VM_restart();
+      $disp_body .= "<div class=\"feedback\">The System is about to restart</div>\n";
+      break;
+    }
     break;
 
   default :
@@ -103,62 +106,58 @@ function disp_default(){
 
   //VPN control UI
   $disp_body .= '<h2>Network Control</h2>';
-  $disp_body .= "<div>\n";
   $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= " <span>\n";
+  $disp_body .= '<input type="hidden" name="cmd" value="connect">';
+  $disp_body .= '<table class="control_box">';
+  $disp_body .= '<tr>';
+  $disp_body .= '<td>';
   $disp_body .=   VPN_get_connections('vpn_connections')."\n";
-  $disp_body .= " </span>\n";
-  $disp_body .= " <span>\n";
-  $disp_body .= '   <input type="hidden" name="page" value="">';
-  $disp_body .= '   <input type="hidden" name="cmd" value="connect">';
-  $disp_body .= '   <input type="submit" style="width: 9em;" name="connect_vpn" value="Connect VPN">';
-  $disp_body .= " </span>\n";
-  $disp_body .= "</form>\n";
-  $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= " <span>\n";
-  $disp_body .= '     <input type="hidden" name="cmd" value="disconnect">';
-  $disp_body .= '     <input type="submit" style="width: 9em;" name="disconnect_vpn" value="Disconnect VPN">';
-  $disp_body .= " </span>\n";
+  $disp_body .= '</td>';
+  $disp_body .= '<td>';
+  $disp_body .= ' <input type="submit" style="width: 9em;" name="connect_vpn" value="Connect VPN">';
+  $disp_body .= '</td>';
+  $disp_body .= '<td>';
+  $disp_body .= ' <input type="submit" style="width: 9em;" name="disconnect_vpn" value="Disconnect VPN">';
+  $disp_body .= '</td>';
+  $disp_body .= '</tr>';
+  $disp_body .= '</table>';
   $disp_body .= " </form>\n";
-  $disp_body .= "</div>\n";
 
   //firewall control UI
-  $disp_body .= "<div>\n";
   $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= " <span>\n";
+  $disp_body .= '<input type="hidden" name="cmd" value="firewall_control">';
+  $disp_body .= '<table class="control_box">';
+  $disp_body .= '<tr>';
+  $disp_body .= '<td>';
   $disp_body .=   "Firewall control\n";
-  $disp_body .= " </span>\n";
-  $disp_body .= " <span>\n";
-  $disp_body .= ' <input type="hidden" name="cmd" value="firewall_enable">';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="fw_enable" value="Enable firewall">';
-  $disp_body .= " </span>\n";
+  $disp_body .= '</td>';
+  $disp_body .= '<td>';
+  $disp_body .= ' <input type="submit" style="width: 9em;" name="firewall_enable" value="Restart Firewall">';
+  $disp_body .= '</td>';
+  $disp_body .= '<td>';
+  $disp_body .= ' <input type="submit" style="width: 9em;" name="firewall_disable" value="Disable Forwarding">';
+  $disp_body .= '</td>';
+  $disp_body .= '</tr>';
+  $disp_body .= '</table>';
   $disp_body .= "</form>\n";
-  $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= " <span>\n";
-  $disp_body .= ' <input type="hidden" name="cmd" value="firewall_disable">';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="fw_disable" value="Disable firewall">';
-  $disp_body .= " </span>\n";
-  $disp_body .= " </form>\n";
-  $disp_body .= "</div>\n";
 
   //OS control UI
-  $disp_body .= "<div>\n";
   $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= " <span>\n";
+  $disp_body .= '<input type="hidden" name="cmd" value="os_control">';
+  $disp_body .= '<table class="control_box">';
+  $disp_body .= '<tr>';
+  $disp_body .= '<td>';
   $disp_body .=   "OS control\n";
-  $disp_body .= " </span>\n";
-  $disp_body .= " <span>\n";
-  $disp_body .= ' <input type="hidden" name="cmd" value="vm_restart">';
+  $disp_body .= '</td>';
+  $disp_body .= '<td>';
   $disp_body .= ' <input type="submit" style="width: 9em;" name="vm_restart" value="Restart PIA-VM">';
-  $disp_body .= " </span>\n";
-  $disp_body .= "</form>\n";
-  $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= " <span>\n";
-  $disp_body .= ' <input type="hidden" name="cmd" value="vm_shutdown">';
+  $disp_body .= '</td>';
+  $disp_body .= '<td>';
   $disp_body .= ' <input type="submit" style="width: 9em;" name="vm_shutdown" value="Shutdown PIA-VM">';
-  $disp_body .= " </span>\n";
-  $disp_body .= " </form>\n";
-  $disp_body .= "</div>\n";
+  $disp_body .= '</td>';
+  $disp_body .= '</tr>';
+  $disp_body .= '</table>';
+  $disp_body .= "</form>\n";
 
 
 
