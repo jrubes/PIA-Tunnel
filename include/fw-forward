@@ -95,7 +95,7 @@ iptables -A OUTPUT -o $IF_TUNNEL -j ACCEPT
 iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 #enable POSTROUTING?
-if [ "$FORWARD_PUBLIC_LAN" = 'yes' ] || [ "$FORWARD_PUBLIC_LAN" = 'yes' ] || [ "$FORWARD_PORT_ENABLED" = 'yes' ] ; then
+if [ "$FORWARD_PUBLIC_LAN" = 'yes' ] || [ "$FORWARD_VM_LAN" = 'yes' ] || [ "$FORWARD_PORT_ENABLED" = 'yes' ]; then
   iptables -A POSTROUTING -t nat -o $IF_TUNNEL -j MASQUERADE
 fi
 
@@ -142,9 +142,12 @@ fi
 if [ ! -z "${FIREWALL_IF_SSH[0]}" ]; then
   for interface in "${FIREWALL_IF_SSH[@]}"
   do
-  echo "SSH for $interface"
-  iptables -A INPUT -i "$interface" -p tcp --dport 22 -j ACCEPT
-  iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    iptables -A INPUT -i "$interface" -p tcp --dport 22 -j ACCEPT
+    iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+	if [ "$VERBOSE_DEBUG" = "yes" ]; then
+		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- SSH has enabled for interface: $interface"
+	fi
   done
 fi
 
@@ -152,9 +155,12 @@ fi
 if [ ! -z "${FIREWALL_IF_WEB[0]}" ]; then
   for interface in "${FIREWALL_IF_WEB[@]}"
   do
-  echo "Web for $interface"
-  iptables -A INPUT -i "$interface" -p tcp --dport 80 -j ACCEPT
-  iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    iptables -A INPUT -i "$interface" -p tcp --dport 80 -j ACCEPT
+    iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+	if [ "$VERBOSE_DEBUG" = "yes" ]; then
+		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- webUI has enabled for interface: $interface"
+	fi
   done
 fi
 
