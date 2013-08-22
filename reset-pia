@@ -23,8 +23,8 @@ cd /var/lib/dhcp/ ; rm -f *.leases
 cd /var/lib/dhcp/ ; rm -f *.leases~
 cd /var/lib/dhcp/ ; touch dhcpd.leases
 
-#delete pia-* cache files
-FILES="session.log login.conf client_id"
+#delete pia-* files
+FILES="session.log login.conf client_id status.txt include/status.txt"
 for f in $FILES
 do
 	if [ -f "/pia/$f" ]; then
@@ -32,31 +32,28 @@ do
 	fi
 done
 
+#delete cache files
+FILES="session.log client_id status.txt"
+for f in $FILES
+do
+	if [ -f "/pia/cache/$f" ]; then
+		rm -f "/pia/cache/$f"
+	fi
+done
+
 #create empty login.conf file
 echo "your PIA account name on this line" > /pia/login.conf
 echo "your PIA account password on this line" >> /pia/login.conf
 
-#create a fresh settings file
-echo '#!/bin/bash' > '/pia/settings.conf'
-echo 'LANG=en_US.UTF-8' >> '/pia/settings.conf'
-echo 'export LANG' >> '/pia/settings.conf'
-echo '' >> '/pia/settings.conf'
-echo '# name of your external interface. this connects to the Internet/Router' >> '/pia/settings.conf'
-echo 'IF_EXT="eth0"' >> '/pia/settings.conf'
-echo '# name of your internal interface. this if for the private VM network' >> '/pia/settings.conf'
-echo 'IF_INT="eth1"' >> '/pia/settings.conf'
-echo '# name of your VPN interface' >> '/pia/settings.conf'
-echo 'IF_TUNNEL="tun0"' >> '/pia/settings.conf'
-echo '' >> '/pia/settings.conf'
+#delete settings.conf
+rm -f /pia/settings.conf
 
 
 # clear cache and SWAP
 sync && /sbin/sysctl vm.drop_caches=3 && swapoff -a && swapon -a
 
 
-
-#ALWAYS RUN THIS LAST
-chown -R root.root /pia
-chmod -R og-rwx /pia
-chmod u+x /pia/pia-*
+#Now run setup to get settings back and apply permissions
+chmod ugo+x /pia/pia-setup
+/pia/pia-setup
 echo "Done, reboot or shutdown now!"
