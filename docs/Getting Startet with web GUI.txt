@@ -126,10 +126,11 @@ Install VMware Player with default options, then continue to the "SETUP" section
 	Open a webbrowser and open http://123.345.678.909
 	replace 123.345.678.909 with the IP display on your screen
 
-12) Select "Network Config" from the main menu. Please keep in mind that you are only updating settings.conf
-	on this page. Changing firewall settings will require that you "Restart Firewall" and network
+12) Select "Network Config" from the main menu. 
+	Please keep in mind that you are only updating settings.conf on this page. 
+	Changing firewall settings will require that you "Restart Firewall" and network
 	changes require a "Full Network Restart".
-	You should not modify these settings while you have an active VPN connection established!
+	! You should not modify these settings with an established VPN connection !
 	
 	* Set "Enable Port Forwarding" if you intend to run a server over your VPN. A torrent client
 	  is also a server so set this to "yes" if you run something like that
@@ -145,7 +146,7 @@ Install VMware Player with default options, then continue to the "SETUP" section
 		
 		
 	* VM System Settings
-		Here you may configure your network interfaces. Use "Full Network Restart" to apply and changes
+		Here you may configure your network interfaces. Use "Full Network Restart" to apply any changes
 		# DHCP Server settings are not implemented yet
 		
 13) Select "VPN Config"
