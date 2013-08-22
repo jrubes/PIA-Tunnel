@@ -210,9 +210,9 @@ function disp_network_default(){
 
   $disp_body = '';
   /* show Username and Password fields - expand this for more VPN providers */
+  $disp_body .= '<form action="/?page=config&amp;cmd=network_store&amp;cid=cnetwork" method="post">'."\n";
   $disp_body .= '<div class="options_box">';
   $disp_body .= '<h2>PIA Network Settings</h2>'."\n";
-  $disp_body .= '<form action="/?page=config&amp;cmd=network_store&amp;cid=cnetwork" method="post">'."\n";
   $disp_body .= "<table>\n";
 
 
@@ -249,7 +249,7 @@ function disp_network_default(){
         );
   $disp_body .= '<tr><td>Enable Port Forwarding</td><td>'.build_select($sel).'</td></tr>'."\n";
   $hash = md5('FORWARD_IP');
-  $disp_body .= '<tr><td>Forward IP</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['FORWARD_IP']).'"</td></tr>'."\n";
+  $disp_body .= '<tr><td>Forward IP</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['FORWARD_IP']).'"></td></tr>'."\n";
 
   //VM LAN segment forwarding
   $sel = array(
