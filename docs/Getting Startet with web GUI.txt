@@ -1,0 +1,160 @@
+/*
+  * Project: PIA Tunnel VM
+  * Description: Linux virtual machine to be used as a VPN to network bridge.
+  *	  This VM currently works with the VPN service from https://www.privateinternetaccess.com/
+  *	  but it should be compatible to any VPN server supporting openVPN
+  *
+  * Author: Mirko Kaiser, http://www.KaiserSoft.net
+  * Support the software with Bitcoins !thank you!: 157Gh2dTCkrip8hqj3TKqzWiezHXTPqNrV
+  * Copyright (C) 2013 Mirko Kaiser
+  * First created in Germany on 2013-07-20
+  * License: New BSD License
+  *
+	Copyright (c) 201, Mirko Kaiser, http://www.KaiserSoft.net
+	All rights reserved.
+*/
+
+
+The PIA Tunnel VM is a virtual machine that can be used as a gateway between your LAN and
+the VPN connection or between a private VM LAN.
+PIA Tunnel VM comes with a simple web interface for system and VPN management.
+
+# Requirements #
+################
+PIA Tunnel is a Virtual Machine (VM) and requires some sort of hypervisor. The VM is published
+as a universal OVF Template so it should work with most VM solutions.
+I recommend that you get a free copy of VMware Player from
+
+	http://www.vmware.com/player/
+	
+Install VMware Player with default options, then continue to the "SETUP" section of this guide
+
+
+
+# SETUP #
+#########
+
+1) Download the compressed VMware OVF Template
+     https://mega.co.nz/#!3MR1CLLA!Kl38RBPdkMU3ghNe7Imu_jya9xV-DfbHZFJ4582v2bg
+
+2) Extract the 7-Zip archive. 7-Zip can be found here: http://www.7-zip.org/
+
+3) Workstation and Player
+3.a) Add OVF Template to VMware Workstation or Player
+	* The easy way: Double click on "PIA Tunnel.ovf" then on "Import" goto step 3.b)
+	*
+	* The hard way....
+	* Start Player/Workstation and click File => Open...
+	* Change file type to "All Files" (lower right corner above OK)
+	* Select "PIA Tunnel.ovf" and click "Open" then "Import"
+	
+3.b) Checking the primary "Network Adapter"
+	* The primary network adapter is connect to your NAT network by default. This will
+	  allow your PC to use the VPN but other PCs on your LAN will not be able to.
+	  Setting this interface to "Bridged" will allow this VM to server all PCs on your LAN.
+	
+3.c) Ensure that the second network adapter is a member of a private vLAN segment
+	* Select "Network Adapter 2"
+	* Click "LAN Segments" => "Add"
+	* Enter name of LAN segment. I use "VPN Bridge"
+	* Click OK to close
+	* Use Dropdown to select the LAN segment you just created and click OK
+		Connect client VMs to this LAN segment and remove or disable their other network cards.
+	* Example:
+	  https://raw.github.com/KaiserSoft/PIA-Tunnel/master/docs/workstation_network_setup.png
+
+3.d) This is how it should look for a NAT and private vLAN segment
+	 https://raw.github.com/KaiserSoft/PIA-Tunnel/master/docs/workstation_overview.png
+
+	* goto step 5
+
+	
+
+4) ESXi
+4.a) Setup private VM LAN segment first
+	* In vSphere Client
+	1) Setup a private VM LAN segment
+	  * select your ESXi server and choose "Configuration"
+	  * Click on "Networking" => "Add Networking..."
+	  * "Virtual Machine" => "Create a vSphere standard switch" uncheck any selected interfaces!
+		The preview must list "No adapters" on the "Physical Adapters" side!
+	  * Enter a network name, I use "VPN Network - PIA"
+		  Double check the preview, it should look like this
+		  https://github.com/KaiserSoft/PIA-Tunnel/blob/master/docs/esxi_private_network.png
+
+4.b) Import the OVF Image
+	  * Extract the file you downloaded. You should now have a folder with tree files
+	  * "File" => "Deploy OVF Template..."
+	  * Browse to the extracted files and select "PIA Tunnel.ovf" => "Next" => "Next"
+	  * Give the VM a name and select a datastore to keep the machine on => "Next"
+	  * I use "Thin Provision" since the VM will not change much
+	  * Select your external Network on the "Network Mapping" screen
+	  * Do not auto power the machine once deployment is complete
+		
+4.c) Configure VM
+	  * Select the VM => "Edit Settings"
+	  * Make sure that "Network adapter 1" is connected to the network with Internet access
+		and that "Network adapter 2" is connected to the private LAN segment you created
+		in step 1 above.
+	  * RAM should be set to at least 92MB RAM. I have never seen the VM SWAP so 92MB is 
+		tight but enough.
+	  * Save the changes and power the VM on	
+	  
+	  
+5) Check that the machine has one CPU and around 92MB of RAM. 
+   PIA Tunnel VM will use around 60MB after a fresh boot so you should use your RAM elsewhere.
+
+6) Start the VM. When asked if you moved or copied it, select "I copied it".
+
+7) You should see the login prompt after a few minutes. Login with "root" and password "pia", no quotes.
+
+7.5) Run "dpkg-reconfigure keyboard-configuration" to change the keyboard setting. Default is German layout
+
+8) Change your root password with the following command
+	passwd
+	
+8.5) *Important* Update to latest script versions by running
+	/pia/pia-update
+
+9) Generate new SSL certificates by running
+	/pia/reset-pia
+
+10) reboot the VM with the following command! yes, really, just do it :)
+	reboot
+	
+11) Once rebooted you should see the "Public LAN IP: 123.345.678.909"
+	Open a webbrowser and open http://123.345.678.909
+	replace 123.345.678.909 with the IP display on your screen
+
+12) Select "Network Config" from the main menu. Please keep in mind that you are only updating settings.conf
+	on this page. Changing firewall settings will require that you "Restart Firewall" and network
+	changes require a "Full Network Restart".
+	You should not modify these settings while you have an active VPN connection established!
+	
+	* Set "Enable Port Forwarding" if you intend to run a server over your VPN. A torrent client
+	  is also a server so set this to "yes" if you run something like that
+	* "Forward IP" should be the IP used by your server inside your LAN
+	* "VPN Gateway for *" allows you to enable forwarding on a per interface basis.
+		"public LAN" is your primary network card
+		"VM LAN" is the private network segment we created in step 3.c)
+	* "Allow ssh/Allow web" will open the service on the interface specified
+	* "Verbose/Debug Verbose" is for command line execution and has no affect on the web GUI
+	
+	* "PIA-Daemon" settings are not implemented yet.
+		* "Failover n" allows you to specify failover connections in case a location goes down
+		
+		
+	* VM System Settings
+		Here you may configure your network interfaces. Use "Full Network Restart" to apply and changes
+		# DHCP Server settings are not implemented yet
+		
+13) Select "VPN Config"
+	* Enter your username and password, then click "Store Settings"
+	
+14) Select "Overview"
+	* Choose a place to connect to and click "Connect VPN"
+	* Please give the VM a minute or two to establish the connection. The UI does not use javascript yet
+	  so click on "Overview" to refresh the "Network Status"
+	* The VPN will be up when the Status reads "Connected to 'Some Location'
+	
+15) Enjoy!

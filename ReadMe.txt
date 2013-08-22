@@ -100,7 +100,7 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 		
 
 5) Check that the machine has one CPU and around 92MB of RAM. 
-   PIA Tunnel VM will use around 56MB after a fresh boot so you should use your RAM elsewhere.
+   PIA Tunnel VM will use around 60MB after a fresh boot so you should use your RAM elsewhere.
 
 6) Start the VM. When asked if you moved or copied it, select "I copied it".
 
