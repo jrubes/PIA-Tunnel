@@ -393,7 +393,6 @@ function disp_network_default(){
   $disp_body .= '<tr><td>eth1 Subnet</td><td><input '.$disabled.' type="text" name="'.$hash.'" value="'.$settings['IF_ETH1_SUB'].'"></td></tr>'."\n";
   $hash = md5('IF_ETH1_GW');
   $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" name="'.$hash.'" value="'.$settings['IF_ETH1_GW'].'"></td></tr>'."\n";
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
   //DNS
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
