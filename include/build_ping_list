@@ -94,11 +94,10 @@ do
 		aIPS[$ip_count]="$ip"
 		ip_count=$((ip_count + 1))
       else
-	if [ "$VERBOSE_DEBUG" = "yes" ]; then
-	      echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+		if [ "$VERBOSE_DEBUG" = "yes" ]; then
+			echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 		      "- $ip not unique"
-
-	fi
+		fi
       fi
     fi
   done
@@ -114,7 +113,7 @@ if [ $ip_count -lt 11 ]; then
   echo -e "\tplease wait a few minutes then run pia-setup again."
 
 else
-  # IPS is now a string over IPs separated by space
+  # aIPS is now a string over IPs separated by space
   # loop over and write to /pia/cache/ip_list.txt
   echo "# generated on "$(date +"%Y-%m-%d %H:%M:%S") > "$IPCACHE"
   for ip in ${aIPS[@]}
