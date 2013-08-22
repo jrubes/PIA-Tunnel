@@ -134,7 +134,7 @@ function disp_default(){
   $disp_body .= ' <input type="submit" style="width: 9em;" name="firewall_enable" value="Restart Firewall">';
   $disp_body .= '</td>';
   $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="firewall_disable" value="Disable Forwarding">';
+  $disp_body .= ' <input type="submit" style="width: 9em;" name="firewall_disable" value="Stop Forwarding">';
   $disp_body .= '</td>';
   $disp_body .= '</tr>';
   $disp_body .= '</table>';
