@@ -80,7 +80,8 @@ do
 	chmod ug+x "/pia/include/$f"
 done
 
-
+#reset-pia is special - ug+x but no /bin link
+chmod ug+x "/pia/reset-pia"
 
 #check ip cache
 if [ ! -f "/pia/cache/ip_list.txt" ]; then
