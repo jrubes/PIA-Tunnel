@@ -4,12 +4,16 @@ This is a cut and paste file so getting everything working should only take a fe
   * 2GB VM disk
     * 100MB for SWAP, rest for /
   * 92MB RAM for VM
+  * Set to en_US.UTF-8 locale or change with 'dpkg-reconfigure locales' later on
+
+1.2) For Debian with SSH Server
+      apt-get install -y openssh-server ca-certificates
 
 1.5)   echo 'APT::Install-Recommends "0" ; APT::Install-Suggests "0" ;' >> /etc/apt/apt.conf.d/70debconf
 
 1.6) delete non root user with userdel -r USER
 
-2) apt-get install -y psmisc openvpn screen dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt sudo ca-certificates
+2) apt-get install -y psmisc openvpn screen dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt sudo
 update-rc.d  ntp remove
 update-rc.d  mpt-statusd remove
 update-rc.d lighttpd enable
