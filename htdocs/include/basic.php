@@ -270,13 +270,13 @@ function VM_get_status(){
     //show forwarding info
     $settings = VPN_get_settings();
     if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
-      $ret_str .= "<tr><td>Forwarding</td><td>$vpn_pub[0] =&gt; $settings[FORWARD_IP]:$port</td></tr>";
+      $ret_str .= "<tr><td>Forwarding</td><td>$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port</td></tr>";
     }
     if( $settings['FORWARD_VM_LAN'] == 'yes' ){
       $ret_str .= "<tr><td>Forwarding</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
     }
     if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
-      $ret_str .= "<tr><td>Forwarding</td><td>$settings[IF_EXT] &lt;=&gt; $settings[IF_TUNNEL]</td></tr>";
+      $ret_str .= "<tr><td>Forwarding2</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
     }
   }
 
