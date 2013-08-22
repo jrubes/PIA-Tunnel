@@ -27,7 +27,7 @@ $meta['name']['author'] = 'Mirko Kaiser';
 $meta['name']['keywords'] = '';
 $meta['name']['description'] = '';
 $meta['name']['robots'] = 'INDEX,FOLLOW';
-$meta['name']['copyright'] = 'Mirko Kaiser';
+$meta['name']['dcterms.creator'] = 'Mirko Kaiser';
 $meta['charset'] = 'UTF-8';
 $meta['icon'] = ''; //'/favicon.ico';
 $meta['stylesheet'] = '/style.css'; // '/css/twoColElsLtHdr.css';
@@ -260,10 +260,18 @@ function VM_get_status(){
     //VPN is enabled. Display info
     $port = VPN_get_port();
     $ret_str .= "<tr><td>VPN IP</td><td>$ret[0]</td></tr>";
+    $vpn_pub = array();
+    exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
+    if( array_key_exists( '0', $vpn_pub) === true ){
+      $ret_str .= "<tr><td>VPN Public IP</td><td>$vpn_pub[0]</td></tr>";
+    }
     $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported</td></tr>";
 
     //show forwarding info
     $settings = VPN_get_settings();
+    if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
+      $ret_str .= "<tr><td>Forwarding</td><td>$vpn_pub[0] => $settings[FORWARD_IP]:$port</td></tr>";
+    }
     if( $settings['FORWARD_VM_LAN'] == 'yes' ){
       $ret_str .= "<tr><td>Forwarding</td><td>$settings[IF_INT] => $settings[IF_TUNNEL]</td></tr>";
     }
