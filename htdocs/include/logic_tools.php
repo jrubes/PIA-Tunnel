@@ -16,9 +16,18 @@ switch($_REQUEST['cmd']){
   case 'run_pia_command':
     if( array_key_exists('pia-update', $_POST) === true ){
       //GUI access to pia-setup
-      exec("sudo bash -c \"/pia/pia-update &> /dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
-      $disp_body .= "<div class=\"feedback\">Running pia-update - this may take a few minutes....</div>\n";
-      $disp_body .= disp_default();
+      $result = array();
+      exec("sudo /pia/pia-update", $result); //using bash allows this to happen in the background
+      $disp_body .= "<div class=\"feedback\">Update Executed</div>\n";
+      $disp_body .= "<div class=\"feedback\">\n";
+      if( array_key_exists('0', $result) === true ){
+        foreach( $result as $val ){
+          $disp_body .= "$val<br>\n";
+        }
+
+      }
+      $disp_body .= "</div>\n";
+
       break;
 
     }elseif( array_key_exists('reset-pia', $_POST) === true ){
@@ -26,7 +35,8 @@ switch($_REQUEST['cmd']){
       $result = array();
       exec("sudo /pia/reset-pia", $result); //using bash allows this to happen in the background
       if( array_key_exists('0', $result) === true ){
-        $disp_body .= "<div class=\"feedback\">Full system reset has been executed. Please reboot or shutdown.</div>\n";
+        $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.</div>\n";
+        VM_restart();
       }
 
       $disp_body .= disp_default();
@@ -39,21 +49,43 @@ switch($_REQUEST['cmd']){
 }
 
 
+function disp_default(){
+  $disp_body = '';
+  $disp_body .= disp_pia_update();
+  $disp_body .= disp_reset_pia();
+  return $disp_body;
+}
+
+/**
+ * returns UI elements in HTML
+ * @return string string with HTML for body of this page
+ */
+function disp_pia_update(){
+  $disp_body = '';
+
   //run pia-update on request
-  $disp_body .= '<form class="inline" action="/" method="post">';
+  $disp_body .= '<p><form class="inline" action="/?page=tools&cid=tools" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';
-  $disp_body .= '<table class="control_box">';
-  $disp_body .= '<tr>';
-  $disp_body .= '<td>';
-  $disp_body .=   "pia-update control\n";
-  $disp_body .= '</td>';
-  $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="pia-update" value="Start pia-update">';
-  $disp_body .= '</td>';
-  $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="reset-pia" value="*Danger* Start pia-update">';
-  $disp_body .= '</td>';
-  $disp_body .= '</tr>';
-  $disp_body .= '</table>';
-  $disp_body .= "</form>\n";
+  $disp_body .= 'Here you may update the PIA Tunnel software. Active VPN connections may be terminated to apply new settings.';
+  $disp_body .= '<br><input type="submit" name="pia-update" value="Start pia-update">';
+  $disp_body .= "</form></p>\n";
+
+  return $disp_body;
+}
+
+/**
+ * returns UI elements in HTML
+ * @return string string with HTML for body of this page
+ */
+function disp_reset_pia(){
+  $disp_body = '';
+
+  $disp_body .= '<p><form class="inline" action="/?page=tools&cid=tools" method="post">';
+  $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';
+  $disp_body .= 'Here you may reset everything back to factory default and reboot the system.';
+  $disp_body .= '<br><input type="submit" name="reset-pia" value="Reset to Default and Restart">';
+  $disp_body .= "</form></p>\n";
+
+  return $disp_body;
+}
 ?>
