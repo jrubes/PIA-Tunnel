@@ -194,8 +194,8 @@ function disp_vpn_default(){
   $disp_body .= '<div><h2>PIA User Settings</h2>';
   $disp_body .= 'You may update your PIA username and password below.';
   $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
-  $disp_body .= '<input type="text" name="username" value="'.htmlentities($user['username']).'" min="1" required">';
-  $disp_body .= '<input type="password" name="password" value="" placeholder="************" min="1" required">';
+  $disp_body .= '<input type="text" name="username" value="'.htmlentities($user['username']).'" min="1" required>';
+  $disp_body .= '<input type="password" name="password" value="" placeholder="************" min="1" required>';
   $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= "</form></div>";
   return $disp_body;
