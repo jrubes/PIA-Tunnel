@@ -9,10 +9,12 @@ if( !array_key_exists('cmd', $_REQUEST) ){ $_REQUEST['cmd'] = ''; }
 if( !array_key_exists('cid', $_GET) ){ $_GET['cid'] = ''; }
 
 require_once $inc_dir.'class_loader.php';
+require_once $inc_dir.'classes/PIASettings.php';
 require_once $inc_dir.'classes/class_files/class_files.php';
 
 /* prepare global objects */
 $_files = loader::loadFiles();
+$_settings = loader::PIASettings();
 
 $header_type = 'foo'; //Change this later to add more headers
 $body_type = 'foo'; //Use to select different code later
@@ -121,11 +123,13 @@ function VPN_is_valid_connection($val2check){
 /**
  * method to get a list of arrays contained in settings.conf
  *  use $settings[$returnFromThisFunction[0]] to get the current value from settings.conf
+ * @global object $_settings
  * @return array,bool return array of names,FALSE if no arrays have been found
  * array[0] == 'name of setting'
  * array[1] == 'name of setting2'
  */
 function VPN_get_array_list(){
+  global $_settings;
   $ret = array();
 
   if(array_key_exists('settings.conf', $_SESSION) !== true ){
@@ -136,13 +140,12 @@ function VPN_get_array_list(){
   }
 
   foreach( $_SESSION['settings.conf'] as $key => $val ){
-    if( VPN_is_settings_array($key) === true ){
+    if( $_settings->is_settings_array($key) === true ){
       $name_only = substr($key, 0, strpos($key, '[') ); //get only the array name, without key, from $set_key string
       //var_dump($name_only);
       if( array_is_value_unique($ret, $name_only) === true ){
-        echo "\n\ngood $name_only<br>\n";
         $ret[] = $name_only;
-      }else{ echo "\n\nfuck $name_only<br>\n"; var_dump($ret); var_dump($name_only); }
+      }
     }
   }
 
@@ -154,21 +157,19 @@ function VPN_get_array_list(){
  * function to check if $val is alread stored in the array
  * @param array $ar the array to check in
  * @param string $val the value to look for
- * @return boolean true if $val is already in the array, false if not
+ * @return boolean true if $val is unique, false if not
  */
 function array_is_value_unique( &$ar, $val ){
   if( !is_array($ar) ){ die('FATAL SCRIPT ERROR: parameter must be an array!'); }
 
-  if( count($ar)== 0 ) return true;
-
   reset($ar);
   foreach( $ar as $array_val ){
     if( $array_val == $val ){
-      return true;
+      return false;
     }
   }
 
-  return false;
+  return true;
 }
 
 /**

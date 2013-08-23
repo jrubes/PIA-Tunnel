@@ -94,15 +94,15 @@ switch($_REQUEST['cmd']){
  * @return boolean TRUE on success or FALSE when nothing was changed
  */
 function VPN_save_settings(){
-  global $_files;
-  $settings = VPN_get_settings();
+  global $_settings;
+  $settings = $_settings->get_settings();
   $updated_one=false;
 
   //handle regular strings here
   foreach( $settings as $setting_key => $setting_val ){
 
     //arrays need to be stored different
-    if( VPN_is_settings_array( $setting_key ) === false )
+    if( $_settings->is_settings_array( $setting_key ) === false )
     {
       //# Regular values for settings.conf
       $hash = $setting_key;//md5($setting_key); //hash the key to avoid array issues with PHP
@@ -117,15 +117,27 @@ function VPN_save_settings(){
     }//if( VPN_is_settings_array
   }
 
-  //# array values for settings.conf #
-  //get list of possible arrays from settings.conf
+  // # array values for settings.conf #
+  // get list of possible arrays from settings.conf
   $settings_arrays = VPN_get_array_list();
-  var_dump($settings_arrays);die();
-  //loop over post to process the array
+
+  //loop over possible array values
   foreach( $settings_arrays as $set_array ){
     if(array_key_exists($set_array, $_POST) ){
-      echo "$set_array in POST<br>";
-      var_dump($_POST[$set_array]);
+      // the settings.conf arrays have been found in $_POST
+      // let's see if any values have changed
+      reset($_POST);
+      $cnt = count($_POST[$set_array]);
+      for( $x = 0 ; $x < $cnt ; ++$x ){
+        $index = $set_array."[$x]";
+        if( $settings[$index] !== $_POST[$set_array][$x] ){
+          //at least one setting changed, store the entire array
+          echo "$index changed <br>";
+        }
+        //echo "cont: $set_array index: '$index' old: '$settings[$index]' new '{$_POST[$set_array][$x]}'<br>";
+      }
+
+      //var_dump($_POST[$set_array]);
     }else{
       echo "se '$set_array'<br>";// => set: {$settings[$set_array]}<br>";
     }
@@ -182,6 +194,7 @@ die();
  * @return array,bool Array containing one storage array name per key or FALSE if none where found
  */
 function VPN_get_post_storage_arrays($match=null){
+  global $_settings;
   $settings = VPN_get_settings();
   $ret = array();
 
@@ -200,10 +213,10 @@ function VPN_get_post_storage_arrays($match=null){
     }
 
     if( $found === true ){
-      if(VPN_is_settings_array($set_key) === true ){
+      if($_settings->is_settings_array($set_key) === true ){
         $name_only = substr($set_key, 0, strpos($set_key, '[') ); //get only the array name, without key, from $set_key string
         //this is an array, do we know this key already?
-        if( array_is_value_unique($ret, $name_only) === false ){
+        if( array_is_value_unique($ret, $name_only) === true ){
           $ret[] = $name_only;
         }
       }
@@ -222,24 +235,7 @@ function VPN_get_post_storage_arrays($match=null){
  * @return boolean TRUE when string is an array in settings.conf or FALSE if not
  */
 function VPN_is_settings_array( $config_value ){
-  //arrays contain [] so check for both
-  $b_open = strpos($config_value, '[');
-  $b_close = strpos($config_value, ']');
-  $key = (int)substr($config_value, $b_open+1, (strlen($config_value)-$b_close) ); //get only the array key
-
-  if( $b_open != 0 && $b_close != 0 ){
-    //no ensure that [ comes before ]
-    if( $b_open < $b_close ){
-      //assemble different parts back together to check script logic
-      //$assembled will have to == $config_value
-      $assembled = substr($config_value, 0, $b_open).'['.$key.']';
-      if( $assembled !== $config_value ){
-        die('FATAL SCRIPT ERROR 45d: bad logic! Please contact support.'.$assembled.' does not match '.$config_value);
-      }
-      return true;
-    }
-  }
-  return false;
+  die('use of old function VPN_is_settings_array()');
 }
 
 /**
@@ -498,23 +494,24 @@ function disp_dhcpd_default(){
   $disp_body .= '<tr><td>DHCP server on eth1</td><td>'.build_select($sel).'</td></tr>'."\n";
 
   //DHCPD network stuff
-  $hash = md5('DHCPD_SUBNET');
+  $hash = 'DHCPD_SUBNET';
   $disp_body .= '<tr><td>DHCPD Subnet</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_SUBNET']).'"></td></tr>'."\n";
 
-  $hash = md5('DHCPD_MASK');
+  $hash = 'DHCPD_MASK';
   $disp_body .= '<tr><td>DHCPD Subnetmask</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_MASK']).'"></td></tr>'."\n";
 
 
-  $hash = md5('DHCPD_BROADCAST');
+  $hash = 'DHCPD_BROADCAST';
   $disp_body .= '<tr><td>DHCPD Broadcasr IP</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_BROADCAST']).'"></td></tr>'."\n";
 
-  $hash = md5('DHCPD_RANGE');
+  $hash = 'DHCPD_RANGE';
   $disp_body .= '<tr><td>DHCPD IP Range</td><td><input class="long" type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_RANGE']).'"></td></tr>'."\n";
 
 
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firewall">';
+  $disp_body .= '</form>';
   $disp_body .= '</div>';
 
   return $disp_body;
