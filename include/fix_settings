@@ -118,13 +118,13 @@ if [ -z "${FIREWALL_IF_WEB[0]}" ]; then
   echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/pia/settings.conf'
 fi
 
-if [ -z "${DNS[0]}" ]; then
+if [ -z "${NAMESERVERS[0]}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# DNS Servers to use' >> '/pia/settings.conf'
-  echo 'DNS[0]="8.8.8.8"' >> '/pia/settings.conf'
-  echo 'DNS[1]="208.67.222.222"' >> '/pia/settings.conf'
-  echo 'DNS[2]="8.8.4.4"' >> '/pia/settings.conf'
-  echo 'DNS[3]="208.67.220.220"' >> '/pia/settings.conf'
+  echo 'NAMESERVERS[0]="8.8.8.8"' >> '/pia/settings.conf'
+  echo 'NAMESERVERS[1]="208.67.222.222"' >> '/pia/settings.conf'
+  echo 'NAMESERVERS[2]="8.8.4.4"' >> '/pia/settings.conf'
+  echo 'NAMESERVERS[3]="208.67.220.220"' >> '/pia/settings.conf'
 fi
 
 if [ -z "${IF_ETH0_DHCP}" ]; then

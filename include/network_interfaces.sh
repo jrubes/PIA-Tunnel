@@ -27,7 +27,7 @@ else
   cont="${cont}iface eth0 inet dhcp\n"
 fi
 #apply DNS when set
-for dns_srv in "${DNS[@]}"
+for dns_srv in "${NAMESERVERS[@]}"
 do
   cont="${cont}        dns-nameservers ${dns_srv}\n"
 done

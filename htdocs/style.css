@@ -86,3 +86,7 @@ root {
 .control_box td{
   width: 8em;
 }
+
+.long{
+  width: 15em;
+}

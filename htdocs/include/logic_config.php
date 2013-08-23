@@ -42,6 +42,23 @@ switch($_REQUEST['cmd']){
     //show inout forms again
     $disp_body .= disp_network_default();
     break;
+    
+  case 'store_setting':
+    //settings are now stored section by section. 
+    // this will allow me to restart the network on network changes and so on.
+    // $_POST['store'] indicates which settings need to be stored
+    
+    switch( $_POST['store'] ){
+      case 'dhcpd_settings':
+        //dhcpd settings will store new settings to settings.conf
+        //then load a dhcpd.conf template from /pia/include/dhcpd.conf
+        //apply the changes and write the new config file back to /etc/dhcp/dhcpd.conf
+                
+        $template = dhcpd_process_template();
+        
+        break;
+    }
+    break;
 
   default :
     $disp_body .= '<h2>Please select a menu option.</h2>';
@@ -57,6 +74,35 @@ switch($_REQUEST['cmd']){
 
 
 /* FUNCTIONS - move into functions file later */
+
+/**
+ * function to modify /pia/include/dhcpd.conf in RAM and return the changes
+ * @return string,bool string containing the modified dhcpd.conf file or false on error
+ */
+function dhcpd_process_template(){
+  global $_files;
+  
+  $templ = $_files->readfile('/pia/settings.conf');
+  $settings = VPN_get_settings();
+  
+  $templ = str_replace('SUBNET_IP_HERE', $settings['DHCPD_SUBNET'], $templ, 1);
+  $templ = str_replace('NETWORK_MASK_HERE', $settings['DHCPD_MASK'], $templ, 1);
+  $templ = str_replace('IP_RANGE_HERE', $settings['DHCPD_RANGE'], $templ, 1);
+  $templ = str_replace('BROADCAST_HERE', $settings['DHCPD_BROADCAST'], $templ, 1);
+  
+  //router IP is the IP of eth1, go get it
+  $ret = array();
+  exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+  if(array_key_exists('0', $ret) ){
+    $templ = str_replace('ROUTER_IP_HERE', $ret[0], $templ, 1);
+  }
+  
+  // DNS is an array which may contain multiple entries, loop over it
+  $aDNS = VPN_get_settings_array('NAMESERVERS');
+  $templ = str_replace('DNSSERVER_HERE', $settings[''], $templ, 1);
+  
+}
+
 
 /**
  * method to update the settings.conf it will loop over the settings and check for matchin $_POSTs
@@ -211,7 +257,8 @@ function disp_dhcpd_default(){
   $disp_body = '';
   
   $disp_body .= '<div class="options_box">';
-  $disp_body .= '<form action="/?page=config&amp;cmd=network_store&amp;cid=cnetwork" method="post">'."\n";
+  $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
+  $disp_body .= '<input type="hidden" name="store" value="dhcpd_settings">';
   $disp_body .= '<h2>DHCP Server  Settings</h2>'."\n";
   $disp_body .= "<table>\n";
   $sel = array(
@@ -231,19 +278,20 @@ function disp_dhcpd_default(){
   $disp_body .= '<tr><td>DHCP server on eth1</td><td>'.build_select($sel).'</td></tr>'."\n";  
   
   //DHCPD network stuff
-  $hash = md5('DHCPD_RANGE');
-  $disp_body .= '<tr><td>dhcpd IP Range</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_RANGE']).'"></td></tr>'."\n";
-  
-  $hash = md5('DHCPD_BROADCAST');
-  $disp_body .= '<tr><td>dhcpd IP Broadcasr</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_BROADCAST']).'"></td></tr>'."\n";
-
   $hash = md5('DHCPD_SUBNET');
-  $disp_body .= '<tr><td>dhcpd IP Subnet</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_SUBNET']).'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>DHCPD Subnet</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_SUBNET']).'"></td></tr>'."\n";
 
   $hash = md5('DHCPD_MASK');
-  $disp_body .= '<tr><td>dhcpd IP Subnetmask</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_MASK']).'"></td></tr>'."\n";
- 
+  $disp_body .= '<tr><td>DHCPD Subnetmask</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_MASK']).'"></td></tr>'."\n";
+   
+    
+  $hash = md5('DHCPD_BROADCAST');
+  $disp_body .= '<tr><td>DHCPD Broadcasr IP</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_BROADCAST']).'"></td></tr>'."\n";
   
+  $hash = md5('DHCPD_RANGE');
+  $disp_body .= '<tr><td>DHCPD IP Range</td><td><input class="long" type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_RANGE']).'"></td></tr>'."\n";
+  
+
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firewall">';
@@ -433,14 +481,14 @@ function disp_network_default(){
 
   //DNS
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $hash = md5('DNS[0]');
-  $disp_body .= '<tr><td>DNS 1</td><td><input type="text" name="'.$hash.'" value="'.$settings['DNS[0]'].'"></td></tr>'."\n";
-  $hash = md5('DNS[1]');
-  $disp_body .= '<tr><td>DNS 2</td><td><input type="text" name="'.$hash.'" value="'.$settings['DNS[1]'].'"></td></tr>'."\n";
-  $hash = md5('DNS[2]');
-  $disp_body .= '<tr><td>DNS 3</td><td><input type="text" name="'.$hash.'" value="'.$settings['DNS[2]'].'"></td></tr>'."\n";
-  $hash = md5('DNS[3]');
-  $disp_body .= '<tr><td>DNS 4</td><td><input type="text" name="'.$hash.'" value="'.$settings['DNS[3]'].'"></td></tr>'."\n";
+  $hash = md5('NAMESERVERS[0]');
+  $disp_body .= '<tr><td>DNS 1</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[0]'].'"></td></tr>'."\n";
+  $hash = md5('NAMESERVERS[1]');
+  $disp_body .= '<tr><td>DNS 2</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[1]'].'"></td></tr>'."\n";
+  $hash = md5('NAMESERVERS[2]');
+  $disp_body .= '<tr><td>DNS 3</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[2]'].'"></td></tr>'."\n";
+  $hash = md5('NAMESERVERS[3]');
+  $disp_body .= '<tr><td>DNS 4</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[3]'].'"></td></tr>'."\n";
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
   //command line stuff
