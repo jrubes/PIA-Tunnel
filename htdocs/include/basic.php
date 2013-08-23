@@ -138,7 +138,7 @@ function VPN_get_settings_array($name){
   foreach( $_SESSION['settings.conf'] as $key => $val ){
     //check $key with substring - remove [?]
     $len = strpos($key, '['); // length or string upto [
-    if(substr($key, 0, $len) == $name ){
+    if(substr($key, 0, $len) === $name ){
       $ret[$key] = $val;
     }
   }
