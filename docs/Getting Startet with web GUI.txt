@@ -113,20 +113,32 @@ Install VMware Player with default options, then continue to the "SETUP" section
 8) Change your root password with the following command
 	passwd
 	
-8.5) *Important* Update to latest script versions by running
-	/pia/pia-update
+9) Run "pia-status" to get a list of IPs.
+   /pia/pia-status
 
-9) Generate new SSL certificates by running
-	/pia/reset-pia
+10) Open your Webbroser and connect to the "Public LAN IP" displayed in the previous step
+    The PIA-Tunnel Management Interface will open, goto step 11
 
-10) reboot the VM with the following command! yes, really, just do it :)
-	reboot
-	
-11) Once rebooted you should see the "Public LAN IP: 123.345.678.909"
-	Open a webbrowser and open http://123.345.678.909
-	replace 123.345.678.909 with the IP display on your screen
+11) *WARNING* DO NOT SKIP THIS STEP!!!!
+    In "PIA-Tunnel Management Interface" click on
+    *) Tools
+    *) Update this software by clicking on "start pia-update". This will take a few seconds to complete, please
+       be patient.
+    *) Go back to the Tools page and run "Reset to Default and Restart" *DO NOT SKIP THIS STEP*
+    *) Please give PIA-Tunnel a minute or two to reboot. Then reconnect to the mangement website
 
-12) Select "Network Config" from the main menu. 
+12) Select "VPN Config"
+	* Enter your username and password, then click "Store Settings"
+
+13) You should be ready to use the PIA-Tunnel at this time.
+	* Choose a place to connect to and click "Connect VPN"
+	* Please give the VM a minute or two to establish the connection. 
+      The UI does not use javascript yet so click on "Overview" to refresh the "Network Status"
+	* The VPN will be up when the Status reads "Connected to 'Some Location'
+
+    Please check step 14 for an explanation of additonal network settings.
+
+14) Select "Network Config" from the main menu. 
 	Please keep in mind that you are only updating settings.conf on this page. 
 	Changing firewall settings will require that you "Restart Firewall" and network
 	changes require a "Full Network Restart".
@@ -149,13 +161,6 @@ Install VMware Player with default options, then continue to the "SETUP" section
 		Here you may configure your network interfaces. Use "Full Network Restart" to apply any changes
 		# DHCP Server settings are not implemented yet
 		
-13) Select "VPN Config"
-	* Enter your username and password, then click "Store Settings"
-	
-14) Select "Overview"
-	* Choose a place to connect to and click "Connect VPN"
-	* Please give the VM a minute or two to establish the connection. The UI does not use javascript yet
-	  so click on "Overview" to refresh the "Network Status"
-	* The VPN will be up when the Status reads "Connected to 'Some Location'
+
 	
 15) Enjoy!

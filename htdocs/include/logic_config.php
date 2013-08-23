@@ -25,6 +25,7 @@ switch($_REQUEST['cmd']){
 
   case 'network':
     $disp_body .= disp_network_default();
+    $disp_body .= disp_dhcpd_default();
     break;
 
   case 'network_store';
@@ -205,6 +206,57 @@ function disp_vpn_default(){
  * returns the default UI for this option
  * @return string string with HTML for body of this page
  */
+function disp_dhcpd_default(){
+  $settings = VPN_get_settings();
+  $disp_body = '';
+  
+  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<form action="/?page=config&amp;cmd=network_store&amp;cid=cnetwork" method="post">'."\n";
+  $disp_body .= '<h2>DHCP Server  Settings</h2>'."\n";
+  $disp_body .= "<table>\n";
+  $sel = array(
+          'id' => 'IF_ETH0_DHCP_SERVER',
+          'selected' => $settings['IF_ETH0_DHCP_SERVER'],
+          array( 'no', 'disabled'),
+          array( 'yes', 'enabled')
+        );
+  $disp_body .= '<tr><td>DHCP server on eth0</td><td>'.build_select($sel).'</td></tr>'."\n";
+
+  $sel = array(
+          'id' => 'IF_ETH1_DHCP_SERVER',
+          'selected' => $settings['IF_ETH1_DHCP_SERVER'],
+          array( 'no', 'disabled'),
+          array( 'yes', 'enabled')
+        );
+  $disp_body .= '<tr><td>DHCP server on eth1</td><td>'.build_select($sel).'</td></tr>'."\n";  
+  
+  //DHCPD network stuff
+  $hash = md5('DHCPD_RANGE');
+  $disp_body .= '<tr><td>dhcpd IP Range</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_RANGE']).'"></td></tr>'."\n";
+  
+  $hash = md5('DHCPD_BROADCAST');
+  $disp_body .= '<tr><td>dhcpd IP Broadcasr</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_BROADCAST']).'"></td></tr>'."\n";
+
+  $hash = md5('DHCPD_SUBNET');
+  $disp_body .= '<tr><td>dhcpd IP Subnet</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_SUBNET']).'"></td></tr>'."\n";
+
+  $hash = md5('DHCPD_MASK');
+  $disp_body .= '<tr><td>dhcpd IP Subnetmask</td><td><input type="text" name="'.$hash.'" value="'.htmlspecialchars($settings['DHCPD_MASK']).'"></td></tr>'."\n";
+ 
+  
+  $disp_body .= "</table>\n";
+  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firewall">';
+  $disp_body .= '</div>';
+  
+  return $disp_body;
+}
+
+
+/**
+ * returns the default UI for this option
+ * @return string string with HTML for body of this page
+ */
 function disp_network_default(){
   $settings = VPN_get_settings();
 
@@ -215,32 +267,7 @@ function disp_network_default(){
   $disp_body .= '<h2>PIA Network Settings</h2>'."\n";
   $disp_body .= "<table>\n";
 
-
-  //interface and network
-  $sel = array(
-          'id' => 'IF_EXT',
-          'selected' =>  $settings['IF_EXT'],
-          array( 'eth0', 'eth0'),
-          array( 'eth1', 'eth1'),
-          array( 'tun0', 'tun0')
-        );
-  $disp_body .= '<tr><td>Public LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $sel = array(
-          'id' => 'IF_INT',
-          'selected' =>  $settings['IF_INT'],
-          array( 'eth0', 'eth0'),
-          array( 'eth1', 'eth1'),
-          array( 'tun0', 'tun0')
-        );
-  $disp_body .= '<tr><td>VM LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $sel = array(
-          'id' => 'IF_TUNNEL',
-          'selected' =>  $settings['IF_TUNNEL'],
-          array( 'eth0', 'eth0'),
-          array( 'eth1', 'eth1'),
-          array( 'tun0', 'tun0')
-        );
-  $disp_body .= '<tr><td>VPN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  //basic interface and network
   $sel = array(
           'id' => 'FORWARD_PORT_ENABLED',
           'selected' =>  $settings['FORWARD_PORT_ENABLED'],
@@ -300,23 +327,6 @@ function disp_network_default(){
 
 
 
-  //command line stuff
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $sel = array(
-            'id' => 'VERBOSE',
-            'selected' =>  $settings['VERBOSE'],
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $sel = array(
-            'id' => 'VERBOSE_DEBUG',
-            'selected' =>  $settings['VERBOSE_DEBUG'],
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>Debug Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
-
   //$disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
@@ -360,8 +370,35 @@ function disp_network_default(){
   $disp_body .= '<div class="options_box">';
   $disp_body .= '<h2>VM System Settings</h2>'."\n";
   $disp_body .= "<table>\n";  //iptables options
+  
+  //interface assignment
+  $sel = array(
+          'id' => 'IF_EXT',
+          'selected' =>  $settings['IF_EXT'],
+          array( 'eth0', 'eth0'),
+          array( 'eth1', 'eth1'),
+          array( 'tun0', 'tun0')
+        );
+  $disp_body .= '<tr><td>Public LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $sel = array(
+          'id' => 'IF_INT',
+          'selected' =>  $settings['IF_INT'],
+          array( 'eth0', 'eth0'),
+          array( 'eth1', 'eth1'),
+          array( 'tun0', 'tun0')
+        );
+  $disp_body .= '<tr><td>VM LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $sel = array(
+          'id' => 'IF_TUNNEL',
+          'selected' =>  $settings['IF_TUNNEL'],
+          array( 'eth0', 'eth0'),
+          array( 'eth1', 'eth1'),
+          array( 'tun0', 'tun0')
+        );
+  $disp_body .= '<tr><td>VPN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
 
   //eth0
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $disabled = ($settings['IF_ETH0_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
   $sel = array(
           'id' => 'IF_ETH0_DHCP',
@@ -406,21 +443,22 @@ function disp_network_default(){
   $disp_body .= '<tr><td>DNS 4</td><td><input type="text" name="'.$hash.'" value="'.$settings['DNS[3]'].'"></td></tr>'."\n";
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
+  //command line stuff
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $sel = array(
-          'id' => 'IF_ETH0_DHCP_SERVER',
-          'selected' => $settings['IF_ETH0_DHCP_SERVER'],
-          array( 'no', 'disabled'),
-          array( 'yes', 'enabled')
-        );
-  $disp_body .= '<tr><td>DHCP server on eth0</td><td>'.build_select($sel).'</td></tr>'."\n";
-
+            'id' => 'VERBOSE',
+            'selected' =>  $settings['VERBOSE'],
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
   $sel = array(
-          'id' => 'IF_ETH1_DHCP_SERVER',
-          'selected' => $settings['IF_ETH1_DHCP_SERVER'],
-          array( 'no', 'disabled'),
-          array( 'yes', 'enabled')
-        );
-  $disp_body .= '<tr><td>DHCP server on eth1</td><td>'.build_select($sel).'</td></tr>'."\n";
+            'id' => 'VERBOSE_DEBUG',
+            'selected' =>  $settings['VERBOSE_DEBUG'],
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>Debug Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
 
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';

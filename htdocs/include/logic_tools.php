@@ -35,6 +35,7 @@ switch($_REQUEST['cmd']){
       $result = array();
       exec("sudo /pia/reset-pia", $result); //using bash allows this to happen in the background
       if( array_key_exists('0', $result) === true ){
+        $_SESSION = array(); //clear all session vars
         $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.</div>\n";
         VM_restart();
       }
