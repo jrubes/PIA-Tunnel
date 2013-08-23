@@ -51,10 +51,19 @@ switch($_REQUEST['cmd']){
     switch( $_POST['store'] ){
       case 'dhcpd_settings':
         //dhcpd settings will store new settings to settings.conf
-        //then load a dhcpd.conf template from /pia/include/dhcpd.conf
-        //apply the changes and write the new config file back to /etc/dhcp/dhcpd.conf
-                
-        $template = dhcpd_process_template();
+        if( VPN_save_settings() === true ){
+          //then load a dhcpd.conf template from /pia/include/dhcpd.conf
+          //apply the changes and write the new config file back to /etc/dhcp/dhcpd.conf
+
+          $template = dhcpd_process_template();
+          var_dump($template);
+          die();          
+          
+        }else{
+          $disp_body .= "<div class=\"feedback\">Request to store settings but it appears that nothing was changed.</div>\n";
+        }
+        
+
         
         break;
     }
@@ -76,13 +85,81 @@ switch($_REQUEST['cmd']){
 /* FUNCTIONS - move into functions file later */
 
 /**
+ * main function to store settings in /pia/settings.conf
+ * loop over all settings in settings.conf and look for a matching $_POST
+ * settings are md5() summed in POST to avoid 
+ * array issues with PHP when posting a string like FOO[0]
+ * @global object $_files
+ * @return boolean TRUE on success or FALSE when nothing was changed
+ */
+function VPN_save_settings(){
+  global $_files;
+  $settings = VPN_get_settings();
+  $updated_one=false;
+
+  //handle regular strings here
+  foreach( $settings as $key => $val ){
+    
+    //arrays need to be stored different
+    if( VPN_is_settings_array( $key ) === true )
+    {
+      $hash = md5($key); //hash the key to avoid array issues with PHP
+      if( array_key_exists($hash, $_POST) === true && $val != $_POST[$hash] ){
+        //setting found and setting has changed, UPDATE!
+        $k = escapeshellarg($key);
+        $v = escapeshellarg($_POST[$hash]);
+        exec("/pia/pia-settings $k $v");
+        echo "$k is now $v<br>\n"; //dev stuff
+        $updated_one=true;
+      }
+    }
+  }
+  
+  //handle arrays here
+  
+  
+  if( $updated_one === true ){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+/**
+ * method to check if $config_value is part of a settings array == contains [x]
+ * so passing 'FOO[99]' returns true while 'FOO' will not
+ * @param string $config_value string containing name of config value
+ * @return boolean TRUE when string is an array in settings.conf or FALSE if not
+ */
+function VPN_is_settings_array( $config_value ){
+  //arrays contain [] so check for both
+  $b_open = strpos($config_value, '[');
+  $b_close = strpos($config_value, ']');
+  $key = (int)substr($config_value, $b_open+1, (strlen($config_value)-$b_close) ); //get only the array key
+  
+  if( $b_open != 0 && $b_close != 0 ){
+    //no ensure that [ comes before ]
+    if( $b_open < $b_close ){
+      //assemble different parts back together to check script logic
+      //$assembled will have to == $config_value
+      $assembled = substr($config_value, 0, $b_open).'['.$key.']';
+      if( $assembled !== $config_value ){
+        die('FATAL SCRIPT ERROR 45d: bad logic! Please contact support.'.$assembled.' does not match '.$config_value);
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * function to modify /pia/include/dhcpd.conf in RAM and return the changes
+ * @global object $_files
  * @return string,bool string containing the modified dhcpd.conf file or false on error
  */
 function dhcpd_process_template(){
-  global $_files;
-  
-  $templ = $_files->readfile('/pia/settings.conf');
+  global $_files;  
+  $templ = $_files->readfile('/pia/include/dhcpd.conf');
   $settings = VPN_get_settings();
 
   $SometimesIreallyHatePHP = 1; //passing this int bý reference will save tremendous ammounts of RAM - AWESOME SHIT!
@@ -98,9 +175,16 @@ function dhcpd_process_template(){
     $templ = str_replace('ROUTER_IP_HERE', $ret[0], $templ, $SometimesIreallyHatePHP);
   }
   
-  // DNS is an array which may contain multiple entries, loop over it
-  $aDNS = VPN_get_settings_array('NAMESERVERS');
-  $templ = str_replace('DNSSERVER_HERE', $settings[''], $templ, $SometimesIreallyHatePHP);
+  // NAMESERVERS is an array which may contain multiple entries, loop over it
+  $NAMESERVERS = VPN_get_settings_array('NAMESERVERS');
+  $ins_dns = '';
+  foreach( $NAMESERVERS as $DNS){
+    $ins_dns .= ($ins_dns === '' ) ? $DNS : ", $DNS";
+  }
+  $templ = str_replace('DNSSERVER_HERE', $ins_dns, $templ, $SometimesIreallyHatePHP);
+  
+  //all done - return
+  return $templ;
   
 }
 
