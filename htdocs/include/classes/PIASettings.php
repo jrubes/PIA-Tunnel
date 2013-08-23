@@ -8,9 +8,11 @@
 class PIASettings {
   private $_settings_file;
   private $_files;
+  private $_settings;
 
   function __construct(){
     $this->_settings_file = '/pia/settings.conf';
+    $this->_settings = '';
   }
 
   /**
@@ -34,6 +36,98 @@ class PIASettings {
     exec("/pia/pia-settings $k $v");
     //$disp_body .= "$k is now $v<br>\n"; //dev stuff
   }
+
+  /**
+   * method to store settings array like NAMESERVERS[]
+   * it removes all values matching NAMESERVERS* then adds the new values
+   * @param string $array_name name of array in settings.conf
+   * @param type $array2store array with integer keys [] containing one setting each
+   */
+  function save_settings_array( $array_name, &$array2store){
+    if( $this->is_settings_array($array_name) !== true ){
+      return false;
+    }
+
+    $this->remove_array($array_name);
+
+    $this->write_array($array2store);
+  }
+
+
+  /**
+   * method to collect an array from $_POST and return it
+   * formated to be stored in settings.conf
+   * @param string $arrayname name pf the $_POST array
+   * @return array,bool FALSE if none found or one result per key
+   */
+  function get_array_from_post($arrayname){
+    $ret = array();
+    if( ! is_array($_POST[$arrayname]) ){ return false; }
+
+    foreach( $_POST[$arrayname] as $val ){
+      $ret[] = $val;
+    }
+
+    if( count($ret) === 0 ){ return false; }
+    return $ret;
+  }
+
+  /**
+   * reformats an array into a string containing a BASH array
+   * which can be stored as is in settings.conf
+   * @param array $array2format array to be formated
+   */
+  function format_array( $name, &$array2format ){
+    $cnt = 0;
+    $ret = '';
+
+    reset($array2format);
+    foreach( $array2format as $val ){
+      $ret .= $name."[$cnt]='$val'";
+      ++$cnt;
+    }
+
+    return $ret;
+  }
+
+  /**
+   * method to write an array to settings.conf
+   * call this after remove_array()
+   * @param array $array2store BASH formatted array of settings
+   */
+  function write_array( &$array2stpre ){
+    // add the settings back at the bottom of the file
+    reset($array2stpre);
+    foreach( $array2stpre as $key => $val ){
+      for( $x = 0 ; $x < count($values) ; ++$x ){ //yes count in a loop - only doing it since this is a single user script -- ohh yeah, sue me!
+        exec("echo '".$config_value.'['.$x."]=\"".$values[$x]."\"' >> '$this->_settings_file'");
+        ++$upcnt;
+      }
+    }
+
+  }
+
+/**
+ * methhod to remove a settings array from settings.conf
+ * @return int number of lines removed
+ */
+function remove_array($array_name){
+  $removed = 0;
+
+  $ret =  array();
+  //get line numbers of current settings
+  $config_value = substr($array_name, 0, strpos($array_name, '[') ); //this is the value of $key without [n]. this is used for the array name when writing it back
+  exec('grep -n  "'.$config_value.'" '.$this->_settings_file.' | cut -d: -f1', $ret); // $ret[] will contain line number with current settings
+
+  //loop over returned values and remove the lines
+  for( $x = count($ret)-1 ; $x >= 0 ; --$x ){ //go backwards or line numbers need to be adjusted
+    exec('sed "'.$ret[$x].'d" '.$this->_settings_file.' > '.$this->_settings_file.'.back');
+    exec('mv '.$this->_settings_file.'.back '.$this->_settings_file.'');
+    ++$removed;
+  }
+
+  return $removed;
+}
 
 
 /**
@@ -70,12 +164,80 @@ function is_settings_array( $config_value ){
  function get_settings(){
    //get settings stored in settings.con
    if( array_key_exists('settings.conf', $_SESSION) !== true ){
-     $ret = load_settings();
+     $ret = $this->load_settings();
      if( $ret !== false ){
        return $ret;
      }
    }
    return $_SESSION['settings.conf'];
  }
+
+
+  /**
+   * method to get a list of arrays contained in settings.conf
+   *  use $settings[$returnFromThisFunction[0]] to get the current value from settings.conf
+   * @return array,bool return array of names,FALSE if no arrays have been found
+   * array[0] == 'name of setting'
+   * array[1] == 'name of setting2'
+   */
+  function get_array_list(){
+    $ret = array();
+
+    if(array_key_exists('settings.conf', $_SESSION) !== true ){
+      if( load_settings() === false ){
+        echo "FATAL ERROR: Unable to get list of settings!";
+        return false;
+      }
+    }
+
+    foreach( $_SESSION['settings.conf'] as $key => $val ){
+      if( $this->is_settings_array($key) === true ){
+        $name_only = substr($key, 0, strpos($key, '[') ); //get only the array name, without key, from $set_key string
+        //var_dump($name_only);
+        if( array_is_value_unique($ret, $name_only) === true ){
+          $ret[] = $name_only;
+        }
+      }
+    }
+
+    if( count($ret) == 0 ){ return false; }
+    return $ret;
+  }
+
+ /**
+  * this function loads settings.conf into an array without comments, stores it in session and return it
+  * ['SETTING'] == $VALUE
+  * @return array,boolean or false on failure
+  */
+ function load_settings(){
+   $ret = array();
+   var_dump($this->_files);
+   $c = $this->_files->readfile($this->_settings_file);
+   if( $c !== false ){
+     $c = explode( "\n", eol($c));
+     foreach( $c as $line ){
+       //ignore a lot of stuff - quick hack for now
+       if(substr($line, 0, 1) != '#'
+               && trim($line) != ''
+               && substr($line, 0, 4) != 'LANG'
+               && substr($line, 0, 1) != '#'
+               && substr($line, 0, 11) != 'export LANG'
+               && substr($line, 0, 4) != 'bold'
+               && substr($line, 0, 6) != 'normal'  ){
+         $set = explode('=', $line);
+         $ret[$set[0]] = trim($set[1], '"\''); //this should now be one setting per key with setting name as key
+       }
+     }
+
+     if( count($ret) > 0 ){
+       $_SESSION['settings.conf'] = $ret;
+       return $_SESSION['settings.conf'];
+     }
+   }else{
+     unset($_SESSION['settings.conf']);
+     return false;
+   }
+ }
+
 }
 ?>

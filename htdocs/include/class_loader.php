@@ -14,8 +14,6 @@ class loader {
 
   public static function PIASettings(){
     self::$_pia_settings = new PIASettings();
-
-
     self::$_pia_settings->set_files(self::$_files);
 
     return self::$_pia_settings;

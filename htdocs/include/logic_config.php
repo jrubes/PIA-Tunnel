@@ -1,4 +1,7 @@
 <?php
+/* @var $_settings PIASettings */
+/* @var $_files FilesystemOperations */
+
 unset($_SESSION['ovpn']); //dev
 unset($_SESSION['settings.conf']);
 
@@ -108,9 +111,7 @@ function VPN_save_settings(){
       $hash = $setting_key;//md5($setting_key); //hash the key to avoid array issues with PHP
       if( array_key_exists($hash, $_POST) === true && $setting_val != $_POST[$hash] ){
         //setting found and setting has changed, UPDATE!
-        $k = escapeshellarg($setting_key);
-        $v = escapeshellarg($_POST[$hash]);
-        exec("/pia/pia-settings $k $v");
+        $_settings->save_settings($setting_key, $_POST[$hash]);
         echo "$k is now $v<br>\n"; //dev stuff
         $updated_one=true;
       }
@@ -119,7 +120,7 @@ function VPN_save_settings(){
 
   // # array values for settings.conf #
   // get list of possible arrays from settings.conf
-  $settings_arrays = VPN_get_array_list();
+  $settings_arrays = $_settings->get_array_list();
 
   //loop over possible array values
   foreach( $settings_arrays as $set_array ){
@@ -132,7 +133,11 @@ function VPN_save_settings(){
         $index = $set_array."[$x]";
         if( $settings[$index] !== $_POST[$set_array][$x] ){
           //at least one setting changed, store the entire array
-          echo "$index changed <br>";
+          $tmppost = $_settings->get_array_from_post($set_array);
+          $array2store = $_settings->format_array($set_array, $tmppost);
+          $_settings->save_settings_array($set_array, $array2store);
+
+          echo "changed: $index removing $set_array<br>";
         }
         //echo "cont: $set_array index: '$index' old: '$settings[$index]' new '{$_POST[$set_array][$x]}'<br>";
       }
@@ -195,7 +200,7 @@ die();
  */
 function VPN_get_post_storage_arrays($match=null){
   global $_settings;
-  $settings = VPN_get_settings();
+  $settings = $_settings->get_settings();
   $ret = array();
 
   reset($_POST);
@@ -227,16 +232,6 @@ function VPN_get_post_storage_arrays($match=null){
   else{ return $ret; }
 }
 
-
-/**
- * method to check if $config_value is part of a settings array == contains [x]
- * so passing 'FOO[99]' returns true while 'FOO' will not
- * @param string $config_value string containing name of config value
- * @return boolean TRUE when string is an array in settings.conf or FALSE if not
- */
-function VPN_is_settings_array( $config_value ){
-  die('use of old function VPN_is_settings_array()');
-}
 
 /**
  * function to modify /pia/include/dhcpd.conf in RAM and return the changes
@@ -359,30 +354,6 @@ function update_network_settings(){
   unset($_SESSION['settings.conf']);
   return $disp_body;
 }
-
-/**
- * function to remove a settings array from settings.conf
- * @return int number of lines removed
- */
-function VPN_setting_remove_array($array_name){
-  $removed = 0;
-
-  $ret =  array();
-  //get line numbers of current settings
-  $config_value = substr($array_name, 0, strpos($array_name, '[') ); //this is the value of $key without [n]. this is used for the array name when writing it back
-  exec('grep -n  "'.$config_value.'" /pia/settings.conf | cut -d: -f1', $ret); // $ret[] will contain line number with current settings
-
-  //loop over returned values and remove the lines
-  for( $x = count($ret)-1 ; $x >= 0 ; --$x ){ //go backwards or line numbers need to be adjusted
-    exec('sed "'.$ret[$x].'d" /pia/settings.conf > /pia/settings.conf.back');
-    exec('mv /pia/settings.conf.back /pia/settings.conf');
-    //echo 'sed "'.$ret[$x].'d" /pia/settings.conf > /pia/settings.conf'.'<br>';
-    ++$removed;
-  }
-
-  return $removed;
-}
-
 
 /**
  * method to update username and password passed via POST

@@ -129,28 +129,7 @@ function VPN_is_valid_connection($val2check){
  * array[1] == 'name of setting2'
  */
 function VPN_get_array_list(){
-  global $_settings;
-  $ret = array();
-
-  if(array_key_exists('settings.conf', $_SESSION) !== true ){
-    if( load_settings() === false ){
-      echo "FATAL ERROR: Unable to get list of settings!";
-      return false;
-    }
-  }
-
-  foreach( $_SESSION['settings.conf'] as $key => $val ){
-    if( $_settings->is_settings_array($key) === true ){
-      $name_only = substr($key, 0, strpos($key, '[') ); //get only the array name, without key, from $set_key string
-      //var_dump($name_only);
-      if( array_is_value_unique($ret, $name_only) === true ){
-        $ret[] = $name_only;
-      }
-    }
-  }
-
-  if( count($ret) == 0 ){ return false; }
-  return $ret;
+  die('old function VPN_get_array_list');
 }
 
 /**
@@ -339,20 +318,6 @@ function VM_get_status(){
   return $ret_str;
 }
 
-/**
- * method read /pia/login.conf into an array
- * @return array,bool array with ['name'], ['password'] OR FALSE on failure
- */
-function VPN_get_settings(){
-  //get settings stored in settings.con
-  if( array_key_exists('settings.conf', $_SESSION) !== true ){
-    $ret = load_settings();
-    if( $ret !== false ){
-      return $ret;
-    }
-  }
-  return $_SESSION['settings.conf'];
-}
 
 /**
  * function checks /pia/cache/session.log for specific words and returns an array with
@@ -493,42 +458,6 @@ function load_login(){
     $_SESSION['login.conf'] = array( 'username' => $un , 'password' => $pw); //store for later
     return $_SESSION['login.conf'];
   }else{
-    return false;
-  }
-}
-
-/**
- * this function loads settings.conf into an array without comments, stores it in session and return it
- * ['SETTING'] == $VALUE
- * @return array,boolean or false on failure
- */
-function load_settings(){
-  global $_files;
-  $ret = array();
-
-  $c = $_files->readfile('/pia/settings.conf');
-  if( $c !== false ){
-    $c = explode( "\n", eol($c));
-    foreach( $c as $line ){
-      //ignore a lot of stuff - quick hack for now
-      if(substr($line, 0, 1) != '#'
-              && trim($line) != ''
-              && substr($line, 0, 4) != 'LANG'
-              && substr($line, 0, 1) != '#'
-              && substr($line, 0, 11) != 'export LANG'
-              && substr($line, 0, 4) != 'bold'
-              && substr($line, 0, 6) != 'normal'  ){
-        $set = explode('=', $line);
-        $ret[$set[0]] = trim($set[1], '"\''); //this should now be one setting per key with setting name as key
-      }
-    }
-
-    if( count($ret) > 0 ){
-      $_SESSION['settings.conf'] = $ret;
-      return $_SESSION['settings.conf'];
-    }
-  }else{
-    unset($_SESSION['settings.conf']);
     return false;
   }
 }
