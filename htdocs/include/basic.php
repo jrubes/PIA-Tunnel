@@ -119,8 +119,61 @@ function VPN_is_valid_connection($val2check){
 }
 
 /**
+ * method to get a list of arrays contained in settings.conf
+ *  use $settings[$returnFromThisFunction[0]] to get the current value from settings.conf
+ * @return array,bool return array of names,FALSE if no arrays have been found
+ * array[0] == 'name of setting'
+ * array[1] == 'name of setting2'
+ */
+function VPN_get_array_list(){
+  $ret = array();
+
+  if(array_key_exists('settings.conf', $_SESSION) !== true ){
+    if( load_settings() === false ){
+      echo "FATAL ERROR: Unable to get list of settings!";
+      return false;
+    }
+  }
+
+  foreach( $_SESSION['settings.conf'] as $key => $val ){
+    if( VPN_is_settings_array($key) === true ){
+      $name_only = substr($key, 0, strpos($key, '[') ); //get only the array name, without key, from $set_key string
+      //var_dump($name_only);
+      if( array_is_value_unique($ret, $name_only) === true ){
+        echo "\n\ngood $name_only<br>\n";
+        $ret[] = $name_only;
+      }else{ echo "\n\nfuck $name_only<br>\n"; var_dump($ret); var_dump($name_only); }
+    }
+  }
+
+  if( count($ret) == 0 ){ return false; }
+  return $ret;
+}
+
+/**
+ * function to check if $val is alread stored in the array
+ * @param array $ar the array to check in
+ * @param string $val the value to look for
+ * @return boolean true if $val is already in the array, false if not
+ */
+function array_is_value_unique( &$ar, $val ){
+  if( !is_array($ar) ){ die('FATAL SCRIPT ERROR: parameter must be an array!'); }
+
+  if( count($ar)== 0 ) return true;
+
+  reset($ar);
+  foreach( $ar as $array_val ){
+    if( $array_val == $val ){
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
  * method to get an entire settings array
- * @param string $name name of array
+ * @param string $name=null *optional* name of array
  * @return string/bool string containing HTML formated as <select> or FALSE
  */
 function VPN_get_settings_array($name){
@@ -493,7 +546,7 @@ function load_settings(){
  */
 function build_select( &$content, $double=false ){
 
-  $hash = md5($content['id']); //hash this to avoid problems with MYVPN[0] and PHP
+  $hash = $content['id'];//md5($content['id']); //hash this to avoid problems with MYVPN[0] and PHP
   $head = '<select id="'.$hash.'" name="'.$hash."\">\n";
 
   /* 'selected' is option */

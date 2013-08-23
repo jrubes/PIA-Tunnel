@@ -105,7 +105,7 @@ function VPN_save_settings(){
     if( VPN_is_settings_array( $setting_key ) === false )
     {
       //# Regular values for settings.conf
-      $hash = md5($setting_key); //hash the key to avoid array issues with PHP
+      $hash = $setting_key;//md5($setting_key); //hash the key to avoid array issues with PHP
       if( array_key_exists($hash, $_POST) === true && $setting_val != $_POST[$hash] ){
         //setting found and setting has changed, UPDATE!
         $k = escapeshellarg($setting_key);
@@ -118,6 +118,20 @@ function VPN_save_settings(){
   }
 
   //# array values for settings.conf #
+  //get list of possible arrays from settings.conf
+  $settings_arrays = VPN_get_array_list();
+  var_dump($settings_arrays);die();
+  //loop over post to process the array
+  foreach( $settings_arrays as $set_array ){
+    if(array_key_exists($set_array, $_POST) ){
+      echo "$set_array in POST<br>";
+      var_dump($_POST[$set_array]);
+    }else{
+      echo "se '$set_array'<br>";// => set: {$settings[$set_array]}<br>";
+    }
+  }
+die('end');
+
   //get a list of storage arrays from $_POST
   $post_storage_array = VPN_get_post_storage_arrays();
   foreach( $post_storage_array as $post_value ){
@@ -130,7 +144,7 @@ function VPN_save_settings(){
         // in settings.conf foo[0]=$aval
 
         //see if one of the array values changes
-        $hash = md5($akey);
+        $hash = $akey;//md5($akey);
         if( $_POST[$hash] !== $aval ) {
           //one of an array setting has been changed. I don't want to update the array
           //so let's just write the current values into settings.con
@@ -141,7 +155,7 @@ function VPN_save_settings(){
           //now add all posted values back in
           exec("/pia/pia-settings $k $v");
         }else{
-          $m5 = md5($akey);
+          $m5 = $akey;//md5($akey);
           echo "no match! ak: $akey = pk: $_POST[$m5] && av: $aval = pv: $post_value<br>";
         }
 
@@ -178,7 +192,7 @@ function VPN_get_post_storage_arrays($match=null){
     reset($settings);
     $found = false;
     foreach( $settings as $set_key => $set_val ){
-      $hash = md5($set_key);
+      $hash = $set_key;//md5($set_key);
       if( $hash === $key ){
         $found = true;
         break;
@@ -200,22 +214,6 @@ function VPN_get_post_storage_arrays($match=null){
   else{ return $ret; }
 }
 
-
-/**
- * function to check if $val is alread stored in the array
- * @param array $ar the array to check in
- * @param string $val the value to look for
- * @return boolean true if $val is already in the array, false if not
- */
-function array_is_value_unique( &$ar, $val ){
-  reset($ar);
-  foreach( $ar as $key => $array_val ){
-    if( $array_val == $val ){
-      return true;
-    }
-  }
-  return false;
-}
 
 /**
  * method to check if $config_value is part of a settings array == contains [x]
@@ -292,7 +290,7 @@ function update_network_settings(){
 
   $disp_body = '';
   foreach( $settings as $key => $val ){
-    $hash = md5($key); //hash the key to avoid array issues with PHP
+    $hash = $key;//md5($key); //hash the key to avoid array issues with PHP
     if( array_key_exists($hash, $_POST) === true && $val != $_POST[$hash] ){
 
       //update setting
@@ -465,19 +463,19 @@ function disp_dhcpd_default(){
             for( $x = 0 ; $x < 10 ; ++$x ){
               if( array_key_exists('MYVPN['.$x.']', $settings) === true ){
                 $ovpn = VPN_get_connections('MYVPN['.$x.']', array( 'selected' => $settings['MYVPN['.$x.']']));
-                $hash = md5('MYVPN['.$x.']').'_del';
+                $hash = 'MYVPN['.$x.']'.'_del';//md5('MYVPN['.$x.']').'_del';
                 $disp_body .= '<tr><td>Failover '.$x.'</td><td>'.$ovpn.' <input type="checkbox" name="'.$hash.'" value="1"> delete</td></tr>'."\n";
                 ++$fovers;
               }
             }
             $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-            $hash = md5('NAMESERVERS[0]');
+            $hash = 'NAMESERVERS[0]';//md5('NAMESERVERS[0]');
             $disp_body .= '<tr><td>DNS 1</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[0]'].'"></td></tr>'."\n";
-            $hash = md5('NAMESERVERS[1]');
+            $hash = 'NAMESERVERS[1]';//md5('NAMESERVERS[1]');
             $disp_body .= '<tr><td>DNS 2</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[1]'].'"></td></tr>'."\n";
-            $hash = md5('NAMESERVERS[2]');
+            $hash = 'NAMESERVERS[0]';//md5('NAMESERVERS[2]');
             $disp_body .= '<tr><td>DNS 3</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[2]'].'"></td></tr>'."\n";
-            $hash = md5('NAMESERVERS[3]');
+            $hash = 'NAMESERVERS[0]';//md5('NAMESERVERS[3]');
             $disp_body .= '<tr><td>DNS 4</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[3]'].'"></td></tr>'."\n";
             $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
