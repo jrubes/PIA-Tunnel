@@ -84,22 +84,23 @@ function dhcpd_process_template(){
   
   $templ = $_files->readfile('/pia/settings.conf');
   $settings = VPN_get_settings();
-  
-  $templ = str_replace('SUBNET_IP_HERE', $settings['DHCPD_SUBNET'], $templ, 1);
-  $templ = str_replace('NETWORK_MASK_HERE', $settings['DHCPD_MASK'], $templ, 1);
-  $templ = str_replace('IP_RANGE_HERE', $settings['DHCPD_RANGE'], $templ, 1);
-  $templ = str_replace('BROADCAST_HERE', $settings['DHCPD_BROADCAST'], $templ, 1);
+
+  $SometimesIreallyHatePHP = 1; //passing this int bý reference will save tremendous ammounts of RAM - AWESOME SHIT!
+  $templ = str_replace('SUBNET_IP_HERE', $settings['DHCPD_SUBNET'], $templ, $SometimesIreallyHatePHP);
+  $templ = str_replace('NETWORK_MASK_HERE', $settings['DHCPD_MASK'], $templ, $SometimesIreallyHatePHP);
+  $templ = str_replace('IP_RANGE_HERE', $settings['DHCPD_RANGE'], $templ, $SometimesIreallyHatePHP);
+  $templ = str_replace('BROADCAST_HERE', $settings['DHCPD_BROADCAST'], $templ, $SometimesIreallyHatePHP);
   
   //router IP is the IP of eth1, go get it
   $ret = array();
   exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if(array_key_exists('0', $ret) ){
-    $templ = str_replace('ROUTER_IP_HERE', $ret[0], $templ, 1);
+    $templ = str_replace('ROUTER_IP_HERE', $ret[0], $templ, $SometimesIreallyHatePHP);
   }
   
   // DNS is an array which may contain multiple entries, loop over it
   $aDNS = VPN_get_settings_array('NAMESERVERS');
-  $templ = str_replace('DNSSERVER_HERE', $settings[''], $templ, 1);
+  $templ = str_replace('DNSSERVER_HERE', $settings[''], $templ, $SometimesIreallyHatePHP);
   
 }
 
