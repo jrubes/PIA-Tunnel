@@ -171,27 +171,43 @@ function VPN_save_settings(){
       // the settings.conf arrays have been found in $_POST
       // let's see if any values have changed
       reset($_POST);
-      $cnt = count($_POST[$set_array]);
+      $found=0;
+
+      //post may be smaller then stored settings due to checkboxes
+      //check which count is larger and use that one
+      $cnt_p = count($_POST[$set_array]);var_dump(count($_POST[$set_array]));
+      $cnt_s = count($_settings->get_settings_array($set_array));var_dump($_settings->get_settings_array($set_array));
+      $cnt = ( $cnt_p > $cnt_s ) ? $cnt_p : $cnt_s;
+
       for( $x = 0 ; $x < $cnt ; ++$x ){
         $index = $set_array."[$x]";
-        if( $settings[$index] !== $_POST[$set_array][$x] ){
+        if( $settings[$index] !== @$_POST[$set_array][$x] ){
           //at least one setting changed, store the entire array
           $tmppost = $_settings->get_array_from_post($set_array);
+          var_dump($tmppost);
           $array2store = $_settings->format_array($set_array, $tmppost);
           $_settings->save_settings_array($set_array, $array2store);
-          //echo "changed: $index removing $set_array<br>";
+          echo "changed: $index removing $set_array<br>";
           $updated_one=true;
+          ++$found;
           break; //get out of for() loop as one changed setting will update the entire array
+        }else{
+          ++$found;
+          //echo "no changed: $index removing $set_array<br>";
         }
       }
     }
   }
 
-  if( $updated_one === true ){
-    return true;
-  }else{
-    return false;
+  //arrays without a match are empty so remove it from config
+  if( $found === 0 ){
+    echo "none changed, removing all: $index removing $set_array<br>";
+    $array2store=array($set_array.'[0]=""');
+    $_settings->save_settings_array($set_array, $array2store);
   }
+
+
+  return true;
 }
 
 
@@ -472,10 +488,11 @@ function disp_network_box(){
   $sel = array(
             'id' => $use,
             'selected' =>  $fw_ssh,
-            array( 'eth0', 'eth0'),
-            array( 'eth1', 'eth1')
+            array( 'FIREWALL_IF_SSH[0]', 'eth0'),
+            array( 'FIREWALL_IF_SSH[1]', 'eth1')
           );
   //$sel = array_merge($sel, $fw_ssh);
+  var_dump($fw_ssh);
   $disp_body .= '<tr><td>Allow ssh logins on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
 
 

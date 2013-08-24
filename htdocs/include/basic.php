@@ -516,10 +516,21 @@ function build_checkbox( &$content, $double=false ){
     $val = htmlspecialchars($content[$x][0]);
     $dis = htmlspecialchars($content[$x][1]);
 
-    $checked = ( array_key_exists("$x", $content['selected']) ) ? 'checked' : '';
+    $checked = '';
+    //array keys may not match so loop over it
+    if( @array_key_exists("$x", $content['selected']) === true )
+    reset($content['selected']);
+    foreach( $content['selected'] as $cur ){
+      if( $cur[1] == $dis ){
+        echo "match $dis<br>";
+        $checked = 'checked';
+      }else{
+        echo "NO match '$cur[0]' vs '$val'<br>\n";
+      }
+    }
 
     /* handle default selection */
-    $opts .= "<input $checked type=\"checkbox\" name=\"{$content['id']}[$x]\" value=\"$val\">$dis</option>\n";
+    $opts .= "<input $checked type=\"checkbox\" name=\"{$content['id']}[$x]\" value=\"$dis\">$dis</option>\n";
   }
 
   /* return it all */
