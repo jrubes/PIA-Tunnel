@@ -423,8 +423,8 @@ function disp_pia_daemon_box(){
   $fovers = 0;
   for( $x = 0 ; $x < 10 ; ++$x ){
     if( array_key_exists('MYVPN['.$x.']', $settings) === true ){
-      $ovpn = VPN_get_connections('MYVPN['.$x.']', array( 'selected' => $settings['MYVPN['.$x.']']));
-      $disp_body .= '<tr><td>Failover '.$x.'</td><td>'.$ovpn.' <input type="checkbox" name="MYVPN['.$x.']" value="1"> delete</td></tr>'."\n";
+      $ovpn = VPN_get_connections('MYVPN['.$x.']', array( 'selected' => $settings['MYVPN['.$x.']'], array( '', '')));
+      $disp_body .= '<tr><td>Failover '.$x.'</td><td>'.$ovpn.'</td></tr>'."\n";
       ++$fovers;
     }
   }

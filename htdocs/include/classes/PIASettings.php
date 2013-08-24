@@ -102,8 +102,10 @@ class PIASettings {
 
     reset($array2format);
     foreach( $array2format as $val ){
-      $ret .= $name."[$cnt]='$val'\n";
-      ++$cnt;
+      if( $val != '' ){
+        $ret .= $name."[$cnt]='$val'\n";
+        ++$cnt;
+      }
     }
 
     return $ret;
