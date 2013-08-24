@@ -68,7 +68,6 @@ switch($_REQUEST['cmd']){
             $disp_body .= "<div class=\"feedback\">".nl2br($ret[1])."</div>\n";
           }
 
-
           $disp_body .= disp_network_default();
           break;
         }else{
@@ -281,90 +280,6 @@ function dhcpd_process_template(){
 
 
 /**
- * method to update the settings.conf it will loop over the settings and check for matchin $_POSTs
- * @global object $_files
- */
-function update_network_settings(){
-  die('old function update_network_settings();');
-  global $_files;
-  $upcnt = 0;
-  $settings = VPN_get_settings();
-
-  $disp_body = '';
-  foreach( $settings as $key => $val ){
-    if( array_key_exists($key, $_POST) === true && $val != $_POST[$key] ){
-
-      //update setting
-      $k = escapeshellarg($key);
-      $v = escapeshellarg($_POST[$key]);
-      exec("/pia/pia-settings $k $v");
-      //$disp_body .= "$k is now $v<br>\n"; //dev stuff
-      ++$upcnt;
-
-    }elseif( array_key_exists($key.'_del', $_POST) === true ){
-        //delete this setting from the file
-        $disp_body .= "<div class=\"feedback\">delete not yet implemented</div>\n";
-    }elseif( array_key_exists($key.'_combined', $_POST) === true ){
-        //store array values passed comma separated
-
-        /* remove old values */
-        $ret =  array();
-        //get line numbers of current settings
-        $config_value = substr($key, 0, strpos($key, '[') ); //this is the value of $key without [n]. this is used for the array name when writing it back
-        exec('grep -n  "'.$config_value.'" /pia/settings.conf | cut -d: -f1', $ret); // $ret[] will contain line number with current settings
-
-        //loop over returned values and remove the lines
-        for( $x = count($ret)-1 ; $x >= 0 ; --$x ){ //go backwards or line numbers need to be adjusted
-          $hhh = array();
-          exec('sed "'.$ret[$x].'d" /pia/settings.conf > /pia/settings.conf.back');
-          exec('mv /pia/settings.conf.back /pia/settings.conf');
-          //echo 'sed "'.$ret[$x].'d" /pia/settings.conf > /pia/settings.conf'.'<br>';
-          ++$upcnt;
-        }
-
-        //now add the settings back at the bottom of the file
-        $values = explode(',', $_POST[$key.'_combined']); // "combined" is comma separated so explode by it
-        for( $x = 0 ; $x < count($values) ; ++$x ){ //yes count in a loop - only doing it since this is a single user script -- ohh yeah, sue me!
-          //echo("echo '".$config_value.'['.$x."]=\"".$values[$x]."\"' >> '/pia/settings.conf'".'<br>');
-          exec("echo '".$config_value.'['.$x."]=\"".$values[$x]."\"' >> '/pia/settings.conf'");
-          ++$upcnt;
-        }
-    }
-  }
-
-  /* now update things with logic */
-  if( array_key_exists('MYVPN[add]', $_POST) === true && $_POST['MYVPN[add]'] !== '' ){
-    //get largest array index in settings.conf to append the new one
-
-    $ret = array();
-    exec('grep -c "MYVPN" /pia/settings.conf', $ret);
-    if( $ret[0] > 0 ){ //config must always contain an entry!
-      //this ia a new failover VPN so append to end of file
-      $index = $ret[0];
-      $val = $_POST['MYVPN[add]'];
-      exec("echo 'MYVPN[$index]=\'$val\'' >> '/pia/settings.conf'"); //disable forwarding
-    }
-  }
-
-  if( $upcnt > 0 ){ //settings have been changed
-    //refresh /etc/networking/interfaces - just in case
-    $foo = array();
-    exec('sudo /pia/include/network_interfaces.sh', $foo);
-
-    $disp_body .= "<div class=\"feedback\">Settings updated</div>\n";
-  }
-
-  //how about a network restart?
-  if( array_key_exists('restart_network', $_POST) && $_POST['restart_network'] === 'Full Network Restart'){
-    exec('sudo /pia/include/network_restart.sh');
-    $disp_body .= "<div class=\"feedback\">Network restarted</div>\n";
-  }
-
-  unset($_SESSION['settings.conf']);
-  return $disp_body;
-}
-
-/**
  * method to update username and password passed via POST
  * @global object $_files
  * @return string string with HTML success message or empty when there was no update
@@ -552,30 +467,30 @@ function disp_network_box(){
 
   //these are array settings so get them first then loop over to display them
   $use = 'FIREWALL_IF_SSH';
-  $fw_ssh = VPN_get_settings_array($use);
-    $c = count($fw_ssh);
-    $t='';
-    for( $x=0 ; $x < $c ; ++$x ){
-      $hash = md5($use.'['.$x.']');
-      #  $disp_body .= '<tr><td>Allow ssh logins on</td><td><input type="checkbox" name="ssh_enable_eth0" value="1"> eth0 <input type="checkbox" name="ssh_enable_eth1" value="1"> eth1</td></tr>'."\n";
-      $t .= htmlspecialchars($settings[$use.'['.$x.']']).",";
-    }
-  $t = rtrim($t, ',');
-  $disp_body .= '<tr><td>Allow ssh logins on</td><td><input type="text" name="'.$hash.'_combined" value="'.$t."\">\n".'</td></tr>'."\n";
+  $fw_ssh = $_settings->get_settings_array($use);
+  //Wvar_dump($fw_ssh);die();
+  $sel = array(
+            'id' => $use,
+            'selected' =>  $fw_ssh,
+            array( 'eth0', 'eth0'),
+            array( 'eth1', 'eth1')
+          );
+  //$sel = array_merge($sel, $fw_ssh);
+  $disp_body .= '<tr><td>Allow ssh logins on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
 
 
   //now FIREWALL_IF_WEB options
   $use = 'FIREWALL_IF_WEB';
-  $fw_ssh = VPN_get_settings_array($use);
-    $c = count($fw_ssh);
-    $t='';
-    for( $x=0 ; $x < $c ; ++$x ){
-      $hash = md5($use.'['.$x.']');
-      #  $disp_body .= '<tr><td>Allow ssh logins on</td><td><input type="checkbox" name="ssh_enable_eth0" value="1"> eth0 <input type="checkbox" name="ssh_enable_eth1" value="1"> eth1</td></tr>'."\n";
-      $t .= htmlspecialchars($settings[$use.'['.$x.']']).",";
-    }
-    $t = rtrim($t, ',');
-    $disp_body .= '<tr><td>Allow web logins on</td><td><input type="text" name="'.$hash.'_combined" value="'.$t."\">\n".'</td></tr>'."\n";
+  $fw_ssh = $_settings->get_settings_array($use);
+  //Wvar_dump($fw_ssh);die();
+  $sel = array(
+            'id' => $use,
+            'selected' =>  $fw_ssh,
+            array( 'FIREWALL_IF_WEB[0]', 'eth0'),
+            array( 'FIREWALL_IF_WEB[1]', 'eth1')
+          );
+  //$sel = array_merge($sel, $fw_ssh);
+  $disp_body .= '<tr><td>Allow web logins on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
 
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';

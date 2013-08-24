@@ -154,37 +154,6 @@ function array_is_value_unique( &$ar, $val ){
 }
 
 /**
- * method to get an entire settings array
- * @param string $name=null *optional* name of array
- * @return string/bool string containing HTML formated as <select> or FALSE
- */
-function VPN_get_settings_array($name){
-  global $_settings;
-  $ret = array();
-
-  if(array_key_exists('settings.conf', $_SESSION) !== true ){
-    if( $_settings->load_settings() === false ){
-      echo "FATAL ERROR: Unable to get list of settings!";
-      return false;
-    }
-  }
-
-
-  /* loop over settings strings and find all with $name* */
-  foreach( $_SESSION['settings.conf'] as $key => $val ){
-    //check $key with substring - remove [?]
-    $len = strpos($key, '['); // length or string upto [
-    if(substr($key, 0, $len) === $name ){
-      $ret[$key] = $val;
-    }
-  }
-
-
-  if( count($ret) == 0 ){ return false; }
-  return $ret;
-}
-
-/**
  * method to get a list of valid VPN connection
  * currently only supporting PIA so I simply index the .ovpn files
  *  - used build_select()
@@ -518,5 +487,42 @@ function build_select( &$content, $double=false ){
 
   /* return it all */
   return $head.$sel.$opts.'</select>';
+}
+
+/**
+ * function to build checkboxes based on a source array
+ * @param array $content array with following structure
+ * <ul><li>['id'] = "foo"; name and id of select element created</li>
+ * <li>['selected'] = "male"; Otional - specify top item from list by option value</li>
+ * <li>array( 'option value', 'option display')</li>
+ * <li>array( 'option value2', 'option display2')</li>
+ * </ul>
+ * @param boolean $double false will not list a 'selected' option twice, true will
+ * @return string containing complete checkbox set as HTMl source
+ */
+function build_checkbox( &$content, $double=false ){
+
+  /* 'selected' is option */
+  if( array_key_exists('selected', $content) === true ){
+    $cnt = count($content)-2;//skip id & selected
+  }else{
+    $cnt = count($content)-1;//skip only id
+  }
+
+  /* time to build the rest */
+  $sel = '';
+  $opts = '';
+  for( $x=0 ; $x < $cnt ; ++$x ){
+    $val = htmlspecialchars($content[$x][0]);
+    $dis = htmlspecialchars($content[$x][1]);
+
+    $checked = ( array_key_exists("$x", $content['selected']) ) ? 'checked' : '';
+
+    /* handle default selection */
+    $opts .= "<input $checked type=\"checkbox\" name=\"{$content['id']}[$x]\" value=\"$val\">$dis</option>\n";
+  }
+
+  /* return it all */
+  return $sel.$opts;
 }
 ?>

@@ -263,5 +263,36 @@ function is_settings_array( $config_value ){
    }
  }
 
+ /**
+ * method to get an entire settings array as used by build_* functions
+ * @param string $name=null *optional* name of array
+ * @return string/bool string containing HTML formated as <select> or FALSE
+ */
+function get_settings_array($name){
+  $ret = array();
+
+  if(array_key_exists('settings.conf', $_SESSION) !== true ){
+    if( $this->load_settings() === false ){
+      echo "FATAL ERROR: Unable to get list of settings!";
+      return false;
+    }
+  }
+
+
+  /* loop over settings strings and find all with $name* */
+    $c=0;
+  foreach( $_SESSION['settings.conf'] as $key => $val ){
+    //check $key with substring - remove [?]
+    $len = strpos($key, '['); // length or string upto [
+    if(substr($key, 0, $len) === $name ){
+      $ret[] = array( $key , $val );
+    }
+  }
+
+  if( count($ret) == 0 ){ return false; }
+  return $ret;
+}
+
+
 }
 ?>
