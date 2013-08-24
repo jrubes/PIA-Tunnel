@@ -40,19 +40,32 @@ class PIASettings {
   /**
    * method to store settings array like NAMESERVERS[]
    * it removes all values matching NAMESERVERS* then adds the new values
-   * @param string $array_name name of array in settings.conf
-   * @param type $array2store array with integer keys [] containing one setting each
+   * @param string $array_name name of array without index, just a string
+   * @param string $array2store the complete array as a string formated for BASH.
+   *                            it will be written "as is" into settings.conf!
    */
   function save_settings_array( $array_name, &$array2store){
-    if( $this->is_settings_array($array_name) !== true ){
+    $index = $array_name."[0]"; //is_settings_array works with a full array key like MYVPN[1]
+    if( $this->is_settings_array($index) !== true ){
       return false;
     }
 
     $this->remove_array($array_name);
 
-    $this->write_array($array2store);
+    $this->append_settings($array2store);
   }
 
+
+  /**
+   * append strings to the end of settings.conf<br>
+   * this method will not replace settings, use save_settings() for that
+   * @param string $addthis string to be appended '>>' to settings.conf
+   */
+  function append_settings( $addthis ){
+    if( $addthis == '' ){ return false; }
+    $save = escapeshellarg($addthis);
+    exec("echo $save >> '$this->_settings_file'");
+  }
 
   /**
    * method to collect an array from $_POST and return it
@@ -67,7 +80,7 @@ class PIASettings {
     foreach( $_POST[$arrayname] as $val ){
       $ret[] = $val;
     }
-
+    var_dump($ret);
     if( count($ret) === 0 ){ return false; }
     return $ret;
   }
@@ -83,7 +96,7 @@ class PIASettings {
 
     reset($array2format);
     foreach( $array2format as $val ){
-      $ret .= $name."[$cnt]='$val'";
+      $ret .= $name."[$cnt]='$val'\n";
       ++$cnt;
     }
 
@@ -95,10 +108,11 @@ class PIASettings {
    * call this after remove_array()
    * @param array $array2store BASH formatted array of settings
    */
-  function write_array( &$array2stpre ){
+  function write_array( &$array2store ){
+    die('decided to go anohter route - not done');
     // add the settings back at the bottom of the file
-    reset($array2stpre);
-    foreach( $array2stpre as $key => $val ){
+    reset($array2store);
+    foreach( $array2store as $key => $val ){
       for( $x = 0 ; $x < count($values) ; ++$x ){ //yes count in a loop - only doing it since this is a single user script -- ohh yeah, sue me!
         exec("echo '".$config_value.'['.$x."]=\"".$values[$x]."\"' >> '$this->_settings_file'");
         ++$upcnt;
@@ -113,10 +127,15 @@ class PIASettings {
  */
 function remove_array($array_name){
   $removed = 0;
-
   $ret =  array();
+
   //get line numbers of current settings
-  $config_value = substr($array_name, 0, strpos($array_name, '[') ); //this is the value of $key without [n]. this is used for the array name when writing it back
+  if( strpos($array_name, '[') === false ){
+    //only the array name was passed, without []
+    $config_value = $array_name;
+  }else{
+    $config_value = substr($array_name, 0, strpos($array_name, '[') ); //this is the value of $key without [n]. this is used for the array name when writing it back
+  }
   exec('grep -n  "'.$config_value.'" '.$this->_settings_file.' | cut -d: -f1', $ret); // $ret[] will contain line number with current settings
 
   //loop over returned values and remove the lines
@@ -211,7 +230,6 @@ function is_settings_array( $config_value ){
   */
  function load_settings(){
    $ret = array();
-   var_dump($this->_files);
    $c = $this->_files->readfile($this->_settings_file);
    if( $c !== false ){
      $c = explode( "\n", eol($c));

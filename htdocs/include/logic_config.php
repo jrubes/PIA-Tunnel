@@ -28,7 +28,6 @@ switch($_REQUEST['cmd']){
 
   case 'network':
     $disp_body .= disp_network_default();
-    $disp_body .= disp_dhcpd_default();
     break;
 
   case 'network_store';
@@ -50,6 +49,12 @@ switch($_REQUEST['cmd']){
     //settings are now stored section by section.
     // this will allow me to restart the network on network changes and so on.
     // $_POST['store'] indicates which settings need to be stored
+
+    if(array_key_exists('store', $_POST) !== true ){
+      //opened by URL
+      $disp_body .= disp_network_default();
+      break;
+    }
 
     switch( $_POST['store'] ){
       case 'dhcpd_settings':
@@ -108,11 +113,10 @@ function VPN_save_settings(){
     if( $_settings->is_settings_array( $setting_key ) === false )
     {
       //# Regular values for settings.conf
-      $hash = $setting_key;//md5($setting_key); //hash the key to avoid array issues with PHP
-      if( array_key_exists($hash, $_POST) === true && $setting_val != $_POST[$hash] ){
+      if( array_key_exists($setting_key, $_POST) === true && $setting_val != $_POST[$setting_key] ){
         //setting found and setting has changed, UPDATE!
-        $_settings->save_settings($setting_key, $_POST[$hash]);
-        echo "$k is now $v<br>\n"; //dev stuff
+        $_settings->save_settings($setting_key, $_POST[$setting_key]);
+        echo "$setting_key is now $_POST[$setting_key]<br>\n"; //dev stuff
         $updated_one=true;
       }
     }//if( VPN_is_settings_array
@@ -135,9 +139,11 @@ function VPN_save_settings(){
           //at least one setting changed, store the entire array
           $tmppost = $_settings->get_array_from_post($set_array);
           $array2store = $_settings->format_array($set_array, $tmppost);
+          var_dump($array2store);
           $_settings->save_settings_array($set_array, $array2store);
 
           echo "changed: $index removing $set_array<br>";
+          break; //get out of for() loop as one changed setting will update the entire array
         }
         //echo "cont: $set_array index: '$index' old: '$settings[$index]' new '{$_POST[$set_array][$x]}'<br>";
       }
@@ -147,42 +153,6 @@ function VPN_save_settings(){
       echo "se '$set_array'<br>";// => set: {$settings[$set_array]}<br>";
     }
   }
-die('end');
-
-  //get a list of storage arrays from $_POST
-  $post_storage_array = VPN_get_post_storage_arrays();
-  foreach( $post_storage_array as $post_value ){
-    echo "processing $post_value<br>";
-    $array_setting = VPN_get_settings_array($post_value); //get only the array we are processing now
-    if( $array_setting != false ){
-      foreach( $array_setting as $akey => $aval ){
-        //$akey now contains the name of the array in settings.conf as string
-        // so $akey='foo[0]' and $aval contains the settings value
-        // in settings.conf foo[0]=$aval
-
-        //see if one of the array values changes
-        $hash = $akey;//md5($akey);
-        if( $_POST[$hash] !== $aval ) {
-          //one of an array setting has been changed. I don't want to update the array
-          //so let's just write the current values into settings.con
-          //echo "Set changed: $akey old: $aval new: {$_POST[$hash]}";
-          echo "Removed array values for $post_value<br>\n";
-          VPN_setting_remove_array($post_value); //remove array from settings.conf
-
-          //now add all posted values back in
-          exec("/pia/pia-settings $k $v");
-        }else{
-          $m5 = $akey;//md5($akey);
-          echo "no match! ak: $akey = pk: $_POST[$m5] && av: $aval = pv: $post_value<br>";
-        }
-
-
-      }
-    }
-  }
-
-die();
-
 
   if( $updated_one === true ){
     return true;
@@ -416,10 +386,12 @@ function disp_vpn_default(){
 
 /**
  * returns the default UI for this option
+ * @global object $_settings
  * @return string string with HTML for body of this page
  */
 function disp_dhcpd_default(){
-  $settings = VPN_get_settings();
+  global $_settings;
+  $settings = $_settings->get_settings();
   $disp_body = '';
 
   $disp_body .= '<div class="options_box">';
@@ -440,9 +412,9 @@ function disp_dhcpd_default(){
             $disp_body .= '<tr><td>DNS 1</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[0]'].'"></td></tr>'."\n";
             $hash = 'NAMESERVERS[1]';//md5('NAMESERVERS[1]');
             $disp_body .= '<tr><td>DNS 2</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[1]'].'"></td></tr>'."\n";
-            $hash = 'NAMESERVERS[0]';//md5('NAMESERVERS[2]');
+            $hash = 'NAMESERVERS[2]';//md5('NAMESERVERS[2]');
             $disp_body .= '<tr><td>DNS 3</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[2]'].'"></td></tr>'."\n";
-            $hash = 'NAMESERVERS[0]';//md5('NAMESERVERS[3]');
+            $hash = 'NAMESERVERS[3]';//md5('NAMESERVERS[3]');
             $disp_body .= '<tr><td>DNS 4</td><td><input type="text" name="'.$hash.'" value="'.$settings['NAMESERVERS[3]'].'"></td></tr>'."\n";
             $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
@@ -491,10 +463,12 @@ function disp_dhcpd_default(){
 
 /**
  * returns the default UI for this option
+ * @global object $_settings
  * @return string string with HTML for body of this page
  */
 function disp_network_default(){
-  $settings = VPN_get_settings();
+  global $_settings;
+  $settings = $_settings->get_settings();
 
   $disp_body = '';
   /* show Username and Password fields - expand this for more VPN providers */
@@ -702,6 +676,8 @@ function disp_network_default(){
 
   $disp_body .= "</form>";
   $disp_body .= '</div>';
+
+  $disp_body .= disp_dhcpd_default();
   return $disp_body;
 }
 
