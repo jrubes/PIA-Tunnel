@@ -157,10 +157,11 @@ function array_is_value_unique( &$ar, $val ){
  * @return string/bool string containing HTML formated as <select> or FALSE
  */
 function VPN_get_settings_array($name){
+  global $_settings;
   $ret = array();
 
   if(array_key_exists('settings.conf', $_SESSION) !== true ){
-    if( load_settings() === false ){
+    if( $_settings->load_settings() === false ){
       echo "FATAL ERROR: Unable to get list of settings!";
       return false;
     }

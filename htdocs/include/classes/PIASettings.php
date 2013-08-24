@@ -35,6 +35,9 @@ class PIASettings {
     $v = escapeshellarg($value);
     exec("/pia/pia-settings $k $v");
     //$disp_body .= "$k is now $v<br>\n"; //dev stuff
+
+    //clear to force a reload
+    unset($_SESSION['settings.conf']);
   }
 
   /**
@@ -53,6 +56,9 @@ class PIASettings {
     $this->remove_array($array_name);
 
     $this->append_settings($array2store);
+
+    //clear to force a reload
+    unset($_SESSION['settings.conf']);
   }
 
 
@@ -80,7 +86,7 @@ class PIASettings {
     foreach( $_POST[$arrayname] as $val ){
       $ret[] = $val;
     }
-    var_dump($ret);
+
     if( count($ret) === 0 ){ return false; }
     return $ret;
   }
@@ -203,7 +209,7 @@ function is_settings_array( $config_value ){
     $ret = array();
 
     if(array_key_exists('settings.conf', $_SESSION) !== true ){
-      if( load_settings() === false ){
+      if( $this->load_settings() === false ){
         echo "FATAL ERROR: Unable to get list of settings!";
         return false;
       }
