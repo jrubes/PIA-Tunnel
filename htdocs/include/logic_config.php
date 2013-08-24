@@ -1,6 +1,7 @@
 <?php
 /* @var $_settings PIASettings */
 /* @var $_files FilesystemOperations */
+/* @var $_services SystemServices */
 
 unset($_SESSION['ovpn']); //dev
 unset($_SESSION['settings.conf']);
@@ -59,17 +60,39 @@ switch($_REQUEST['cmd']){
     switch( $_POST['store'] ){
       case 'dhcpd_settings':
         //dhcpd settings will store new settings to settings.conf
-        if( VPN_save_settings() === true ){
-          //then load a dhcpd.conf template from /pia/include/dhcpd.conf
-          //apply the changes and write the new config file back to /etc/dhcp/dhcpd.conf
-          $template = dhcpd_process_template();
-          var_dump($template);
-          die();
+        if(array_key_exists('restart_dhcpd', $_POST) ){
+          $ret = $_services->dhcpd_restart();
+          if( $ret === true ){
+            $disp_body .= "<div class=\"feedback\">dhcpd has been restartet.</div>\n";
+          }else{
+            $disp_body .= "<div class=\"feedback\">".nl2br($ret[1])."</div>\n";
+          }
 
+
+          $disp_body .= disp_network_default();
+          break;
+        }else{
+          if( VPN_save_settings() === true ){
+            VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
+            $disp_body .= "<div class=\"feedback\">Settings updated. Please restart the dhcpd process to apply your changes.</div>\n";
+            $disp_body .= disp_network_default();
+
+          }else{
+            $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed.</div>\n";
+            $disp_body .= disp_network_default();
+          }
+        }
+        break;
+
+      case 'system_settings':
+        //like default but regenerate dhcpd.conf for possilbe nameserver change
+        if( VPN_save_settings() === true ){
+          VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
+          $disp_body .= "<div class=\"feedback\">Settings updated.</div>\n";
         }else{
           $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed.</div>\n";
-          $disp_body .= disp_network_default();
         }
+        $disp_body .= disp_network_default();
         break;
 
       default:
@@ -98,6 +121,17 @@ switch($_REQUEST['cmd']){
 
 
 /* FUNCTIONS - move into functions file later */
+
+
+/**
+ * function to generate a new dhcpd.conf file after a config change
+ */
+function VPN_generate_dhcpd_conf(){
+  //are not  controlled by this
+  $template = dhcpd_process_template();
+  $save = escapeshellarg($template);
+  exec("sudo /pia/include/dhcpd-reconfigure.sh $save"); //write new dhcpd.conf
+}
 
 /**
  * main function to store settings in /pia/settings.conf
@@ -211,22 +245,28 @@ function dhcpd_process_template(){
   global $_files;
   global $_settings;
   $templ = $_files->readfile('/pia/include/dhcpd.conf');
+  $subnet_templ = "subnet SUBNET_IP_HERE netmask NETWORK_MASK_HERE {\n"
+                  ."  range IP_RANGE_HERE;\n"
+                  ."  option routers ROUTER_IP_HERE;\n"
+                  ."  option broadcast-address BROADCAST_HERE;\n"
+                  ."}\n";
+  $subnet = ''; //contains assembled subnet declarations
   $settings = $_settings->get_settings();
 
-  $SometimesIreallyHatePHP = 1; //passing this int bý reference will save tremendous ammounts of RAM - AWESOME SHIT!
-  $templ = str_replace('SUBNET_IP_HERE', $settings['DHCPD_SUBNET'], $templ, $SometimesIreallyHatePHP);
-  $templ = str_replace('NETWORK_MASK_HERE', $settings['DHCPD_MASK'], $templ, $SometimesIreallyHatePHP);
-  $templ = str_replace('IP_RANGE_HERE', $settings['DHCPD_RANGE'], $templ, $SometimesIreallyHatePHP);
-  $templ = str_replace('BROADCAST_HERE', $settings['DHCPD_BROADCAST'], $templ, $SometimesIreallyHatePHP);
-
-  //router IP is the IP of eth1, go get it
-  $ret = array();
-  exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  if(array_key_exists('0', $ret) ){
-    $templ = str_replace('ROUTER_IP_HERE', $ret[0], $templ, $SometimesIreallyHatePHP);
+  //there are two dhcpd subnet config ranges
+  for( $x = 1 ; $x < 3 ; ++$x ){
+    if( $settings['DHCPD_ENABLED'.$x] == 'yes' ){
+      $subnet .= "$subnet_templ\n";
+      $SometimesIreallyHatePHP = 1; //passing this int bý reference will save tremendous ammounts of RAM - AWESOME SHIT!
+      $subnet = str_replace('SUBNET_IP_HERE', $settings['DHCPD_SUBNET'.$x], $subnet, $SometimesIreallyHatePHP);
+      $subnet = str_replace('NETWORK_MASK_HERE', $settings['DHCPD_MASK'.$x], $subnet, $SometimesIreallyHatePHP);
+      $subnet = str_replace('IP_RANGE_HERE', $settings['DHCPD_RANGE'.$x], $subnet, $SometimesIreallyHatePHP);
+      $subnet = str_replace('BROADCAST_HERE', $settings['DHCPD_BROADCAST'.$x], $subnet, $SometimesIreallyHatePHP);
+      $subnet = str_replace('ROUTER_IP_HERE', $settings['DHCPD_ROUTER'.$x], $subnet, $SometimesIreallyHatePHP);
+    }
   }
 
-  // NAMESERVERS is an array which may contain multiple entries, loop over it
+  // Global Option - NAMESERVERS is an array which may contain multiple entries, loop over it
   $NAMESERVERS = VPN_get_settings_array('NAMESERVERS');
   $ins_dns = '';
   foreach( $NAMESERVERS as $DNS){
@@ -235,7 +275,7 @@ function dhcpd_process_template(){
   $templ = str_replace('DNSSERVER_HERE', $ins_dns, $templ, $SometimesIreallyHatePHP);
 
   //all done - return
-  return $templ;
+  return $templ.$subnet;
 
 }
 
@@ -398,35 +438,30 @@ function disp_dhcpd_box(){
   $disp_body .= '<input type="hidden" name="store" value="dhcpd_settings">';
   $disp_body .= '<h2>DHCP Server  Settings</h2>'."\n";
   $disp_body .= "<table>\n";
-  $sel = array(
-          'id' => 'IF_ETH0_DHCP_SERVER',
-          'selected' => $settings['IF_ETH0_DHCP_SERVER'],
-          array( 'no', 'disabled'),
-          array( 'yes', 'enabled')
-        );
-  $disp_body .= '<tr><td>DHCP server on eth0</td><td>'.build_select($sel).'</td></tr>'."\n";
 
-  $sel = array(
-          'id' => 'IF_ETH1_DHCP_SERVER',
-          'selected' => $settings['IF_ETH1_DHCP_SERVER'],
-          array( 'no', 'disabled'),
-          array( 'yes', 'enabled')
-        );
-  $disp_body .= '<tr><td>DHCP server on eth1</td><td>'.build_select($sel).'</td></tr>'."\n";
-
-  //DHCPD network stuff
-  $disp_body .= '<tr><td>DHCPD Subnet</td><td><input type="text" name="DHCPD_SUBNET" value="'.htmlspecialchars($settings['DHCPD_SUBNET']).'"></td></tr>'."\n";
-
-  $disp_body .= '<tr><td>DHCPD Subnetmask</td><td><input type="text" name="DHCPD_MASK" value="'.htmlspecialchars($settings['DHCPD_MASK']).'"></td></tr>'."\n";
-
-  $disp_body .= '<tr><td>DHCPD Broadcasr IP</td><td><input type="text" name="DHCPD_BROADCAST" value="'.htmlspecialchars($settings['DHCPD_BROADCAST']).'"></td></tr>'."\n";
-
-  $disp_body .= '<tr><td>DHCPD IP Range</td><td><input class="long" type="text" name="DHCPD_RANGE" value="'.htmlspecialchars($settings['DHCPD_RANGE']).'"></td></tr>'."\n";
-
+  //show two subnets
+  for( $x=1 ; $x < 3 ; ++$x )
+  {
+    $sel = array(
+            'id' => 'DHCPD_ENABLED'.$x,
+            'selected' => $settings['DHCPD_ENABLED'.$x],
+            array( 'no', 'disabled'),
+            array( 'yes', 'enabled')
+          );
+    $disp_body .= '<tr><td>Subnet '.$x.'</td><td>'.build_select($sel).'</td></tr>'."\n";
+    //Subnet 1 settings
+    $disabled = ($settings['DHCPD_ENABLED'.$x] === 'no') ? 'disabled' : ''; //disable input fields when DHCP is set
+    $disp_body .= '<tr><td>Subnet IP</td><td><input '.$disabled.' type="text" name="DHCPD_SUBNET'.$x.'" value="'.htmlspecialchars($settings['DHCPD_SUBNET'.$x]).'"></td></tr>'."\n";
+    $disp_body .= '<tr><td>Subnetmask</td><td><input '.$disabled.' type="text" name="DHCPD_MASK'.$x.'" value="'.htmlspecialchars($settings['DHCPD_MASK'.$x]).'"></td></tr>'."\n";
+    $disp_body .= '<tr><td>Broadcast IP</td><td><input '.$disabled.' type="text" name="DHCPD_BROADCAST'.$x.'" value="'.htmlspecialchars($settings['DHCPD_BROADCAST'.$x]).'"></td></tr>'."\n";
+    $disp_body .= '<tr><td>Router/Gateway</td><td><input '.$disabled.' type="text" name="DHCPD_ROUTER'.$x.'" value="'.htmlspecialchars($settings['DHCPD_ROUTER'.$x]).'"></td></tr>'."\n";
+    $disp_body .= '<tr><td>IP Range</td><td><input '.$disabled.' class="long" type="text" name="DHCPD_RANGE'.$x.'" value="'.htmlspecialchars($settings['DHCPD_RANGE'.$x]).'"></td></tr>'."\n";
+    $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  }
 
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firewall">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_dhcpd" value="Restart dhcpd">';
   $disp_body .= '</form>';
   $disp_body .= '</div>';
 

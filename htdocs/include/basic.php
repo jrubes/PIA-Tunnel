@@ -10,11 +10,13 @@ if( !array_key_exists('cid', $_GET) ){ $_GET['cid'] = ''; }
 
 require_once $inc_dir.'class_loader.php';
 require_once $inc_dir.'classes/PIASettings.php';
+require_once $inc_dir.'classes/SystemServices.php';
 require_once $inc_dir.'classes/class_files/class_files.php';
 
 /* prepare global objects */
 $_files = loader::loadFiles();
 $_settings = loader::PIASettings();
+$_services= loader::SystemServices();
 
 $header_type = 'foo'; //Change this later to add more headers
 $body_type = 'foo'; //Use to select different code later

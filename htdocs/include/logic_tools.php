@@ -17,7 +17,7 @@ switch($_REQUEST['cmd']){
     if( array_key_exists('pia-update', $_POST) === true ){
       //GUI access to pia-setup
       $result = array();
-      exec("sudo /pia/pia-update", $result); //using bash allows this to happen in the background
+      exec("sudo /pia/pia-update", $result);
       $disp_body .= "<div class=\"feedback\">Update Executed</div>\n";
       $disp_body .= "<div class=\"feedback\">\n";
       if( array_key_exists('0', $result) === true ){
@@ -33,7 +33,7 @@ switch($_REQUEST['cmd']){
     }elseif( array_key_exists('reset-pia', $_POST) === true ){
       //GUI access to reset-pia
       $result = array();
-      exec("sudo /pia/reset-pia", $result); //using bash allows this to happen in the background
+      exec("sudo /pia/reset-pia", $result);
       if( array_key_exists('0', $result) === true ){
         $_SESSION = array(); //clear all session vars
         $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.</div>\n";

@@ -131,7 +131,6 @@ if [ -z "${IF_ETH0_DHCP}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# Interface settings' >> '/pia/settings.conf'
   echo 'IF_ETH0_DHCP="yes"' >> '/pia/settings.conf'
-  echo 'IF_ETH0_DHCP_SERVER="no"' >> '/pia/settings.conf'
   echo 'IF_ETH0_IP=""' >> '/pia/settings.conf'
   echo 'IF_ETH0_SUB=""' >> '/pia/settings.conf'
   echo 'IF_ETH0_GW=""' >> '/pia/settings.conf'
@@ -141,18 +140,29 @@ if [ -z "${IF_ETH1_DHCP}" ]; then
   echo '' >> '/pia/settings.conf'
   echo '# Interface settings' >> '/pia/settings.conf'
   echo 'IF_ETH1_DHCP="no"' >> '/pia/settings.conf'
-  echo 'IF_ETH1_DHCP_SERVER="yes"' >> '/pia/settings.conf'
   echo 'IF_ETH1_IP="192.168.10.1"' >> '/pia/settings.conf'
   echo 'IF_ETH1_SUB="255.255.255.0"' >> '/pia/settings.conf'
   echo 'IF_ETH1_GW=""' >> '/pia/settings.conf'
 fi
 
-if [ -z "${DHCPD_RANGE}" ]; then
+if [ -z "${DHCPD_RANGE1}" ]; then
   echo '' >> '/pia/settings.conf'
-  echo '# Range for dynami IPs' >> '/pia/settings.conf'
-  echo 'DHCPD_RANGE="192.168.10.101 192.168.10.151"' >> '/pia/settings.conf'
-  echo 'DHCPD_BROADCAST="192.168.10.255"' >> '/pia/settings.conf'
-  echo 'DHCPD_SUBNET="192.168.10.0"' >> '/pia/settings.conf'
-  echo 'DHCPD_MASK="255.255.255.0"' >> '/pia/settings.conf'
-  echo 'IF_ETH1_GW=""' >> '/pia/settings.conf'
+  echo '# Range for dynamic IPs' >> '/pia/settings.conf'
+  echo 'DHCPD_ENABLED1="yes"' >> '/pia/settings.conf'
+  echo 'DHCPD_RANGE1="192.168.10.101 192.168.10.151"' >> '/pia/settings.conf'
+  echo 'DHCPD_BROADCAST1="192.168.10.255"' >> '/pia/settings.conf'
+  echo 'DHCPD_ROUTER1="192.168.10.1"' >> '/pia/settings.conf'
+  echo 'DHCPD_SUBNET1="192.168.10.0"' >> '/pia/settings.conf'
+  echo 'DHCPD_MASK1="255.255.255.0"' >> '/pia/settings.conf'
+fi
+
+if [ -z "${DHCPD_RANGE2}" ]; then
+  echo '' >> '/pia/settings.conf'
+  echo '# Range for dynamic IPs' >> '/pia/settings.conf'
+  echo 'DHCPD_ENABLED2="no"' >> '/pia/settings.conf'
+  echo 'DHCPD_RANGE2=""' >> '/pia/settings.conf'
+  echo 'DHCPD_BROADCAST2=""' >> '/pia/settings.conf'
+  echo 'DHCPD_ROUTER2=""' >> '/pia/settings.conf'
+  echo 'DHCPD_SUBNET2=""' >> '/pia/settings.conf'
+  echo 'DHCPD_MASK2=""' >> '/pia/settings.conf'
 fi
