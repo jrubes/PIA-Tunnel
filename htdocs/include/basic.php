@@ -9,10 +9,12 @@ if( !array_key_exists('cmd', $_REQUEST) ){ $_REQUEST['cmd'] = ''; }
 if( !array_key_exists('cid', $_GET) ){ $_GET['cid'] = ''; }
 
 require_once $inc_dir.'class_loader.php';
+require_once $inc_dir.'classes/PIASettings.php';
 require_once $inc_dir.'classes/class_files/class_files.php';
 
 /* prepare global objects */
 $_files = loader::loadFiles();
+$_settings = loader::PIASettings();
 
 $header_type = 'foo'; //Change this later to add more headers
 $body_type = 'foo'; //Use to select different code later
@@ -119,15 +121,47 @@ function VPN_is_valid_connection($val2check){
 }
 
 /**
+ * method to get a list of arrays contained in settings.conf
+ *  use $settings[$returnFromThisFunction[0]] to get the current value from settings.conf
+ * @global object $_settings
+ * @return array,bool return array of names,FALSE if no arrays have been found
+ * array[0] == 'name of setting'
+ * array[1] == 'name of setting2'
+ */
+function VPN_get_array_list(){
+  die('old function VPN_get_array_list');
+}
+
+/**
+ * function to check if $val is alread stored in the array
+ * @param array $ar the array to check in
+ * @param string $val the value to look for
+ * @return boolean true if $val is unique, false if not
+ */
+function array_is_value_unique( &$ar, $val ){
+  if( !is_array($ar) ){ die('FATAL SCRIPT ERROR: parameter must be an array!'); }
+
+  reset($ar);
+  foreach( $ar as $array_val ){
+    if( $array_val == $val ){
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
  * method to get an entire settings array
- * @param string $name name of array
+ * @param string $name=null *optional* name of array
  * @return string/bool string containing HTML formated as <select> or FALSE
  */
 function VPN_get_settings_array($name){
+  global $_settings;
   $ret = array();
 
   if(array_key_exists('settings.conf', $_SESSION) !== true ){
-    if( load_settings() === false ){
+    if( $_settings->load_settings() === false ){
       echo "FATAL ERROR: Unable to get list of settings!";
       return false;
     }
@@ -285,20 +319,6 @@ function VM_get_status(){
   return $ret_str;
 }
 
-/**
- * method read /pia/login.conf into an array
- * @return array,bool array with ['name'], ['password'] OR FALSE on failure
- */
-function VPN_get_settings(){
-  //get settings stored in settings.con
-  if( array_key_exists('settings.conf', $_SESSION) !== true ){
-    $ret = load_settings();
-    if( $ret !== false ){
-      return $ret;
-    }
-  }
-  return $_SESSION['settings.conf'];
-}
 
 /**
  * function checks /pia/cache/session.log for specific words and returns an array with
@@ -444,42 +464,6 @@ function load_login(){
 }
 
 /**
- * this function loads settings.conf into an array without comments, stores it in session and return it
- * ['SETTING'] == $VALUE
- * @return array,boolean or false on failure
- */
-function load_settings(){
-  global $_files;
-  $ret = array();
-
-  $c = $_files->readfile('/pia/settings.conf');
-  if( $c !== false ){
-    $c = explode( "\n", eol($c));
-    foreach( $c as $line ){
-      //ignore a lot of stuff - quick hack for now
-      if(substr($line, 0, 1) != '#'
-              && trim($line) != ''
-              && substr($line, 0, 4) != 'LANG'
-              && substr($line, 0, 1) != '#'
-              && substr($line, 0, 11) != 'export LANG'
-              && substr($line, 0, 4) != 'bold'
-              && substr($line, 0, 6) != 'normal'  ){
-        $set = explode('=', $line);
-        $ret[$set[0]] = trim($set[1], '"\''); //this should now be one setting per key with setting name as key
-      }
-    }
-
-    if( count($ret) > 0 ){
-      $_SESSION['settings.conf'] = $ret;
-      return $_SESSION['settings.conf'];
-    }
-  }else{
-    unset($_SESSION['settings.conf']);
-    return false;
-  }
-}
-
-/**
  * function to build a select element based on a source array
  * @param array $content array with following structure
  * <ul><li>['id'] = "foo"; name and id of select element created</li>
@@ -493,7 +477,7 @@ function load_settings(){
  */
 function build_select( &$content, $double=false ){
 
-  $hash = md5($content['id']); //hash this to avoid problems with MYVPN[0] and PHP
+  $hash = $content['id'];//md5($content['id']); //hash this to avoid problems with MYVPN[0] and PHP
   $head = '<select id="'.$hash.'" name="'.$hash."\">\n";
 
   /* 'selected' is option */

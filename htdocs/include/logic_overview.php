@@ -16,8 +16,8 @@ switch($_REQUEST['cmd']){
   case 'network_control':
     if( array_key_exists('vpn_connect', $_POST) === true ){
       //check if passed VPN name is valid and pass to command line if it is
-      if( VPN_is_valid_connection($_POST[md5('vpn_connections')]) === true ){
-        $arg = escapeshellarg($_POST[md5('vpn_connections')]);
+      if( VPN_is_valid_connection($_POST['vpn_connections']) === true ){
+        $arg = escapeshellarg($_POST['vpn_connections']);
 
         //looks good, delete old session.log
         $f = '/pia/cache/session.log';
