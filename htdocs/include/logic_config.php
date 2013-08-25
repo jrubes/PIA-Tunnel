@@ -80,7 +80,8 @@ switch($_REQUEST['cmd']){
 
         $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
         if( $ret_save !== '' ){
-          //like default but regenerate dhcpd.conf for possilbe nameserver change
+          //settings changed - update interfaces and dhcpd.conf
+          VPN_generate_interfaces();
           VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
           $disp_body .= $ret_save;
         }else{
@@ -126,6 +127,13 @@ switch($_REQUEST['cmd']){
 
 /* FUNCTIONS - move into functions file later */
 
+/**
+ * function calls a script to generate a new /etc/network/interfaces
+ * based on settings.conf
+ */
+function VPN_generate_interfaces(){
+  exec("sudo /pia/include/network-interfaces.sh"); //write new dhcpd.conf
+}
 
 /**
  * function to generate a new dhcpd.conf file after a config change
