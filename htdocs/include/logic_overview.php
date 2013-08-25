@@ -46,12 +46,12 @@ switch($_REQUEST['cmd']){
 
   case 'firewall_control':
     if( array_key_exists('firewall_enable', $_POST) === true ){
-      VPN_forward('stop');
-      VPN_forward('start');
+      $_services->firewall_fw('stop');
+      $_services->firewall_fw('start');
       $disp_body .= "<div class=\"feedback\">Firewall has been restarted</div>\n";
 
     }elseif( array_key_exists('firewall_disable', $_POST) === true ){
-      VPN_forward('stop');
+      $_services->firewall_fw('stop');
       $disp_body .= "<div class=\"feedback\">Forwarding has been stopped</div>\n";
       $disp_body .= disp_default();
     }
