@@ -74,7 +74,7 @@ done
 
 #handle files in include, these don't get /bin/ links
 FILES="fw-forward fw-no-forward functions.inc build_ping_list fix_settings network-interfaces.sh"
-FILES="$FILES network-restart.sh autostart.sh dhcpd-reconfigure.sh dhcpd-start.sh"
+FILES="$FILES network-restart.sh autostart autostart.sh dhcpd-reconfigure.sh dhcpd-start.sh"
 FILES="$FILES dhcpd-stop.sh dhcpd-status.sh"
 for f in $FILES
 do
