@@ -522,10 +522,10 @@ function build_checkbox( &$content, $double=false ){
     reset($content['selected']);
     foreach( $content['selected'] as $cur ){
       if( $cur[1] == $dis ){
-        echo "match $dis<br>";
+        //echo "match $dis<br>";
         $checked = 'checked';
       }else{
-        echo "NO match '$cur[0]' vs '$val'<br>\n";
+        //echo "NO match '$cur[0]' vs '$val'<br>\n";
       }
     }
 

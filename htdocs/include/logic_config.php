@@ -71,9 +71,11 @@ switch($_REQUEST['cmd']){
           $disp_body .= disp_network_default();
           break;
         }else{
-          if( VPN_save_settings() === true ){
+          $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
+          if( $ret_save !== '' ){
             VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
-            $disp_body .= "<div class=\"feedback\">Settings updated. Please restart the dhcpd process to apply your changes.</div>\n";
+            $disp_body .= $ret_save;
+            $disp_body .= "<div class=\"feedback\">Please restart the dhcpd process to apply your changes.</div>\n";
             $disp_body .= disp_network_default();
 
           }else{
@@ -84,10 +86,11 @@ switch($_REQUEST['cmd']){
         break;
 
       case 'system_settings':
-        //like default but regenerate dhcpd.conf for possilbe nameserver change
-        if( VPN_save_settings() === true ){
+        $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
+        if( $ret_save !== '' ){
+          //like default but regenerate dhcpd.conf for possilbe nameserver change
           VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
-          $disp_body .= "<div class=\"feedback\">Settings updated.</div>\n";
+          $disp_body .= $ret_save;
         }else{
           $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed.</div>\n";
         }
@@ -95,8 +98,9 @@ switch($_REQUEST['cmd']){
         break;
 
       default:
-        if( VPN_save_settings() === true ){
-          $disp_body .= "<div class=\"feedback\">Settings updated.</div>\n";
+        $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
+        if( $ret_save !== '' ){
+          $disp_body .= $ret_save;
         }else{
           $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed.</div>\n";
         }
@@ -131,85 +135,6 @@ function VPN_generate_dhcpd_conf(){
   $save = escapeshellarg($template);
   exec("sudo /pia/include/dhcpd-reconfigure.sh $save"); //write new dhcpd.conf
 }
-
-/**
- * main function to store settings in /pia/settings.conf
- * loop over all settings in settings.conf and look for a matching $_POST
- * settings are md5() summed in POST to avoid
- * array issues with PHP when posting a string like FOO[0]
- * @global object $_files
- * @return boolean TRUE on success or FALSE when nothing was changed
- */
-function VPN_save_settings(){
-  global $_settings;
-  $settings = $_settings->get_settings();
-  $updated_one=false;
-
-  //handle regular strings here
-  foreach( $settings as $setting_key => $setting_val ){
-
-    //arrays need to be stored different
-    if( $_settings->is_settings_array( $setting_key ) === false )
-    {
-      //# Regular values for settings.conf
-      if( array_key_exists($setting_key, $_POST) === true && $setting_val != $_POST[$setting_key] ){
-        //setting found and setting has changed, UPDATE!
-        $_settings->save_settings($setting_key, $_POST[$setting_key]);
-        //echo "$setting_key is now $_POST[$setting_key]<br>\n"; //dev stuff
-        $updated_one=true;
-      }
-    }//if( VPN_is_settings_array
-  }
-
-  // # array values for settings.conf #
-  // get list of possible arrays from settings.conf
-  $settings_arrays = $_settings->get_array_list();
-
-  //loop over possible array values
-  foreach( $settings_arrays as $set_array ){
-    if(array_key_exists($set_array, $_POST) ){
-      // the settings.conf arrays have been found in $_POST
-      // let's see if any values have changed
-      reset($_POST);
-      $found=0;
-
-      //post may be smaller then stored settings due to checkboxes
-      //check which count is larger and use that one
-      $cnt_p = count($_POST[$set_array]);var_dump(count($_POST[$set_array]));
-      $cnt_s = count($_settings->get_settings_array($set_array));var_dump($_settings->get_settings_array($set_array));
-      $cnt = ( $cnt_p > $cnt_s ) ? $cnt_p : $cnt_s;
-
-      for( $x = 0 ; $x < $cnt ; ++$x ){
-        $index = $set_array."[$x]";
-        if( $settings[$index] !== @$_POST[$set_array][$x] ){
-          //at least one setting changed, store the entire array
-          $tmppost = $_settings->get_array_from_post($set_array);
-          var_dump($tmppost);
-          $array2store = $_settings->format_array($set_array, $tmppost);
-          $_settings->save_settings_array($set_array, $array2store);
-          echo "changed: $index removing $set_array<br>";
-          $updated_one=true;
-          ++$found;
-          break; //get out of for() loop as one changed setting will update the entire array
-        }else{
-          ++$found;
-          //echo "no changed: $index removing $set_array<br>";
-        }
-      }
-    }
-  }
-
-  //arrays without a match are empty so remove it from config
-  if( $found === 0 ){
-    echo "none changed, removing all: $index removing $set_array<br>";
-    $array2store=array($set_array.'[0]=""');
-    $_settings->save_settings_array($set_array, $array2store);
-  }
-
-
-  return true;
-}
-
 
 /**
  * function to scan $_POST for any settings.conf array values
@@ -363,6 +288,7 @@ function disp_dhcpd_box(){
   global $_settings;
   $settings = $_settings->get_settings();
   $disp_body = '';
+  $fields = ''; //comma separate list of settings offered here
 
   $disp_body .= '<div class="options_box">';
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
@@ -373,6 +299,7 @@ function disp_dhcpd_box(){
   //show two subnets
   for( $x=1 ; $x < 3 ; ++$x )
   {
+    $fields .= 'DHCPD_ENABLED'.$x.',';
     $sel = array(
             'id' => 'DHCPD_ENABLED'.$x,
             'selected' => $settings['DHCPD_ENABLED'.$x],
@@ -382,15 +309,21 @@ function disp_dhcpd_box(){
     $disp_body .= '<tr><td>Subnet '.$x.'</td><td>'.build_select($sel).'</td></tr>'."\n";
     //Subnet 1 settings
     $disabled = ($settings['DHCPD_ENABLED'.$x] === 'no') ? 'disabled' : ''; //disable input fields when DHCP is set
+    $fields .= 'DHCPD_SUBNET'.$x.',';
     $disp_body .= '<tr><td>Subnet IP</td><td><input '.$disabled.' type="text" name="DHCPD_SUBNET'.$x.'" value="'.htmlspecialchars($settings['DHCPD_SUBNET'.$x]).'"></td></tr>'."\n";
+    $fields .= 'DHCPD_MASK'.$x.',';
     $disp_body .= '<tr><td>Subnetmask</td><td><input '.$disabled.' type="text" name="DHCPD_MASK'.$x.'" value="'.htmlspecialchars($settings['DHCPD_MASK'.$x]).'"></td></tr>'."\n";
+    $fields .= 'DHCPD_BROADCAST'.$x.',';
     $disp_body .= '<tr><td>Broadcast IP</td><td><input '.$disabled.' type="text" name="DHCPD_BROADCAST'.$x.'" value="'.htmlspecialchars($settings['DHCPD_BROADCAST'.$x]).'"></td></tr>'."\n";
+    $fields .= 'DHCPD_ROUTER'.$x.',';
     $disp_body .= '<tr><td>Router/Gateway</td><td><input '.$disabled.' type="text" name="DHCPD_ROUTER'.$x.'" value="'.htmlspecialchars($settings['DHCPD_ROUTER'.$x]).'"></td></tr>'."\n";
-    $disp_body .= '<tr><td>IP Range</td><td><input '.$disabled.' class="long" type="text" name="DHCPD_RANGE'.$x.'" value="'.htmlspecialchars($settings['DHCPD_RANGE'.$x]).'"></td></tr>'."\n";
+    $fields .= 'DHCPD_RANGE'.$x.',';
+    $disp_body .= '<tr><td>IP Range</td><td><input '.$disabled.' class="long" type="text" name="DHCPD_RANGE'.$x.'" value="'.htmlspecialchars($settings['DHCPD_RANGE'.$x]).'"></td></tr>'."\n";;
     $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   }
 
   $disp_body .= "</table>\n";
+  $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_dhcpd" value="Restart dhcpd">';
   $disp_body .= '</form>';
@@ -404,6 +337,7 @@ function disp_pia_daemon_box(){
   global $_settings;
   $settings = $_settings->get_settings();
   $disp_body = '';
+  $fields = ''; //comma separate list of settings offered here
 
   $disp_body .= '<div class="options_box">';
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
@@ -411,6 +345,7 @@ function disp_pia_daemon_box(){
   $disp_body .= '<h2>PIA Daemon Settings</h2>'."\n";
   $disp_body .= "<table>\n";
 
+  $fields .= 'DAEMON_ENABLED,';
   $sel = array(
             'id' => 'DAEMON_ENABLED',
             'selected' =>  $settings['DAEMON_ENABLED'],
@@ -419,20 +354,22 @@ function disp_pia_daemon_box(){
           );
   $disp_body .= '<tr><td>Enable pia-daemon</td><td>'.build_select($sel).'</td></tr>'."\n";
 
-  //Failover connection selection - offer 10 entires
+  //Failover connection selection - fix hard coded loop later
   $fovers = 0;
-  for( $x = 0 ; $x < 10 ; ++$x ){
+  $fields .= 'MYVPN,';
+  for( $x = 0 ; $x < 30 ; ++$x ){
     if( array_key_exists('MYVPN['.$x.']', $settings) === true ){
       $ovpn = VPN_get_connections('MYVPN['.$x.']', array( 'selected' => $settings['MYVPN['.$x.']'], array( '', '')));
       $disp_body .= '<tr><td>Failover '.$x.'</td><td>'.$ovpn.'</td></tr>'."\n";
       ++$fovers;
     }
   }
-  $ovpn = VPN_get_connections('MYVPN[add]', array('initial' => 'empty'));
-  //$disp_body .= '<tr><td>Add Failover</td><td>'.$ovpn.'</td></tr>'."\n";
+  $ovpn = VPN_get_connections('MYVPN['.$fovers.']', array('initial' => 'empty'));
+  $disp_body .= '<tr><td>Add Failover</td><td>'.$ovpn.'</td></tr>'."\n";
 
 
   $disp_body .= "</table>\n";
+  $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= '</form>';
   $disp_body .= '</div>';
@@ -444,6 +381,7 @@ function disp_network_box(){
   global $_settings;
   $settings = $_settings->get_settings();
   $disp_body = '';
+  $fields = ''; //comma separate list of settings offered here
 
   $disp_body .= '<div class="options_box">';
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
@@ -451,7 +389,8 @@ function disp_network_box(){
   $disp_body .= '<h2>PIA Network Settings</h2>'."\n";
   $disp_body .= "<table>\n";
 
-//basic interface and network
+  //basic interface and network
+  $fields .= 'FORWARD_PORT_ENABLED,';
   $sel = array(
           'id' => 'FORWARD_PORT_ENABLED',
           'selected' =>  $settings['FORWARD_PORT_ENABLED'],
@@ -459,9 +398,11 @@ function disp_network_box(){
           array( 'no', 'no')
         );
   $disp_body .= '<tr><td>Enable Port Forwarding</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $fields .= 'FORWARD_IP,';
   $disp_body .= '<tr><td>Forward IP</td><td><input type="text" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'"></td></tr>'."\n";
 
   //VM LAN segment forwarding
+  $fields .= 'FORWARD_VM_LAN,';
   $sel = array(
             'id' => 'FORWARD_VM_LAN',
             'selected' =>  $settings['FORWARD_VM_LAN'],
@@ -470,6 +411,7 @@ function disp_network_box(){
           );
   $disp_body .= '<tr><td>VPN Gateway for VM LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
   //use public LAN segment for forwarding
+  $fields .= 'FORWARD_PUBLIC_LAN,';
   $sel = array(
             'id' => 'FORWARD_PUBLIC_LAN',
             'selected' =>  $settings['FORWARD_PUBLIC_LAN'],
@@ -483,6 +425,7 @@ function disp_network_box(){
 
   //these are array settings so get them first then loop over to display them
   $use = 'FIREWALL_IF_SSH';
+  $fields .= 'FIREWALL_IF_SSH,';
   $fw_ssh = $_settings->get_settings_array($use);
   //Wvar_dump($fw_ssh);die();
   $sel = array(
@@ -492,12 +435,12 @@ function disp_network_box(){
             array( 'FIREWALL_IF_SSH[1]', 'eth1')
           );
   //$sel = array_merge($sel, $fw_ssh);
-  var_dump($fw_ssh);
   $disp_body .= '<tr><td>Allow ssh logins on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
 
 
   //now FIREWALL_IF_WEB options
   $use = 'FIREWALL_IF_WEB';
+  $fields .= 'FIREWALL_IF_WEB,';
   $fw_ssh = $_settings->get_settings_array($use);
   //Wvar_dump($fw_ssh);die();
   $sel = array(
@@ -510,6 +453,7 @@ function disp_network_box(){
   $disp_body .= '<tr><td>Allow web logins on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
 
   $disp_body .= "</table>\n";
+  $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firewall">';
   $disp_body .= '</form>';
@@ -522,6 +466,7 @@ function disp_system_box(){
   global $_settings;
   $settings = $_settings->get_settings();
   $disp_body = '';
+  $fields = ''; //comma separate list of settings offered here
 
   $disp_body .= '<div class="options_box">';
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
@@ -530,6 +475,7 @@ function disp_system_box(){
   $disp_body .= "<table>\n";
 
   //interface assignment
+  $fields .= 'IF_EXT,';
   $sel = array(
           'id' => 'IF_EXT',
           'selected' =>  $settings['IF_EXT'],
@@ -538,6 +484,7 @@ function disp_system_box(){
           array( 'tun0', 'tun0')
         );
   $disp_body .= '<tr><td>Public LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $fields .= 'IF_INT,';
   $sel = array(
           'id' => 'IF_INT',
           'selected' =>  $settings['IF_INT'],
@@ -546,6 +493,7 @@ function disp_system_box(){
           array( 'tun0', 'tun0')
         );
   $disp_body .= '<tr><td>VM LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $fields .= 'IF_TUNNEL,';
   $sel = array(
           'id' => 'IF_TUNNEL',
           'selected' =>  $settings['IF_TUNNEL'],
@@ -558,6 +506,7 @@ function disp_system_box(){
   //eth0
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $disabled = ($settings['IF_ETH0_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
+  $fields .= 'IF_ETH0_DHCP,';
   $sel = array(
           'id' => 'IF_ETH0_DHCP',
           'selected' => $settings['IF_ETH0_DHCP'],
@@ -565,13 +514,17 @@ function disp_system_box(){
           array( 'no', 'no')
         );
   $disp_body .= '<tr><td>eth0 use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $fields .= 'IF_ETH0_IP,';
   $disp_body .= '<tr><td>eth1 IP</td><td><input '.$disabled.' type="text" name="IF_ETH0_IP" value="'.$settings['IF_ETH0_IP'].'"></td></tr>'."\n";
+  $fields .= 'IF_ETH0_SUB,';
   $disp_body .= '<tr><td>eth1 Subnet</td><td><input '.$disabled.' type="text" name="IF_ETH0_SUB" value="'.$settings['IF_ETH0_SUB'].'"></td></tr>'."\n";
+  $fields .= 'IF_ETH0_GW,';
   $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" name="IF_ETH0_GW" value="'.$settings['IF_ETH0_GW'].'"></td></tr>'."\n";
 
   //eth1
   $disabled = ($settings['IF_ETH1_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $fields .= 'IF_ETH1_DHCP,';
   $sel = array(
           'id' => 'IF_ETH1_DHCP',
           'selected' => $settings['IF_ETH1_DHCP'],
@@ -579,12 +532,16 @@ function disp_system_box(){
           array( 'no', 'no')
         );
   $disp_body .= '<tr><td>eth1 use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $fields .= 'IF_ETH1_IP,';
   $disp_body .= '<tr><td>eth1 IP</td><td><input '.$disabled.' type="text" name="IF_ETH1_IP" value="'.$settings['IF_ETH1_IP'].'"></td></tr>'."\n";
+  $fields .= 'IF_ETH1_SUB,';
   $disp_body .= '<tr><td>eth1 Subnet</td><td><input '.$disabled.' type="text" name="IF_ETH1_SUB" value="'.$settings['IF_ETH1_SUB'].'"></td></tr>'."\n";
+  $fields .= 'IF_ETH1_GW,';
   $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" name="IF_ETH1_GW" value="'.$settings['IF_ETH1_GW'].'"></td></tr>'."\n";
 
   //DNS
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $fields .= 'NAMESERVERS,';
   $disp_body .= '<tr><td>DNS 1</td><td><input type="text" name="NAMESERVERS[0]" value="'.$settings['NAMESERVERS[0]'].'"></td></tr>'."\n";
   $disp_body .= '<tr><td>DNS 2</td><td><input type="text" name="NAMESERVERS[1]" value="'.$settings['NAMESERVERS[1]'].'"></td></tr>'."\n";
   $disp_body .= '<tr><td>DNS 3</td><td><input type="text" name="NAMESERVERS[2]" value="'.$settings['NAMESERVERS[2]'].'"></td></tr>'."\n";
@@ -593,6 +550,7 @@ function disp_system_box(){
 
   //command line stuff
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $fields .= 'VERBOSE,';
   $sel = array(
             'id' => 'VERBOSE',
             'selected' =>  $settings['VERBOSE'],
@@ -600,6 +558,7 @@ function disp_system_box(){
             array( 'no', 'no')
           );
   $disp_body .= '<tr><td>Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $fields .= 'VERBOSE_DEBUG,';
   $sel = array(
             'id' => 'VERBOSE_DEBUG',
             'selected' =>  $settings['VERBOSE_DEBUG'],
@@ -609,6 +568,7 @@ function disp_system_box(){
   $disp_body .= '<tr><td>Debug Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
 
   $disp_body .= "</table>\n";
+  $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Full Network Restart">';
   $disp_body .= '</form>';
