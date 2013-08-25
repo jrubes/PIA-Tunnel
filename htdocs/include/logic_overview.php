@@ -53,7 +53,6 @@ switch($_REQUEST['cmd']){
     }elseif( array_key_exists('firewall_disable', $_POST) === true ){
       $_services->firewall_fw('stop');
       $disp_body .= "<div class=\"feedback\">Forwarding has been stopped</div>\n";
-      $disp_body .= disp_default();
     }
     $disp_body .= disp_default();
     break;
