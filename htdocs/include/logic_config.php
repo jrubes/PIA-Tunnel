@@ -31,21 +31,6 @@ switch($_REQUEST['cmd']){
     $disp_body .= disp_network_default();
     break;
 
-  case 'network_store';
-    //restart the network or store settings
-    if( array_key_exists('restart_firewall', $_POST ) === true && $_POST['restart_firewall'] != '' ){
-      VPN_forward('stop');
-      VPN_forward('start');
-      $disp_body .= "<div class=\"feedback\">Firewall has been started</div>\n";
-    }else{
-      //update user settings
-      $disp_body .= update_network_settings();
-    }
-
-    //show inout forms again
-    $disp_body .= disp_network_default();
-    break;
-
   case 'store_setting':
     //settings are now stored section by section.
     // this will allow me to restart the network on network changes and so on.
@@ -63,7 +48,7 @@ switch($_REQUEST['cmd']){
         if(array_key_exists('restart_dhcpd', $_POST) ){
           $ret = $_services->dhcpd_restart();
           if( $ret === true ){
-            $disp_body .= "<div class=\"feedback\">dhcpd has been restartet.</div>\n";
+            $disp_body .= "<div class=\"feedback\">dhcpd has been restartet</div>\n";
           }else{
             $disp_body .= "<div class=\"feedback\">".nl2br($ret[1])."</div>\n";
           }
@@ -75,24 +60,31 @@ switch($_REQUEST['cmd']){
           if( $ret_save !== '' ){
             VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
             $disp_body .= $ret_save;
-            $disp_body .= "<div class=\"feedback\">Please restart the dhcpd process to apply your changes.</div>\n";
+            $disp_body .= "<div class=\"feedback\">Please restart the dhcpd process to apply your changes</div>\n";
             $disp_body .= disp_network_default();
 
           }else{
-            $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed.</div>\n";
+            $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed</div>\n";
             $disp_body .= disp_network_default();
           }
         }
         break;
 
       case 'system_settings':
+        if( array_key_exists('restart_network', $_POST ) === true && $_POST['restart_network'] != '' ){
+            $_services->network_restart();
+            $disp_body .= "<div class=\"feedback\">All network interfaces have been restarted</div>\n";
+            $disp_body .= disp_network_default();
+            break;
+        }
+
         $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
         if( $ret_save !== '' ){
           //like default but regenerate dhcpd.conf for possilbe nameserver change
           VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
           $disp_body .= $ret_save;
         }else{
-          $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed.</div>\n";
+          $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed</div>\n";
         }
         $disp_body .= disp_network_default();
         break;
@@ -102,8 +94,17 @@ switch($_REQUEST['cmd']){
         if( $ret_save !== '' ){
           $disp_body .= $ret_save;
         }else{
-          $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed.</div>\n";
+          if( array_key_exists('restart_firewall', $_POST ) === true && $_POST['restart_firewall'] != '' ){
+            $_services->firewall_fw('stop');
+            $_services->firewall_fw('start');
+            $disp_body .= "<div class=\"feedback\">Firewall has been restarted</div>\n";
+          }else{
+            $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed.</div>\n";
+          }
         }
+
+
+
         $disp_body .= disp_network_default();
         break;
 
@@ -111,7 +112,7 @@ switch($_REQUEST['cmd']){
     break;
 
   default :
-    $disp_body .= '<h2>Please select a menu option.</h2>';
+    $disp_body .= '<h2>Please select a menu option</h2>';
 }
 
 

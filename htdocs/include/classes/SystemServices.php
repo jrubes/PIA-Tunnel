@@ -8,6 +8,25 @@ class SystemServices {
 
 
 /**
+ * method to execute pia-forward start/stop - control the firewall
+ * @param string $command "start" or "stop"
+ */
+function firewall_fw( $command ){
+  if( $command === 'start' )
+    exec('sudo /pia/pia-forward start &>/dev/null &');
+  else{
+    exec('sudo /pia/pia-forward stop &>/dev/null &');
+  }
+}
+
+/**
+ * method to execute a full network restart
+ */
+function network_restart(){
+  exec('sudo "/pia/include/network-restart.sh"');
+}
+
+/**
  * method to restart dhcpd using dhcpd-restart.sh and check the return
  * @return bool,array TRUE on success or [0]=false [1]=error message
  */

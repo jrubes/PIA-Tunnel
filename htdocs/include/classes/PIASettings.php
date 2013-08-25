@@ -110,6 +110,12 @@ class PIASettings {
       return false;
     }
 
+    //the array functions do not honor line numbers so strip all comments as they will not
+    //be above the settings anymore
+    exec('sed \'/^#/ d\' "/pia/settings.conf" > "/pia/settings.conf.bak"');
+    exec('mv "/pia/settings.conf.bak" "/pia/settings.conf"');
+
+
     $this->remove_array($array_name);
 
     $this->append_settings($array2store);
@@ -242,6 +248,7 @@ class PIASettings {
       }
     }
 
+    $ret = trim($ret, "\n");
     return $ret;
   }
 
@@ -283,6 +290,7 @@ function remove_array($array_name){
   //loop over returned values and remove the lines
   for( $x = count($ret)-1 ; $x >= 0 ; --$x ){ //go backwards or line numbers need to be adjusted
     exec('sed "'.$ret[$x].'d" '.$this->_settings_file.' > '.$this->_settings_file.'.back');
+//    exec('sed -e :a -e \'/^\n*$/{$d;N;};/\n$/ba\' '.$this->_settings_file.'.back');
     exec('mv '.$this->_settings_file.'.back '.$this->_settings_file.'');
     ++$removed;
   }

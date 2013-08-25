@@ -94,18 +94,6 @@ function VM_restart(){
   exec('sudo /sbin/shutdown -r now &>/dev/null &');
 }
 
-/**
- * method to execute pia-forward start/stop - control the firewall
- * @param string $command "start" or "stop"
- */
-function VPN_forward($command){
-  if( $command === 'start' )
-    exec('sudo /pia/pia-forward start &>/dev/null &');
-  else{
-    exec('sudo /pia/pia-forward stop &>/dev/null &');
-  }
-}
-
 
 function VPN_is_valid_connection($val2check){
   if(array_key_exists('ovpn', $_SESSION) !== true ){
