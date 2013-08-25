@@ -48,7 +48,7 @@ switch($_REQUEST['cmd']){
         if(array_key_exists('restart_dhcpd', $_POST) ){
           $ret = $_services->dhcpd_restart();
           if( $ret === true ){
-            $disp_body .= "<div class=\"feedback\">dhcpd has been restartet</div>\n";
+            $disp_body .= "<div class=\"feedback\">dhcpd has been restarted</div>\n";
           }else{
             $disp_body .= "<div class=\"feedback\">".nl2br($ret[1])."</div>\n";
           }

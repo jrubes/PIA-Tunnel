@@ -207,6 +207,7 @@ function VPN_ovpn_to_session(){
    * @global type $CONF
    */
 function VM_get_status(){
+  global $_settings;
   $ret_str = '<table id="vm_status">';
 
   //check session.log if for current status
@@ -261,7 +262,7 @@ function VM_get_status(){
     $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported</td></tr>";
 
     //show forwarding info
-    $settings = VPN_get_settings();
+    $settings = $_settings->get_settings();
     if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
       $ret_str .= "<tr><td>Forwarding</td><td>$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port</td></tr>";
     }
