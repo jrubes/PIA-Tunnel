@@ -258,19 +258,21 @@ function VM_get_status(){
     exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
     if( array_key_exists( '0', $vpn_pub) === true ){
       $ret_str .= "<tr><td>VPN Public IP</td><td>$vpn_pub[0]</td></tr>";
-    }
-    $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported</td></tr>";
+      $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported</td></tr>";
 
-    //show forwarding info
-    $settings = $_settings->get_settings();
-    if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
-      $ret_str .= "<tr><td>Forwarding</td><td>$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port</td></tr>";
-    }
-    if( $settings['FORWARD_VM_LAN'] == 'yes' ){
-      $ret_str .= "<tr><td>Forwarding</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
-    }
-    if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
-      $ret_str .= "<tr><td>Forwarding2</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+      //show forwarding info
+      $settings = $_settings->get_settings();
+      if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
+        $ret_str .= "<tr><td>Forwarding</td><td>$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port</td></tr>";
+      }
+      if( $settings['FORWARD_VM_LAN'] == 'yes' ){
+        $ret_str .= "<tr><td>Forwarding</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+      }
+      if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
+        $ret_str .= "<tr><td>Forwarding2</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+      }
+    }else{
+      $ret_str .= "<tr><td>VPN</td><td>down</td></tr>";
     }
   }
 
