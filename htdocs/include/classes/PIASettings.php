@@ -57,7 +57,7 @@ class PIASettings {
         if( $this->settings_array_changes > 0 ){
           $onechanged=true;
         }else{
-          echo "no changes to $posted<br>";
+          //echo "no changes to $posted<br>";
         }
 
       }else{
@@ -68,10 +68,7 @@ class PIASettings {
         if( array_key_exists($posted, $_POST) === true && $settings[$posted] != $_POST[$posted] ){
           //setting found and setting has changed, UPDATE!
           $this->save_settings($posted, $_POST[$posted]);
-          //echo "$setting_key is now $_POST[$setting_key]<br>\n"; //dev stuff
-          if( $this->settings_changed > 0 ){
-            $onechanged=true;
-          }
+          $onechanged=true;
         }else{
           //echo "NOT: s: ".$settings[$posted]." vs p: ".$_POST[$posted]."<br>";
         }

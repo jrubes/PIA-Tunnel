@@ -207,10 +207,10 @@ function dhcpd_process_template(){
   }
 
   // Global Option - NAMESERVERS is an array which may contain multiple entries, loop over it
-  $NAMESERVERS = VPN_get_settings_array('NAMESERVERS');
+  $NAMESERVERS = $_settings->get_settings_array('NAMESERVERS');
   $ins_dns = '';
   foreach( $NAMESERVERS as $DNS){
-    $ins_dns .= ($ins_dns === '' ) ? $DNS : ", $DNS";
+    $ins_dns .= ($ins_dns === '' ) ? $DNS[1] : ", $DNS[1]";
   }
   $templ = str_replace('DNSSERVER_HERE', $ins_dns, $templ, $SometimesIreallyHatePHP);
 
