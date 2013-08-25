@@ -15,13 +15,32 @@ iptables -P FORWARD DROP
 iptables -P OUTPUT ACCEPT
 iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 
-#trust private LAN segment
-iptables -A INPUT -i $IF_INT -p tcp -j ACCEPT
+#development rules, need to think about port 22
+if [ ! -z "${FIREWALL_IF_SSH[0]}" ]; then
+  for interface in "${FIREWALL_IF_SSH[@]}"
+  do
+    iptables -A INPUT -i "$interface" -p tcp --dport 22 -j ACCEPT
+    iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+	if [ "$VERBOSE_DEBUG" = "yes" ]; then
+		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- SSH has been enabled for interface: $interface"
+	fi
+  done
+fi
 
-#allow SSH on port 22 from EXT LAN
-iptables -A INPUT -i $IF_EXT -p tcp --dport 22 -j ACCEPT
-iptables -A INPUT -i $IF_EXT -p tcp --dport 80 -j ACCEPT
-iptables -A INPUT -i $IF_INT -p tcp --dport 80 -j ACCEPT
+
+#allowing incoming traffic to web UI
+if [ ! -z "${FIREWALL_IF_WEB[0]}" ]; then
+  for interface in "${FIREWALL_IF_WEB[@]}"
+  do
+    iptables -A INPUT -i "$interface" -p tcp --dport 80 -j ACCEPT
+    iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+	if [ "$VERBOSE_DEBUG" = "yes" ]; then
+		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- webUI has been enabled for interface: $interface"
+	fi
+  done
+fi
 
 
 #disable forwarding

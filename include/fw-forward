@@ -146,12 +146,12 @@ if [ ! -z "${FIREWALL_IF_SSH[0]}" ]; then
     iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- SSH has enabled for interface: $interface"
+			"- SSH has been enabled for interface: $interface"
 	fi
   done
 fi
 
-#allowing incoming traffic to pia-daemon
+#allowing incoming traffic to web UI
 if [ ! -z "${FIREWALL_IF_WEB[0]}" ]; then
   for interface in "${FIREWALL_IF_WEB[@]}"
   do
@@ -159,7 +159,7 @@ if [ ! -z "${FIREWALL_IF_WEB[0]}" ]; then
     iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- webUI has enabled for interface: $interface"
+			"- webUI has been enabled for interface: $interface"
 	fi
   done
 fi
