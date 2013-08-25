@@ -4,6 +4,7 @@
 date_default_timezone_set('Europe/Berlin');
 define('APC_CACHE_PREFIX', 'piatunnel_');
 if( session_id () == '' ) session_start ();
+unset($_SESSION['settings.conf']); //DEV ONLY - remove!
 if( !array_key_exists('page', $_REQUEST) ){ $_REQUEST['page'] = ''; }
 if( !array_key_exists('cmd', $_REQUEST) ){ $_REQUEST['cmd'] = ''; }
 if( !array_key_exists('cid', $_GET) ){ $_GET['cid'] = ''; }
@@ -16,7 +17,7 @@ require_once $inc_dir.'classes/class_files/class_files.php';
 /* prepare global objects */
 $_files = loader::loadFiles();
 $_settings = loader::PIASettings();
-$_services= loader::SystemServices();
+$_services = loader::SystemServices();
 
 $header_type = 'foo'; //Change this later to add more headers
 $body_type = 'foo'; //Use to select different code later
@@ -405,23 +406,30 @@ function eol($string) {
  * this function loads login.conf into an array, stores it in session and return it
  * ['username']
  * ['password']
+ * @global object $_files
  * @return array,boolean or false on failure
  */
 function load_login(){
   global $_files;
 
-  $c = $_files->readfile('/pia/login.conf');
-  if( $c !== false ){
-    $c = explode( "\n", eol($c));
-    $un = ( mb_strlen($c[0]) > 0 ) ? $c[0] : '';
-    $pw = ( mb_strlen($c[1]) > 0 ) ? $c[1] : '';
-    if( $un == '' || $pw == '' ){
-      return false;
-    }
-    $_SESSION['login.conf'] = array( 'username' => $un , 'password' => $pw); //store for later
+  if( array_key_exists('login.conf', $_SESSION) === true
+          && $_SESSION['login.conf']['username'] != 'your PIA account name on this line' )
+  {
     return $_SESSION['login.conf'];
   }else{
-    return false;
+    $c = $_files->readfile('/pia/login.conf');
+    if( $c !== false ){
+      $c = explode( "\n", eol($c));
+      $un = ( mb_strlen($c[0]) > 0 ) ? $c[0] : '';
+      $pw = ( mb_strlen($c[1]) > 0 ) ? $c[1] : '';
+      if( $un == '' || $pw == '' ){
+        return false;
+      }
+      $_SESSION['login.conf'] = array( 'username' => $un , 'password' => $pw); //store for later
+      return $_SESSION['login.conf'];
+    }else{
+      return false;
+    }
   }
 }
 

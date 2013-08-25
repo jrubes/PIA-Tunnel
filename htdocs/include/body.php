@@ -23,6 +23,9 @@ if( $plen > 1 && $plen < 20 && isset($_REQUEST['page']) ){
     case 'logout':
       require_once $inc_dir.'logic_logout.php';
       break;
+    case 'setup-wizard':
+      require_once $inc_dir.'logic_wizard.php';
+      break;
     default:
       require_once $inc_dir.'logic_overview.php';
   }

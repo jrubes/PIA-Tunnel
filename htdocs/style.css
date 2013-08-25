@@ -72,6 +72,7 @@ root {
   float: left;
   margin-top: 1em;
   padding-left: 0.5em;
+  padding-right: 0.5em;
   padding-bottom: 1em;
   border-right-style: solid;
   border-right-width: 0.1px;
@@ -89,4 +90,19 @@ root {
 
 .long{
   width: 15em;
+}
+
+.wizard_box{
+  width: 550px;
+  display: inline;
+  float: left;
+  margin-top: 1em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-bottom: 1em;
+  border-right-style: solid;
+  border-right-width: 0.1px;
+  border-bottom-width: 0.1px;
+  border-bottom-style: solid;
+
 }
