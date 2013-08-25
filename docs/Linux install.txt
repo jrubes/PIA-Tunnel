@@ -109,7 +109,7 @@ host statichost {
 
 9) vi /etc/rc.local
 #execute PIA start scripts
-/pia/include/autostart
+/pia/include/autostart.sh
 
 10) paste the block below into a bash terminal
 BLMODS="psmouse snd snd_pcm snd_pcsp snd_timer parport parport_pc pcspkr floppy"

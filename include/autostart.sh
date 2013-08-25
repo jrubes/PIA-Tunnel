@@ -11,6 +11,6 @@ IFS=$'\r\n' CMD_LIST=($(cat "/pia/include/autostart.conf"))
 for command in ${CMD_LIST[@]}
 do
   if [ ! "$command" == "" ]; then
-      "$command" 2> /dev/null
+      eval "$command"
   fi
 done
