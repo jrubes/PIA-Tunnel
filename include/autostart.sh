@@ -1,5 +1,5 @@
 #!/bin/bash
-# legacy for old VM version - DELETE FOR NEXT RELEASE
+# script to start services with rc.local
 # you should not change this as it is controlled by the webbased PHP config script
 LANG=en_US.UTF-8
 export LANG

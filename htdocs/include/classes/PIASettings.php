@@ -9,10 +9,14 @@ class PIASettings {
   private $_settings_file;
   private $_files;
   private $_settings;
+  private $settings_array_changes;
+  private $settings_changed;
 
   function __construct(){
     $this->_settings_file = '/pia/settings.conf';
     $this->_settings = '';
+    $this->settings_array_changes = 0;
+    $this->settings_changed = 0;
   }
 
   /**
@@ -23,6 +27,59 @@ class PIASettings {
     $this->_files = $files;
   }
 
+  /**
+   * main method to call when you want settings stored
+   * @param string $fields_string comma separated string of form fields to be expected in POST
+   *                              every field name is checked with $this->is_settings_array so only
+   *                              pass the array names without key
+   */
+  function save_settings_logic( &$fields_string ){
+    $ret = '';
+    $onechanged=false;
+
+    $post2expect = explode(',', $fields_string);
+    if( count($post2expect) == 0 ){
+      die('fatal error, count zero in save_settings_logic!');
+    }
+
+    //check how each POSTed setting should be handled
+    foreach( $post2expect as $posted ){
+      if( $this->is_settings_array($posted) === true ){
+        /*# this is a settings array, compare post with existing settings #*/
+
+        $parray = $this->get_post_array($posted, true);
+        $sarray = $this->get_settings_array($posted);
+        $tmp_array = $this->compare_settings_arrays( $sarray, $parray);
+
+        /* new_settings now contains the new values to be stored or empty for "no values" */
+        $array2store = $this->format_array($posted, $tmp_array);
+        $this->save_settings_array($posted, $array2store);
+        if( $this->settings_array_changes > 0 ){
+          $onechanged=true;
+        }else{
+          //echo "no changes to $posted<br>";
+        }
+
+      }else{
+        /*# regular string setting  #*/
+        $settings = $this->get_settings();
+
+        //handle regular strings here
+        if( array_key_exists($posted, $_POST) === true && $settings[$posted] != $_POST[$posted] ){
+          //setting found and setting has changed, UPDATE!
+          $this->save_settings($posted, $_POST[$posted]);
+          $onechanged=true;
+        }else{
+          //echo "NOT: s: ".$settings[$posted]." vs p: ".$_POST[$posted]."<br>";
+        }
+      }
+    }
+
+    if( $onechanged === true ){
+      $ret = "<div class=\"feedback\">Settings updated</div>\n";
+    }
+    return $ret;
+  }
 
   /**
    * method to store config settings in settings.conf
@@ -53,6 +110,12 @@ class PIASettings {
       return false;
     }
 
+    //the array functions do not honor line numbers so strip all comments as they will not
+    //be above the settings anymore
+    exec('sed \'/^#/ d\' "/pia/settings.conf" > "/pia/settings.conf.bak"');
+    exec('mv "/pia/settings.conf.bak" "/pia/settings.conf"');
+
+
     $this->remove_array($array_name);
 
     $this->append_settings($array2store);
@@ -74,17 +137,89 @@ class PIASettings {
   }
 
   /**
+   * compare settings arrays and create a diff array
+   * use get_post_array( foo, <b>true</b>) or get_settings_array() to get the proper format
+   * @param array $settings_array <b>settings array</b> with following structure
+   *  <ul><li>[0][0] = 'array name with key'</li>
+   *      <li>[0][1] = 'config value'</li>
+   *  </ul>
+   * @param array $array2 array with following structure
+   *  <ul><li>[0][0] = 'array name or array name with key'</li>
+   *      <li>[0][1] = 'config/post value'</li>
+   *  </ul>
+   * @return array array containing the new settings array
+   */
+  function compare_settings_arrays( $settings_array, $array2 ){
+    $new = array();
+    $this->settings_array_changes = 0;
+
+//    var_dump($settings_array);
+//    var_dump($array2);
+//    var_dump($new);
+//    die('ends in compare_settings_arrays()');
+
+    //do a count comparsion to check for removed values
+    if( count($settings_array) != count($array2) ){
+      ++$this->settings_array_changes;//count mismatch - something changed
+    }
+
+    //compare each setting against array2 and look for matches
+    reset($settings_array);
+    foreach( $settings_array as $array_key => $array_setting ){
+
+      if( is_array($array2) === true ){
+          reset($array2);
+          foreach( $array2 as $array2_key => $array2_inside ){
+          if( $array2_inside[1] != $array_setting[1] ){
+            ++$this->settings_array_changes;
+          }
+          $new[] = $array2_inside[1];
+          unset($array2[$array2_key]); //remove as it has been processed
+          unset($settings_array[$array_key]); //remove as it has been processed
+          break;
+        }
+      }else{
+        //no values posted so this value should be deleted, unset settings
+        unset($settings_array[$array_key]); //remove as it has been processed
+      }
+    }
+
+    //now check for leftovers in array2, these are new settings so just store them
+    if( is_array($array2) === true ){
+      reset($array2);
+      foreach( $array2 as $array2_key => $array2_inside ){
+        ++$this->settings_array_changes;
+        $new[] = $array2_inside[1];
+        unset($array2[$array2_key]); //remove as it has been processed
+
+      }
+    }
+
+    return $new;
+  }
+
+
+  /**
    * method to collect an array from $_POST and return it
    * formated to be stored in settings.conf
    * @param string $arrayname name pf the $_POST array
+   * @param bool $$multidimensinal=false returns multidimensional array when true
    * @return array,bool FALSE if none found or one result per key
    */
-  function get_array_from_post($arrayname){
+  function get_post_array($arrayname, $multidimensional=false){
     $ret = array();
-    if( ! is_array($_POST[$arrayname]) ){ return false; }
+    $multi = 0;
+    if( !array_key_exists($arrayname, $_POST) ){ return false; }
+    if( !is_array($_POST[$arrayname]) ){ return false; }
 
     foreach( $_POST[$arrayname] as $val ){
-      $ret[] = $val;
+      if( $multidimensional === true ){
+        $ret[$multi][0] = $arrayname;//only contain the array name without key
+        $ret[$multi][1] = $val;
+        ++$multi;
+      }else{
+        $ret[] = $val;
+      }
     }
 
     if( count($ret) === 0 ){ return false; }
@@ -100,12 +235,20 @@ class PIASettings {
     $cnt = 0;
     $ret = '';
 
-    reset($array2format);
-    foreach( $array2format as $val ){
-      $ret .= $name."[$cnt]='$val'\n";
-      ++$cnt;
+    if( count($array2format) === 0 ){
+      //no values, create empty array to have a default in settings.conf
+      return $name.'[0]=""';
     }
 
+    reset($array2format);
+    foreach( $array2format as $val ){
+      if( $val != '' ){
+        $ret .= $name."[$cnt]='$val'\n";
+        ++$cnt;
+      }
+    }
+
+    $ret = trim($ret, "\n");
     return $ret;
   }
 
@@ -147,6 +290,7 @@ function remove_array($array_name){
   //loop over returned values and remove the lines
   for( $x = count($ret)-1 ; $x >= 0 ; --$x ){ //go backwards or line numbers need to be adjusted
     exec('sed "'.$ret[$x].'d" '.$this->_settings_file.' > '.$this->_settings_file.'.back');
+//    exec('sed -e :a -e \'/^\n*$/{$d;N;};/\n$/ba\' '.$this->_settings_file.'.back');
     exec('mv '.$this->_settings_file.'.back '.$this->_settings_file.'');
     ++$removed;
   }
@@ -156,30 +300,27 @@ function remove_array($array_name){
 
 
 /**
- * method to check if $config_value is part of a settings array == contains [x]
- * so passing 'FOO[99]' returns true while 'FOO' will not
- * @param string $config_value string containing name of config value
+ * method to check if $config_value is part of a settings array
+ * it checks settings.conf for a matching array with [0] as this must always exist, even if empty
+ * @param string $array_name string containing name of config value
  * @return boolean TRUE when string is an array in settings.conf or FALSE if not
  */
-function is_settings_array( $config_value ){
-  //arrays contain [] so check for both
-  $b_open = strpos($config_value, '[');
-  $b_close = strpos($config_value, ']');
-  $key = (int)substr($config_value, $b_open+1, (strlen($config_value)-$b_close) ); //get only the array key
+function is_settings_array( $array_name ){
+  $settings = $this->get_settings();
 
-  if( $b_open != 0 && $b_close != 0 ){
-    //no ensure that [ comes before ]
-    if( $b_open < $b_close ){
-      //assemble different parts back together to check script logic
-      //$assembled will have to == $config_value
-      $assembled = substr($config_value, 0, $b_open).'['.$key.']';
-      if( $assembled !== $config_value ){
-        die('FATAL SCRIPT ERROR 45d: bad logic! Please contact support.'.$assembled.' does not match '.$config_value);
-      }
-      return true;
-    }
+  // array name may be passed as 'foo' or 'foo[99]'
+  if( strpos($array_name, '[') === false ){
+    $config_value = $array_name;
+  }else{
+    $config_value = substr($array_name, 0, strpos($array_name, '[') ); //this is the value of $key without [n]. this is used for the array name when writing it back
   }
-  return false;
+
+  //check if $config_value[0] is in settings
+  if( array_key_exists($config_value.'[0]', $settings) === true ){
+    return true;
+  }else{
+    return false;
+  }
 }
 
   /**
@@ -262,6 +403,37 @@ function is_settings_array( $config_value ){
      return false;
    }
  }
+
+ /**
+ * method to get an entire settings array as used by build_* functions
+ * @param string $name=null *optional* name of array
+ * @return string/bool string containing HTML formated as <select> or FALSE
+ */
+function get_settings_array($name){
+  $ret = array();
+
+  if(array_key_exists('settings.conf', $_SESSION) !== true ){
+    if( $this->load_settings() === false ){
+      echo "FATAL ERROR: Unable to get list of settings!";
+      return false;
+    }
+  }
+
+
+  /* loop over settings strings and find all with $name* */
+    $c=0;
+  foreach( $_SESSION['settings.conf'] as $key => $val ){
+    //check $key with substring - remove [?]
+    $len = strpos($key, '['); // length or string upto [
+    if(substr($key, 0, $len) === $name ){
+      $ret[] = array( $key , $val );
+    }
+  }
+
+  if( count($ret) == 0 ){ return false; }
+  return $ret;
+}
+
 
 }
 ?>

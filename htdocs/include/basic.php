@@ -10,11 +10,13 @@ if( !array_key_exists('cid', $_GET) ){ $_GET['cid'] = ''; }
 
 require_once $inc_dir.'class_loader.php';
 require_once $inc_dir.'classes/PIASettings.php';
+require_once $inc_dir.'classes/SystemServices.php';
 require_once $inc_dir.'classes/class_files/class_files.php';
 
 /* prepare global objects */
 $_files = loader::loadFiles();
 $_settings = loader::PIASettings();
+$_services= loader::SystemServices();
 
 $header_type = 'foo'; //Change this later to add more headers
 $body_type = 'foo'; //Use to select different code later
@@ -92,18 +94,6 @@ function VM_restart(){
   exec('sudo /sbin/shutdown -r now &>/dev/null &');
 }
 
-/**
- * method to execute pia-forward start/stop - control the firewall
- * @param string $command "start" or "stop"
- */
-function VPN_forward($command){
-  if( $command === 'start' )
-    exec('sudo /pia/pia-forward start &>/dev/null &');
-  else{
-    exec('sudo /pia/pia-forward stop &>/dev/null &');
-  }
-}
-
 
 function VPN_is_valid_connection($val2check){
   if(array_key_exists('ovpn', $_SESSION) !== true ){
@@ -149,37 +139,6 @@ function array_is_value_unique( &$ar, $val ){
   }
 
   return true;
-}
-
-/**
- * method to get an entire settings array
- * @param string $name=null *optional* name of array
- * @return string/bool string containing HTML formated as <select> or FALSE
- */
-function VPN_get_settings_array($name){
-  global $_settings;
-  $ret = array();
-
-  if(array_key_exists('settings.conf', $_SESSION) !== true ){
-    if( $_settings->load_settings() === false ){
-      echo "FATAL ERROR: Unable to get list of settings!";
-      return false;
-    }
-  }
-
-
-  /* loop over settings strings and find all with $name* */
-  foreach( $_SESSION['settings.conf'] as $key => $val ){
-    //check $key with substring - remove [?]
-    $len = strpos($key, '['); // length or string upto [
-    if(substr($key, 0, $len) === $name ){
-      $ret[$key] = $val;
-    }
-  }
-
-
-  if( count($ret) == 0 ){ return false; }
-  return $ret;
 }
 
 /**
@@ -248,6 +207,7 @@ function VPN_ovpn_to_session(){
    * @global type $CONF
    */
 function VM_get_status(){
+  global $_settings;
   $ret_str = '<table id="vm_status">';
 
   //check session.log if for current status
@@ -302,7 +262,7 @@ function VM_get_status(){
     $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported</td></tr>";
 
     //show forwarding info
-    $settings = VPN_get_settings();
+    $settings = $_settings->get_settings();
     if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
       $ret_str .= "<tr><td>Forwarding</td><td>$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port</td></tr>";
     }
@@ -516,5 +476,53 @@ function build_select( &$content, $double=false ){
 
   /* return it all */
   return $head.$sel.$opts.'</select>';
+}
+
+/**
+ * function to build checkboxes based on a source array
+ * @param array $content array with following structure
+ * <ul><li>['id'] = "foo"; name and id of select element created</li>
+ * <li>['selected'] = "male"; Otional - specify top item from list by option value</li>
+ * <li>array( 'option value', 'option display')</li>
+ * <li>array( 'option value2', 'option display2')</li>
+ * </ul>
+ * @param boolean $double false will not list a 'selected' option twice, true will
+ * @return string containing complete checkbox set as HTMl source
+ */
+function build_checkbox( &$content, $double=false ){
+
+  /* 'selected' is option */
+  if( array_key_exists('selected', $content) === true ){
+    $cnt = count($content)-2;//skip id & selected
+  }else{
+    $cnt = count($content)-1;//skip only id
+  }
+
+  /* time to build the rest */
+  $sel = '';
+  $opts = '';
+  for( $x=0 ; $x < $cnt ; ++$x ){
+    $val = htmlspecialchars($content[$x][0]);
+    $dis = htmlspecialchars($content[$x][1]);
+
+    $checked = '';
+    //array keys may not match so loop over it
+    if( @array_key_exists("$x", $content['selected']) === true )
+    reset($content['selected']);
+    foreach( $content['selected'] as $cur ){
+      if( $cur[1] == $dis ){
+        //echo "match $dis<br>";
+        $checked = 'checked';
+      }else{
+        //echo "NO match '$cur[0]' vs '$val'<br>\n";
+      }
+    }
+
+    /* handle default selection */
+    $opts .= "<input $checked type=\"checkbox\" name=\"{$content['id']}[$x]\" value=\"$dis\">$dis</option>\n";
+  }
+
+  /* return it all */
+  return $sel.$opts;
 }
 ?>

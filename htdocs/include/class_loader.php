@@ -8,6 +8,7 @@ class loader {
   public static $_login;
   public static $_token;
   public static $_pia_settings;
+  public static $_system_services;
   public static $_gen;
   public static $_config;
   public static $_files;
@@ -17,6 +18,12 @@ class loader {
     self::$_pia_settings->set_files(self::$_files);
 
     return self::$_pia_settings;
+  }
+
+  public static function SystemServices(){
+    self::$_system_services = new SystemServices();
+
+    return self::$_system_services;
   }
 
   public static function loadFiles(){

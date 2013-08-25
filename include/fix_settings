@@ -10,11 +10,18 @@ source '/pia/settings.conf'
 #check if settings exist in settings.conf and add their default
 
 
-if [ -z "${MYVPN[0]}" ]; then
-  echo '' >> '/pia/settings.conf'
+if [ -z "${DAEMON_ENABLED}" ]; then
   echo '# pia-daemon settings' >> '/pia/settings.conf'
   echo '#####' >> '/pia/settings.conf'
   echo 'DAEMON_ENABLED="no"' >> '/pia/settings.conf'
+  echo '# set action when VPN fails: terminate | failover' >> '/pia/settings.conf'
+  echo 'FAIL_ACTION="failover"' >> '/pia/settings.conf'
+  echo 'FAIL_RETRY_VPN=4' >> '/pia/settings.conf'
+  echo 'FAIL_RETRY_INTERNET=3' >> '/pia/settings.conf'
+  echo 'FAIL_RETRY_DELAY=1' >> '/pia/settings.conf'
+fi
+
+if [ ! ${NAMESERVERS[0]+abc} ]; then
   echo '# list of VPN connections to use, the first is awlays the primary' >> '/pia/settings.conf'
   echo 'MYVPN[0]="CA Toronto"' >> '/pia/settings.conf'
   echo 'MYVPN[1]="Switzerland"' >> '/pia/settings.conf'
@@ -23,51 +30,37 @@ if [ -z "${MYVPN[0]}" ]; then
   echo 'MYVPN[4]="Germany"' >> '/pia/settings.conf'
   echo 'MYVPN[5]="France"' >> '/pia/settings.conf'
   echo 'MYVPN[6]="Netherlands"' >> '/pia/settings.conf'
-  echo '' >> '/pia/settings.conf'
-  echo '# set action when VPN fails: terminate | failover' >> '/pia/settings.conf'
-  echo 'FAIL_ACTION="failover"' >> '/pia/settings.conf'
-  echo 'FAIL_RETRY_VPN=4' >> '/pia/settings.conf'
-  echo 'FAIL_RETRY_INTERNET=3' >> '/pia/settings.conf'
-  echo 'FAIL_RETRY_DELAY=1' >> '/pia/settings.conf'
-  echo '' >> '/pia/settings.conf'
 fi
 
 if [ -z "${SLEEP_INTERNET_DOWN}" ]; then
-  echo '' >> '/pia/settings.conf'
   echo '# General Time and Delay Settings' >> '/pia/settings.conf'
   echo '#####' >> '/pia/settings.conf'
   echo '# time in seconds to wait before rechecking a down Internet connection' >> '/pia/settings.conf'
   echo "# each run takes a few seconds to complete so don't go too low!" >> '/pia/settings.conf'
   echo '# default 320 (5 minutes)' >> '/pia/settings.conf'
   echo 'SLEEP_INTERNET_DOWN=320' >> '/pia/settings.conf'
-  echo '' >> '/pia/settings.conf'
   echo '# time in seconds to wait before attempting to ping a resource again' >> '/pia/settings.conf'
   echo '# default 4' >> '/pia/settings.conf'
   echo 'SLEEP_PING_RETEST=4' >> '/pia/settings.conf'
-  echo '' >> '/pia/settings.conf'
   echo '# time in seconds between retries when none of the PIA Gateways can be reached' >> '/pia/settings.conf'
   echo '# default 320 (5 minutes)' >> '/pia/settings.conf'
   echo 'SLEEP_RECONNECT_ERROR=320' >> '/pia/settings.conf'
-  echo '' >> '/pia/settings.conf'
   echo '# time (seconds) in between "uptime" checks. every check will send a few pings' >> '/pia/settings.conf'
   echo "# to some server so please don't flood them or they may block you" >> '/pia/settings.conf'
   echo '# default 30' >> '/pia/settings.conf'
   echo 'SLEEP_MAIN_LOOP=30' >> '/pia/settings.conf'
-  echo '' >> '/pia/settings.conf'
 fi
 
 if [ -z "${VERBOSE}" ]; then
-  echo '' >> '/pia/settings.conf'
   echo '# output level and debug settings' >> '/pia/settings.conf'
   echo '#####' >> '/pia/settings.conf'
   echo '# setting verbose to yes will print status notification after each check. any other settings for "background mode"' >> '/pia/settings.conf'
   echo 'VERBOSE="no"' >> '/pia/settings.conf'
   echo 'VERBOSE_DEBUG="no"' >> '/pia/settings.conf'
-  echo '' >> '/pia/settings.conf'
+
 fi
 
 if [ -z "${bold}" ]; then
-  echo '' >> '/pia/settings.conf'
   echo '#for pretty print' >> '/pia/settings.conf'
   echo '#####' >> '/pia/settings.conf'
   echo 'bold=`tput bold`' >> '/pia/settings.conf'
@@ -75,51 +68,43 @@ if [ -z "${bold}" ]; then
 fi
 
 if [ -z "${FORWARD_IP}" ]; then
-  echo '' >> '/pia/settings.conf'
   echo '# IP of target computer for port forwarding - if supported by location' >> '/pia/settings.conf'
   echo 'FORWARD_IP="192.168.10.101"' >> '/pia/settings.conf'
 fi
 
 if [ -z "${FORWARD_PORT_ENABLED}" ]; then
-  echo '' >> '/pia/settings.conf'
   echo '# Enable/Disable forwarding yes/no' >> '/pia/settings.conf'
   echo 'FORWARD_PORT_ENABLED="yes"' >> '/pia/settings.conf'
 fi
 
 if [ -z "${DAEMON_ENABLED}" ]; then
-  echo '' >> '/pia/settings.conf'
   echo '# Enable/Disable pia-daemon yes/no' >> '/pia/settings.conf'
   echo 'DAEMON_ENABLED="no"' >> '/pia/settings.conf'
 fi
 
 if [ -z "${FORWARD_VM_LAN}" ]; then
-  echo '' >> '/pia/settings.conf'
   echo '# Enable/Disable forwarding for private VM LAN yes/no' >> '/pia/settings.conf'
   echo 'FORWARD_VM_LAN="yes"' >> '/pia/settings.conf'
 fi
 
 if [ -z "${FORWARD_PUBLIC_LAN}" ]; then
-  echo '' >> '/pia/settings.conf'
   echo '# Enable/Disable forwarding for public LAN yes/no' >> '/pia/settings.conf'
   echo 'FORWARD_PUBLIC_LAN="no"' >> '/pia/settings.conf'
 fi
 
-if [ -z "${FIREWALL_IF_SSH[0]}" ]; then
-  echo '' >> '/pia/settings.conf'
+if [ ! ${FIREWALL_IF_SSH[0]+abc} ]; then
   echo '# Enable ssh on the following interfaces' >> '/pia/settings.conf'
   echo 'FIREWALL_IF_SSH[0]="eth0"' >> '/pia/settings.conf'
   echo 'FIREWALL_IF_SSH[1]="eth1"' >> '/pia/settings.conf'
 fi
 
-if [ -z "${FIREWALL_IF_WEB[0]}" ]; then
-  echo '' >> '/pia/settings.conf'
+if [ ! ${FIREWALL_IF_WEB[0]+abc} ]; then
   echo '# Enable web UI on the following interfaces' >> '/pia/settings.conf'
   echo 'FIREWALL_IF_WEB[0]="eth0"' >> '/pia/settings.conf'
   echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/pia/settings.conf'
 fi
 
-if [ -z "${NAMESERVERS[0]}" ]; then
-  echo '' >> '/pia/settings.conf'
+if [ ! ${NAMESERVERS[0]+abc} ]; then
   echo '# DNS Servers to use' >> '/pia/settings.conf'
   echo 'NAMESERVERS[0]="8.8.8.8"' >> '/pia/settings.conf'
   echo 'NAMESERVERS[1]="208.67.222.222"' >> '/pia/settings.conf'
@@ -128,31 +113,37 @@ if [ -z "${NAMESERVERS[0]}" ]; then
 fi
 
 if [ -z "${IF_ETH0_DHCP}" ]; then
-  echo '' >> '/pia/settings.conf'
   echo '# Interface settings' >> '/pia/settings.conf'
   echo 'IF_ETH0_DHCP="yes"' >> '/pia/settings.conf'
-  echo 'IF_ETH0_DHCP_SERVER="no"' >> '/pia/settings.conf'
   echo 'IF_ETH0_IP=""' >> '/pia/settings.conf'
   echo 'IF_ETH0_SUB=""' >> '/pia/settings.conf'
   echo 'IF_ETH0_GW=""' >> '/pia/settings.conf'
 fi
 
 if [ -z "${IF_ETH1_DHCP}" ]; then
-  echo '' >> '/pia/settings.conf'
   echo '# Interface settings' >> '/pia/settings.conf'
   echo 'IF_ETH1_DHCP="no"' >> '/pia/settings.conf'
-  echo 'IF_ETH1_DHCP_SERVER="yes"' >> '/pia/settings.conf'
   echo 'IF_ETH1_IP="192.168.10.1"' >> '/pia/settings.conf'
   echo 'IF_ETH1_SUB="255.255.255.0"' >> '/pia/settings.conf'
   echo 'IF_ETH1_GW=""' >> '/pia/settings.conf'
 fi
 
-if [ -z "${DHCPD_RANGE}" ]; then
-  echo '' >> '/pia/settings.conf'
-  echo '# Range for dynami IPs' >> '/pia/settings.conf'
-  echo 'DHCPD_RANGE="192.168.10.101 192.168.10.151"' >> '/pia/settings.conf'
-  echo 'DHCPD_BROADCAST="192.168.10.255"' >> '/pia/settings.conf'
-  echo 'DHCPD_SUBNET="192.168.10.0"' >> '/pia/settings.conf'
-  echo 'DHCPD_MASK="255.255.255.0"' >> '/pia/settings.conf'
-  echo 'IF_ETH1_GW=""' >> '/pia/settings.conf'
+if [ -z "${DHCPD_ENABLED1}" ]; then
+  echo '# Range for dynamic IPs' >> '/pia/settings.conf'
+  echo 'DHCPD_ENABLED1="yes"' >> '/pia/settings.conf'
+  echo 'DHCPD_RANGE1="192.168.10.101 192.168.10.151"' >> '/pia/settings.conf'
+  echo 'DHCPD_BROADCAST1="192.168.10.255"' >> '/pia/settings.conf'
+  echo 'DHCPD_ROUTER1="192.168.10.1"' >> '/pia/settings.conf'
+  echo 'DHCPD_SUBNET1="192.168.10.0"' >> '/pia/settings.conf'
+  echo 'DHCPD_MASK1="255.255.255.0"' >> '/pia/settings.conf'
+fi
+
+if [ -z "${DHCPD_ENABLED2}" ]; then
+  echo '# Range for dynamic IPs' >> '/pia/settings.conf'
+  echo 'DHCPD_ENABLED2="no"' >> '/pia/settings.conf'
+  echo 'DHCPD_RANGE2=""' >> '/pia/settings.conf'
+  echo 'DHCPD_BROADCAST2=""' >> '/pia/settings.conf'
+  echo 'DHCPD_ROUTER2=""' >> '/pia/settings.conf'
+  echo 'DHCPD_SUBNET2=""' >> '/pia/settings.conf'
+  echo 'DHCPD_MASK2=""' >> '/pia/settings.conf'
 fi
