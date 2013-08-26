@@ -301,6 +301,16 @@ function VPN_sessionlog_status(){
       $lines = explode("\n", $content);
       $location = substr($lines[0], strpos($content, 'connecting to')+13 ); //+13 to remove 'connecting to'
       $_SESSION['connecting2'] = $location;
+    }else{
+      //recover from previous error
+      if( array_key_exists('connecting2', $_SESSION) === true 
+              && ( $_SESSION['connectiong2'] == '' || $_SESSION['connectiong2'] === 'ERROR 5642' )
+              && strpos($content, 'connecting to') !== false
+        ){
+        $lines = explode("\n", $content);
+        $location = substr($lines[0], strpos($content, 'connecting to')+13 ); //+13 to remove 'connecting to'
+        $_SESSION['connecting2'] = $location;        
+      }
     }
 
     //check for 'connected'
