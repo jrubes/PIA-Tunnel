@@ -8,6 +8,7 @@ class loader {
   public static $_login;
   public static $_token;
   public static $_pia_settings;
+  public static $_pia_commands;
   public static $_system_services;
   public static $_gen;
   public static $_config;
@@ -19,6 +20,14 @@ class loader {
 
     return self::$_pia_settings;
   }
+  
+  public static function PIACommands(){
+    self::$_pia_commands = new PIACommands();
+    self::$_pia_commands->set_files(self::$_files);
+    self::$_pia_commands->set_settings(self::$_pia_settings);
+
+    return self::$_pia_commands;
+  }  
 
   public static function SystemServices(){
     self::$_system_services = new SystemServices();

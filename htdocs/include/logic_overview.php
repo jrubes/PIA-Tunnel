@@ -1,4 +1,9 @@
 <?php
+/* @var $_settings PIASettings */
+/* @var $_pia PIACommands */
+/* @var $_files FilesystemOperations */
+/* @var $_services SystemServices */
+
 unset($_SESSION['ovpn']); //dev
 
 /* load list of available connections into SESSION */
@@ -17,17 +22,8 @@ switch($_REQUEST['cmd']){
     if( array_key_exists('vpn_connect', $_POST) === true ){
       //check if passed VPN name is valid and pass to command line if it is
       if( VPN_is_valid_connection($_POST['vpn_connections']) === true ){
-        $arg = escapeshellarg($_POST['vpn_connections']);
 
-        //looks good, delete old session.log
-        $f = '/pia/cache/session.log';
-        $_files->rm($f);
-        $c = "connecting to $arg\n\n";
-        $_SESSION['connecting2'] = $arg; //store for messages
-        $_files->writefile( $f, $c ); //write file so status overview works right away
-
-        //time to initiate the connection
-        exec("sudo bash -c \"/pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &"); //using bash allows this to happen in the background
+        $_pia->pia_connect($_POST['vpn_connections']);
         $disp_body .= "<div class=\"feedback\">Establishing a VPN connection to $arg</div>\n";
         $disp_body .= disp_default();
       }
@@ -40,6 +36,38 @@ switch($_REQUEST['cmd']){
       $_SESSION['connecting2'] = '';
 
       $disp_body .= "<div class=\"feedback\">Disconnecting VPN</div>\n";
+      $disp_body .= disp_default();
+      break;
+      
+    }elseif( array_key_exists('daemon_start', $_POST) === true ){
+      
+      //start a VPN connection as with daemon => MYVPN[0]
+      if( $_pia->is_vpn_up() === true ){
+        //VPN already up, only start daemon
+        //die('just daemon');
+        $_pia->pia_daemon('start');
+      }else{
+        //VPN down, calling pia-start first is quicker
+        echo "fresh";var_dump($_pia->is_vpn_up());die();
+        $_pia->pia_connect('daemon');
+      }
+      $disp_body .= "<div class=\"feedback\">Starting pia-daemon</div>\n";
+
+
+      $disp_body .= disp_default();
+      break;
+      
+    }elseif( array_key_exists('daemon_stop', $_POST) === true ){
+      
+      //start a VPN connection as with daemon => MYVPN[0]
+      $_pia->pia_daemon('stop');
+
+      if( $_pia->status_pia_daemon() === 'offline' ){
+        $disp_body .= "<div class=\"feedback\">pia-daemon has been stopped</div>\n";
+      }else{
+        $disp_body .= "<div class=\"feedback\">pia-daemon is still running. please try again</div>\n";
+      }
+      
       $disp_body .= disp_default();
       break;
     }
@@ -104,6 +132,23 @@ function disp_default(){
 
   //VPN control UI
   $disp_body .= '<h2>Network Control</h2>';
+  
+  $disp_body .= '<form class="inline" action="/" method="post">';
+  $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
+  $disp_body .= '<table class="control_box">';
+  $disp_body .= '<tr>';
+  $disp_body .= '<td>PIA VPN Daemon</td>';
+  $disp_body .= '<td>';
+  $disp_body .= ' <input type="submit" style="width: 9em;" name="daemon_start" value="Start pia-daemon">';
+  $disp_body .= '</td>';
+  $disp_body .= '<td>';
+  $disp_body .= ' <input type="submit" style="width: 9em;" name="daemon_stop" value="Stop pia-daemon">';
+  $disp_body .= '</td>';
+  $disp_body .= '</tr>';
+  $disp_body .= '</table>';
+  $disp_body .= " </form>\n";
+  
+  
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
   $disp_body .= '<table class="control_box">';

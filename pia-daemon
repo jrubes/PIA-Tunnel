@@ -12,6 +12,11 @@ source '/pia/include/functions.inc'
 # 	if the ping fails n times the tunnel is closed or restartet
 
 
+# check for "stop" $1 which kills all pia-daemons
+if [ "$1" = "stop" ]; then
+  killall "pia-daemon"
+fi
+
 
 
 # generate a few IPs for the uptime functions
@@ -123,11 +128,12 @@ while true; do
 					"- forwarding disabled until the VPN is back up."
 				echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
+                rm -f "/pia/cache/session.log"
 				/pia/pia-forward stop quite
 				sleep $SLEEP_INTERNET_DOWN
 
 				#restarting pia-daemon because there is no goto :(
-				# will have to rewrite this script with support for contitions
+				# will have to rewrite this script as a later timer
 				/pia/pia-daemon shutup
 				exit
 				break
