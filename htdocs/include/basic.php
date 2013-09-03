@@ -216,12 +216,13 @@ function VPN_ovpn_to_session(){
 function VM_get_status(){
   global $_settings;
   global $_pia;
+  $settings = $_settings->get_settings();
   
   $ret_str = '<table id="vm_status">';
 
   //check session.log if for current status
   $session_status = VPN_sessionlog_status();
-  $ret_str .= "<tr><td>Status</td>";
+  $ret_str .= "<tr><td style=\"width:6em\">Status</td>";
   switch( $session_status[0] ){
     case 'connected':
       $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
@@ -239,6 +240,12 @@ function VM_get_status(){
       break;
     default:
       var_dump($session_status);
+  }
+  
+  if( $_pia->status_pia_daemon() === 'running' ){
+    $ret_str .= "<tr><td>PIA Daemon</td><td>running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
+  }else{
+    $ret_str .= "<tr><td>PIA Daemon</td><td>not running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
   }
 
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
@@ -270,7 +277,6 @@ function VM_get_status(){
       $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported</td></tr>";
 
       //show forwarding info
-      $settings = $_settings->get_settings();
       if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
         $ret_str .= "<tr><td>Forwarding</td><td>$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port</td></tr>";
       }
@@ -281,11 +287,6 @@ function VM_get_status(){
         $ret_str .= "<tr><td>Forwarding2</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
       }
       
-      if( $_pia->status_pia_daemon() === 'running' ){
-        $ret_str .= "<tr><td>pia-daemon</td><td>running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
-      }else{
-        $ret_str .= "<tr><td>pia-daemon</td><td>not running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
-      }
     }else{
       $ret_str .= "<tr><td>VPN</td><td>down</td></tr>";
     }

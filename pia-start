@@ -100,7 +100,8 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
           echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
             "- starting pia-daemon in a screen session"
           killall pia-daemon &> /dev/null
-          screen -d -m /pia/pia-daemon
+          #screen -d -m /pia/pia-daemon
+          nohup /pia/pia-daemon &
         fi
 	    break
 	  fi

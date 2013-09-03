@@ -47,8 +47,7 @@ switch($_REQUEST['cmd']){
         //die('just daemon');
         $_pia->pia_daemon('start');
       }else{
-        //VPN down, calling pia-start first is quicker
-        echo "fresh";var_dump($_pia->is_vpn_up());die();
+        //VPN down, calling pia-start with "daemon" parameter
         $_pia->pia_connect('daemon');
       }
       $disp_body .= "<div class=\"feedback\">Starting pia-daemon</div>\n";
