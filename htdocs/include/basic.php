@@ -217,7 +217,7 @@ function VM_get_status(){
   global $_settings;
   global $_pia;
   $settings = $_settings->get_settings();
-  
+
   $ret_str = '<table id="vm_status">';
 
   //check session.log if for current status
@@ -241,7 +241,7 @@ function VM_get_status(){
     default:
       var_dump($session_status);
   }
-  
+
   if( $_pia->status_pia_daemon() === 'running' ){
     $ret_str .= "<tr><td>PIA Daemon</td><td>running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
   }else{
@@ -286,7 +286,7 @@ function VM_get_status(){
       if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
         $ret_str .= "<tr><td>Forwarding2</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
       }
-      
+
     }else{
       $ret_str .= "<tr><td>VPN</td><td>down</td></tr>";
     }
@@ -319,13 +319,13 @@ function VPN_sessionlog_status(){
       $_SESSION['connecting2'] = $location;
     }else{
       //recover from previous error
-      if( array_key_exists('connecting2', $_SESSION) === true 
-              && ( $_SESSION['connectiong2'] == '' || $_SESSION['connectiong2'] === 'ERROR 5642' )
+      if( array_key_exists('connecting2', $_SESSION) === true
+              && ( $_SESSION['connecting2'] == '' || $_SESSION['connecting2'] === 'ERROR 5642' )
               && strpos($content, 'connecting to') !== false
         ){
         $lines = explode("\n", $content);
         $location = substr($lines[0], strpos($content, 'connecting to')+13 ); //+13 to remove 'connecting to'
-        $_SESSION['connecting2'] = $location;        
+        $_SESSION['connecting2'] = $location;
       }
     }
 
