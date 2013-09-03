@@ -1,5 +1,6 @@
 <?php
 /* @var $_settings PIASettings */
+/* @var $_pia PIACommands */
 /* @var $_files FilesystemOperations */
 /* @var $_services SystemServices */
 

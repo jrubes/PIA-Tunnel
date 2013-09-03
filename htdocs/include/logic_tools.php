@@ -1,6 +1,10 @@
 <?php
 /* execute tools for the PIA VPN GUI Management */
-unset($_SESSION['ovpn']); //dev
+/* @var $_settings PIASettings */
+/* @var $_pia PIACommands */
+/* @var $_files FilesystemOperations */
+/* @var $_services SystemServices */
+
 
 /* load list of available connections into SESSION */
 if(array_key_exists('ovpn', $_SESSION) !== true ){

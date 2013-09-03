@@ -1,4 +1,9 @@
 <?php
+/* @var $_settings PIASettings */
+/* @var $_pia PIACommands */
+/* @var $_files FilesystemOperations */
+/* @var $_services SystemServices */
+
 /* basic include file used for all scripts */
 
 date_default_timezone_set('Europe/Berlin');
@@ -10,6 +15,7 @@ if( !array_key_exists('cid', $_GET) ){ $_GET['cid'] = ''; }
 
 require_once $inc_dir.'class_loader.php';
 require_once $inc_dir.'classes/PIASettings.php';
+require_once $inc_dir.'classes/PIACommands.php';
 require_once $inc_dir.'classes/SystemServices.php';
 require_once $inc_dir.'classes/class_files/class_files.php';
 
@@ -17,6 +23,7 @@ require_once $inc_dir.'classes/class_files/class_files.php';
 $_files = loader::loadFiles();
 $_settings = loader::PIASettings();
 $_services= loader::SystemServices();
+$_pia = loader::PIACommands();
 
 $header_type = 'foo'; //Change this later to add more headers
 $body_type = 'foo'; //Use to select different code later
@@ -208,11 +215,14 @@ function VPN_ovpn_to_session(){
    */
 function VM_get_status(){
   global $_settings;
+  global $_pia;
+  $settings = $_settings->get_settings();
+  
   $ret_str = '<table id="vm_status">';
 
   //check session.log if for current status
   $session_status = VPN_sessionlog_status();
-  $ret_str .= "<tr><td>Status</td>";
+  $ret_str .= "<tr><td style=\"width:6em\">Status</td>";
   switch( $session_status[0] ){
     case 'connected':
       $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
@@ -230,6 +240,12 @@ function VM_get_status(){
       break;
     default:
       var_dump($session_status);
+  }
+  
+  if( $_pia->status_pia_daemon() === 'running' ){
+    $ret_str .= "<tr><td>PIA Daemon</td><td>running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
+  }else{
+    $ret_str .= "<tr><td>PIA Daemon</td><td>not running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
   }
 
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
@@ -261,7 +277,6 @@ function VM_get_status(){
       $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported</td></tr>";
 
       //show forwarding info
-      $settings = $_settings->get_settings();
       if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
         $ret_str .= "<tr><td>Forwarding</td><td>$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port</td></tr>";
       }
@@ -271,6 +286,7 @@ function VM_get_status(){
       if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
         $ret_str .= "<tr><td>Forwarding2</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
       }
+      
     }else{
       $ret_str .= "<tr><td>VPN</td><td>down</td></tr>";
     }
@@ -292,7 +308,7 @@ function VPN_sessionlog_status(){
   global $_files;
 
   $content = $_files->readfile('/pia/cache/session.log');
-  if( $content === false ){
+  if( $content == '' ){
     return array('disconnected');
   }else{
     //get name of current connection and store in SESSION

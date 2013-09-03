@@ -34,9 +34,17 @@ if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
 	exit
 fi
 
+# passed as command line argument
+filename="$1"
+
+# check if this is a "daemon" run
+if [ "$1" = "daemon" ]; then
+	# select the first connection from the failover array
+	filename="${MYVPN[0]}"
+fi
 
 #execute if .ovpn file exists with name passed
-if [ -f "/pia/ovpn/$1.ovpn" ]; then
+if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 	#check the for default value
 	PIA_UN=`sed -n '1p' /pia/login.conf`
 	if [ "$PIA_UN" = "your PIA account name on this line" ]; then
@@ -68,10 +76,10 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 
 
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-		"- establishing a VPN connection to $1."
+		"- establishing a VPN connection to $filename."
 	echo -e "\tsee ${bold}/pia/cache/session.log${normal} for details"
-    echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $1" > /pia/cache/session.log
-	openvpn "/pia/ovpn/$1.ovpn" &>> /pia/cache/session.log &
+    echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $filename" > /pia/cache/session.log
+	openvpn "/pia/ovpn/$filename.ovpn" &>> /pia/cache/session.log &
 
 
 
@@ -82,9 +90,19 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	  ping_host "vpn" "keep"
 	  if [ "$RET_PING_HOST" = "OK" ]; then
 	    # show connection data
-	    echo_conn_established $1
+	    echo_conn_established $filename
 	    #start firewall and enable forwarding
 	    /pia/pia-forward start quite
+
+        # keep VPN up with daemon?
+        if [ "$1" = "daemon" ]; then
+          sleep 5 #give everything a few seconds to settle	
+          echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+            "- starting pia-daemon in a screen session"
+          killall pia-daemon &> /dev/null
+          #screen -d -m /pia/pia-daemon
+          nohup /pia/pia-daemon &
+        fi
 	    break
 	  fi
 
@@ -103,6 +121,6 @@ if [ -f "/pia/ovpn/$1.ovpn" ]; then
 	done
 else
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-	  "- no connection with name $1."
+	  "- no connection with name $filename."
   echo -e "\ttry ${bold}pia-start list${normal} for a list of connections."
 fi
