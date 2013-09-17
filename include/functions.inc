@@ -280,6 +280,7 @@ function switch_vpn() {
 			echo -e "\tsee ${bold}/pia/cache/session.log${normal} for details"
 		fi
 		killall openvpn &> /dev/null
+        echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $CONN" > /pia/cache/session.log
 		openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/cache/session.log &
 
 		#wait until connection has been established
@@ -378,6 +379,7 @@ function check_repair_internet() {
 				"- forwarding disabled until the VPN is back up."
 			echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
+            rm -f "/pia/cache/session.log" &> /dev/null
 			/pia/pia-forward stop quite
 			exit
 		else

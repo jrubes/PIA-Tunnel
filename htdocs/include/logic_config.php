@@ -1,5 +1,6 @@
 <?php
 /* @var $_settings PIASettings */
+/* @var $_pia PIACommands */
 /* @var $_files FilesystemOperations */
 /* @var $_services SystemServices */
 
@@ -223,47 +224,6 @@ function dhcpd_process_template(){
   //all done - return
   return $templ.$subnet;
 
-}
-
-
-/**
- * method to update username and password passed via POST
- * @global object $_files
- * @return string string with HTML success message or empty when there was no update
- */
-function update_user_settings(){
-  global $_files;
-
-  $ret = '';
-  $login_file = '/pia/login.conf';
-  $username = ( array_key_exists('username', $_POST) ) ? $_POST['username'] : '';
-  $password = ( array_key_exists('password', $_POST) ) ? $_POST['password'] : '';
-
-  //can not empty values right now ... but there is a reset command
-  if( $username != '' ){
-    if( file_exists($login_file) ){
-      $c = $_files->readfile($login_file);
-      $ct = explode( "\n", eol($c));
-      if( $username !== $ct[0] ){
-        $content = "$username\n$ct[1]"; //write new username with old password
-        $_files->writefile($login_file, $content); //back to login.conf
-        $ret .= "<div class=\"feedback\">Username updated</div>\n";
-      }
-    }
-  }
-  if( $password != '' ){
-    if( file_exists($login_file) ){
-      $c = $_files->readfile($login_file);
-      $ct = explode( "\n", eol($c));
-      if( $password !== $ct[1] ){
-        $content = "$ct[0]\n$password"; //write old username with new password
-        $_files->writefile($login_file, $content); //back to login.conf
-        $ret .= "<div class=\"feedback\">Password updated</div>\n";
-      }
-    }
-  }
-  unset($_SESSION['login.conf']);
-  return $ret;
 }
 
 /**

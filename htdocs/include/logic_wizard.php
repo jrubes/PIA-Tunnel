@@ -5,13 +5,18 @@
 /* @var $_settings PIASettings */
 /* @var $_files FilesystemOperations */
 /* @var $_services SystemServices */
+/* @var $_settings PIASettings */
 
 
 
 //act on $CMD variable
 switch($_REQUEST['cmd']){
-  case 'store':
+  case 'store_setting':
 
+    echo "store";
+    
+    $disp_body .= update_user_settings();
+    $disp_body .= $_settings->save_settings_logic($_POST['store_fields']);
     break;
   default:
     $disp_body .= disp_wizard_default();
@@ -47,8 +52,7 @@ function disp_wizard_default(){
   // Gateway
   $disp_body .= "<p>&nbsp;</p>\n";
   $disp_body .= '<p>This virtual machine may act as a default gateway for your network and/or '
-          .'a virtual private Lan. Set the IP of this system as the default gateway of the computers you want to '
-          .'share the VPN connection with.<br>'
+          .'a virtual private Lan.<br>'
           .'The public LAN is your network, where your DSL/Cable router is connected.</p>';
   $disp_body .= "<table>\n";
   $fields .= 'FORWARD_PUBLIC_LAN,';
@@ -73,9 +77,9 @@ function disp_wizard_default(){
 
   // Forwarding
   $disp_body .= "<p>&nbsp;</p>\n";
-  $disp_body .= '<p>This VM supports port forwarding and can forward the VPN port to one IP.<br>'
+  $disp_body .= '<p>This VM supports port forwarding to one IP on either LAN segment.<br>'
           .'You may share the VPN connection with multiple computers but port forwarding only works with'
-          .' a single target IP.<br>Port forwarding is for torrent clients or other servers.<br>'
+          .' a single target IP.<br>'
           .'Enable the option below and select a VPN connection point marked with a * when creating a VPN connection later</p>';
   $disp_body .= "<table>\n";
   $fields .= 'FORWARD_PORT_ENABLED,';
@@ -94,10 +98,10 @@ function disp_wizard_default(){
 
   // pai-daemon
   $disp_body .= "<p>&nbsp;</p>\n";
-  $disp_body .= '<p>pia-daemon is a background script that can be started after a VPN connection '
-          .' has been established.<br> The script will periodically check if the VPN connection is'
-          .' still up and connect to a failover address when problems are detected.<br>'
-          .' You may enable the daemon here and customize the list of failover connections later.</p>';
+  $disp_body .= '<p>pia-daemon will mointor the VPN connections by pinging hosts through the VPN tunnel.<br>'
+          .' It will block any traffic when an error is detected and will'
+          .' attempt to reestablish a connection every few minutes.<br>'
+          .' enable this option if you "just want your VPN to work"</p>';
   $disp_body .= "<table>\n";
   $fields .= 'DAEMON_ENABLED,';
   $sel = array(
@@ -111,6 +115,7 @@ function disp_wizard_default(){
 
 
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= '<input type="hidden" name="store_fields" value="FORWARD_PUBLIC_LAN,FORWARD_VM_LAN,FORWARD_PORT_ENABLED,FORWARD_IP,DAEMON_ENABLED">';
   $disp_body .= '</form>';
   $disp_body .= '</div>';
   $disp_body .= "<p>&nbsp;</p>\n";

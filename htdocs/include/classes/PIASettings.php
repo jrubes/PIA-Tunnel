@@ -434,6 +434,5 @@ function get_settings_array($name){
   return $ret;
 }
 
-
 }
 ?>
