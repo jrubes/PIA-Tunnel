@@ -16,7 +16,8 @@ if [ ! -f "/usr/bin/dig" ]; then
 fi
 # pia-daemon will need screen soon
 if [ ! -f "/usr/bin/screen" ]; then
-	apt-get -y install screen > /dev/null
+  #using nohup for now
+  #apt-get -y install screen > /dev/null
 fi
 # add php5-cli for pia-daemon 2.0
 if [ ! -f "/usr/bin/php" ]; then
