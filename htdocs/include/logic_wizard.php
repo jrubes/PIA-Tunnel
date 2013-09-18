@@ -16,12 +16,49 @@ switch($_REQUEST['cmd']){
     $disp_body .= $_settings->save_settings_logic($_POST['store_fields']);
     $disp_body .= $_pia->update_root_password($_POST['new_root_password']);
     break;
+  case 'reset-system':
+    $settings = $_settings->get_settings();
+    
+    if( $settings['HAS_BEEN_RESET'] != "yes" ){ //don't run again on page refresh
+      $result = array();
+      exec("sudo /pia/reset-pia", $result);
+      if( array_key_exists('0', $result) === true ){
+        $_SESSION = array(); //clear all session vars
+        $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.<br>Please wait about a minute before you reload the page.</div>\n";
+        $_settings->save_settings('HAS_BEEN_RESET', "yes");
+        VM_restart();
+      }else{
+        $disp_body .= "<div class=\"feedback\">FATAL ERROR when attempting to reset the system. This should never happen! Please contact support!</div>\n";
+      }
+    }else{
+      $disp_body .= disp_wizard_default(); 
+    }
+    break;
   default:
-    $disp_body .= disp_wizard_default();
+    $settings = $_settings->get_settings();
+    if( $settings['HAS_BEEN_RESET'] != "yes" ){
+      $disp_body .= disp_wizard_reset();
+    }else{
+     $disp_body .= disp_wizard_default(); 
+    }
     break;
 }
 
+/**
+ * returns UI elements in HTML
+ * @return string string with HTML for body of this page
+ */
+function disp_wizard_reset(){
+  $disp_body = '';
 
+  $disp_body .= '<p>Brand new setup detected!<br>';
+  $disp_body .= 'Please click on "Reset the system and restart" to reset security certificates, clear the cache and reboot the system.</p>';
+  $disp_body .= '<p><form action="/?page=wizard&amp;cmd=reset-system" method="post">'."\n";
+  $disp_body .= '<br><input type="submit" name="reset-pia" value="Reset the system and restart">';
+  $disp_body .= "</form></p>\n";
+
+  return $disp_body;
+}
 
 /**
  * generates a setup UI for the user
@@ -39,7 +76,7 @@ function disp_wizard_default(){
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
   $disp_body .= '<input type="hidden" name="store" value="dhcpd_settings">';
   $disp_body .= '<h2>PIA-Tunnel Setup Wizard</h2>'."\n";
-
+  
   //username
   $disp_body .= '<p>Please enter your <a href="https://www.privateinternetaccess.com" target="_blank">https://www.privateinternetaccess.com</a>
                     account information below. The information will be stored in /pia/login.conf with read access for root and this webUI.</p>';

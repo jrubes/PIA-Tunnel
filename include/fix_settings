@@ -147,3 +147,8 @@ if [ -z "${DHCPD_ENABLED2}" ]; then
   echo 'DHCPD_SUBNET2=""' >> '/pia/settings.conf'
   echo 'DHCPD_MASK2=""' >> '/pia/settings.conf'
 fi
+
+#add HAS_BEEN_RESET for the setup wizard
+if [ -z "$HAS_BEEN_RESET" ]; then
+  echo 'HAS_BEEN_RESET="no"' >> '/pia/settings.conf'
+fi
