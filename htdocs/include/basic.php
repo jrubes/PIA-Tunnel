@@ -253,7 +253,7 @@ function VM_get_status(){
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
   $ret = array();
   exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  $ret_str .= "<tr><td>Internet IP</td><td>$ret[0]</td></tr>";
+  $ret_str .= "<tr><td>Public IP</td><td>$ret[0]</td></tr>";
   unset($ret);
 
   $ret = array();

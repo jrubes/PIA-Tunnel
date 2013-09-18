@@ -83,7 +83,7 @@ The PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player o
 4.b) Import the OVF Image
 	  * Extract the file you downloaded. You should now have a folder with tree files
 	  * "File" => "Deploy OVF Template..."
-	  * Browse to the extraced files and select "PIA Tunnel.ovf" => "Next" => "Next"
+	  * Browse to the extracted files and select "PIA Tunnel.ovf" => "Next" => "Next"
 	  * Give the VM a name and select a datastore to keep the machine on => "Next"
 	  * I use "Thin Provision" since the VM will not change much
 	  * Select your external Network on the "Network Mapping" screen
