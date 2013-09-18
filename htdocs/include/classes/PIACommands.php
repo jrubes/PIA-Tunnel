@@ -119,12 +119,31 @@ class PIACommands {
  * @param string $new_pw new root password as string or 
  */
 function update_root_password( $new_pw = null ){
-  if( $new_pw == '' ){
+  if( $new_pw == '' || strlen($new_pw) < 3 ){
     $new_pw = $this->rand_string(50);
   }
-  $new_pw = escapeshell($new_pw);
+  $new_pw = escapeshellarg($new_pw);
   
-  exec("/pia/include/update_root.sh $new_pw");
+  $out = array();
+  $stat = 99;
+  exec("sudo /pia/include/update_root.sh $new_pw", $out, $stat);
+  
+  $ret = "";
+  switch($stat){
+    case 0:
+      $ret = "<div class=\"feedback\">the root password has been changed to '".htmlspecialchars($new_pw)."'</div>\n";
+      break;
+    case 1:
+      $ret = "<div class=\"feedback\">Unkown Error when changing root password...</div>\n";
+      break;
+    case 2:
+      $ret = "<div class=\"feedback\">invalid root password</div>\n";
+      break;
+    default:
+      $ret = "<div class=\"feedback\">root password default text ???!?!?!</div>\n";
+      break;
+  }  
+  return $ret;
 }
 
 

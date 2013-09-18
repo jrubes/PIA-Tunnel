@@ -46,6 +46,10 @@ switch($_REQUEST['cmd']){
 
       $disp_body .= disp_default();
       break;
+      
+    }elseif( array_key_exists('update_root', $_POST) === true ){
+      $disp_body .= $_pia->update_root_password($_POST['new_root_password']);
+      break;
     }
 
 
@@ -57,7 +61,11 @@ switch($_REQUEST['cmd']){
 function disp_default(){
   $disp_body = '';
   $disp_body .= disp_pia_update();
+  $disp_body .= "<hr>";
   $disp_body .= disp_reset_pia();
+  $disp_body .= "<hr>";
+  $disp_body .= disp_update_root();
+  $disp_body .= "<hr>";
   return $disp_body;
 }
 
@@ -73,6 +81,27 @@ function disp_pia_update(){
   $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';
   $disp_body .= 'Here you may update the PIA Tunnel software. Active VPN connections may be terminated to apply new settings.';
   $disp_body .= '<br><input type="submit" name="pia-update" value="Start pia-update">';
+  $disp_body .= "</form></p>\n";
+
+  return $disp_body;
+}
+
+/**
+ * returns UI elements in HTML
+ * @return string string with HTML for body of this page
+ */
+function disp_update_root(){
+  global $_pia;
+  $disp_body = '';
+
+  //change the root password
+  $disp_body .= '<p><form class="inline" action="/?page=tools&cid=tools" method="post">';
+  $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';
+  $disp_body .= 'Here you may set a new root password. New passwords need to be at least three characters long.';
+  $disp_body .= "<table>\n";
+  $disp_body .= '<tr><td>root password</td><td><input type="text" style="width:30em;" name="new_root_password" value="'.$_pia->rand_string(50).'"></td></tr>'."\n";
+  $disp_body .= "</table>\n";
+  $disp_body .= '<input type="submit" name="update_root" value="Change root password">';
   $disp_body .= "</form></p>\n";
 
   return $disp_body;

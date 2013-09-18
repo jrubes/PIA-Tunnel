@@ -5,18 +5,16 @@
 /* @var $_settings PIASettings */
 /* @var $_files FilesystemOperations */
 /* @var $_services SystemServices */
-/* @var $_settings PIASettings */
+/* @var $_pia PIACommands */
 
 
 
 //act on $CMD variable
 switch($_REQUEST['cmd']){
   case 'store_setting':
-
-    echo "store";
-    
     $disp_body .= update_user_settings();
     $disp_body .= $_settings->save_settings_logic($_POST['store_fields']);
+    $disp_body .= $_pia->update_root_password($_POST['new_root_password']);
     break;
   default:
     $disp_body .= disp_wizard_default();
@@ -31,6 +29,8 @@ switch($_REQUEST['cmd']){
  */
 function disp_wizard_default(){
   global $_settings;
+  global $_pia;
+  
   $settings = $_settings->get_settings();
   $disp_body = '';
   $fields = ''; //comma separate list of settings offered here
@@ -110,6 +110,15 @@ function disp_wizard_default(){
             array( 'no', 'no')
           );
   $disp_body .= '<tr><td>Enable pia-daemon</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= "</table>\n";
+  
+  
+  // set a proper root password
+  $disp_body .= "<p>&nbsp;</p>\n";
+  $disp_body .= '<p>Please enter a new root password below or accept the generated one. Passwords may not be less than 3 characters long!<br>'
+          .'You may reset the password at any time using the "Tools" menu.</p>';
+  $disp_body .= "<table>\n";
+  $disp_body .= '<tr><td>root password</td><td><input type="text" style="width:25em;" name="new_root_password" value="'.$_pia->rand_string(50).'"></td></tr>'."\n";
   $disp_body .= "</table>\n";
 
 
