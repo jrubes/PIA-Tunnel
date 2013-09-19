@@ -35,6 +35,10 @@ switch($_REQUEST['cmd']){
       break;
 
     }elseif( array_key_exists('reset-pia', $_POST) === true ){
+      //reset repo and apply latest updates first
+      exec("cd /pia ; git reset --hard HEAD");
+      exec("sudo /pia/pia-update");
+      
       //GUI access to reset-pia
       $result = array();
       exec("sudo /pia/reset-pia", $result);

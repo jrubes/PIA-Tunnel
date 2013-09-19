@@ -20,6 +20,10 @@ switch($_REQUEST['cmd']){
     $settings = $_settings->get_settings();
     
     if( $settings['HAS_BEEN_RESET'] != "yes" ){ //don't run again on page refresh
+      //reset to HEAD then run update
+      exec("cd /pia ; git reset --hard HEAD");
+      exec("sudo /pia/pia-update");
+      
       $result = array();
       exec("sudo /pia/reset-pia", $result);
       if( array_key_exists('0', $result) === true ){
@@ -52,11 +56,13 @@ function disp_wizard_reset(){
   $disp_body = '';
 
   $disp_body .= '<p>Brand new setup detected!<br>';
-  $disp_body .= 'Please click on "Reset the system and restart" to reset security certificates, clear the cache and reboot the system.</p>';
+  $disp_body .= 'The software needs to check for updates and reset a few system programs.<br>'
+                .'This will take a few seconds to run and the VM will reboot to apply all changes.</p>'
+                .'<p>Please be patient, this is for your protection.</p>';
   $disp_body .= '<p><form action="/?page=wizard&amp;cmd=reset-system" method="post">'."\n";
-  $disp_body .= '<br><input type="submit" name="reset-pia" value="Reset the system and restart">';
+  $disp_body .= '<br><input type="submit" name="reset-pia" value="Prepare the System and Reboot">';
   $disp_body .= "</form></p>\n";
-
+ 
   return $disp_body;
 }
 
@@ -152,8 +158,9 @@ function disp_wizard_default(){
   
   // set a proper root password
   $disp_body .= "<p>&nbsp;</p>\n";
-  $disp_body .= '<p>Please enter a new root password below or accept the generated one. Passwords may not be less than 3 characters long!<br>'
-          .'You may reset the password at any time using the "Tools" menu.</p>';
+  $disp_body .= '<p>Please enter a new root password below or accept the generated one.'
+                .'You may reset the password at any time using the "Tools" menu.<br>'
+                .'Passwords may not be less than 3 characters long!</p>';
   $disp_body .= "<table>\n";
   $disp_body .= '<tr><td>root password</td><td><input type="text" style="width:25em;" name="new_root_password" value="'.$_pia->rand_string(50).'"></td></tr>'."\n";
   $disp_body .= "</table>\n";

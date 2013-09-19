@@ -88,7 +88,7 @@ class PIACommands {
 
     //time to initiate the connection
     //using bash allows this to happen in the background
-    // EDIT: this open the door for the UI to run any command as root. need to remove bash calls!!
+    // EDIT: this opens the door for the UI to run any command as root. need to remove bash calls!!
     exec("sudo bash -c \"/pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &");
   }
 
@@ -131,7 +131,7 @@ function update_root_password( $new_pw = null ){
   $ret = "";
   switch($stat){
     case 0:
-      $ret = "<div class=\"feedback\">the root password has been changed to '".htmlspecialchars($new_pw)."'</div>\n";
+      $ret = "<div class=\"feedback\">the root password has been set to '".htmlspecialchars($new_pw)."'</div>\n";
       break;
     case 1:
       $ret = "<div class=\"feedback\">Unkown Error when changing root password...</div>\n";
