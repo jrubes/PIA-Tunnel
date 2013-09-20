@@ -1,21 +1,33 @@
+This is a cut and paste file so getting everything working should only take a few minutes!
+
 1) Install minimum Debian with SSH Server, nothing else!
   * 2GB VM disk
     * 100MB for SWAP, rest for /
-  * 92MB RAM for VM
-  
-1.5)   vi /etc/apt/apt.conf.d/70debconf
-APT::Install-Recommends "0" ; APT::Install-Suggests "0" ;
+  * 92MB RAM for VM - 128MB during installation
+  * Set to en_US.UTF-8 locale or change with 'dpkg-reconfigure locales' later on
+
+1.2) For Debian without SSH Server
+      apt-get install -y openssh-server
+
+1.5)   echo 'APT::Install-Recommends "0" ; APT::Install-Suggests "0" ;' >> /etc/apt/apt.conf.d/70debconf
 
 1.6) delete non root user with userdel -r USER
 
-2) apt-get install psmisc openvpn screen dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc
-    update-rc.d  ntp remove
-    update-rc.d  mpt-statusd remove
-    
-2.4)  avoid using SWAP 
+2) apt-get install -y psmisc openvpn dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt sudo ca-certificates
+update-rc.d  ntp remove
+update-rc.d  mpt-statusd remove
+update-rc.d lighttpd enable
+lighttpd-enable-mod fastcgi fastcgi-php
+/etc/init.d/lighttpd force-reload
+addgroup vpnvm
+usermod -G vpnvm www-data
+usermod -G vpnvm root
+
+
+2.4)  avoid using SWAP
       echo "0" > /proc/sys/vm/swappiness
-    
-    
+
+
 2.5) vi /etc/dhcp/dhclient.conf
   on line 21 add
     supersede domain-name-servers 8.8.8.8, 208.67.222.222, 8.8.4.4, 208.67.220.220;
@@ -36,8 +48,8 @@ iface eth1 inet static
         netmask 255.255.255.0
 
 
-        
-4) /etc/dhcp/dhcpd.conf
+
+4) /etc/dhcp/dhcpd.conf (delete all and paste below)
 # dhcpd.conf
 # option definitions common to all supported networks...
 option domain-name "localdomain.local";
@@ -78,25 +90,26 @@ host statichost {
 
 5) crontab -e
     0 6/* * * * ntpd -q > /dev/null
-    
+
 6) vi /etc/inittab
   Replace this (line 54)
   1:2345:respawn:/sbin/getty 38400 tty1
   with
   1:2345:respawn:/sbin/getty --noclear 38400 tty1
- 
- 
+
+6.5) vi /etc/sudoers
+  Add this on line 21
+    www-data pia-tunnel = NOPASSWD: /pia/*,/pia/include/*,/bin/bash,/sbin/shutdown
+
+
 7) mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
    git clone https://github.com/KaiserSoft/PIA-Tunnel.git /pia
- 
-8) pia-setup
- 
-9) vi /etc/rc.local
-#start system with default firewall and forwarding disabled
-/pia/pia-forward stop
 
-#enable auto connect after boot by adding something like this
-#/pia/pia-start "UK London"
+8) chmod 777 /pia/pia-setup ; /pia/pia-setup
+
+9) vi /etc/rc.local
+#execute PIA start scripts
+/pia/include/autostart.sh
 
 10) paste the block below into a bash terminal
 BLMODS="psmouse snd snd_pcm snd_pcsp snd_timer parport parport_pc pcspkr floppy"
@@ -110,5 +123,5 @@ depmod -a ; update-initramfs -u
 11) /pia/reset-pia ; halt
 
 
-12) Export to OVF Template and compress with 
+12) Export to OVF Template and compress with
     7z a -mx9 -m0=lzma2 -md=128m -ms=on -mmt=off -t7z "PIA_Tunnel2.7z" "PIA Tunnel 2/"
