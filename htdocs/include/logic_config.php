@@ -197,7 +197,12 @@ function dhcpd_process_template(){
                   ."  option routers ROUTER_IP_HERE;\n"
                   ."  option broadcast-address BROADCAST_HERE;\n"
                   ."}\n";
+  $static_templ = "host statichost {\n"
+                  ."  hardware ethernet STATIC_MAC_HERE;\n"
+                  ."  fixed-address STATIC_IP_HERE;\n"
+                  ."}\n";
   $subnet = ''; //contains assembled subnet declarations
+  $static_host = ''; //contains assembled static host info
   $settings = $_settings->get_settings();
 
   //there are two dhcpd subnet config ranges
@@ -212,6 +217,13 @@ function dhcpd_process_template(){
       $subnet = str_replace('ROUTER_IP_HERE', $settings['DHCPD_ROUTER'.$x], $subnet, $SometimesIreallyHatePHP);
     }
   }
+  
+  //static IP assignment
+  if( $settings['DHCPD_STATIC_IP'] != "" && $settings['DHCPD_STATIC_MAC'] != "" ){
+    $static_host = $static_templ;
+    $static_host = str_replace('STATIC_MAC_HERE', $settings['DHCPD_STATIC_MAC'], $static_host, $SometimesIreallyHatePHP);
+    $static_host = str_replace('STATIC_IP_HERE', $settings['DHCPD_STATIC_IP'], $static_host, $SometimesIreallyHatePHP);
+  }
 
   // Global Option - NAMESERVERS is an array which may contain multiple entries, loop over it
   $NAMESERVERS = $_settings->get_settings_array('NAMESERVERS');
@@ -222,7 +234,7 @@ function dhcpd_process_template(){
   $templ = str_replace('DNSSERVER_HERE', $ins_dns, $templ, $SometimesIreallyHatePHP);
 
   //all done - return
-  return $templ.$subnet;
+  return $templ.$subnet.$static_host;
 
 }
 
@@ -287,6 +299,15 @@ function disp_dhcpd_box(){
     $disp_body .= '<tr><td>IP Range</td><td><input '.$disabled.' class="long" type="text" name="DHCPD_RANGE'.$x.'" value="'.htmlspecialchars($settings['DHCPD_RANGE'.$x]).'"></td></tr>'."\n";;
     $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   }
+  
+  //basic interface and network
+  $disabled = ($settings['DHCPD_ENABLED1'] === 'no' && $settings['DHCPD_ENABLED2'] === 'no' ) ? 'disabled' : '';
+  $fields .= 'DHCPD_STATIC_IP,';
+  $disp_body .= '<tr><td>Fixed IP</td><td><input '.$disabled.' type="text" name="DHCPD_STATIC_IP" value="'.htmlspecialchars($settings['DHCPD_STATIC_IP']).'"></td></tr>'."\n";
+  $fields .= 'DHCPD_STATIC_MAC,';
+  $disp_body .= '<tr><td>MAC for IP</td><td><input '.$disabled.' type="text" class="long" name="DHCPD_STATIC_MAC" value="'.htmlspecialchars($settings['DHCPD_STATIC_MAC']).'"></td></tr>'."\n";
+
+
 
   $disp_body .= "</table>\n";
   $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';

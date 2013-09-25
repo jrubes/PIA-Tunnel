@@ -149,6 +149,17 @@ if [ -z "${DHCPD_ENABLED2}" ]; then
 fi
 
 #add HAS_BEEN_RESET for the setup wizard
-if [ -z "$HAS_BEEN_RESET" ]; then
+if [ -z "${HAS_BEEN_RESET}" ]; then
   echo 'HAS_BEEN_RESET="no"' >> '/pia/settings.conf'
+fi
+
+
+# in BASH DHCPD_STATIC_MAC="" then -z fails
+ret=`grep -c "DHCPD_STATIC_MAC" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'DHCPD_STATIC_MAC=""' >> '/pia/settings.conf'
+fi
+ret=`grep -c "DHCPD_STATIC_IP" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'DHCPD_STATIC_IP=""' >> '/pia/settings.conf'
 fi
