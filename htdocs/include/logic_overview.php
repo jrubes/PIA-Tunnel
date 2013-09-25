@@ -24,7 +24,7 @@ switch($_REQUEST['cmd']){
       if( VPN_is_valid_connection($_POST['vpn_connections']) === true ){
 
         $_pia->pia_connect($_POST['vpn_connections']);
-        $disp_body .= "<div class=\"feedback\">Establishing a VPN connection to $arg</div>\n";
+        $disp_body .= "<div class=\"feedback\">Establishing a VPN connection to $_POST[vpn_connections]</div>\n";
         $disp_body .= disp_default();
       }
       break;
