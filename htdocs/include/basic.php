@@ -355,7 +355,25 @@ function VPN_sessionlog_status(){
   */
  function VPN_get_port(){
    global $_files;
+   
+   //check if the port cache should be considered old
+   $session_settings_timeout = strtotime('-10 minutes'); //time until session expires
+   if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
+     //validate time
+     if( $_SESSION['PIA_port_timestamp'] < $session_settings_timeout ){
+      if( array_key_exists('PIA_port', $_SESSION) === true ){
+        unset($_SESSION['PIA_port']);
+      }
+     }
+   }else{
+     //does not exist so destroy PIA_port just to be save
+     if( array_key_exists('PIA_port', $_SESSION) === true ){
+       unset($_SESSION['PIA_port']);
+     }
+   }
 
+   
+   //get fresh port info or just return what is in session?
    if( array_key_exists('PIA_port', $_SESSION) !== true )
    {
       //get username and password from file or SESSION
@@ -377,8 +395,6 @@ function VPN_sessionlog_status(){
          return false;
        }
      }
-
-
 
      // create a new cURL resource
      $ch = curl_init();
@@ -415,13 +431,16 @@ function VPN_sessionlog_status(){
      $pia_ret = json_decode($return, true);
      if( is_int($pia_ret['port']) === true && $pia_ret['port'] > 0 && $pia_ret['port'] < 65536 ){
        $_SESSION['PIA_port'] = $pia_ret['port']; //needs to be refreshed later on
+       $_SESSION['PIA_port_timestamp'] = strtotime('now');
      }elseif( $return === false ){
        //unable to get port info - PIA may be down
        $_SESSION['PIA_port'] = "ERROR: getting port info. is the website up?";
+       $_SESSION['PIA_port_timestamp'] = strtotime('now');
      }else{
        return false;
      }
    }
+   
    return $_SESSION['PIA_port'];
  }
 
