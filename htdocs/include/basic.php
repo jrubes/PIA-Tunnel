@@ -403,6 +403,8 @@ function VPN_sessionlog_status(){
      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
      curl_setopt($ch,CURLOPT_POST, count(explode('&', $post_vars)));
      curl_setopt($ch,CURLOPT_POSTFIELDS, $post_vars);
+     curl_setopt($ch,CURLOPT_TIMEOUT, 10); //max runtime for CURL
+     curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, 4); //only the connection timeout
 
      // grab URL and pass it to the browser
      $return = curl_exec($ch);
@@ -413,6 +415,9 @@ function VPN_sessionlog_status(){
      $pia_ret = json_decode($return, true);
      if( is_int($pia_ret['port']) === true && $pia_ret['port'] > 0 && $pia_ret['port'] < 65536 ){
        $_SESSION['PIA_port'] = $pia_ret['port']; //needs to be refreshed later on
+     }elseif( $return === false ){
+       //unable to get port info - PIA may be down
+       $_SESSION['PIA_port'] = "ERROR: getting port info. is the website up?";
      }else{
        return false;
      }
