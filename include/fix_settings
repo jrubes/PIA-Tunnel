@@ -60,7 +60,8 @@ if [ -z "${VERBOSE}" ]; then
 
 fi
 
-if [ -z "${bold}" ]; then
+ret=`grep -c 'bold=' /pia/settings.conf`
+if [ $ret = 0 ]; then
   echo '#for pretty print' >> '/pia/settings.conf'
   echo '#####' >> '/pia/settings.conf'
   echo 'bold=`tput bold`' >> '/pia/settings.conf'
@@ -162,4 +163,22 @@ fi
 ret=`grep -c "DHCPD_STATIC_IP" /pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'DHCPD_STATIC_IP=""' >> '/pia/settings.conf'
+fi
+
+#add web UI user info
+ret=`grep -c "WEB_UI_USER" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'WEB_UI_USER=""' >> '/pia/settings.conf'
+fi
+ret=`grep -c "WEB_UI_PASSWORD" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'WEB_UI_PASSWORD=""' >> '/pia/settings.conf'
+fi
+ret=`grep -c "WEB_UI_NAMESPACE" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'WEB_UI_NAMESPACE="3DApa2ezdm"' >> '/pia/settings.conf'
+fi
+ret=`grep -c "WEB_UI_COOKIE" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'WEB_UI_COOKIE=""' >> '/pia/settings.conf'
 fi

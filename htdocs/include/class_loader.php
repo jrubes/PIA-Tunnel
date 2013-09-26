@@ -13,6 +13,7 @@ class loader {
   public static $_gen;
   public static $_config;
   public static $_files;
+  public static $_auth;
 
   public static function PIASettings(){
     self::$_pia_settings = new PIASettings();
@@ -33,6 +34,16 @@ class loader {
     self::$_system_services = new SystemServices();
 
     return self::$_system_services;
+  }
+
+ 
+  public static function AuthenticateUser(){
+    self::$_auth = new AuthenticateUser();
+    $settings = self::$_pia_settings->get_settings();
+    self::$_auth->set_namespace($settings['WEB_UI_NAMESPACE']);
+    self::$_auth->set_cookie_hash($settings['WEB_UI_COOKIE']);
+
+    return self::$_auth;
   }
 
   public static function loadFiles(){

@@ -30,6 +30,9 @@ if( $plen > 1 && $plen < 20 && isset($_REQUEST['page']) ){
     case 'setup-wizard':
       require_once $inc_dir.'logic_wizard.php';
       break;
+    case 'setup-admin_account':
+      require_once $inc_dir.'logic_admin_account.php';
+      break;
     default:
       require_once $inc_dir.'logic_overview.php';
   }

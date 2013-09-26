@@ -1,0 +1,3 @@
+[submodule "htdocs/include/classes/class_password"]
+	path = htdocs/include/classes/class_password
+	url = https://github.com/KaiserSoft/PHP_class_password.git
