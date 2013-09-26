@@ -93,14 +93,11 @@ class AuthenticateUser {
       return true;
     }else{
       $_SESSION[$this->namespace.'authenticated'] = false;
-      
-      echo "cookie login failed";
       require $this->login_form;
       die();
     }
   
   //catch all
-  echo "catch";
   require $this->login_form;
   die();
   }
