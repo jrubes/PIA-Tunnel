@@ -324,7 +324,7 @@ function is_settings_array( $array_name ){
 }
 
   /**
-  * method read /pia/settings.conf into an array
+  * read /pia/settings.conf into an array
   * @return array,bool array with ['name'], ['password'] OR FALSE on failure
   */
  function get_settings(){

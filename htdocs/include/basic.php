@@ -19,6 +19,8 @@ require_once $inc_dir.'classes/PIASettings.php';
 require_once $inc_dir.'classes/PIACommands.php';
 require_once $inc_dir.'classes/SystemServices.php';
 require_once $inc_dir.'classes/class_files/class_files.php';
+require_once $inc_dir.'classes/AuthenticateUser.php';
+require_once $inc_dir.'classes/class_token.php';
 
 /* prepare global objects */
 $_files = loader::loadFiles();
@@ -26,6 +28,8 @@ $_settings = loader::PIASettings();
 $_services = loader::SystemServices();
 $_services= loader::SystemServices();
 $_pia = loader::PIACommands();
+$_auth = loader::AuthenticateUser();
+$_token = loader::loadToken();
 
 $header_type = 'foo'; //Change this later to add more headers
 $body_type = 'foo'; //Use to select different code later
@@ -55,6 +59,11 @@ $CONF['date_format'] = 'H:i:s'; //PHP date() format
  * @return string the main menu in HTML string
  */
 function load_menu(){
+  global $_token;
+  
+  /* get a token to protect logout */
+  $pass = array( 'process user logout request' );
+  $tokens = $_token->pgen( $pass );
 
   /* define the main menu below
    * this tends to come out of a db and go into a cache but this makes no sense here
@@ -65,7 +74,7 @@ function load_menu(){
       array( 'name' => 'Tools', 'url' => '/?page=tools', 'id' => 'tools'),
       array( 'name' => 'Network Config', 'url' => '/?page=config&amp;cmd=network', 'id' => 'cnet'),
       array( 'name' => 'VPN Config', 'url' => '/?page=config&amp;cmd=vpn', 'id' => 'cvpn'),
-      array( 'name' => 'Logout', 'url' => '/?page=logout', 'id' => 'logout')
+      array( 'name' => 'Logout', 'url' => '/?page=logout&amp;token='.$tokens[0], 'id' => 'logout')
   );
 
   $selected = $_GET['cid'];
@@ -75,12 +84,16 @@ function load_menu(){
   foreach( $source as $menu_entry )
   {
       /* $menu_entry['id'] must be added with ? or & - figure out which one */
+    if( $menu_entry['id'] != '' ){
       $highlight_id = ( strstr($menu_entry['url'], '?') === false ) ? "?cid=$menu_entry[id]" : "&amp;cid=$menu_entry[id]";
+    }else{
+      $highlight_id = '';
+    }
 
-      $menu .= '<span';
-      if( $selected == $menu_entry['id'] ){ $menu .= ' id="highlight"> '; }else{ $menu .= '>'; }
-      $menu .= '<a href="'.$menu_entry['url'].$highlight_id.'">'.htmlentities($menu_entry['name']).'</a>';
-      $menu .= "</span>\n";
+    $menu .= '<span';
+    if( $selected == $menu_entry['id'] ){ $menu .= ' id="highlight"> '; }else{ $menu .= '>'; }
+    $menu .= '<a href="'.$menu_entry['url'].$highlight_id.'">'.htmlentities($menu_entry['name']).'</a>';
+    $menu .= "</span>\n";
   }
 
   $menu .= "</div>\n";

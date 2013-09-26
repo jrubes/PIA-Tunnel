@@ -4,6 +4,9 @@
 /* @var $_files FilesystemOperations */
 /* @var $_services SystemServices */
 
+// only show this form if the user has logged in
+$_auth->authenticate();
+
 /* load list of available connections into SESSION */
 if(array_key_exists('ovpn', $_SESSION) !== true ){
   if( VPN_ovpn_to_session() !== true ){
@@ -19,8 +22,12 @@ switch($_REQUEST['cmd']){
     $disp_body .= disp_vpn_default();
     break;
   case 'vpn_store';
-    //update user settings
-    $disp_body .= update_user_settings();
+    if( $_token->pval($_POST['token'], 'update VPN username and password') === true ){
+      //update user settings
+      $disp_body .= update_user_settings();
+    }else{
+      $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+    }
     //show inout forms again
     $disp_body .= disp_vpn_default();
     break;
@@ -243,8 +250,12 @@ function dhcpd_process_template(){
  * @return string string with HTML for body of this page
  */
 function disp_vpn_default(){
+  global $_token;
   $user = VPN_get_user();
 
+  $pass = array('update VPN username and password');
+  $tokens = $_token->pgen($pass);  
+  
   $disp_body = '';
   /* show Username and Password fields - expand this for more VPN providers */
   $disp_body .= '<div><h2>PIA User Settings</h2>';
@@ -253,6 +264,7 @@ function disp_vpn_default(){
   $disp_body .= '<input type="text" name="username" value="'.htmlentities($user['username']).'">';
   $disp_body .= '<input type="password" name="password" value="" placeholder="************">';
   $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form></div>";
   return $disp_body;
 }
