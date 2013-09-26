@@ -4,7 +4,8 @@
 /* @var $_files FilesystemOperations */
 /* @var $_services SystemServices */
 
-unset($_SESSION['ovpn']); //dev
+// only show this form if the user has logged in
+$_auth->authenticate();
 
 /* load list of available connections into SESSION */
 if(array_key_exists('ovpn', $_SESSION) !== true ){

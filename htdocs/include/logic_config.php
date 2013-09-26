@@ -4,6 +4,9 @@
 /* @var $_files FilesystemOperations */
 /* @var $_services SystemServices */
 
+// only show this form if the user has logged in
+$_auth->authenticate();
+
 /* load list of available connections into SESSION */
 if(array_key_exists('ovpn', $_SESSION) !== true ){
   if( VPN_ovpn_to_session() !== true ){

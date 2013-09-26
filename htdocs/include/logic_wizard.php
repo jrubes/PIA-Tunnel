@@ -83,6 +83,17 @@ function disp_wizard_default(){
   $disp_body .= '<input type="hidden" name="store" value="dhcpd_settings">';
   $disp_body .= '<h2>PIA-Tunnel Setup Wizard</h2>'."\n";
   
+  //web UI account
+  $disp_body .= 'Please enter a username and password for logging into the Web-UI<br>';
+  $disp_body .= "<table>\n";
+  $disp_body .= '<tr><td>Web-UI Username</td><td><input type="text" style="width: 15em" name="WEB_UI_USER" value="" placeholder="Username for the Web-UI"></td>';
+  $disp_body .= '<tr><td>Web-UI Password</td><td><input type="password" style="width: 15em" name="WEB_UI_PASSWORD" value="" placeholder="Password for the Web-UI"></td>';
+  $disp_body .= "</table>\n";
+  $disp_body .= '<input type="hidden" name="WEB_UI_NAMESPACE" value="'.$_pia->rand_string(10).'">';
+  $disp_body .= '<input type="hidden" name="WEB_UI_COOKIE" value="'.$_pia->rand_string(20).'">';
+  $disp_body .= '<hr>';
+  $fields .= 'WEB_UI_USER,WEB_UI_PASSWORD,WEB_UI_NAMESPACE,WEB_UI_COOKIE,';
+  
   //username
   $disp_body .= '<p>Please enter your <a href="https://www.privateinternetaccess.com" target="_blank">https://www.privateinternetaccess.com</a>
                     account information below. The information will be stored in /pia/login.conf with read access for root and this webUI.</p>';
@@ -90,10 +101,10 @@ function disp_wizard_default(){
   $disp_body .= '<tr><td>Username</td><td><input type="text" style="width: 15em" name="username" value="" placeholder="Your Account Username"></td>';
   $disp_body .= '<tr><td>Password</td><td><input type="password" style="width: 15em" name="password" value="" placeholder="Your Account Password"></td>';
   $disp_body .= "</table>\n";
+  $disp_body .= '<hr>';
 
 
   // Gateway
-  $disp_body .= "<p>&nbsp;</p>\n";
   $disp_body .= '<p>This virtual machine may act as a default gateway for your network and/or '
           .'a virtual private Lan.<br>'
           .'The public LAN is your network, where your DSL/Cable router is connected.</p>';
@@ -115,11 +126,11 @@ function disp_wizard_default(){
           );
   $disp_body .= '<tr><td>VPN Gateway for VM LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
   $disp_body .= "</table>\n";
+  $disp_body .= '<hr>';
 
 
 
   // Forwarding
-  $disp_body .= "<p>&nbsp;</p>\n";
   $disp_body .= '<p>This VM supports port forwarding to one IP on either LAN segment.<br>'
           .'You may share the VPN connection with multiple computers but port forwarding only works with'
           .' a single target IP.<br>'
@@ -136,11 +147,11 @@ function disp_wizard_default(){
   $fields .= 'FORWARD_IP,';
   $disp_body .= '<tr><td>Forward IP</td><td><input type="text" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'"></td></tr>'."\n";
   $disp_body .= "</table>\n";
+  $disp_body .= '<hr>';
 
 
 
   // pai-daemon
-  $disp_body .= "<p>&nbsp;</p>\n";
   $disp_body .= '<p>pia-daemon will mointor the VPN connections by pinging hosts through the VPN tunnel.<br>'
           .' It will block any traffic when an error is detected and will'
           .' attempt to reestablish a connection every few minutes.<br>'
@@ -154,10 +165,10 @@ function disp_wizard_default(){
           );
   $disp_body .= '<tr><td>Enable pia-daemon</td><td>'.build_select($sel).'</td></tr>'."\n";
   $disp_body .= "</table>\n";
+  $disp_body .= '<hr>';
   
   
   // set a proper root password
-  $disp_body .= "<p>&nbsp;</p>\n";
   $disp_body .= '<p>Please enter a new root password below or accept the generated one.'
                 .'You may reset the password at any time using the "Tools" menu.<br>'
                 .'Passwords may not be less than 3 characters long!</p>';
