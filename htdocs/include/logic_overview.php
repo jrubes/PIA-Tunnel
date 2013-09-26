@@ -21,51 +21,66 @@ if(array_key_exists('ovpn', $_SESSION) !== true ){
 switch($_REQUEST['cmd']){
   case 'network_control':
     if( array_key_exists('vpn_connect', $_POST) === true ){
+      if( $_token->pval($_POST['token'], 'handle user request - establish or disconnect VPN') === true ){
       //check if passed VPN name is valid and pass to command line if it is
       if( VPN_is_valid_connection($_POST['vpn_connections']) === true ){
 
         $_pia->pia_connect($_POST['vpn_connections']);
         $disp_body .= "<div class=\"feedback\">Establishing a VPN connection to $_POST[vpn_connections]</div>\n";
-        $disp_body .= disp_default();
       }
+      }else{
+        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+      }
+      $disp_body .= disp_default();
       break;
 
     }elseif( array_key_exists('vpn_disconnect', $_POST) === true ){
-      //looks good, delete old session.log
-      $_files->rm('/pia/cache/session.log');
-      exec("sudo bash -c \"/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
-      $_SESSION['connecting2'] = '';
+      if( $_token->pval($_POST['token'], 'handle user request - establish or disconnect VPN') === true ){
+        //looks good, delete old session.log
+        $_files->rm('/pia/cache/session.log');
+        exec("sudo bash -c \"/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
+        $_SESSION['connecting2'] = '';
 
-      $disp_body .= "<div class=\"feedback\">Disconnecting VPN</div>\n";
+        $disp_body .= "<div class=\"feedback\">Disconnecting VPN</div>\n";
+      }else{
+        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+      }
+      
       $disp_body .= disp_default();
       break;
       
     }elseif( array_key_exists('daemon_start', $_POST) === true ){
-      
-      //start a VPN connection as with daemon => MYVPN[0]
-      if( $_pia->is_vpn_up() === true ){
-        //VPN already up, only start daemon
-        //die('just daemon');
-        $_pia->pia_daemon('start');
+      if( $_token->pval($_POST['token'], 'handle user request - start or stop pia-daemon') === true ){
+        //start a VPN connection as with daemon => MYVPN[0]
+        if( $_pia->is_vpn_up() === true ){
+          //VPN already up, only start daemon
+          //die('just daemon');
+          $_pia->pia_daemon('start');
+        }else{
+          //VPN down, calling pia-start with "daemon" parameter
+          $_pia->pia_connect('daemon');
+        }
+        $disp_body .= "<div class=\"feedback\">Starting pia-daemon</div>\n";
       }else{
-        //VPN down, calling pia-start with "daemon" parameter
-        $_pia->pia_connect('daemon');
+        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
-      $disp_body .= "<div class=\"feedback\">Starting pia-daemon</div>\n";
 
 
       $disp_body .= disp_default();
       break;
       
     }elseif( array_key_exists('daemon_stop', $_POST) === true ){
-      
-      //start a VPN connection as with daemon => MYVPN[0]
-      $_pia->pia_daemon('stop');
+      if( $_token->pval($_POST['token'], 'handle user request - start or stop pia-daemon') === true ){
+        //start a VPN connection as with daemon => MYVPN[0]
+        $_pia->pia_daemon('stop');
 
-      if( $_pia->status_pia_daemon() === 'offline' ){
-        $disp_body .= "<div class=\"feedback\">pia-daemon has been stopped</div>\n";
+        if( $_pia->status_pia_daemon() === 'offline' ){
+          $disp_body .= "<div class=\"feedback\">pia-daemon has been stopped</div>\n";
+        }else{
+          $disp_body .= "<div class=\"feedback\">pia-daemon is still running. please try again</div>\n";
+        }
       }else{
-        $disp_body .= "<div class=\"feedback\">pia-daemon is still running. please try again</div>\n";
+        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
       
       $disp_body .= disp_default();
@@ -73,28 +88,39 @@ switch($_REQUEST['cmd']){
     }
 
   case 'firewall_control':
-    if( array_key_exists('firewall_enable', $_POST) === true ){
-      $_services->firewall_fw('stop');
-      $_services->firewall_fw('start');
-      $disp_body .= "<div class=\"feedback\">Firewall has been restarted</div>\n";
+    if( $_token->pval($_POST['token'], 'handle user request - start or stop the firewall') === true ){
+      if( array_key_exists('firewall_enable', $_POST) === true ){
+        $_services->firewall_fw('stop');
+        $_services->firewall_fw('start');
+        $disp_body .= "<div class=\"feedback\">Firewall has been restarted</div>\n";
 
-    }elseif( array_key_exists('firewall_disable', $_POST) === true ){
-      $_services->firewall_fw('stop');
-      $disp_body .= "<div class=\"feedback\">Forwarding has been stopped</div>\n";
+      }elseif( array_key_exists('firewall_disable', $_POST) === true ){
+        $_services->firewall_fw('stop');
+        $disp_body .= "<div class=\"feedback\">Forwarding has been stopped</div>\n";
+      }
+    }else{
+      $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
     }
+      
     $disp_body .= disp_default();
     break;
 
   case 'os_control':
-    if( array_key_exists('vm_shutdown', $_POST) === true ){
-      VM_shutdown();
-      $disp_body .= "<div class=\"feedback\">The System is about to shut down</div>\n";
-      break;
-    }elseif( array_key_exists('vm_restart', $_POST) === true ){
-      VM_restart();
-      $disp_body .= "<div class=\"feedback\">The System is about to restart</div>\n";
-      break;
+    if( $_token->pval($_POST['token'], 'handle user request - shutdown or reboot the OS') === true ){
+      if( array_key_exists('vm_shutdown', $_POST) === true ){
+        VM_shutdown();
+        $disp_body .= "<div class=\"feedback\">The System is about to shut down</div>\n";
+        break;
+      }elseif( array_key_exists('vm_restart', $_POST) === true ){
+        VM_restart();
+        $disp_body .= "<div class=\"feedback\">The System will reboot now.</div>\n";
+        break;
+      }
+    }else{
+      $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+      $disp_body .= disp_default();
     }
+    
     break;
 
   default :
@@ -127,12 +153,15 @@ switch($_REQUEST['cmd']){
  * @return string string with HTML for body of this page
  */
 function disp_default(){
+  global $_token;
   $disp_body = '';
   /* show VM network and VPN overview */
-
+  
   //VPN control UI
   $disp_body .= '<h2>Network Control</h2>';
-  
+
+  $pass = array('handle user request - start or stop pia-daemon');
+  $tokens = $_token->pgen($pass);  
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
   $disp_body .= '<table class="control_box">';
@@ -146,9 +175,11 @@ function disp_default(){
   $disp_body .= '</td>';
   $disp_body .= '</tr>';
   $disp_body .= '</table>';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= " </form>\n";
   
-  
+  $pass = array('handle user request - establish or disconnect VPN');
+  $tokens = $_token->pgen($pass);    
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
   $disp_body .= '<table class="control_box">';
@@ -164,9 +195,12 @@ function disp_default(){
   $disp_body .= '</td>';
   $disp_body .= '</tr>';
   $disp_body .= '</table>';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= " </form>\n";
 
   //firewall control UI
+  $pass = array('handle user request - start or stop the firewall');
+  $tokens = $_token->pgen($pass);      
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="firewall_control">';
   $disp_body .= '<table class="control_box">';
@@ -182,9 +216,12 @@ function disp_default(){
   $disp_body .= '</td>';
   $disp_body .= '</tr>';
   $disp_body .= '</table>';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form>\n";
 
   //OS control UI
+  $pass = array('handle user request - shutdown or reboot the OS');
+  $tokens = $_token->pgen($pass);
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="os_control">';
   $disp_body .= '<table class="control_box">';
@@ -200,6 +237,7 @@ function disp_default(){
   $disp_body .= '</td>';
   $disp_body .= '</tr>';
   $disp_body .= '</table>';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form>\n";
 
 

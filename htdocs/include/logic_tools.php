@@ -4,6 +4,7 @@
 /* @var $_pia PIACommands */
 /* @var $_files FilesystemOperations */
 /* @var $_services SystemServices */
+/* @var $_token token */
 
 // only show this form if the user has logged in
 $_auth->authenticate();
@@ -37,24 +38,33 @@ switch($_REQUEST['cmd']){
       break;
 
     }elseif( array_key_exists('reset-pia', $_POST) === true ){
-      //reset repo and apply latest updates first
-      exec("cd /pia ; git reset --hard HEAD");
-      exec("sudo /pia/pia-update");
-      
-      //GUI access to reset-pia
-      $result = array();
-      exec("sudo /pia/reset-pia", $result);
-      if( array_key_exists('0', $result) === true ){
-        $_SESSION = array(); //clear all session vars
-        $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.</div>\n";
-        VM_restart();
+      if( $_token->pval($_POST['token'], 'complete system reset') === true ){
+        //reset repo and apply latest updates first
+        exec("cd /pia ; git reset --hard HEAD");
+        exec("sudo /pia/pia-update");
+
+        //GUI access to reset-pia
+        $result = array();
+        exec("sudo /pia/reset-pia", $result);
+        if( array_key_exists('0', $result) === true ){
+          $_SESSION = array(); //clear all session vars
+          $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.</div>\n";
+          VM_restart();
+        }
+      }else{
+        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
 
       $disp_body .= disp_default();
       break;
       
     }elseif( array_key_exists('update_root', $_POST) === true ){
-      $disp_body .= $_pia->update_root_password($_POST['new_root_password']);
+      if( $_token->pval($_POST['token'], 'update system root password') === true ){
+        $disp_body .= $_pia->update_root_password($_POST['new_root_password']);
+      }else{
+        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+      }
+      $disp_body .= disp_default();
       break;
     }
 
@@ -98,7 +108,11 @@ function disp_pia_update(){
  */
 function disp_update_root(){
   global $_pia;
+  global $_token;
   $disp_body = '';
+  
+  $pass = array('update system root password');
+  $tokens = $_token->pgen($pass);
 
   //change the root password
   $disp_body .= '<p><form class="inline" action="/?page=tools&cid=tools" method="post">';
@@ -108,6 +122,7 @@ function disp_update_root(){
   $disp_body .= '<tr><td>root password</td><td><input type="text" style="width:30em;" name="new_root_password" value="'.$_pia->rand_string(50).'"></td></tr>'."\n";
   $disp_body .= "</table>\n";
   $disp_body .= '<input type="submit" name="update_root" value="Change root password">';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form></p>\n";
 
   return $disp_body;
@@ -118,12 +133,17 @@ function disp_update_root(){
  * @return string string with HTML for body of this page
  */
 function disp_reset_pia(){
+  global $_token;
   $disp_body = '';
+  
+  $pass = array('complete system reset');
+  $tokens = $_token->pgen($pass);
 
   $disp_body .= '<p><form class="inline" action="/?page=tools&cid=tools" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';
   $disp_body .= 'Here you may reset everything back to factory default and reboot the system.';
   $disp_body .= '<br><input type="submit" name="reset-pia" value="Reset to Default and Restart">';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form></p>\n";
 
   return $disp_body;

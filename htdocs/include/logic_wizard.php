@@ -79,7 +79,7 @@ function disp_wizard_default(){
   $fields = ''; //comma separate list of settings offered here
 
   $disp_body .= '<div class="wizard_box">';
-  $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
+  $disp_body .= '<form action="/?page=config&amp;cmd=store_setting" method="post">'."\n";
   $disp_body .= '<input type="hidden" name="store" value="dhcpd_settings">';
   $disp_body .= '<h2>PIA-Tunnel Setup Wizard</h2>'."\n";
   
@@ -98,8 +98,8 @@ function disp_wizard_default(){
   $disp_body .= '<p>Please enter your <a href="https://www.privateinternetaccess.com" target="_blank">https://www.privateinternetaccess.com</a>
                     account information below. The information will be stored in /pia/login.conf with read access for root and this webUI.</p>';
   $disp_body .= "<table>\n";
-  $disp_body .= '<tr><td>Username</td><td><input type="text" style="width: 15em" name="username" value="" placeholder="Your Account Username"></td>';
-  $disp_body .= '<tr><td>Password</td><td><input type="password" style="width: 15em" name="password" value="" placeholder="Your Account Password"></td>';
+  $disp_body .= '<tr><td>Username</td><td><input type="text" style="width: 15em" name="username" value="" placeholder="Your Account Username" required></td>';
+  $disp_body .= '<tr><td>Password</td><td><input type="password" style="width: 15em" name="password" value="" placeholder="Your Account Password" required></td>';
   $disp_body .= "</table>\n";
   $disp_body .= '<hr>';
 

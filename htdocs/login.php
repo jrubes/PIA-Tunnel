@@ -41,15 +41,17 @@ $tokens = $_token->pgen( $pass );
     <body>
         <div class="login_form">
             <p>&nbsp;</p>
+          <h1>PIA-Tunnel Management Interface</h1>
+            <p>&nbsp;</p>
             <form method="post" name="login_form">
                 <table class="center">
                     <tr>
                         <td>User:</td>
-                        <td><input type="text" id="inp_username" name="username" tabindex="1" size="30" required="required"></td>
+                        <td><input type="text" id="inp_username" name="username" tabindex="1" size="30" required autofocus></td>
                     </tr>
                     <tr>
                         <td>Password:</td>
-                        <td><input type="password" name="password" tabindex="2" size="30" required="required"></td>
+                        <td><input type="password" name="password" tabindex="2" size="30" required></td>
                     </tr>
                 </table>
 

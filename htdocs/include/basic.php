@@ -62,7 +62,7 @@ function load_menu(){
   global $_token;
   
   /* get a token to protect logout */
-  $pass = array( '?page=logout' );
+  $pass = array( 'process user logout request' );
   $tokens = $_token->pgen( $pass );
 
   /* define the main menu below
@@ -84,12 +84,16 @@ function load_menu(){
   foreach( $source as $menu_entry )
   {
       /* $menu_entry['id'] must be added with ? or & - figure out which one */
+    if( $menu_entry['id'] != '' ){
       $highlight_id = ( strstr($menu_entry['url'], '?') === false ) ? "?cid=$menu_entry[id]" : "&amp;cid=$menu_entry[id]";
+    }else{
+      $highlight_id = '';
+    }
 
-      $menu .= '<span';
-      if( $selected == $menu_entry['id'] ){ $menu .= ' id="highlight"> '; }else{ $menu .= '>'; }
-      $menu .= '<a href="'.$menu_entry['url'].$highlight_id.'">'.htmlentities($menu_entry['name']).'</a>';
-      $menu .= "</span>\n";
+    $menu .= '<span';
+    if( $selected == $menu_entry['id'] ){ $menu .= ' id="highlight"> '; }else{ $menu .= '>'; }
+    $menu .= '<a href="'.$menu_entry['url'].$highlight_id.'">'.htmlentities($menu_entry['name']).'</a>';
+    $menu .= "</span>\n";
   }
 
   $menu .= "</div>\n";
