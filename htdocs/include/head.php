@@ -1,6 +1,4 @@
 <?php
-// only show this form if the user has logged in
-$_auth->authenticate();
 
 $disp_header = '';
 

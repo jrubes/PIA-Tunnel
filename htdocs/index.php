@@ -21,9 +21,9 @@ unset($login_dta);
 
 //user account control was added later so keep the following code for the next few releases
 $settings = $_settings->get_settings();
-if( $settings['WEB_UI_USER'] == "" ){
+if( $settings['WEB_UI_USER'] == "" && $_REQUEST['page'] != 'setup-wizard'){
   $_REQUEST['page'] = 'setup-admin_account';
-}else{
+}elseif($_REQUEST['page'] != 'setup-wizard'){
   //only allow authenticated users past this point
   if(array_key_exists('username', $_POST) !== true ){ $_POST['username'] = ''; }
   if(array_key_exists('password', $_POST) !== true ){ $_POST['password'] = ''; }
