@@ -179,7 +179,7 @@ function disp_wizard_default(){
 
 
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= '<input type="hidden" name="store_fields" value="FORWARD_PUBLIC_LAN,FORWARD_VM_LAN,FORWARD_PORT_ENABLED,FORWARD_IP,DAEMON_ENABLED">';
+  $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
   $disp_body .= '</form>';
   $disp_body .= '</div>';
   $disp_body .= "<p>&nbsp;</p>\n";
