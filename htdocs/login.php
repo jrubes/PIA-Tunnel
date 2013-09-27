@@ -51,7 +51,7 @@ $tokens = $_token->pgen( $pass );
                     </tr>
                     <tr>
                         <td>Password:</td>
-                        <td><input type="password" name="password" tabindex="2" size="30" required></td>
+                        <td><input type="password" name="password" tabindex="2" size="30"></td>
                     </tr>
                 </table>
 

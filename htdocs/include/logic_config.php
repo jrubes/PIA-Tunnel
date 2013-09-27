@@ -40,61 +40,76 @@ switch($_REQUEST['cmd']){
     //settings are now stored section by section.
     // this will allow me to restart the network on network changes and so on.
     // $_POST['store'] indicates which settings need to be stored
-
-    if(array_key_exists('store', $_POST) !== true ){
-      //opened by URL
-      $disp_body .= disp_network_default();
-      break;
-    }
-
-    switch( $_POST['store'] ){
-      case 'dhcpd_settings':
-        //dhcpd settings will store new settings to settings.conf
-        if(array_key_exists('restart_dhcpd', $_POST) ){
-          $ret = $_services->dhcpd_restart();
-          if( $ret === true ){
-            $disp_body .= "<div class=\"feedback\">dhcpd has been restarted</div>\n";
-          }else{
-            $disp_body .= "<div class=\"feedback\">".nl2br($ret[1])."</div>\n";
-          }
-
-          $disp_body .= disp_network_default();
-          break;
-        }else{
-          $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
-          if( $ret_save !== '' ){
-            VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
-            $disp_body .= $ret_save;
-            $disp_body .= "<div class=\"feedback\">Please restart the dhcpd process to apply your changes</div>\n";
-            $disp_body .= disp_network_default();
-
-          }else{
-            $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed</div>\n";
-            $disp_body .= disp_network_default();
-          }
-        }
+    
+    if( $_token->pval($_POST['token'], 'handle user request - update settings.conf') === true ){
+      if(array_key_exists('store', $_POST) !== true ){
+        //opened by URL
+        $disp_body .= disp_network_default();
         break;
+      }
 
-      case 'system_settings':
-        if( array_key_exists('restart_network', $_POST ) === true && $_POST['restart_network'] != '' ){
-            $_services->network_restart();
-            $disp_body .= "<div class=\"feedback\">All network interfaces have been restarted</div>\n";
+      switch( $_POST['store'] ){
+        case 'dhcpd_settings':
+          //dhcpd settings will store new settings to settings.conf
+          if(array_key_exists('restart_dhcpd', $_POST) ){
+            $ret = $_services->dhcpd_restart();
+            if( $ret === true ){
+              $disp_body .= "<div class=\"feedback\">dhcpd has been restarted</div>\n";
+            }else{
+              $disp_body .= "<div class=\"feedback\">".nl2br($ret[1])."</div>\n";
+            }
+
             $disp_body .= disp_network_default();
             break;
-        }
+          }else{
+            $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
+            if( $ret_save !== '' ){
+              VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
+              $disp_body .= $ret_save;
+              $disp_body .= "<div class=\"feedback\">Please restart the dhcpd process to apply your changes</div>\n";
+              $disp_body .= disp_network_default();
 
-        $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
-        if( $ret_save !== '' ){
-          //settings changed - update interfaces and dhcpd.conf
-          VPN_generate_interfaces();
-          VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
-          $disp_body .= $ret_save;
-        }else{
-          $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed</div>\n";
-        }
+            }else{
+              $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed</div>\n";
+              $disp_body .= disp_network_default();
+            }
+          }
+          break;
+
+        case 'system_settings':
+          if( array_key_exists('restart_network', $_POST ) === true && $_POST['restart_network'] != '' ){
+              $_services->network_restart();
+              $disp_body .= "<div class=\"feedback\">All network interfaces have been restarted</div>\n";
+              $disp_body .= disp_network_default();
+              break;
+          }
+
+          $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
+          if( $ret_save !== '' ){
+            //settings changed - update interfaces and dhcpd.conf
+            VPN_generate_interfaces();
+            VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
+            $disp_body .= $ret_save;
+          }else{
+            $disp_body .= "<div class=\"feedback\">Request to store settings but nothing was changed</div>\n";
+          }
         $disp_body .= disp_network_default();
         break;
 
+      case 'web_ui_settings':
+        if( strlen($_POST['WEB_UI_USER']) > 0 ){
+          $pass = 'WEB_UI_USER';
+          $disp_body .= $_settings->save_settings_logic($pass);
+        }
+        if( strlen($_POST['WEB_UI_PASSWORD']) > 0 ){
+          $pass = 'WEB_UI_PASSWORD';
+          $disp_body .= $_settings->save_settings_logic($pass);
+        }
+        
+        $disp_body .= $_settings->save_settings_logic($_POST['store_fields']);
+        $disp_body .= disp_network_default();
+        break;
+      
       default:
         $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
         if( $ret_save !== '' ){
@@ -113,7 +128,10 @@ switch($_REQUEST['cmd']){
 
         $disp_body .= disp_network_default();
         break;
-
+      }
+    }else{
+      $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+      $disp_body .= disp_network_default();
     }
     break;
 
@@ -274,7 +292,7 @@ function disp_vpn_default(){
  * @global object $_settings
  * @return string string with HTML for body of this page
  */
-function disp_dhcpd_box(){
+function disp_dhcpd_box($tokens){
   global $_settings;
   $settings = $_settings->get_settings();
   $disp_body = '';
@@ -325,6 +343,7 @@ function disp_dhcpd_box(){
   $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_dhcpd" value="Restart dhcpd">';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= '</form>';
   $disp_body .= '</div>';
 
@@ -332,7 +351,7 @@ function disp_dhcpd_box(){
 }
 
 
-function disp_pia_daemon_box(){
+function disp_pia_daemon_box($tokens){
   global $_settings;
   $settings = $_settings->get_settings();
   $disp_body = '';
@@ -370,13 +389,44 @@ function disp_pia_daemon_box(){
   $disp_body .= "</table>\n";
   $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= '</form>';
   $disp_body .= '</div>';
 
   return $disp_body;
 }
 
-function disp_network_box(){
+function disp_webui_box($tokens){
+  global $_settings;
+  
+  
+  $settings = $_settings->get_settings();
+  $disp_body = '';
+  $fields = ''; //comma separate list of settings offered here
+
+  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
+  $disp_body .= '<input type="hidden" name="store" value="web_ui_settings">';
+  $disp_body .= '<h2>Web-UI Settings</h2>'."\n";
+  $disp_body .= "<table>\n";
+  $disp_body .= '<tr><td>Web-UI Username</td><td><input type="text" name="WEB_UI_USER" value="'.htmlspecialchars($settings['WEB_UI_USER']).'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>Web-UI Password</td><td><input type="password" name="WEB_UI_PASSWORD" value="" placeholder="*********"></td></tr>'."\n";
+  
+  $fields .= 'WEB_UI_COOKIE_LIFETIME,';
+  $disp_body .= '<tr><td>Remember Me for</td><td><input type="text" class="short" name="WEB_UI_COOKIE_LIFETIME" value="'.htmlspecialchars($settings['WEB_UI_COOKIE_LIFETIME']).'"> days</td></tr>'."\n";
+
+  $disp_body .= "</table>\n";
+  $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
+  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
+  $disp_body .= '</form>';
+  $disp_body .= '</div>';
+
+  return $disp_body;  
+  
+}
+
+function disp_network_box($tokens){
   global $_settings;
   $settings = $_settings->get_settings();
   $disp_body = '';
@@ -455,13 +505,14 @@ function disp_network_box(){
   $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firewall">';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= '</form>';
   $disp_body .= '</div>';
 
   return $disp_body;
 }
 
-function disp_system_box(){
+function disp_system_box($tokens){
   global $_settings;
   $settings = $_settings->get_settings();
   $disp_body = '';
@@ -570,6 +621,7 @@ function disp_system_box(){
   $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Full Network Restart">';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= '</form>';
   $disp_body .= '</div>';
 
@@ -583,15 +635,21 @@ function disp_system_box(){
  */
 function disp_network_default(){
   global $_settings;
+  global $_token;
   $settings = $_settings->get_settings();
+  
+  //all functions use the same "save function" so they all use the same token
+  $pass = array('handle user request - update settings.conf');
+  $tokens = $_token->pgen($pass); 
 
   $disp_body = '';
 
 
-  $disp_body .= disp_network_box();
-  $disp_body .= disp_pia_daemon_box();
-  $disp_body .= disp_system_box();
-  $disp_body .= disp_dhcpd_box();
+  $disp_body .= disp_network_box($tokens);
+  $disp_body .= disp_pia_daemon_box($tokens);
+  $disp_body .= disp_system_box($tokens);
+  $disp_body .= disp_dhcpd_box($tokens);
+  $disp_body .= disp_webui_box($tokens);
   return $disp_body;
 }
 

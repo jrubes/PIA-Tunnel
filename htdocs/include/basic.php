@@ -53,6 +53,9 @@ $meta['javascript'] = '';
 $CONF = array();
 $CONF['date_format'] = 'H:i:s'; //PHP date() format
 
+$settings = $_settings->get_settings();
+$_auth->set_cookie_lifetime($settings['WEB_UI_COOKIE_LIFETIME']);
+
 
 /**
  * function to generate the main menu
@@ -72,8 +75,8 @@ function load_menu(){
       /* 'URL Name', 'URL target', 'URL ID' */
       array( 'name' => 'Overview', 'url' => '/?page=main', 'id' => ''),
       array( 'name' => 'Tools', 'url' => '/?page=tools', 'id' => 'tools'),
-      array( 'name' => 'Network Config', 'url' => '/?page=config&amp;cmd=network', 'id' => 'cnet'),
-      array( 'name' => 'VPN Config', 'url' => '/?page=config&amp;cmd=vpn', 'id' => 'cvpn'),
+      array( 'name' => 'Settings', 'url' => '/?page=config&amp;cmd=network', 'id' => 'cnet'),
+      array( 'name' => 'VPN Accounts', 'url' => '/?page=config&amp;cmd=vpn', 'id' => 'cvpn'),
       array( 'name' => 'Logout', 'url' => '/?page=logout&amp;token='.$tokens[0], 'id' => 'logout')
   );
 

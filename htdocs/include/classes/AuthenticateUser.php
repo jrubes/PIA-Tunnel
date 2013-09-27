@@ -17,6 +17,7 @@ class AuthenticateUser {
   private $login_form; //hold the location of the login form
   private $cookie_name;//string, holds name of "login"remember me" cookie
   private $cookie_hash;//value stored on client used to reauthenticate
+  private $cookie_lifetime; //time in days for the cookie to life
   
   function __construct(){
     $this->namespace = '45BauNuMYV';
@@ -24,6 +25,7 @@ class AuthenticateUser {
     $this->cookie_hash = $this->rand_string(10); //this sets a default value but breaks the functionality
                                                 //use set_cookie_hash() to pass your value
     $this->login_form = '/var/www/login.php';
+    $this->cookie_lifetime = 30;
   }
   
   /**
@@ -46,6 +48,13 @@ class AuthenticateUser {
       $hash = $this->rand_string(20);
     }
     $this->cookie_hash = $hash;
+  }
+  
+  function set_cookie_lifetime( $days ){
+        if( strlen($days) < 1){
+      $days = 0;
+    }
+    $this->cookie_lifetime = $days;
   }
   
   /**
@@ -147,8 +156,9 @@ private function login_cookie(){
   
 private function login_set_cookie( )
 {
+  if( $this->cookie_lifetime > 0 ){
     setcookie($this->cookie_name, '', 1); //Clear Old Cookie First
-    $exp_time = time()+(60*60*24*10) ; //default to expire after 10 days
+    $exp_time = time()+(60*60*24*$this->cookie_lifetime) ; //default to expire after X days
     $path = '/'; //works for entire domain
 
     $ret = setcookie($this->cookie_name, $this->cookie_hash , $exp_time , $path, null, false, true );
@@ -156,7 +166,8 @@ private function login_set_cookie( )
         echo 'Debug: unable to set "remember me" cookie...';
         return false;
     }
-    return true;
+  }
+  return true;
 }
   
 /**

@@ -182,3 +182,7 @@ ret=`grep -c "WEB_UI_COOKIE" /pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_COOKIE=""' >> '/pia/settings.conf'
 fi
+ret=`grep -c "WEB_UI_COOKIE_LIFETIME" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'WEB_UI_COOKIE_LIFETIME="120"' >> '/pia/settings.conf'
+fi

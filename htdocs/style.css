@@ -91,6 +91,9 @@ root {
 .long{
   width: 15em;
 }
+.short{
+  width: 5em;
+}
 
 .wizard_box{
   width: 550px;
