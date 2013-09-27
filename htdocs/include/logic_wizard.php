@@ -86,8 +86,8 @@ function disp_wizard_default(){
   //web UI account
   $disp_body .= 'Please enter a username and password for logging into the Web-UI<br>';
   $disp_body .= "<table>\n";
-  $disp_body .= '<tr><td>Web-UI Username</td><td><input type="text" style="width: 15em" name="WEB_UI_USER" value="" placeholder="Username for the Web-UI"></td>';
-  $disp_body .= '<tr><td>Web-UI Password</td><td><input type="password" style="width: 15em" name="WEB_UI_PASSWORD" value="" placeholder="Password for the Web-UI"></td>';
+  $disp_body .= '<tr><td>Web-UI Username</td><td><input type="text" style="width: 15em" name="WEB_UI_USER" value="" placeholder="Username for the Web-UI" required></td>';
+  $disp_body .= '<tr><td>Web-UI Password</td><td><input type="password" style="width: 15em" name="WEB_UI_PASSWORD" value="" placeholder="Password for the Web-UI" required></td>';
   $disp_body .= "</table>\n";
   $disp_body .= '<input type="hidden" name="WEB_UI_NAMESPACE" value="'.$_pia->rand_string(10).'">';
   $disp_body .= '<input type="hidden" name="WEB_UI_COOKIE" value="'.$_pia->rand_string(20).'">';
@@ -98,8 +98,8 @@ function disp_wizard_default(){
   $disp_body .= '<p>Please enter your <a href="https://www.privateinternetaccess.com" target="_blank">https://www.privateinternetaccess.com</a>
                     account information below. The information will be stored in /pia/login.conf with read access for root and this webUI.</p>';
   $disp_body .= "<table>\n";
-  $disp_body .= '<tr><td>Username</td><td><input type="text" style="width: 15em" name="username" value="" placeholder="Your Account Username" required></td>';
-  $disp_body .= '<tr><td>Password</td><td><input type="password" style="width: 15em" name="password" value="" placeholder="Your Account Password" required></td>';
+  $disp_body .= '<tr><td>VPN Username</td><td><input type="text" style="width: 15em" name="username" value="" placeholder="Your Account Username" required></td>';
+  $disp_body .= '<tr><td>VPN Password</td><td><input type="password" style="width: 15em" name="password" value="" placeholder="Your Account Password" required></td>';
   $disp_body .= "</table>\n";
   $disp_body .= '<hr>';
 
