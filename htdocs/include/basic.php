@@ -251,14 +251,16 @@ function VPN_ovpn_to_session(){
 
 /**
    * method to display the current network info for all interfaces to the user and console
+   * @param string $output='html' specifies return of the function, may be either html or JSON
    * @global type $CONF
    */
-function VM_get_status(){
+function VM_get_status( $output = 'html'){
   global $_settings;
   global $_pia;
   $settings = $_settings->get_settings();
 
   $ret_str = '<table id="vm_status">';
+  $ret_json = array();
 
   //check session.log if for current status
   $session_status = VPN_sessionlog_status();
@@ -267,16 +269,20 @@ function VM_get_status(){
     case 'connected':
       $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
       $ret_str .= "<td>Connected to $_SESSION[connecting2]</td></tr>";
+      $ret_json['vpn_status'] = "Connected to $_SESSION[connecting2]";
       break;
     case 'connecting':
       $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
       $ret_str .= "<td>Connecting to $_SESSION[connecting2]</td></tr>";
+      $ret_json['vpn_status'] = "Connecting to $_SESSION[connecting2]";
       break;
     case 'disconnected':
       $ret_str .= "<td>VPN Disconnected</td></tr>";
+      $ret_json['vpn_status'] = "VPN Disconnected";
       break;
     case 'error':
       $ret_str .= "<td>Error: $session_status[1]</td></tr>";
+      $ret_json['vpn_status'] = "Error: $session_status[1]";
       break;
     default:
       var_dump($session_status);
@@ -284,37 +290,48 @@ function VM_get_status(){
 
   if( $_pia->status_pia_daemon() === 'running' ){
     $ret_str .= "<tr><td>PIA Daemon</td><td>running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
+    $ret_json['daemon_status'] = "running (autostart:{$settings['DAEMON_ENABLED']})";
   }else{
     $ret_str .= "<tr><td>PIA Daemon</td><td>not running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
+    $ret_json['daemon_status'] = "not running (autostart:{$settings['DAEMON_ENABLED']})";
   }
 
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
   $ret = array();
   exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   $ret_str .= "<tr><td>Public IP</td><td>$ret[0]</td></tr>";
+  $ret_json['public_ip'] = $ret[0];
   unset($ret);
 
   $ret = array();
   exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if(array_key_exists('0', $ret) ){
     $ret_str .= "<tr><td>Private IP</td><td>$ret[0]</td></tr>";
+    $ret_json['private_ip'] = $ret[0];
   }else{
     $ret_str .= "<tr><td>Private IP</td><td>please refresh the page</td></tr>";
+    $ret_json['private_ip'] = '';
   }
   unset($ret);
 
   exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if( array_key_exists( '0', $ret) !== true ){
     $ret_str .= "<tr><td>VPN</td><td>down</td></tr>";
+    $ret_json['vpn_port'] = '';
+    $ret_json['vpn_ip'] = '';
+    $ret_json['vpn_public_ip'] = '';
   }else{
     //VPN is enabled. Display info
     $port = VPN_get_port();
     $ret_str .= "<tr><td>VPN IP</td><td>$ret[0]</td></tr>";
+    $ret_json['vpn_ip'] = $ret[0];
     $vpn_pub = array();
     exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
     if( array_key_exists( '0', $vpn_pub) === true ){
       $ret_str .= "<tr><td>VPN Public IP</td><td>$vpn_pub[0]</td></tr>";
-      $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported</td></tr>";
+      $ret_json['vpn_public_ip'] = $vpn_pub[0];
+      $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported by location</td></tr>";
+      $ret_json['vpn_port'] = ($port != '') ? "$port" : "not supported by location";
 
       //show forwarding info
       if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
@@ -334,7 +351,11 @@ function VM_get_status(){
 
   $ret_str .= "</table>\n";
 
-  return $ret_str;
+  if( $output === 'JSON'){
+    return json_encode($ret_json);
+  }else{
+    return $ret_str;
+  }
 }
 
 
