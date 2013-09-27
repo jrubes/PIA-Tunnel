@@ -63,7 +63,7 @@ $_auth->set_cookie_lifetime($settings['WEB_UI_COOKIE_LIFETIME']);
  */
 function load_menu(){
   global $_token;
-  
+
   /* get a token to protect logout */
   $pass = array( 'process user logout request' );
   $tokens = $_token->pgen( $pass );
@@ -214,7 +214,7 @@ function VPN_get_connections($name, $build_options=array()){
 function supports_forwarding( $conn_name ){
   $locations = array( 'Canada', 'CA Toronto', 'Switzerland', 'Sweden', 'Romania', 'Germany', 'France', 'Netherlands' );
   $lc = strtolower($conn_name);
-  
+
   foreach( $locations as $l ){
     if( strtolower($l) == $lc ){
       return true;
@@ -393,13 +393,13 @@ function VPN_sessionlog_status(){
   */
  function VPN_get_port(){
    global $_files;
-   
+
    //check if we are connected yet
   $session_status = VPN_sessionlog_status();
   if( $session_status[0] != 'connected'){
     return 'not connected yet';
   }
-   
+
    //check if the port cache should be considered old
    $session_settings_timeout = strtotime('-10 minutes'); //time until session expires
    if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
@@ -416,7 +416,7 @@ function VPN_sessionlog_status(){
      }
    }
 
-   
+
    //get fresh port info or just return what is in session?
    if( array_key_exists('PIA_port', $_SESSION) !== true )
    {
@@ -445,7 +445,7 @@ function VPN_sessionlog_status(){
 
      $PIA_UN = urlencode($_SESSION['login.conf']['username']);
      $PIA_PW = urlencode($_SESSION['login.conf']['password']);
-     $PIA_CLIENT_ID = urlencode($_SESSION['client_id']);
+     $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
      $ret = array();
      exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
      if( array_key_exists( '0', $ret) !== true ){
@@ -484,7 +484,7 @@ function VPN_sessionlog_status(){
        return false;
      }
    }
-   
+
    return $_SESSION['PIA_port'];
  }
 
