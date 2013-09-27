@@ -70,9 +70,7 @@ class PIACommands {
   function pia_connect( $ovpn ){
     $arg = escapeshellarg($ovpn);
 
-    //delete old session.log
-    $f = '/pia/cache/session.log';
-    $this->_files->rm($f);
+    $this->clear_session();
 
     //add header to new session.log
     if( $ovpn === 'daemon' ){
@@ -92,6 +90,14 @@ class PIACommands {
     exec("sudo bash -c \"/pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &");
   }
 
+  /**
+   * executes pia-stop
+   */
+  function pia_disconnect(){
+    $this->clear_session();
+
+    exec("sudo bash -c \"/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
+  }
 
   /**
    * interact with /pia/pia-daemon commnad
@@ -114,6 +120,23 @@ class PIACommands {
     }
   }
 
+  /**
+   * method to clear any cached data
+   */
+  function clear_session(){
+    $f = '/pia/cache/session.log';
+    $this->_files->rm($f);
+    
+    if( array_key_exists('PIA_port', $_SESSION) === true ){
+      unset($_SESSION['PIA_port']);
+    }
+    
+    if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
+      unset($_SESSION['PIA_port_timestamp']);
+    }
+    
+    $_SESSION['connecting2'] = '';
+  }
   /**
  * method to update the root password with a custom or random password
  * @param string $new_pw new root password as string or 

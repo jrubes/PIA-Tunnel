@@ -190,15 +190,37 @@ function VPN_get_connections($name, $build_options=array()){
   foreach( $_SESSION['ovpn'] as $ovpn ){
     $html = htmlentities($ovpn);
     //$ret .= "<option value=\"$html\">$html</option>\n";
-    $ret[] = array( $html, $html);
+    if( supports_forwarding($html) === true ){
+      $ret[] = array( $html, '*'.$html);
+    }else{
+      $ret[] = array( $html, $html);
+    }
   }
 
   if( $ret == '' ){ return false; }
 
+  sort($ret);
   $t = array_merge($sel, $ret);
   $assembled = build_select($t);
   //return "<select name=\"vpn_connections\">\n$ret</select>\n";
   return $assembled;
+}
+
+/**
+ * check if the connection supports port forwarding
+ * this is hardcoded information
+ * @param string $conn_name name OVPN file without .ovpn
+ */
+function supports_forwarding( $conn_name ){
+  $locations = array( 'Canada', 'CA Toronto', 'Switzerland', 'Sweden', 'Romania', 'Germany', 'France', 'Netherlands' );
+  $lc = strtolower($conn_name);
+  
+  foreach( $locations as $l ){
+    if( strtolower($l) == $lc ){
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
@@ -372,6 +394,12 @@ function VPN_sessionlog_status(){
  function VPN_get_port(){
    global $_files;
    
+   //check if we are connected yet
+  $session_status = VPN_sessionlog_status();
+  if( $session_status[0] != 'connected'){
+    return 'not connected yet';
+  }
+   
    //check if the port cache should be considered old
    $session_settings_timeout = strtotime('-10 minutes'); //time until session expires
    if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
@@ -446,12 +474,12 @@ function VPN_sessionlog_status(){
 
      $pia_ret = json_decode($return, true);
      if( is_int($pia_ret['port']) === true && $pia_ret['port'] > 0 && $pia_ret['port'] < 65536 ){
-       $_SESSION['PIA_port'] = $pia_ret['port']; //needs to be refreshed later on
-       $_SESSION['PIA_port_timestamp'] = strtotime('now');
+      $_SESSION['PIA_port'] = $pia_ret['port']; //needs to be refreshed later on
+      $_SESSION['PIA_port_timestamp'] = strtotime('now');
      }elseif( $return === false ){
-       //unable to get port info - PIA may be down
-       $_SESSION['PIA_port'] = "ERROR: getting port info. is the website up?";
-       $_SESSION['PIA_port_timestamp'] = strtotime('now');
+      //unable to get port info - PIA may be down
+      $_SESSION['PIA_port'] = "ERROR: getting port info. is the website up?";
+        $_SESSION['PIA_port_timestamp'] = strtotime('now');
      }else{
        return false;
      }

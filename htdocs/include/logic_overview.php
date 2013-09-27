@@ -36,11 +36,7 @@ switch($_REQUEST['cmd']){
 
     }elseif( array_key_exists('vpn_disconnect', $_POST) === true ){
       if( $_token->pval($_POST['token'], 'handle user request - establish or disconnect VPN') === true ){
-        //looks good, delete old session.log
-        $_files->rm('/pia/cache/session.log');
-        exec("sudo bash -c \"/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
-        $_SESSION['connecting2'] = '';
-
+        $_pia->pia_disconnect();
         $disp_body .= "<div class=\"feedback\">Disconnecting VPN</div>\n";
       }else{
         $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
