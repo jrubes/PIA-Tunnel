@@ -136,6 +136,7 @@ class PIACommands {
     }
     
     $_SESSION['connecting2'] = '';
+    unset($_SESSION['client_id']);
   }
   /**
  * method to update the root password with a custom or random password

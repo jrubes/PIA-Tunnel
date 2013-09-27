@@ -421,6 +421,8 @@ function VPN_sessionlog_status(){
     return 'not connected yet';
   }
    
+  unset($_SESSION['PIA_port_timestamp']);
+  
    //check if the port cache should be considered old
    $session_settings_timeout = strtotime('-10 minutes'); //time until session expires
    if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
@@ -466,7 +468,7 @@ function VPN_sessionlog_status(){
 
      $PIA_UN = urlencode($_SESSION['login.conf']['username']);
      $PIA_PW = urlencode($_SESSION['login.conf']['password']);
-     $PIA_CLIENT_ID = urlencode($_SESSION['client_id']);
+     $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
      $ret = array();
      exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
      if( array_key_exists( '0', $ret) !== true ){
