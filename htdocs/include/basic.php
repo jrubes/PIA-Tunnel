@@ -63,7 +63,7 @@ $_auth->set_cookie_lifetime($settings['WEB_UI_COOKIE_LIFETIME']);
  */
 function load_menu(){
   global $_token;
-  
+
   /* get a token to protect logout */
   $pass = array( 'process user logout request' );
   $tokens = $_token->pgen( $pass );
@@ -214,7 +214,7 @@ function VPN_get_connections($name, $build_options=array()){
 function supports_forwarding( $conn_name ){
   $locations = array( 'Canada', 'CA Toronto', 'Switzerland', 'Sweden', 'Romania', 'Germany', 'France', 'Netherlands' );
   $lc = strtolower($conn_name);
-  
+
   foreach( $locations as $l ){
     if( strtolower($l) == $lc ){
       return true;
@@ -268,20 +268,20 @@ function VM_get_status( $output = 'html'){
   switch( $session_status[0] ){
     case 'connected':
       $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
-      $ret_str .= "<td>Connected to $_SESSION[connecting2]</td></tr>";
+      $ret_str .= "<td id=\"vpn_status\">Connected to $_SESSION[connecting2]</td></tr>";
       $ret_json['vpn_status'] = "Connected to $_SESSION[connecting2]";
       break;
     case 'connecting':
       $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
-      $ret_str .= "<td>Connecting to $_SESSION[connecting2]</td></tr>";
+      $ret_str .= "<td id=\"vpn_status\">Connecting to $_SESSION[connecting2]</td></tr>";
       $ret_json['vpn_status'] = "Connecting to $_SESSION[connecting2]";
       break;
     case 'disconnected':
-      $ret_str .= "<td>VPN Disconnected</td></tr>";
+      $ret_str .= "<td id=\"vpn_status\">VPN Disconnected</td></tr>";
       $ret_json['vpn_status'] = "VPN Disconnected";
       break;
     case 'error':
-      $ret_str .= "<td>Error: $session_status[1]</td></tr>";
+      $ret_str .= "<td id=\"vpn_status\">Error: $session_status[1]</td></tr>";
       $ret_json['vpn_status'] = "Error: $session_status[1]";
       break;
     default:
@@ -289,63 +289,66 @@ function VM_get_status( $output = 'html'){
   }
 
   if( $_pia->status_pia_daemon() === 'running' ){
-    $ret_str .= "<tr><td>PIA Daemon</td><td>running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
+    $ret_str .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
     $ret_json['daemon_status'] = "running (autostart:{$settings['DAEMON_ENABLED']})";
   }else{
-    $ret_str .= "<tr><td>PIA Daemon</td><td>not running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
+    $ret_str .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">not running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
     $ret_json['daemon_status'] = "not running (autostart:{$settings['DAEMON_ENABLED']})";
   }
 
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
   $ret = array();
   exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  $ret_str .= "<tr><td>Public IP</td><td>$ret[0]</td></tr>";
+  $ret_str .= "<tr><td>Public IP</td><td id=\"public_ip\">$ret[0]</td></tr>";
   $ret_json['public_ip'] = $ret[0];
   unset($ret);
 
   $ret = array();
   exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if(array_key_exists('0', $ret) ){
-    $ret_str .= "<tr><td>Private IP</td><td>$ret[0]</td></tr>";
+    $ret_str .= "<tr><td>Private IP</td><td id=\"private_ip\">$ret[0]</td></tr>";
     $ret_json['private_ip'] = $ret[0];
   }else{
-    $ret_str .= "<tr><td>Private IP</td><td>please refresh the page</td></tr>";
+    $ret_str .= "<tr><td>Private IP</td><td id=\"private_ip\">please refresh the page</td></tr>";
     $ret_json['private_ip'] = '';
   }
   unset($ret);
 
   exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if( array_key_exists( '0', $ret) !== true ){
-    $ret_str .= "<tr><td>VPN</td><td>down</td></tr>";
+    $ret_str .= "<tr id=\"vpn_down\"><td>VPN</td><td>down</td></tr>";
     $ret_json['vpn_port'] = '';
     $ret_json['vpn_ip'] = '';
     $ret_json['vpn_public_ip'] = '';
   }else{
     //VPN is enabled. Display info
     $port = VPN_get_port();
-    $ret_str .= "<tr><td>VPN IP</td><td>$ret[0]</td></tr>";
+    $ret_str .= "<tr><td>VPN IP</td><td id=\"vpn_ip\">$ret[0]</td></tr>";
     $ret_json['vpn_ip'] = $ret[0];
     $vpn_pub = array();
     exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
     if( array_key_exists( '0', $vpn_pub) === true ){
-      $ret_str .= "<tr><td>VPN Public IP</td><td>$vpn_pub[0]</td></tr>";
+      $ret_str .= "<tr><td>VPN Public IP</td><td id=\"vpn_public_ip\">$vpn_pub[0]</td></tr>";
       $ret_json['vpn_public_ip'] = $vpn_pub[0];
-      $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td>$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported by location</td></tr>";
+      $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td id=\"vpn_port\">$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported by location</td></tr>";
       $ret_json['vpn_port'] = ($port != '') ? "$port" : "not supported by location";
 
       //show forwarding info
       if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
-        $ret_str .= "<tr><td>Forwarding</td><td>$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port</td></tr>";
+        $ret_str .= "<tr><td>Port Forwarding</td><td>$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port</td></tr>";
+        $ret_json['forwarding_port'] = "$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port";
       }
       if( $settings['FORWARD_VM_LAN'] == 'yes' ){
-        $ret_str .= "<tr><td>Forwarding</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+        $ret_str .= "<tr><td>Forwarding interface</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+        $ret_json['forwarding_if1'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
       }
       if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
-        $ret_str .= "<tr><td>Forwarding2</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+        $ret_str .= "<tr><td>Forwarding interface</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+        $ret_json['forwarding_if2'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
       }
 
     }else{
-      $ret_str .= "<tr><td>VPN</td><td>down</td></tr>";
+      $ret_str .= "<tr id=\"vpn_down\"><td>VPN</td><td>down</td></tr>";
     }
   }
 
@@ -414,15 +417,15 @@ function VPN_sessionlog_status(){
   */
  function VPN_get_port(){
    global $_files;
-   
+
    //check if we are connected yet
   $session_status = VPN_sessionlog_status();
   if( $session_status[0] != 'connected'){
     return 'not connected yet';
   }
-   
+
   unset($_SESSION['PIA_port_timestamp']);
-  
+
    //check if the port cache should be considered old
    $session_settings_timeout = strtotime('-10 minutes'); //time until session expires
    if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
@@ -439,7 +442,7 @@ function VPN_sessionlog_status(){
      }
    }
 
-   
+
    //get fresh port info or just return what is in session?
    if( array_key_exists('PIA_port', $_SESSION) !== true )
    {
@@ -507,7 +510,7 @@ function VPN_sessionlog_status(){
        return false;
      }
    }
-   
+
    return $_SESSION['PIA_port'];
  }
 
