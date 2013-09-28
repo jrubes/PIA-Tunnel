@@ -48,7 +48,8 @@ $meta['name']['dcterms.creator'] = 'Mirko Kaiser';
 $meta['charset'] = 'UTF-8';
 $meta['icon'] = ''; //'/favicon.ico';
 $meta['stylesheet'] = '/style.css'; // '/css/twoColElsLtHdr.css';
-$meta['javascript'] = '';
+$meta['javascript'][] = '/js/RequestHandler.js';
+$meta['javascript'][] = '/js/pia.js';
 
 $CONF = array();
 $CONF['date_format'] = 'H:i:s'; //PHP date() format
@@ -264,7 +265,7 @@ function VM_get_status( $output = 'html'){
 
   //check session.log if for current status
   $session_status = VPN_sessionlog_status();
-  $ret_str .= "<tr><td style=\"width:6em\">Status</td>";
+  $ret_str .= "<tr><td style=\"width:7em\">Status</td>";
   switch( $session_status[0] ){
     case 'connected':
       $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
@@ -299,14 +300,14 @@ function VM_get_status( $output = 'html'){
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
   $ret = array();
   exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  $ret_str .= "<tr><td>Public IP</td><td id=\"public_ip\">$ret[0]</td></tr>";
+  $ret_str .= "<tr><td>Public LAN IP</td><td id=\"public_ip\">$ret[0]</td></tr>";
   $ret_json['public_ip'] = $ret[0];
   unset($ret);
 
   $ret = array();
   exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if(array_key_exists('0', $ret) ){
-    $ret_str .= "<tr><td>Private IP</td><td id=\"private_ip\">$ret[0]</td></tr>";
+    $ret_str .= "<tr><td>Private LAN IP</td><td id=\"private_ip\">$ret[0]</td></tr>";
     $ret_json['private_ip'] = $ret[0];
   }else{
     $ret_str .= "<tr><td>Private IP</td><td id=\"private_ip\">please refresh the page</td></tr>";
@@ -323,8 +324,8 @@ function VM_get_status( $output = 'html'){
   }else{
     //VPN is enabled. Display info
     $port = VPN_get_port();
-    $ret_str .= "<tr><td>VPN IP</td><td id=\"vpn_ip\">$ret[0]</td></tr>";
-    $ret_json['vpn_ip'] = $ret[0];
+    //$ret_str .= "<tr><td>VPN IP</td><td id=\"vpn_ip\">$ret[0]</td></tr>";
+    //$ret_json['vpn_ip'] = $ret[0];
     $vpn_pub = array();
     exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
     if( array_key_exists( '0', $vpn_pub) === true ){
@@ -335,15 +336,15 @@ function VM_get_status( $output = 'html'){
 
       //show forwarding info
       if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
-        $ret_str .= "<tr><td>Port Forwarding</td><td>$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port</td></tr>";
-        $ret_json['forwarding_port'] = "$vpn_pub[0] &lt;=&gt; $settings[FORWARD_IP]:$port";
+        $ret_str .= "<tr><td>Port Forwarding</td><td>$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]</td></tr>";
+        $ret_json['forwarding_port'] = "$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]";
       }
       if( $settings['FORWARD_VM_LAN'] == 'yes' ){
-        $ret_str .= "<tr><td>Forwarding interface</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+        $ret_str .= "<tr><td>FW interfaces</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
         $ret_json['forwarding_if1'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
       }
       if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
-        $ret_str .= "<tr><td>Forwarding interface</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+        $ret_str .= "<tr><td>FW interfaces</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
         $ret_json['forwarding_if2'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
       }
 

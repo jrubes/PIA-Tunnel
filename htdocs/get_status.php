@@ -12,7 +12,8 @@
 
 $inc_dir = './include/';
 require_once $inc_dir.'basic.php';
+$type = ( isset($_REQUEST['type']) && $_REQUEST['type'] === 'JSON' ) ? 'JSON' : '';
 
-echo VM_get_status('JSON');
+echo VM_get_status($type);
 
 ?>

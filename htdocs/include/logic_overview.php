@@ -41,10 +41,10 @@ switch($_REQUEST['cmd']){
       }else{
         $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
-      
+
       $disp_body .= disp_default();
       break;
-      
+
     }elseif( array_key_exists('daemon_start', $_POST) === true ){
       if( $_token->pval($_POST['token'], 'handle user request - start or stop pia-daemon') === true ){
         //start a VPN connection as with daemon => MYVPN[0]
@@ -64,7 +64,7 @@ switch($_REQUEST['cmd']){
 
       $disp_body .= disp_default();
       break;
-      
+
     }elseif( array_key_exists('daemon_stop', $_POST) === true ){
       if( $_token->pval($_POST['token'], 'handle user request - start or stop pia-daemon') === true ){
         //start a VPN connection as with daemon => MYVPN[0]
@@ -78,7 +78,7 @@ switch($_REQUEST['cmd']){
       }else{
         $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
-      
+
       $disp_body .= disp_default();
       break;
     }
@@ -97,7 +97,7 @@ switch($_REQUEST['cmd']){
     }else{
       $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
     }
-      
+
     $disp_body .= disp_default();
     break;
 
@@ -116,7 +116,7 @@ switch($_REQUEST['cmd']){
       $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
       $disp_body .= disp_default();
     }
-    
+
     break;
 
   default :
@@ -152,12 +152,12 @@ function disp_default(){
   global $_token;
   $disp_body = '';
   /* show VM network and VPN overview */
-  
+
   //VPN control UI
   $disp_body .= '<h2>Network Control</h2>';
 
   $pass = array('handle user request - start or stop pia-daemon');
-  $tokens = $_token->pgen($pass);  
+  $tokens = $_token->pgen($pass);
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
   $disp_body .= '<table class="control_box">';
@@ -173,9 +173,9 @@ function disp_default(){
   $disp_body .= '</table>';
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= " </form>\n";
-  
+
   $pass = array('handle user request - establish or disconnect VPN');
-  $tokens = $_token->pgen($pass);    
+  $tokens = $_token->pgen($pass);
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
   $disp_body .= '<table class="control_box">';
@@ -196,7 +196,7 @@ function disp_default(){
 
   //firewall control UI
   $pass = array('handle user request - start or stop the firewall');
-  $tokens = $_token->pgen($pass);      
+  $tokens = $_token->pgen($pass);
   $disp_body .= '<form class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="firewall_control">';
   $disp_body .= '<table class="control_box">';
@@ -241,7 +241,14 @@ function disp_default(){
 
   /* show network status */
   $disp_body .= '<h2>Network Status</h2>';
-  $disp_body .= VM_get_status();
+  $disp_body .= '<div id="network_status">'.VM_get_status().'</div>';
+
+  $disp_body .= '<script type="text/javascript">'
+                .'var timr1=setInterval(function(){'
+                  .'var _overview = new OverviewObj();'
+                  .'_overview.refresh_status();'
+                .'},5000);'
+                .'</script>';
 
   return $disp_body;
 }

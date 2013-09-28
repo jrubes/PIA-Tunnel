@@ -39,8 +39,10 @@ foreach( $meta as $key => $val ){
       }
       break;
     case 'javascript':
-      if( $val != '' ){
-        $disp_header .= '<script src="'.urlencode($val).'" type="text/javascript"></script>'."\n";
+      foreach( $meta[$key] as $val ){
+        if( $val != '' ){
+          $disp_header .= '<script src="'.urlencode($val).'" type="text/javascript"></script>'."\n";
+        }
       }
       break;
   }
