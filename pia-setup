@@ -14,14 +14,19 @@ find /pia -type f -exec chmod 0660 {} \;
 if [ ! -f "/usr/bin/dig" ]; then
 	apt-get -y install dnsutils > /dev/null
 fi
-# pia-daemon will need screen soon
-#if [ ! -f "/usr/bin/screen" ]; then
-  #using nohup for now
-  #apt-get -y install screen > /dev/null
-#fi
 # add php5-cli for pia-daemon 2.0
 if [ ! -f "/usr/bin/php" ]; then
     apt-get -y install php5-cli php5-curl
+fi
+
+#remove /bin/bash from sudoers
+pos=`grep -n '/bin/bash,/sbin/shutdown' /etc/sudoers | gawk -F":" '{print $1}'`
+if [ ! -z "$pos" ]; then
+  sed -i /etc/sudoers -e "$pos"'s!\/bin\/bash,!!'
+  if [ "$?" != "0" ]; then
+    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- unable to remove bash entry from sudoers. you can fix this by getting the latest VM image."
+  fi
 fi
 
 #create a new login.conf if none exists

@@ -86,8 +86,7 @@ class PIACommands {
 
     //time to initiate the connection
     //using bash allows this to happen in the background
-    // EDIT: this opens the door for the UI to run any command as root. need to remove bash calls!!
-    exec("sudo bash -c \"/pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &");
+    exec("bash -c \"sudo /pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &");
   }
 
   /**
@@ -96,7 +95,7 @@ class PIACommands {
   function pia_disconnect(){
     $this->clear_session();
 
-    exec("sudo bash -c \"/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
+    exec("bash -c \"sudo /pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
   }
 
   /**
@@ -115,7 +114,7 @@ class PIACommands {
         break;
       case 'start':
         exec('killall /pia/pia-daemon &> /dev/null');
-        exec('sudo bash -c "/pia/pia-daemon &>/pia/cache/pia-daemon.log &" &>/dev/null &');
+        exec('bash -c "sudo /pia/pia-daemon &>/pia/cache/pia-daemon.log &" &>/dev/null &');
         break;
     }
   }
