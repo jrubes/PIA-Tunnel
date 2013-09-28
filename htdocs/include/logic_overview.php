@@ -26,10 +26,10 @@ switch($_REQUEST['cmd']){
       if( VPN_is_valid_connection($_POST['vpn_connections']) === true ){
 
         $_pia->pia_connect($_POST['vpn_connections']);
-        $disp_body .= "<div class=\"feedback\">Establishing a VPN connection to $_POST[vpn_connections]</div>\n";
+        //$disp_body .= "<div id=\"feedback\" class=\"feedback\">Establishing a VPN connection to $_POST[vpn_connections]</div>\n";
       }
       }else{
-        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
       $disp_body .= disp_default();
       break;
@@ -37,9 +37,9 @@ switch($_REQUEST['cmd']){
     }elseif( array_key_exists('vpn_disconnect', $_POST) === true ){
       if( $_token->pval($_POST['token'], 'handle user request - establish or disconnect VPN') === true ){
         $_pia->pia_disconnect();
-        $disp_body .= "<div class=\"feedback\">Disconnecting VPN</div>\n";
+        //$disp_body .= "<div id=\"feedback\" class=\"feedback\">Disconnecting VPN</div>\n";
       }else{
-        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
 
       $disp_body .= disp_default();
@@ -56,9 +56,9 @@ switch($_REQUEST['cmd']){
           //VPN down, calling pia-start with "daemon" parameter
           $_pia->pia_connect('daemon');
         }
-        $disp_body .= "<div class=\"feedback\">Starting pia-daemon</div>\n";
+        //$disp_body .= "<div id=\"feedback\" class=\"feedback\">Starting pia-daemon</div>\n";
       }else{
-        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
 
 
@@ -71,12 +71,12 @@ switch($_REQUEST['cmd']){
         $_pia->pia_daemon('stop');
 
         if( $_pia->status_pia_daemon() === 'offline' ){
-          $disp_body .= "<div class=\"feedback\">pia-daemon has been stopped</div>\n";
+          //$disp_body .= "<div id=\"feedback\" class=\"feedback\">pia-daemon has been stopped</div>\n";
         }else{
-          $disp_body .= "<div class=\"feedback\">pia-daemon is still running. please try again</div>\n";
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">pia-daemon is still running. please try again</div>\n";
         }
       }else{
-        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
 
       $disp_body .= disp_default();
@@ -88,14 +88,14 @@ switch($_REQUEST['cmd']){
       if( array_key_exists('firewall_enable', $_POST) === true ){
         $_services->firewall_fw('stop');
         $_services->firewall_fw('start');
-        $disp_body .= "<div class=\"feedback\">Firewall has been restarted</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
 
       }elseif( array_key_exists('firewall_disable', $_POST) === true ){
         $_services->firewall_fw('stop');
-        $disp_body .= "<div class=\"feedback\">Forwarding has been stopped</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Forwarding has been stopped</div>\n";
       }
     }else{
-      $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+      $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
     }
 
     $disp_body .= disp_default();
@@ -105,15 +105,15 @@ switch($_REQUEST['cmd']){
     if( $_token->pval($_POST['token'], 'handle user request - shutdown or reboot the OS') === true ){
       if( array_key_exists('vm_shutdown', $_POST) === true ){
         VM_shutdown();
-        $disp_body .= "<div class=\"feedback\">The System is about to shut down</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">The System is about to shut down</div>\n";
         break;
       }elseif( array_key_exists('vm_restart', $_POST) === true ){
         VM_restart();
-        $disp_body .= "<div class=\"feedback\">The System will reboot now.</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">The System will reboot now.</div>\n";
         break;
       }
     }else{
-      $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+      $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
       $disp_body .= disp_default();
     }
 
@@ -247,7 +247,8 @@ function disp_default(){
                 .'var timr1=setInterval(function(){'
                   .'var _overview = new OverviewObj();'
                   .'_overview.refresh_status();'
-                .'},5000);'
+                  .'_overview.clean_feedback();'
+                .'},2500);'
                 .'</script>';
 
   return $disp_body;

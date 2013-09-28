@@ -25,8 +25,8 @@ switch($_REQUEST['cmd']){
       //GUI access to pia-setup
       $result = array();
       exec("sudo /pia/pia-update", $result);
-      $disp_body .= "<div class=\"feedback\">Update Executed</div>\n";
-      $disp_body .= "<div class=\"feedback\">\n";
+      $disp_body .= "<div id=\"feedback\" class=\"feedback\">Update Executed</div>\n";
+      $disp_body .= "<div id=\"feedback\" class=\"feedback\">\n";
       if( array_key_exists('0', $result) === true ){
         foreach( $result as $val ){
           $disp_body .= "$val<br>\n";
@@ -48,21 +48,21 @@ switch($_REQUEST['cmd']){
         exec("sudo /pia/reset-pia", $result);
         if( array_key_exists('0', $result) === true ){
           $_SESSION = array(); //clear all session vars
-          $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.</div>\n";
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">Full system reset has been executed - system will reboot now.</div>\n";
           VM_restart();
         }
       }else{
-        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
 
       $disp_body .= disp_default();
       break;
-      
+
     }elseif( array_key_exists('update_root', $_POST) === true ){
       if( $_token->pval($_POST['token'], 'update system root password') === true ){
         $disp_body .= $_pia->update_root_password($_POST['new_root_password']);
       }else{
-        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
       $disp_body .= disp_default();
       break;
@@ -110,7 +110,7 @@ function disp_update_root(){
   global $_pia;
   global $_token;
   $disp_body = '';
-  
+
   $pass = array('update system root password');
   $tokens = $_token->pgen($pass);
 
@@ -135,7 +135,7 @@ function disp_update_root(){
 function disp_reset_pia(){
   global $_token;
   $disp_body = '';
-  
+
   $pass = array('complete system reset');
   $tokens = $_token->pgen($pass);
 

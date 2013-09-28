@@ -679,7 +679,7 @@ function update_user_settings(){
       if( $username !== $ct[0] ){
         $content = "$username\n$ct[1]"; //write new username with old password
         $_files->writefile($login_file, $content); //back to login.conf
-        $ret .= "<div class=\"feedback\">Username updated</div>\n";
+        $ret .= "<div id=\"feedback\" class=\"feedback\">Username updated</div>\n";
       }
     }
   }
@@ -690,7 +690,7 @@ function update_user_settings(){
       if( $password !== $ct[1] ){
         $content = "$ct[0]\n$password"; //write old username with new password
         $_files->writefile($login_file, $content); //back to login.conf
-        $ret .= "<div class=\"feedback\">Password updated</div>\n";
+        $ret .= "<div id=\"feedback\" class=\"feedback\">Password updated</div>\n";
       }
     }
   }
