@@ -12,10 +12,33 @@
 
 $inc_dir = './include/';
 require_once $inc_dir.'basic.php';
-$type = ( isset($_REQUEST['type']) && $_REQUEST['type'] === 'JSON' ) ? 'JSON' : '';
+$type = ( isset($_REQUEST['type']) ) ? $_REQUEST['type'] : '';
 $value = ( isset($_REQUEST['value']) ) ? $_REQUEST['value'] : '';
 
-$ret = VM_get_status($type);
+switch($type){
+  case 'JSON':
+    echo json_encode(VM_get_status('array'));
+    break;
+  case 'value':
+    $ar = VM_get_status('array');
+    //var_dump($ar);
+    $value = trim(strtolower($value));
+    reset($ar);
+    foreach( $ar as $k => $v ){
+      if( trim(strtolower($k)) == $value ){
+        echo $ar[$k];
+        die();
+      }
+    }
+    break;
+  default:
+    echo VM_get_status();
+    break;
+
+}
+
+
+
 
 if( $value == '' ){
   echo $ret;
@@ -24,10 +47,12 @@ if( $value == '' ){
    * allows an external script to ask for a specific value
   */
   $ar = json_decode($ret);
+  var_dump($ar);
   $value = strotolower($value);
   foreach( $ar as $k => $v ){
+    echo $k;
     if( strtolower($k) == $value ){
-      echo $v;
+      echo "foo" . $k;
       die();
     }
   }
