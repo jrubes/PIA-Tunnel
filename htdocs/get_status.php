@@ -26,7 +26,7 @@ if( $value == '' ){
   $ar = json_decode($ret);
   $value = strotolower($value);
   foreach( $ar as $k => $v ){
-    if( strtolower($k) == $v ){
+    if( strtolower($k) == $value ){
       echo $v;
       die();
     }
