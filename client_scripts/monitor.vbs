@@ -1,87 +1,91 @@
 
-Dim tmp, oShell, oFSO,file, appdata, oHTTP, http_return, torrent_client, current_port
-Dim outer_loop, outer_protect, outer_sleep, pattern, PWD
+Dim tmp, oShell, oFSO,file, appdata, oHTTP, http_return, torrent_exe, current_port
+Dim outer_loop, outer_protect, outer_sleep, pattern, PWD, config_file, get_status_ip
+Dim torrent_config, torrent_client
 Set oShell = WScript.CreateObject("WScript.Shell")
 Set oFSO  = CreateObject("Scripting.FileSystemObject")
-Set oHTTP = CreateObject("MSXML2.XMLHTTP")
+'Set oHTTP = CreateObject("MSXML2.XMLHTTP")
+Set oHTTP = CreateObject("MSXML2.ServerXMLHTTP")
+PWD = Left(WScript.ScriptFullName,(Len(WScript.ScriptFullName) - (Len(WScript.ScriptName) + 1))) 'working dir without trailing \
 
-torrent_process="qbittorrent.exe"
-torrent_client="C:\Program Files (x86)\qBittorrent\qbittorrent.exe"
+config_file = PWD & "\monitor.ini"
+torrent_process = GetINIString("MAIN", "PROCESS_NAME", "", config_file)
+torrent_exe = GetINIString("MAIN", "EXE_PATH", "", config_file)
+torrent_client = GetINIString("MAIN", "SOFTWARE", "", config_file) 'deluge, utorrent, qbittorrent
+torrent_config = GetINIString("MAIN", "CONFIG_PATH", "", config_file)
+get_status_ip = GetINIString("MAIN", "MANGEMENT_IP", "", config_file)
 current_port = 0
 outer_loop=true
 outer_protect=0 'debug value
 outer_sleep=5000 'recheck for port change every X ms
-PWD = Left(WScript.ScriptFullName,(Len(WScript.ScriptFullName) - (Len(WScript.ScriptName) + 1))) 'working dir without trailing \
+
 
 'load replacement pattern
-tmp = file_get_text( PWD & "\deluge.pattern")
-pattern = split(tmp, vbcrlf)
-
-Dim cont 
-cont = file_get_text("C:\Users\dev\AppData\Roaming\deluge\core.conf")
-Set reg = New RegExp
-reg.IgnoreCase = True
-reg.Global = false 'only one match
-reg.Pattern = pattern(0)
-msgbox(reg.test(cont))
-
-dim poo
-tmp = replace(pattern(1), "PIAOPENPORT", "45678")
-poo=reg.replace(cont, tmp)
-poo=file_write_text("T:\development-home\public_g\PIA Tunnel\client_scripts\out.txt", poo)
-wscript.quit
+tmp = file_get_text( PWD & "\" & torrent_client & ".pattern")
+if tmp = false then
+	msgbox("Could not find pattern file: " & PWD & "\" & torrent_client & ".pattern")
+	wscript.quit
+else
+	pattern = split(tmp, vbcrlf)
+end if
 
 
-cont = file_get_text("C:\Users\dev\AppData\Roaming\deluge\core.conf")
-Set reg = New RegExp
-reg.IgnoreCase = True
-reg.Global = false 'only one match
+
+
+'cont = file_get_text("C:\Users\dev\AppData\Roaming\deluge\core.conf")
+'Set reg = New RegExp
+'reg.IgnoreCase = True
+'reg.Global = false 'only one match
 'reg.Pattern = "PortRangeMin=[0-9]{1,5}" 'qBittorrent
 'reg.Pattern = ":bind_porti([0-9]{1,5})e7:" 'uTorrent
 'reg.Pattern = """listen_ports"":([\s])\[([\s])([0-9]{1,5}),([\s])([0-9]{1,5})([\s])\]" 'Deluge
-reg.Pattern = """listen_ports"":([\s]*)\[([\s]*)([0-9]{1,5}),([\s]*)([0-9]{1,5})([\s]*)\]" 'Deluge
-
-
-msgbox(reg.test(cont))
+'reg.Pattern = """listen_ports"":([\s]*)\[([\s]*)([0-9]{1,5}),([\s]*)([0-9]{1,5})([\s]*)\]" 'Deluge
+'msgbox(reg.test(cont))
 'msgbox((cont))
-wscript.quit
+'wscript.quit
 
 do while outer_loop=true
 	'get current port number
-	oHTTP.open "GET", "http://192.168.1.105/get_status.php?type=value&value=vpn_port", False
+	http_return=""
+	foo=oHTTP.setTimeouts( 10000, 5000, 10000, 10000)
+	oHTTP.open "GET", "http://" & get_status_ip & "/get_status.php?type=value&value=vpn_port", False
+
+	'open http and catch any errors
+	On Error Resume Next
 	oHTTP.send
-	http_return = oHTTP.responseText
+	
+	If Err.Number <> 0 Then
+		select case Err.Number
+			case -2146697211
+				msgbox("ERROR: connecting to " & get_status_ip & " is the IP correct and the system running?")
+			case -2147012894
+				msgbox("ERROR: connection timed out. Is the IP correct and the system running? IP on file: " & get_status_ip)
+			case else
+				call msgbox( "UNKOWN ERROR: fetching the latest port data" &vbcrlf _
+						& "Please send the error information below to your support contact." &vbcrlf _
+						& "Errorcode: " & Err.Number & vbcrlf _
+						& "Source: " & Err.Source &vbcrlf _
+						& "Description: " & Err.Description)
+				wscript.quit
+		end select
+	else
+		http_return = oHTTP.responseText
+	end if
+	On Error Goto 0	'Resume default error handeling
+	
+	
 	'msgbox http_return
 	if NOT http_return = "" AND IsNumeric(http_return) = true then
 		' something returned
 		if NOT http_return = current_port then
-			msgbox("updating with " & http_return)
+			'msgbox("updating with " & http_return)
 			current_port = http_return
 			appdata=oShell.ExpandEnvironmentStrings( "%APPData%" )
 
-			
-Set reg = New RegExp
-reg.IgnoreCase = True
-reg.Global = True
-reg.Pattern = "^PortRangeMin$"
+			'update the config file
+			foo=update_config(http_return)
+			'foo=update_one_per_line( appdata & "\qBittorrent\qBittorrent.ini", "PortRangeMin=", http_return)
 
-msgbox(reg.test(":bind_porti46058e7:"))
-wscript.quit
-			
-			foo=update_one_per_line( appdata & "\qBittorrent\qBittorrent.ini", "PortRangeMin=", http_return)
-			'foo=update_in_between( appdata & "\qBittorrent\qBittorrent.ini", ":bind_porti", "e7", http_return)
-			
-			' Connection\PortRangeMin=46058
-			' PortRangeMin=$VALUE
-			
-			' :bind_porti46058e7:
-			'  bind_porti$VALUE$TAIL
-			'  $TAIL=e7:
-			
-			' "listen_ports": [
-			'			6881, 
-			'			6881
-			'	], 
 			
 			
 			'resart the application
@@ -89,13 +93,13 @@ wscript.quit
 		end if
 	else
 		'not connected or not yet
-		msgbox("Debug: not connected")
+		'msgbox("Debug: not connected")
 	end if
 
-	if outer_protect > 100 then ' wscript.sleep times this value is the "timeout"
+	if outer_protect > 3 then ' wscript.sleep times this value is the "timeout"
 		outer_loop=false
 	else
-		outer_sleep = outer_sleep + 1
+		outer_protect = outer_protect + 1
 	end if
 	wscript.sleep(outer_sleep)
 loop
@@ -139,6 +143,22 @@ function restart_process( byval process_name )
 	oShell.run cmd,6
 end function
 
+' read in text file and replace according to foo.pattern
+function update_config( byref openport )
+	Dim cont, foo, newconf
+	cont = file_get_text(torrent_config)
+	
+	Set reg = New RegExp
+	reg.IgnoreCase = True
+	reg.Global = false 'only one match
+	reg.Pattern = pattern(0)
+	'msgbox(reg.test(cont))
+
+	tmp = replace(pattern(1), "PIAOPENPORT", openport)
+	newconf=reg.replace(cont, tmp)
+	foo=file_write_text( PWD & "\out.txt", newconf)
+
+end function
 
 ' update a setting like this
 '		Connection\PortRangeMin=46058
@@ -269,3 +289,133 @@ function strip_q( byref str )
 	'return
 	strip_q = str
 end function
+
+
+
+'----------- Schreib und lese Funktionen für ini Datei Block START -----------------
+'Work with INI files In VBS (ASP/WSH)
+'v1.00
+'2003 Antonin Foller, PSTRUH Software, http://www.motobit.com
+'Function GetINIString(Section, KeyName, Default, FileName)
+'Sub WriteINIString(Section, KeyName, Value, FileName)
+
+Sub WriteINIString(Section, KeyName, Value, FileName)
+  Dim INIContents, PosSection, PosEndSection
+  
+  'Get contents of the INI file As a string
+  INIContents = GetFile(FileName)
+
+  'Find section
+  PosSection = InStr(1, INIContents, "[" & Section & "]", vbTextCompare)
+  If PosSection>0 Then
+    'Section exists. Find end of section
+    PosEndSection = InStr(PosSection, INIContents, vbCrLf & "[")
+    '?Is this last section?
+    If PosEndSection = 0 Then PosEndSection = Len(INIContents)+1
+    
+    'Separate section contents
+    Dim OldsContents, NewsContents, Line
+    Dim sKeyName, Found
+    OldsContents = Mid(INIContents, PosSection, PosEndSection - PosSection)
+    OldsContents = split(OldsContents, vbCrLf)
+
+    'Temp variable To find a Key
+    sKeyName = LCase(KeyName & "=")
+
+    'Enumerate section lines
+    For Each Line In OldsContents
+      If LCase(Left(Line, Len(sKeyName))) = sKeyName Then
+        Line = KeyName & "=" & Value
+        Found = True
+      End If
+      NewsContents = NewsContents & Line & vbCrLf
+    Next
+
+    If isempty(Found) Then
+      'key Not found - add it at the end of section
+      NewsContents = NewsContents & KeyName & "=" & Value
+    Else
+      'remove last vbCrLf - the vbCrLf is at PosEndSection
+      NewsContents = Left(NewsContents, Len(NewsContents) - 2)
+    End If
+
+    'Combine pre-section, new section And post-section data.
+    INIContents = Left(INIContents, PosSection-1) & _
+      NewsContents & Mid(INIContents, PosEndSection)
+  else'if PosSection>0 Then
+    'Section Not found. Add section data at the end of file contents.
+    If Right(INIContents, 2) <> vbCrLf And Len(INIContents)>0 Then 
+      INIContents = INIContents & vbCrLf 
+    End If
+    INIContents = INIContents & "[" & Section & "]" & vbCrLf & _
+      KeyName & "=" & Value
+  end if'if PosSection>0 Then
+  WriteFile FileName, INIContents
+End Sub
+
+Function GetINIString(Section, KeyName, Default, FileName)
+  Dim INIContents, PosSection, PosEndSection, sContents, Value, Found
+  
+  'Get contents of the INI file As a string
+  INIContents = GetFile(FileName)
+
+  'Find section
+  PosSection = InStr(1, INIContents, "[" & Section & "]", vbTextCompare)
+  If PosSection>0 Then
+    'Section exists. Find end of section
+    PosEndSection = InStr(PosSection, INIContents, vbCrLf & "[")
+    '?Is this last section?
+    If PosEndSection = 0 Then PosEndSection = Len(INIContents)+1
+    
+    'Separate section contents
+    sContents = Mid(INIContents, PosSection, PosEndSection - PosSection)
+
+    If InStr(1, sContents, vbCrLf & KeyName & "=", vbTextCompare)>0 Then
+      Found = True
+      'Separate value of a key.
+      Value = SeparateField(sContents, vbCrLf & KeyName & "=", vbCrLf)
+    End If
+  End If
+  If isempty(Found) Then Value = Default
+  GetINIString = Value
+End Function
+
+'Separates one field between sStart And sEnd
+Function SeparateField(ByVal sFrom, ByVal sStart, ByVal sEnd)
+  Dim PosB: PosB = InStr(1, sFrom, sStart, 1)
+  If PosB > 0 Then
+    PosB = PosB + Len(sStart)
+    Dim PosE: PosE = InStr(PosB, sFrom, sEnd, 1)
+    If PosE = 0 Then PosE = InStr(PosB, sFrom, vbCrLf, 1)
+    If PosE = 0 Then PosE = Len(sFrom) + 1
+    SeparateField = Mid(sFrom, PosB, PosE - PosB)
+  End If
+End Function
+
+
+'File functions
+Function GetFile(ByVal FileName)
+  Dim FS: Set FS = CreateObject("Scripting.FileSystemObject")
+  'Go To windows folder If full path Not specified.
+  If InStr(FileName, ":\") = 0 And Left (FileName,2)<>"\\" Then 
+    FileName = FS.GetSpecialFolder(0) & "\" & FileName
+  End If
+  On Error Resume Next
+
+  GetFile = FS.OpenTextFile(FileName).ReadAll
+End Function
+
+Function WriteFile(ByVal FileName, ByVal Contents)
+  
+  Dim FS: Set FS = CreateObject("Scripting.FileSystemObject")
+  'On Error Resume Next
+
+  'Go To windows folder If full path Not specified.
+  If InStr(FileName, ":\") = 0 And Left (FileName,2)<>"\\" Then 
+    FileName = FS.GetSpecialFolder(0) & "\" & FileName
+  End If
+
+  Dim OutStream: Set OutStream = FS.OpenTextFile(FileName, 2, True)
+  OutStream.Write Contents
+End Function
+'----------- Schreib und lese Funktionen für ini Datei Block Ende -----------------
