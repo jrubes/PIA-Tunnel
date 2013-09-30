@@ -1,6 +1,6 @@
 
 Dim tmp, oShell, oFSO,file, appdata, oHTTP, http_return, torrent_client, current_port
-Dim outer_loop, outer_protect, outer_sleep
+Dim outer_loop, outer_protect, outer_sleep, pattern, PWD
 Set oShell = WScript.CreateObject("WScript.Shell")
 Set oFSO  = CreateObject("Scripting.FileSystemObject")
 Set oHTTP = CreateObject("MSXML2.XMLHTTP")
@@ -11,6 +11,40 @@ current_port = 0
 outer_loop=true
 outer_protect=0 'debug value
 outer_sleep=5000 'recheck for port change every X ms
+PWD = Left(WScript.ScriptFullName,(Len(WScript.ScriptFullName) - (Len(WScript.ScriptName) + 1))) 'working dir without trailing \
+
+'load replacement pattern
+tmp = file_get_text( PWD & "\deluge.pattern")
+pattern = split(tmp, vbcrlf)
+
+Dim cont 
+cont = file_get_text("C:\Users\dev\AppData\Roaming\deluge\core.conf")
+Set reg = New RegExp
+reg.IgnoreCase = True
+reg.Global = false 'only one match
+reg.Pattern = pattern(0)
+msgbox(reg.test(cont))
+
+dim poo
+tmp = replace(pattern(1), "PIAOPENPORT", "45678")
+poo=reg.replace(cont, tmp)
+poo=file_write_text("T:\development-home\public_g\PIA Tunnel\client_scripts\out.txt", poo)
+wscript.quit
+
+
+cont = file_get_text("C:\Users\dev\AppData\Roaming\deluge\core.conf")
+Set reg = New RegExp
+reg.IgnoreCase = True
+reg.Global = false 'only one match
+'reg.Pattern = "PortRangeMin=[0-9]{1,5}" 'qBittorrent
+'reg.Pattern = ":bind_porti([0-9]{1,5})e7:" 'uTorrent
+'reg.Pattern = """listen_ports"":([\s])\[([\s])([0-9]{1,5}),([\s])([0-9]{1,5})([\s])\]" 'Deluge
+reg.Pattern = """listen_ports"":([\s]*)\[([\s]*)([0-9]{1,5}),([\s]*)([0-9]{1,5})([\s]*)\]" 'Deluge
+
+
+msgbox(reg.test(cont))
+'msgbox((cont))
+wscript.quit
 
 do while outer_loop=true
 	'get current port number
@@ -18,13 +52,37 @@ do while outer_loop=true
 	oHTTP.send
 	http_return = oHTTP.responseText
 	'msgbox http_return
-	if NOT http_return = "" then
+	if NOT http_return = "" AND IsNumeric(http_return) = true then
 		' something returned
 		if NOT http_return = current_port then
 			msgbox("updating with " & http_return)
 			current_port = http_return
 			appdata=oShell.ExpandEnvironmentStrings( "%APPData%" )
-			foo=update_value( appdata & "\qBittorrent\qBittorrent.ini", "PortRangeMin", "=", http_return)
+
+			
+Set reg = New RegExp
+reg.IgnoreCase = True
+reg.Global = True
+reg.Pattern = "^PortRangeMin$"
+
+msgbox(reg.test(":bind_porti46058e7:"))
+wscript.quit
+			
+			foo=update_one_per_line( appdata & "\qBittorrent\qBittorrent.ini", "PortRangeMin=", http_return)
+			'foo=update_in_between( appdata & "\qBittorrent\qBittorrent.ini", ":bind_porti", "e7", http_return)
+			
+			' Connection\PortRangeMin=46058
+			' PortRangeMin=$VALUE
+			
+			' :bind_porti46058e7:
+			'  bind_porti$VALUE$TAIL
+			'  $TAIL=e7:
+			
+			' "listen_ports": [
+			'			6881, 
+			'			6881
+			'	], 
+			
 			
 			'resart the application
 			foo=restart_process(torrent_process)
@@ -84,8 +142,8 @@ end function
 
 ' update a setting like this
 '		Connection\PortRangeMin=46058
-' update_value( "foo\bar.txt", "PortRangeMin", "=", "46058")
-function update_value( byref file, byref look4, byref separator, byref newval)
+' update_one_per_line( "foo\bar.txt", "PortRangeMin=", "46058")
+function update_one_per_line( byref file, byref look4, byref newval)
 
 	'loop over file and look for "look4" on every line
 	' repalce value then write back
@@ -185,7 +243,7 @@ function file_get_text( byref file)
 		Const ForReading = 1
 		Set oFile = oFSO.OpenTextFile(file, ForReading)
 		Do While oFile.AtEndOfStream = False
-				ret = ret & oFile.ReadLine
+				ret = ret & oFile.ReadLine & vbcrlf
 		Loop
 		oFile.Close
 		file_get_text = ret
