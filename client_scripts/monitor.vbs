@@ -1,6 +1,6 @@
 
 Dim tmp, oShell, oFSO,file, appdata, oHTTP, http_return, torrent_exe, current_port
-Dim outer_loop, outer_protect, outer_sleep, pattern, PWD, config_file, get_status_ip
+Dim outer_loop, outer_protect, outer_sleep, pattern, PWD, config_file, status_ip
 Dim torrent_config, torrent_client
 Set oShell = WScript.CreateObject("WScript.Shell")
 Set oFSO  = CreateObject("Scripting.FileSystemObject")
@@ -13,7 +13,7 @@ torrent_process = GetINIString("MAIN", "PROCESS_NAME", "", config_file)
 torrent_exe = GetINIString("MAIN", "EXE_PATH", "", config_file)
 torrent_client = GetINIString("MAIN", "SOFTWARE", "", config_file) 'deluge, utorrent, qbittorrent
 torrent_config = GetINIString("MAIN", "CONFIG_PATH", "", config_file)
-get_status_ip = GetINIString("MAIN", "MANGEMENT_IP", "", config_file)
+status_ip = GetINIString("MAIN", "STATUS_IP", "", config_file)
 current_port = 0
 outer_loop=true
 outer_protect=0 'debug value
@@ -48,7 +48,7 @@ do while outer_loop=true
 	'get current port number
 	http_return=""
 	foo=oHTTP.setTimeouts( 10000, 5000, 10000, 10000)
-	oHTTP.open "GET", "http://" & get_status_ip & "/get_status.php?type=value&value=vpn_port", False
+	oHTTP.open "GET", "http://" & status_ip & "/get_status.php?type=value&value=vpn_port", False
 
 	'open http and catch any errors
 	On Error Resume Next
@@ -57,9 +57,9 @@ do while outer_loop=true
 	If Err.Number <> 0 Then
 		select case Err.Number
 			case -2146697211
-				msgbox("ERROR: connecting to " & get_status_ip & " is the IP correct and the system running?")
+				msgbox("ERROR: connecting to " & status_ip & " is the IP correct and the system running?")
 			case -2147012894
-				msgbox("ERROR: connection timed out. Is the IP correct and the system running? IP on file: " & get_status_ip)
+				msgbox("ERROR: connection timed out. Is the IP correct and the system running? IP on file: " & status_ip)
 			case else
 				call msgbox( "UNKOWN ERROR: fetching the latest port data" &vbcrlf _
 						& "Please send the error information below to your support contact." &vbcrlf _
@@ -83,6 +83,7 @@ do while outer_loop=true
 			appdata=oShell.ExpandEnvironmentStrings( "%APPData%" )
 
 			'update the config file
+			msgbox("ret: " & http_return )
 			foo=update_config(http_return)
 			'foo=update_one_per_line( appdata & "\qBittorrent\qBittorrent.ini", "PortRangeMin=", http_return)
 
@@ -96,7 +97,7 @@ do while outer_loop=true
 		'msgbox("Debug: not connected")
 	end if
 
-	if outer_protect > 3 then ' wscript.sleep times this value is the "timeout"
+	if outer_protect > 20 then ' wscript.sleep times this value is the "timeout"
 		outer_loop=false
 	else
 		outer_protect = outer_protect + 1
@@ -139,7 +140,7 @@ function restart_process( byval process_name )
 
 	'start it again
 	'start the process
-	cmd = "cmd /c """ & torrent_client &""""
+	cmd = "cmd /c """ & torrent_exe &""""
 	oShell.run cmd,6
 end function
 
@@ -156,7 +157,10 @@ function update_config( byref openport )
 
 	tmp = replace(pattern(1), "PIAOPENPORT", openport)
 	newconf=reg.replace(cont, tmp)
+	del(PWD & "\out.txt")
 	foo=file_write_text( PWD & "\out.txt", newconf)
+	del(torrent_config)
+	foo=file_write_text( torrent_config, newconf)
 
 end function
 
