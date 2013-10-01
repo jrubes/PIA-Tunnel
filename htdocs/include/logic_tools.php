@@ -82,6 +82,25 @@ function disp_default(){
   $disp_body .= "<hr>";
   $disp_body .= disp_update_root();
   $disp_body .= "<hr>";
+  $disp_body .= disp_client_tools();
+  $disp_body .= "<hr>";
+  return $disp_body;
+}
+
+/**
+ * returns UI elements in HTML
+ * @return string string with HTML for body of this page
+ */
+function disp_client_tools(){
+  $disp_body = '';
+
+  //offer download links to client tools
+  $disp_body .= '<p><a href="/monitor-windows.zip">Torrent Monitor for Windows</a><br>';
+  $disp_body .= 'This script will detected port changes and will reconfigure your torrent'
+                .' client with updated settings.'
+                .'<br>Supports <a href="http://deluge-torrent.org/" target="_blank">Deluge</a> and <a href="http://www.qbittorrent.org/" target="_blank">qBittorrent</a>. Please check the documentation for instructions.'
+                .'</p>';
+
   return $disp_body;
 }
 

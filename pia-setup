@@ -107,7 +107,7 @@ fi
 cp -r /pia/htdocs/* /var/www
 rm -f /var/www/README.txt
 rm -f /var/www/monitor-windows.zip
-cd /pia ; zip -r /var/www/monitor-windows.zip client_scripts/monitor-windows/
+cd /pia/client_scripts ; zip -r /var/www/monitor-windows.zip monitor-windows/ &> /dev/null
 chown -R www-data.www-data /var/www
 find /var/www -type d -exec chmod 0750 {} \;
 find /var/www -type f -exec chmod 0640 {} \;
