@@ -18,6 +18,10 @@ fi
 if [ ! -f "/usr/bin/php" ]; then
     apt-get -y install php5-cli php5-curl
 fi
+# add zip
+if [ ! -f "/usr/bin/zip" ]; then
+    apt-get -y install zip unzip
+fi
 
 #remove /bin/bash from sudoers
 pos=`grep -n '/bin/bash,/sbin/shutdown' /etc/sudoers | gawk -F":" '{print $1}'`
@@ -99,9 +103,11 @@ if [ ! -f "/pia/cache/ip_list.txt" ]; then
 fi
 
 
-#copy htdocs to /var/www
+#update files in /var/www
 cp -r /pia/htdocs/* /var/www
 rm -f /var/www/README.txt
+rm -f /var/www/monitor-windows.zip
+cd /pia ; zip -r /var/www/monitor-windows.zip client_scripts/monitor-windows/
 chown -R www-data.www-data /var/www
 find /var/www -type d -exec chmod 0750 {} \;
 find /var/www -type f -exec chmod 0640 {} \;
