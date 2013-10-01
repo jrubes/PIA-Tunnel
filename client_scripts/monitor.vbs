@@ -23,7 +23,7 @@ outer_sleep=5000 'recheck for port change every X ms
 'load replacement pattern
 tmp = file_get_text( PWD & "\" & torrent_client & ".pattern")
 if tmp = false then
-	msgbox("Could not find pattern file: " & PWD & "\" & torrent_client & ".pattern")
+	wscript.echo("Could not find pattern file: " & PWD & "\" & torrent_client & ".pattern")
 	wscript.quit
 else
 	pattern = split(tmp, vbcrlf)
@@ -40,8 +40,8 @@ end if
 'reg.Pattern = ":bind_porti([0-9]{1,5})e7:" 'uTorrent
 'reg.Pattern = """listen_ports"":([\s])\[([\s])([0-9]{1,5}),([\s])([0-9]{1,5})([\s])\]" 'Deluge
 'reg.Pattern = """listen_ports"":([\s]*)\[([\s]*)([0-9]{1,5}),([\s]*)([0-9]{1,5})([\s]*)\]" 'Deluge
-'msgbox(reg.test(cont))
-'msgbox((cont))
+'wscript.echo(reg.test(cont))
+'wscript.echo((cont))
 'wscript.quit
 
 do while outer_loop=true
@@ -57,11 +57,11 @@ do while outer_loop=true
 	If Err.Number <> 0 Then
 		select case Err.Number
 			case -2146697211
-				msgbox("ERROR: connecting to " & status_ip & " is the IP correct and the system running?")
+				wscript.echo("ERROR: connecting to " & status_ip & " is the IP correct and the system running?")
 			case -2147012894
-				msgbox("ERROR: connection timed out. Is the IP correct and the system running? IP on file: " & status_ip)
+				wscript.echo("ERROR: connection timed out. Is the IP correct and the system running? IP on file: " & status_ip)
 			case else
-				call msgbox( "UNKOWN ERROR: fetching the latest port data" &vbcrlf _
+				call wscript.echo( "UNKOWN ERROR: fetching the latest port data" &vbcrlf _
 						& "Please send the error information below to your support contact." &vbcrlf _
 						& "Errorcode: " & Err.Number & vbcrlf _
 						& "Source: " & Err.Source &vbcrlf _
@@ -74,16 +74,15 @@ do while outer_loop=true
 	On Error Goto 0	'Resume default error handeling
 	
 	
-	'msgbox http_return
+	'wscript.echo http_return
 	if NOT http_return = "" AND IsNumeric(http_return) = true then
 		' something returned
 		if NOT http_return = current_port then
-			'msgbox("updating with " & http_return)
+			wscript.echo("VPN port has changed. Updating with " & http_return)
 			current_port = http_return
 			appdata=oShell.ExpandEnvironmentStrings( "%APPData%" )
 
 			'update the config file
-			msgbox("ret: " & http_return )
 			foo=update_config(http_return)
 			'foo=update_one_per_line( appdata & "\qBittorrent\qBittorrent.ini", "PortRangeMin=", http_return)
 
@@ -94,7 +93,7 @@ do while outer_loop=true
 		end if
 	else
 		'not connected or not yet
-		'msgbox("Debug: not connected")
+		wscript.echo("VPN is not connected")
 	end if
 
 	if outer_protect > 20 then ' wscript.sleep times this value is the "timeout"
@@ -105,7 +104,7 @@ do while outer_loop=true
 	wscript.sleep(outer_sleep)
 loop
 
-msgbox("loop done")
+wscript.echo("loop done")
 wscript.quit
 
 function restart_process( byval process_name )
@@ -119,7 +118,8 @@ function restart_process( byval process_name )
 	do while run=true
 		count=0
 		Set colProcessList = objWMIService.ExecQuery("SELECT * FROM Win32_Process WHERE Name = '" & process_name & "'")
-		For Each objProcess in colProcessList 
+		For Each objProcess in colProcessList
+			wscript.echo "Terminating " & process_name
 			oShell.Exec "PSKill " & objProcess.ProcessId
 			count = count + 1
 		Next		
@@ -130,7 +130,7 @@ function restart_process( byval process_name )
 			run = false
 		else
 			if protect > 120 then ' wscript.sleep times this value is the "timeout"
-				msgbox("unable to end process. please restart manually")
+				wscript.echo("unable to end process. please restart manually")
 				run=false
 			end if
 			protect = protect + 1
@@ -140,6 +140,7 @@ function restart_process( byval process_name )
 
 	'start it again
 	'start the process
+	wscript.echo "Starting " & process_name
 	cmd = "cmd /c """ & torrent_exe &""""
 	oShell.run cmd,6
 end function
@@ -153,7 +154,7 @@ function update_config( byref openport )
 	reg.IgnoreCase = True
 	reg.Global = false 'only one match
 	reg.Pattern = pattern(0)
-	'msgbox(reg.test(cont))
+	'wscript.echo(reg.test(cont))
 
 	tmp = replace(pattern(1), "PIAOPENPORT", openport)
 	newconf=reg.replace(cont, tmp)
@@ -240,7 +241,7 @@ function del( byref file)
 						'Unkown error
 						del = false
 						exit function
-						'msgbox( "Unkown error" & Err.Number &vbcrlf & "Source: " & Err.Source & "Desc: "&Err.Description)
+						'wscript.echo( "Unkown error" & Err.Number &vbcrlf & "Source: " & Err.Source & "Desc: "&Err.Description)
 						'wscript.quit
 				end select
 			End If

@@ -1,0 +1,1 @@
+cscript monitor.vbs
