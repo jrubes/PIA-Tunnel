@@ -1,7 +1,7 @@
 
 Dim tmp, oShell, oFSO,file, appdata, oHTTP, http_return, torrent_exe, current_port
-Dim outer_loop, outer_protect, outer_sleep, pattern, PWD, config_file, status_ip
-Dim torrent_config, torrent_client
+Dim outer_loop, outer_sleep, pattern, PWD, config_file, status_ip
+Dim torrent_config, torrent_client, development_run
 Set oShell = WScript.CreateObject("WScript.Shell")
 Set oFSO  = CreateObject("Scripting.FileSystemObject")
 'Set oHTTP = CreateObject("MSXML2.XMLHTTP")
@@ -16,8 +16,7 @@ torrent_config = GetINIString("MAIN", "CONFIG_PATH", "", config_file)
 status_ip = GetINIString("MAIN", "STATUS_IP", "", config_file)
 current_port = 0
 outer_loop=true
-outer_protect=0 'debug value
-outer_sleep=5000 'recheck for port change every X ms
+outer_sleep=5000 'run check every n milliseconds
 
 
 'load replacement pattern
@@ -96,16 +95,17 @@ do while outer_loop=true
 		wscript.echo("VPN is not connected")
 	end if
 
-	if outer_protect > 20 then ' wscript.sleep times this value is the "timeout"
-		outer_loop=false
-	else
-		outer_protect = outer_protect + 1
-	end if
 	wscript.sleep(outer_sleep)
 loop
 
-wscript.echo("loop done")
-wscript.quit
+
+
+'end of script
+
+
+
+
+
 
 function restart_process( byval process_name )
 	dim run, objWMIService, colProcessList, count, protect
