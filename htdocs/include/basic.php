@@ -418,6 +418,7 @@ function VPN_sessionlog_status(){
   */
  function VPN_get_port(){
    global $_files;
+   $cache_file = '/pia/cache/webgui_port.txt';
 
    //check if we are connected yet
   $session_status = VPN_sessionlog_status();
@@ -428,12 +429,12 @@ function VPN_sessionlog_status(){
   unset($_SESSION['PIA_port_timestamp']);
 
    //check if the port cache should be considered old
-   $session_settings_timeout = strtotime('-10 minutes'); //time until session expires
+   $session_settings_timeout = strtotime('-300 minutes'); //time until session expires
    if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
      //validate time
      if( $_SESSION['PIA_port_timestamp'] < $session_settings_timeout ){
       if( array_key_exists('PIA_port', $_SESSION) === true ){
-        unset($_SESSION['PIA_port']);
+        unset($_SESSION['PIA_port']); //time expired
       }
      }
    }else{
@@ -444,69 +445,36 @@ function VPN_sessionlog_status(){
    }
 
 
-   //get fresh port info or just return what is in session?
+   //get fresh port info
    if( array_key_exists('PIA_port', $_SESSION) !== true )
    {
-      //get username and password from file or SESSION
-      if( array_key_exists('login.conf', $_SESSION) !== true ){
-        if( load_login() === false ){
-          return false;
+      //read from cache file or get fresh info
+      if( file_exists($cache_file) === true ){
+        $cont = explode('|', $_files->readfile($cache_file));
+
+        //cont(0) is timestamp of creation
+        //cont(1) contains the port number
+        $expires = strtotime('-96 hours'); //time until session expires
+        if( trim($cont(0)) < $expires ){
+          $pia_ret = get_port();
+
+        }else{
+          $pia_ret['port'] = trim(cont(1));
         }
       }
 
-     //get the client ID
-     if( array_key_exists('client_id', $_SESSION) !== true ){
-       $c = $_files->readfile('/pia/client_id');
-       if( $c !== false ){
-         if( mb_strlen($c) < 1 ){
-           return false;
-         }
-         $_SESSION['client_id'] = $c; //store for later
-       }else{
-         return false;
-       }
-     }
 
-     // create a new cURL resource
-     $ch = curl_init();
-
-     $PIA_UN = urlencode($_SESSION['login.conf']['username']);
-     $PIA_PW = urlencode($_SESSION['login.conf']['password']);
-     $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
-     $ret = array();
-     exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-     if( array_key_exists( '0', $ret) !== true ){
-       //VPN  is down, can not continue to check for open ports
-       return false;
-     }else{
-       $TUN_IP = $ret[0];
-     }
-
-     $post_vars = "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP";
-
-     // set URL and other appropriate options
-     curl_setopt($ch, CURLOPT_URL, 'https://www.privateinternetaccess.com/vpninfo/port_forward_assignment');
-     curl_setopt($ch, CURLOPT_HEADER, 0);
-     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-     curl_setopt($ch,CURLOPT_POST, count(explode('&', $post_vars)));
-     curl_setopt($ch,CURLOPT_POSTFIELDS, $post_vars);
-     curl_setopt($ch,CURLOPT_TIMEOUT, 10); //max runtime for CURL
-     curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, 4); //only the connection timeout
-
-     // grab URL and pass it to the browser
-     $return = curl_exec($ch);
-
-     // close cURL resource, and free up system resources
-     curl_close($ch);
-
-     $pia_ret = json_decode($return, true);
      if( is_int($pia_ret['port']) === true && $pia_ret['port'] > 0 && $pia_ret['port'] < 65536 ){
       $_SESSION['PIA_port'] = $pia_ret['port']; //needs to be refreshed later on
       $_SESSION['PIA_port_timestamp'] = strtotime('now');
-     }elseif( $return === false ){
+
+      //update cache
+      $txt = strtotime('now').'|'.$pia_ret['port'];
+      $_files->writefile($cache_file, $txt);
+     }elseif( is_array($pia_ret) === false && $pia_ret === false ){
       //unable to get port info - PIA may be down
       $_SESSION['PIA_port'] = "ERROR: getting port info. is the website up?";
-        $_SESSION['PIA_port_timestamp'] = strtotime('now');
+      $_SESSION['PIA_port_timestamp'] = strtotime('now');
      }else{
        return false;
      }
@@ -514,6 +482,63 @@ function VPN_sessionlog_status(){
 
    return $_SESSION['PIA_port'];
  }
+
+ function get_port(){
+  //get username and password from file or SESSION
+  if( array_key_exists('login.conf', $_SESSION) !== true ){
+   if( load_login() === false ){
+     return false;
+   }
+  }
+
+  //get the client ID
+  if( array_key_exists('client_id', $_SESSION) !== true ){
+    $c = $_files->readfile('/pia/client_id');
+    if( $c !== false ){
+      if( mb_strlen($c) < 1 ){
+        return false;
+      }
+      $_SESSION['client_id'] = $c; //store for later
+    }else{
+      return false;
+    }
+  }
+
+  // create a new cURL resource
+  $ch = curl_init();
+
+  $PIA_UN = urlencode($_SESSION['login.conf']['username']);
+  $PIA_PW = urlencode($_SESSION['login.conf']['password']);
+  $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
+  $ret = array();
+  exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+  if( array_key_exists( '0', $ret) !== true ){
+    //VPN  is down, can not continue to check for open ports
+    return false;
+  }else{
+    $TUN_IP = $ret[0];
+  }
+
+  $post_vars = "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP";
+
+  // set URL and other appropriate options
+  curl_setopt($ch, CURLOPT_URL, 'https://www.privateinternetaccess.com/vpninfo/port_forward_assignment');
+  curl_setopt($ch, CURLOPT_HEADER, 0);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch,CURLOPT_POST, count(explode('&', $post_vars)));
+  curl_setopt($ch,CURLOPT_POSTFIELDS, $post_vars);
+  curl_setopt($ch,CURLOPT_TIMEOUT, 10); //max runtime for CURL
+  curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, 4); //only the connection timeout
+
+  // grab URL and pass it to the browser
+  $return = json_decode(curl_exec($ch), true);
+
+  // close cURL resource, and free up system resources
+  curl_close($ch);
+
+  return $return;
+ }
+
 
 /**
  * ensures that every string uses only \n
