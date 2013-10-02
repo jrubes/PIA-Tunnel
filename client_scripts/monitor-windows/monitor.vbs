@@ -1,6 +1,6 @@
 
 Dim tmp, oShell, oFSO,file, oHTTP, http_return, torrent_exe, current_port
-Dim outer_loop, outer_sleep, pattern, PWD, config_file, status_ip, stamp
+Dim outer_loop, outer_sleep, pattern, PWD, config_file, status_ip
 Dim torrent_config, torrent_client, development_run, demo_mode
 Set oShell = WScript.CreateObject("WScript.Shell")
 Set oFSO  = CreateObject("Scripting.FileSystemObject")
@@ -17,8 +17,7 @@ status_ip = GetINIString("MAIN", "STATUS_IP", "", config_file)
 current_port = 0
 outer_loop=true
 outer_sleep=5000 'run check every n milliseconds
-demo_mode=1 '0/1 will only log actions but will not terminate or start the torrent client
-stamp = ""
+demo_mode=0 '0/1 will only log actions but will not terminate or start the torrent client
 
 wscript.echo( Date() & " " & Time() & " -- Software to manage: " & torrent_client)
 wscript.echo( Date() & " " & Time() & " -- Process to terminate: " & torrent_process)
@@ -166,8 +165,6 @@ function update_config( byref openport )
 
 	tmp = replace(pattern(1), "PIAOPENPORT", openport)
 	newconf=reg.replace(cont, tmp)
-	del(PWD & "\out.txt")
-	foo=file_write_text( PWD & "\out.txt", newconf)
 	del(torrent_config)
 	foo=file_write_text( torrent_config, newconf)
 
