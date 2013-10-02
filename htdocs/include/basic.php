@@ -497,7 +497,6 @@ function VPN_sessionlog_status(){
   */
  function get_port(){
    global $_files;
-die('about to ask PIA for port');
   //get username and password from file or SESSION
   if( array_key_exists('login.conf', $_SESSION) !== true ){
    if( load_login() === false ){
