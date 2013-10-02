@@ -26,7 +26,7 @@ status_ip = GetINIString("MAIN", "STATUS_IP", "", config_file)
 current_port = 0
 outer_loop=true
 outer_sleep=5000 'run check every n milliseconds
-demo_mode=1 '0/1 will only log actions but will not terminate or start the torrent client
+demo_mode=0 '0/1 will only log actions but will not terminate or start the torrent client
 
 wscript.echo( Date() & " " & Time() & " -- Software to manage: " & torrent_client)
 wscript.echo( Date() & " " & Time() & " -- Process to terminate: " & torrent_process)
