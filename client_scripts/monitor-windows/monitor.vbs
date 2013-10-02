@@ -1,12 +1,21 @@
 
 Dim tmp, oShell, oFSO,file, oHTTP, http_return, torrent_exe, current_port
 Dim outer_loop, outer_sleep, pattern, PWD, config_file, status_ip
-Dim torrent_config, torrent_client, development_run, demo_mode
+Dim torrent_config, torrent_client, development_run, demo_mode, args
 Set oShell = WScript.CreateObject("WScript.Shell")
 Set oFSO  = CreateObject("Scripting.FileSystemObject")
+set args = Wscript.Arguments
 'Set oHTTP = CreateObject("MSXML2.XMLHTTP")
 Set oHTTP = CreateObject("MSXML2.ServerXMLHTTP")
 PWD = Left(WScript.ScriptFullName,(Len(WScript.ScriptFullName) - (Len(WScript.ScriptName) + 1))) 'working dir without trailing \
+
+'must be started with cscript to provide better feedback while running
+if NOT args.count = 1 then
+	cmd = "cmd /c ""cscript monitor.vbs foo"""
+	oShell.run cmd,1
+	wscript.quit
+end if
+
 
 config_file = PWD & "\monitor.ini"
 torrent_process = GetINIString("MAIN", "PROCESS_NAME", "", config_file)
@@ -17,7 +26,7 @@ status_ip = GetINIString("MAIN", "STATUS_IP", "", config_file)
 current_port = 0
 outer_loop=true
 outer_sleep=5000 'run check every n milliseconds
-demo_mode=0 '0/1 will only log actions but will not terminate or start the torrent client
+demo_mode=1 '0/1 will only log actions but will not terminate or start the torrent client
 
 wscript.echo( Date() & " " & Time() & " -- Software to manage: " & torrent_client)
 wscript.echo( Date() & " " & Time() & " -- Process to terminate: " & torrent_process)
@@ -53,9 +62,9 @@ do while outer_loop=true
 	If Err.Number <> 0 Then
 		select case Err.Number
 			case -2146697211
-				wscript.echo( Date() & " " & Time() & " -- ERROR: connecting to " & status_ip & " is the IP correct and the system running?")
+				wscript.echo( Date() & " " & Time() & " -- ERROR: connecting to PIA Tunnel VM. Is the IP correct and the VM running?")
 			case -2147012894
-				wscript.echo( Date() & " " & Time() & " -- ERROR: connection timed out. Is the IP correct and the system running? IP on file: " & status_ip)
+				wscript.echo( Date() & " " & Time() & " -- ERROR: connection to PIA Tunnel VM timed out. Is the IP correct?")
 			case -2147012744
 				'invalid respons from server - ignore for now
 			case else
