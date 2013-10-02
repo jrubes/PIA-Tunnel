@@ -38,7 +38,7 @@ wscript.echo( Date() & " " & Time() & " -- IP of PIA Tunnel: " & status_ip)
 'load replacement pattern
 tmp = file_get_text( PWD & "\" & torrent_client & ".pattern")
 if tmp = false then
-	wscript.echo( Date() & " " & Time() & " -- ERROR: Could not find pattern file: " & PWD & "\" & torrent_client & ".pattern")
+	msgbox( Date() & " " & Time() & " -- ERROR: Could not find pattern file: " & PWD & "\" & torrent_client & ".pattern")
 	wscript.quit
 else
 	pattern = split(tmp, vbcrlf)
@@ -255,7 +255,7 @@ function del( byref file)
 						'Unkown error
 						del = false
 						exit function
-						wscript.echo( Date() & " " & Time() & " -- Unkown error" & Err.Number &vbcrlf & "Source: " & Err.Source & "Desc: "&Err.Description)
+						msgbox( Date() & " " & Time() & " -- Unkown error" & Err.Number &vbcrlf & "Source: " & Err.Source & "Desc: "&Err.Description)
 						wscript.quit
 				end select
 			End If
