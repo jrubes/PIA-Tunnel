@@ -132,7 +132,7 @@ function restart_process( byval process_name )
 		Set colProcessList = objWMIService.ExecQuery("SELECT * FROM Win32_Process WHERE Name = '" & process_name & "'")
 		For Each objProcess in colProcessList
 			if NOt demo_mode = 1 then
-				wscript.ech( Date() & " " & Time() & " -- terminating " & process_name)
+				wscript.echo( Date() & " " & Time() & " -- terminating " & process_name)
 				oShell.Exec "PSKill " & objProcess.ProcessId
 				count = count + 1
 			end if
