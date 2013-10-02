@@ -125,6 +125,8 @@ class PIACommands {
   function clear_session(){
     $f = '/pia/cache/session.log';
     $this->_files->rm($f);
+    $f = '/pia/cache/webgui_port.txt';
+    $this->_files->rm($f);
 
     if( array_key_exists('PIA_port', $_SESSION) === true ){
       unset($_SESSION['PIA_port']);

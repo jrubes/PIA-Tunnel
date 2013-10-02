@@ -36,29 +36,4 @@ switch($type){
     break;
 
 }
-
-
-
-
-if( $value == '' ){
-  echo $ret;
-}else{
-  /**
-   * allows an external script to ask for a specific value
-  */
-  $ar = json_decode($ret);
-  var_dump($ar);
-  $value = strotolower($value);
-  foreach( $ar as $k => $v ){
-    echo $k;
-    if( strtolower($k) == $value ){
-      echo "foo" . $k;
-      die();
-    }
-  }
-  //not found
-  echo $ret;
-  die();
-}
-
 ?>

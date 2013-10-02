@@ -455,14 +455,21 @@ function VPN_sessionlog_status(){
         //cont(0) is timestamp of creation
         //cont(1) contains the port number
         $expires = strtotime('-96 hours'); //time until session expires
-        if( trim($cont(0)) < $expires ){
+        if( trim($cont[0]) < $expires ){
           $pia_ret = get_port();
+          if(array_key_exists('port', $pia_ret) === true ){
+            settype($pia_ret['port'], 'integer');
+          }
 
         }else{
-          $pia_ret['port'] = trim(cont(1));
+          $pia_ret['port'] = (int)trim($cont[1]);
+        }
+      }else{
+        $pia_ret = get_port();
+        if(array_key_exists('port', $pia_ret) === true ){
+          settype($pia_ret['port'], 'integer');
         }
       }
-
 
      if( is_int($pia_ret['port']) === true && $pia_ret['port'] > 0 && $pia_ret['port'] < 65536 ){
       $_SESSION['PIA_port'] = $pia_ret['port']; //needs to be refreshed later on
@@ -483,7 +490,14 @@ function VPN_sessionlog_status(){
    return $_SESSION['PIA_port'];
  }
 
+ /**
+  * get forwarded port from PIA
+  * @global object $_files
+  * @return int,boolean integer with port number or boolean false on failure
+  */
  function get_port(){
+   global $_files;
+die('about to ask PIA for port');
   //get username and password from file or SESSION
   if( array_key_exists('login.conf', $_SESSION) !== true ){
    if( load_login() === false ){
