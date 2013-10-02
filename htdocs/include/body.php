@@ -5,7 +5,7 @@
 /* @var $_services SystemServices */
 
 $disp_body = "<body>\n";
-$disp_body .= "<h1>PIA-Tunnel Management Interface</h1>";
+//$disp_body .= "<h1>PIA-Tunnel Management Interface</h1>";
 
 
 /* always include the menu on top of the page */

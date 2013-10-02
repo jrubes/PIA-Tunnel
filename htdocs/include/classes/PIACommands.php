@@ -86,8 +86,7 @@ class PIACommands {
 
     //time to initiate the connection
     //using bash allows this to happen in the background
-    // EDIT: this opens the door for the UI to run any command as root. need to remove bash calls!!
-    exec("sudo bash -c \"/pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &");
+    exec("bash -c \"sudo /pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &");
   }
 
   /**
@@ -96,7 +95,7 @@ class PIACommands {
   function pia_disconnect(){
     $this->clear_session();
 
-    exec("sudo bash -c \"/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
+    exec("bash -c \"sudo /pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
   }
 
   /**
@@ -115,7 +114,7 @@ class PIACommands {
         break;
       case 'start':
         exec('killall /pia/pia-daemon &> /dev/null');
-        exec('sudo bash -c "/pia/pia-daemon &>/pia/cache/pia-daemon.log &" &>/dev/null &');
+        exec('bash -c "sudo /pia/pia-daemon &>/pia/cache/pia-daemon.log &" &>/dev/null &');
         break;
     }
   }
@@ -126,46 +125,49 @@ class PIACommands {
   function clear_session(){
     $f = '/pia/cache/session.log';
     $this->_files->rm($f);
-    
+    $f = '/pia/cache/webgui_port.txt';
+    $this->_files->rm($f);
+
     if( array_key_exists('PIA_port', $_SESSION) === true ){
       unset($_SESSION['PIA_port']);
     }
-    
+
     if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
       unset($_SESSION['PIA_port_timestamp']);
     }
-    
+
     $_SESSION['connecting2'] = '';
+    unset($_SESSION['client_id']);
   }
   /**
  * method to update the root password with a custom or random password
- * @param string $new_pw new root password as string or 
+ * @param string $new_pw new root password as string or
  */
 function update_root_password( $new_pw = null ){
   if( $new_pw == '' || strlen($new_pw) < 3 ){
     $new_pw = $this->rand_string(50);
   }
   $new_pw = escapeshellarg($new_pw);
-  
+
   $out = array();
   $stat = 99;
   exec("sudo /pia/include/update_root.sh $new_pw", $out, $stat);
-  
+
   $ret = "";
   switch($stat){
     case 0:
-      $ret = "<div class=\"feedback\">the root password has been set to '".htmlspecialchars($new_pw)."'</div>\n";
+      $ret = "<div id=\"feedback\" class=\"feedback\">the root password has been set to '".htmlspecialchars($new_pw)."'</div>\n";
       break;
     case 1:
-      $ret = "<div class=\"feedback\">Unkown Error when changing root password...</div>\n";
+      $ret = "<div id=\"feedback\" class=\"feedback\">Unkown Error when changing root password...</div>\n";
       break;
     case 2:
-      $ret = "<div class=\"feedback\">invalid root password</div>\n";
+      $ret = "<div id=\"feedback\" class=\"feedback\">invalid root password</div>\n";
       break;
     default:
-      $ret = "<div class=\"feedback\">root password default text ???!?!?!</div>\n";
+      $ret = "<div id=\"feedback\" class=\"feedback\">root password default text ???!?!?!</div>\n";
       break;
-  }  
+  }
   return $ret;
 }
 
@@ -186,11 +188,11 @@ function rand_string($lenth, $range=array('A','Z','a','z',0,9), $other='' ) {
 	$sel_range = array_merge($sel_range, range($range[$x], $range[$x+1]));
   if( $other !== '' )
 	$sel_range = array_merge($sel_range, explode (',', $other));
-  $out =''; 
+  $out ='';
   $cnt = count($sel_range);
   for( $x = 0 ; $x < $lenth ; ++$x )
 	$out .= $sel_range[mt_rand(0,$cnt-1)];
-  return $out; 
+  return $out;
 /*
     // test the "randomness", replace mt_rand() with rand() to see why you should use mt_rand()
     header("Content-type: image/png");

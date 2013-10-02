@@ -76,7 +76,7 @@ class PIASettings {
     }
 
     if( $onechanged === true ){
-      $ret = "<div class=\"feedback\">Settings updated</div>\n";
+      $ret = "<div id=\"feedback\" class=\"feedback\">Settings updated</div>\n";
     }
     return $ret;
   }

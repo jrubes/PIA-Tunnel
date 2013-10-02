@@ -1,0 +1,4 @@
+# Declare files that will always have CRLF line endings on checkout.
+*.vbs text eol=crlf
+*.pattern text eol=crlf
+*.ini text eol=crlf

@@ -25,8 +25,8 @@ switch($_REQUEST['cmd']){
       //GUI access to pia-setup
       $result = array();
       exec("sudo /pia/pia-update", $result);
-      $disp_body .= "<div class=\"feedback\">Update Executed</div>\n";
-      $disp_body .= "<div class=\"feedback\">\n";
+      $disp_body .= "<div id=\"feedback\" class=\"feedback\">Update Executed</div>\n";
+      $disp_body .= "<div id=\"feedback\" class=\"feedback\">\n";
       if( array_key_exists('0', $result) === true ){
         foreach( $result as $val ){
           $disp_body .= "$val<br>\n";
@@ -48,21 +48,21 @@ switch($_REQUEST['cmd']){
         exec("sudo /pia/reset-pia", $result);
         if( array_key_exists('0', $result) === true ){
           $_SESSION = array(); //clear all session vars
-          $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.</div>\n";
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">Full system reset has been executed - system will reboot now.</div>\n";
           VM_restart();
         }
       }else{
-        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
 
       $disp_body .= disp_default();
       break;
-      
+
     }elseif( array_key_exists('update_root', $_POST) === true ){
       if( $_token->pval($_POST['token'], 'update system root password') === true ){
         $disp_body .= $_pia->update_root_password($_POST['new_root_password']);
       }else{
-        $disp_body .= "<div class=\"feedback\">Invalid token - request ignored.</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
       }
       $disp_body .= disp_default();
       break;
@@ -82,6 +82,25 @@ function disp_default(){
   $disp_body .= "<hr>";
   $disp_body .= disp_update_root();
   $disp_body .= "<hr>";
+  $disp_body .= disp_client_tools();
+  $disp_body .= "<hr>";
+  return $disp_body;
+}
+
+/**
+ * returns UI elements in HTML
+ * @return string string with HTML for body of this page
+ */
+function disp_client_tools(){
+  $disp_body = '';
+
+  //offer download links to client tools
+  $disp_body .= '<p><a href="/monitor-windows.zip">Torrent Monitor for Windows</a><br>';
+  $disp_body .= 'This script will detected port changes and will reconfigure your torrent'
+                .' client with updated settings.'
+                .'<br>Supports <a href="http://deluge-torrent.org/" target="_blank">Deluge</a> and <a href="http://www.qbittorrent.org/" target="_blank">qBittorrent</a>. Please check the documentation for instructions.'
+                .'</p>';
+
   return $disp_body;
 }
 
@@ -110,7 +129,7 @@ function disp_update_root(){
   global $_pia;
   global $_token;
   $disp_body = '';
-  
+
   $pass = array('update system root password');
   $tokens = $_token->pgen($pass);
 
@@ -135,7 +154,7 @@ function disp_update_root(){
 function disp_reset_pia(){
   global $_token;
   $disp_body = '';
-  
+
   $pass = array('complete system reset');
   $tokens = $_token->pgen($pass);
 
