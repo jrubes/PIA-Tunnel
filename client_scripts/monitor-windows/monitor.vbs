@@ -173,6 +173,7 @@ function update_config( byref openport )
 			wscript.quit
 		else
 			wscript.echo(msg)
+		end if
 	else
 		Set reg = New RegExp
 		reg.IgnoreCase = True
