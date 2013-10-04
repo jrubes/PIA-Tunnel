@@ -1,5 +1,5 @@
 Dim tmp, oShell, oFSO,file, oHTTP, http_return, torrent_exe, current_port
-Dim outer_loop, outer_sleep, pattern, PWD, config_file, status_ip
+Dim outer_loop, outer_sleep, pattern, PWD, config_file, status_ip, msg
 Dim torrent_config, torrent_client, development_run, demo_mode, args
 Set oShell = WScript.CreateObject("WScript.Shell")
 Set oFSO  = CreateObject("Scripting.FileSystemObject")
@@ -166,8 +166,13 @@ function update_config( byref openport )
 	cont = file_get_text(torrent_config)
 	
 	if cont = false then
-		msgbox("FATAL ERROR: config file not found! Please check your monitor.ini" & vbcrlf & "You supplied:" & vbcrlf & vbcrlf & torrent_config)
-		wscript.quit
+		msg = "FATAL ERROR: config file not found! Please check monitor.ini" & vbcrlf & "You supplied:" & vbcrlf & vbcrlf & torrent_config
+		
+		if NOT demo_mode = 1 then
+			msgbox(msg)
+			wscript.quit
+		else
+			wscript.echo(msg)
 	else
 		Set reg = New RegExp
 		reg.IgnoreCase = True
