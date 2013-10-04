@@ -1,5 +1,6 @@
+
 Dim tmp, oShell, oFSO,file, oHTTP, http_return, torrent_exe, current_port
-Dim outer_loop, outer_sleep, pattern, PWD, config_file, status_ip, msg
+Dim outer_loop, outer_sleep, pattern, PWD, config_file, status_ip
 Dim torrent_config, torrent_client, development_run, demo_mode, args
 Set oShell = WScript.CreateObject("WScript.Shell")
 Set oFSO  = CreateObject("Scripting.FileSystemObject")
@@ -37,7 +38,7 @@ wscript.echo( Date() & " " & Time() & " -- IP of PIA Tunnel: " & status_ip)
 'load replacement pattern
 tmp = file_get_text( PWD & "\" & torrent_client & ".pattern")
 if tmp = false then
-	msgbox( Date() & " " & Time() & " -- ERROR: Could not find pattern file: " & PWD & "\" & torrent_client & ".pattern")
+	wscript.echo( Date() & " " & Time() & " -- ERROR: Could not find pattern file: " & PWD & "\" & torrent_client & ".pattern")
 	wscript.quit
 else
 	pattern = split(tmp, vbcrlf)
@@ -65,7 +66,9 @@ do while outer_loop=true
 			case -2147012894
 				wscript.echo( Date() & " " & Time() & " -- ERROR: connection to PIA Tunnel VM timed out. Is the IP correct?")
 			case -2147012744
-				'invalid respons from server - ignore for now
+				'invalid response from server - ignore
+			case -2147012866
+				'connection terminated due to error - ignore
 			case else
 				call msgbox( Date() & " " & Time() & " -- UNKOWN ERROR: fetching the latest port data" &vbcrlf _
 						& "Please send the error information below to your support contact." &vbcrlf _
@@ -131,7 +134,7 @@ function restart_process( byval process_name )
 		Set colProcessList = objWMIService.ExecQuery("SELECT * FROM Win32_Process WHERE Name = '" & process_name & "'")
 		For Each objProcess in colProcessList
 			if NOt demo_mode = 1 then
-				wscript.echo( Date() & " " & Time() & " -- terminating " & process_name)
+				wscript.ech( Date() & " " & Time() & " -- terminating " & process_name)
 				oShell.Exec "PSKill " & objProcess.ProcessId
 				count = count + 1
 			end if
@@ -165,30 +168,56 @@ function update_config( byref openport )
 	Dim cont, foo, newconf
 	cont = file_get_text(torrent_config)
 	
-	if cont = false then
-		msg = "FATAL ERROR: config file not found! Please check monitor.ini" & vbcrlf & "You supplied:" & vbcrlf & vbcrlf & torrent_config
-		
-		if NOT demo_mode = 1 then
-			msgbox(msg)
-			wscript.quit
-		else
-			wscript.echo(msg)
-		end if
-	else
-		Set reg = New RegExp
-		reg.IgnoreCase = True
-		reg.Global = false 'only one match
-		reg.Pattern = pattern(0)
-		'wscript.echo(reg.test(cont))
+	Set reg = New RegExp
+	reg.IgnoreCase = True
+	reg.Global = false 'only one match
+	reg.Pattern = pattern(0)
+	'wscript.echo(reg.test(cont))
 
-		tmp = replace(pattern(1), "PIAOPENPORT", openport)
-		newconf=reg.replace(cont, tmp)
-		del(torrent_config)
-		foo=file_write_text( torrent_config, newconf)
-	end if
+	tmp = replace(pattern(1), "PIAOPENPORT", openport)
+	newconf=reg.replace(cont, tmp)
+	del(torrent_config)
+	foo=file_write_text( torrent_config, newconf)
 
 end function
 
+' update a setting like this
+'		Connection\PortRangeMin=46058
+' update_one_per_line( "foo\bar.txt", "PortRangeMin=", "46058")
+function update_one_per_line( byref file, byref look4, byref newval)
+
+	'loop over file and look for "look4" on every line
+	' repalce value then write back
+	if oFSO.FileExists(file) = true then
+		Const ForReading = 1
+		Dim line,newfile,changed
+		changed=false
+		newfile="" 'will contain the uptaded file contents
+		Set oFile = oFSO.OpenTextFile(file, ForReading)
+		Do While oFile.AtEndOfStream = False
+			line = oFile.ReadLine
+			if instr(line, look4) > 0 then
+				'match found - uptade the option
+				Dim position, currrent
+				position = instr(line,separator)
+				current = mid(line, 1, position)
+				line=current & newval
+				changed=true
+			end if
+			
+			newfile = newfile & vbcrlf & line
+		Loop
+		oFile.Close
+		
+		'write content back
+		if NOT newfile = "" AND changed = true then
+			foo=del(file)
+			foo=file_write_text( file, newfile)
+		end if
+	end if
+
+
+end function
 
 function file_write_text( byref file, byref content)
 	'Writes information to text file, returns true if ok, false when something went wrong
@@ -228,7 +257,7 @@ function del( byref file)
 						'Unkown error
 						del = false
 						exit function
-						msgbox( Date() & " " & Time() & " -- Unkown error" & Err.Number &vbcrlf & "Source: " & Err.Source & "Desc: "&Err.Description)
+						wscript.echo( Date() & " " & Time() & " -- Unkown error" & Err.Number &vbcrlf & "Source: " & Err.Source & "Desc: "&Err.Description)
 						wscript.quit
 				end select
 			End If
