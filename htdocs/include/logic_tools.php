@@ -73,6 +73,13 @@ switch($_REQUEST['cmd']){
     $disp_body .= disp_default();
 }
 
+$disp_body .= '<script type="text/javascript">'
+				.'var timr1=setInterval(function(){'
+					.'var _overview = new OverviewObj();'
+					.'_overview.clean_feedback();'
+				.'},2500);'
+				.'</script>';
+
 
 function disp_default(){
   $disp_body = '';

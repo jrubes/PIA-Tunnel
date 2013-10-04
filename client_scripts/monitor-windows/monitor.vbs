@@ -1,4 +1,3 @@
-
 Dim tmp, oShell, oFSO,file, oHTTP, http_return, torrent_exe, current_port
 Dim outer_loop, outer_sleep, pattern, PWD, config_file, status_ip
 Dim torrent_config, torrent_client, development_run, demo_mode, args
@@ -166,56 +165,24 @@ function update_config( byref openport )
 	Dim cont, foo, newconf
 	cont = file_get_text(torrent_config)
 	
-	Set reg = New RegExp
-	reg.IgnoreCase = True
-	reg.Global = false 'only one match
-	reg.Pattern = pattern(0)
-	'wscript.echo(reg.test(cont))
+	if cont = false then
+		msgbox("FATAL ERROR: config file not found! Please check your monitor.ini" & vbcrlf & "You supplied:" & vbcrlf & vbcrlf & torrent_config)
+		wscript.quit
+	else
+		Set reg = New RegExp
+		reg.IgnoreCase = True
+		reg.Global = false 'only one match
+		reg.Pattern = pattern(0)
+		'wscript.echo(reg.test(cont))
 
-	tmp = replace(pattern(1), "PIAOPENPORT", openport)
-	newconf=reg.replace(cont, tmp)
-	del(torrent_config)
-	foo=file_write_text( torrent_config, newconf)
-
-end function
-
-' update a setting like this
-'		Connection\PortRangeMin=46058
-' update_one_per_line( "foo\bar.txt", "PortRangeMin=", "46058")
-function update_one_per_line( byref file, byref look4, byref newval)
-
-	'loop over file and look for "look4" on every line
-	' repalce value then write back
-	if oFSO.FileExists(file) = true then
-		Const ForReading = 1
-		Dim line,newfile,changed
-		changed=false
-		newfile="" 'will contain the uptaded file contents
-		Set oFile = oFSO.OpenTextFile(file, ForReading)
-		Do While oFile.AtEndOfStream = False
-			line = oFile.ReadLine
-			if instr(line, look4) > 0 then
-				'match found - uptade the option
-				Dim position, currrent
-				position = instr(line,separator)
-				current = mid(line, 1, position)
-				line=current & newval
-				changed=true
-			end if
-			
-			newfile = newfile & vbcrlf & line
-		Loop
-		oFile.Close
-		
-		'write content back
-		if NOT newfile = "" AND changed = true then
-			foo=del(file)
-			foo=file_write_text( file, newfile)
-		end if
+		tmp = replace(pattern(1), "PIAOPENPORT", openport)
+		newconf=reg.replace(cont, tmp)
+		del(torrent_config)
+		foo=file_write_text( torrent_config, newconf)
 	end if
 
-
 end function
+
 
 function file_write_text( byref file, byref content)
 	'Writes information to text file, returns true if ok, false when something went wrong
