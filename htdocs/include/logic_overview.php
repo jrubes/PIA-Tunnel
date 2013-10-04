@@ -240,8 +240,8 @@ function disp_default(){
 
 
   /* show network status */
-  $disp_body .= '<h2>Network Status</h2><br>'
-								.'<noscript>please enable javascript for automatic status updates</noscript>';
+  $disp_body .= '<h2>Network Status</h2>'
+								.'<noscript><p>please enable javascript for automatic status updates</p></noscript>';
   $disp_body .= '<div id="network_status">'.VM_get_status().'</div>';
 
   $disp_body .= '<script type="text/javascript">'
