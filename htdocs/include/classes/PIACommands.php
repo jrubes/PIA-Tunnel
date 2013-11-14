@@ -49,17 +49,54 @@ class PIACommands {
 
 
   /**
+   * checks if iptables has forwarding enabled or not
+   * @return boolean TRUE when forwarding is enabled, FALSE if not
+   *
+   */
+  function check_forward_state(){
+    $ret = array();
+    exec('sudo /pia/include/fw_get_forward_state.sh', $ret);
+    if( array_key_exists( '0', $ret) === true ){
+        if( $ret[0] === 'ON' ){
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        return false;
+    }
+  }
+
+   /**
+   * method to rebuild /pia/include/autostart.conf file based on configuration settings
+   * @return boolean TRUE on success or FALSE on failure
+   */
+  function rebuild_autostart(){
+    $ret = array();
+    exec('sudo /pia/include/autostart_rebuild.sh', $ret);
+    if( array_key_exists( '0', $ret) === true ){
+        if( $ret[0] === 'OK' ){
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        return false;
+    }
+  }
+
+  /**
    * method will run a check if tun0 return an IP and assume "UP" when one is found
    * @return booolean TRUE if VPN is up or FALSE if VPN is down
    */
   function is_vpn_up(){
     $ret = array();
-     exec('/sbin/ip addr show tun0 2>/dev/null', $ret);
-     if( array_key_exists( '0', $ret) !== true ){
-       return false;
-     }
+    exec('/sbin/ip addr show tun0 2>/dev/null', $ret);
+    if( array_key_exists( '0', $ret) !== true ){
+      return false;
+    }
 
-     return true;
+    return true;
   }
 
 
@@ -82,11 +119,14 @@ class PIACommands {
       $c = "connecting to $arg\n\n";
       $_SESSION['connecting2'] = $arg; //store for messages
     }
+
+    $f = '/pia/cache/php_pia-start.log';
+    $this->_files->rm($f);
     $this->_files->writefile( $f, $c ); //write file so status overview works right away
 
     //time to initiate the connection
     //using bash allows this to happen in the background
-    exec("bash -c \"sudo /pia/pia-start $arg &> /pia/cache/php_pia-start.log &\" &>/dev/null &");
+    exec("bash -c \"sudo /pia/pia-start $arg &>> $f &\" &>/dev/null &");
   }
 
   /**

@@ -4,7 +4,7 @@
 LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
-source '/pia/include/functions.inc'
+source '/pia/include/functions.sh'
 
 
 

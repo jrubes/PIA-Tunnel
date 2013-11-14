@@ -19,7 +19,7 @@ if [ ! -f "/pia/settings.conf" ]; then
 	echo '' >> '/pia/settings.conf'
 fi
 source '/pia/settings.conf'
-source '/pia/include/functions.inc'
+source '/pia/include/functions.sh'
 
 #check the for default value
 if [ "$PIA_UN" = "your PIA account name on this line" ]; then

@@ -7,7 +7,7 @@
 LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
-source '/pia/include/functions.inc'
+source '/pia/include/functions.sh'
 FAIL_RETRY_INTERNET=3
 SLEEP_PING_RETEST=4
 
@@ -61,7 +61,7 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 
 
 	#see if we have a tunnel open
-	ping_host "vpn" "quick" "keep"
+	ping_host_new "vpn" "quick" "keep"
 	if [ "$RET_PING_HOST" = "OK" ]; then
 		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- closing current VPN tunnel"
@@ -87,7 +87,7 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 	# start the FW script once the VPN is up and running
 	LOOP_PROTECT=0
 	while true; do
-	  ping_host "vpn" "keep"
+	  ping_host_new "vpn" "keep"
 	  if [ "$RET_PING_HOST" = "OK" ]; then
 	    # show connection data
 	    echo_conn_established $filename
@@ -96,7 +96,7 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 
         # keep VPN up with daemon?
         if [ "$1" = "daemon" ]; then
-          sleep 5 #give everything a few seconds to settle	
+          sleep 5 #give everything a few seconds to settle
           echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
             "- starting pia-daemon in a screen session"
           killall pia-daemon &> /dev/null

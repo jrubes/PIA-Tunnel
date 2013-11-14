@@ -45,4 +45,4 @@ else
 fi
 cont="${cont}\n"
 
-echo -e $cont > '/etc/network/interfaces';
+echo -e $cont > '/etc/network/interfaces'

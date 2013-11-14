@@ -83,9 +83,9 @@ do
 done
 
 #handle files in include, these don't get /bin/ links
-FILES="fw-forward fw-no-forward functions.inc build_ping_list fix_settings network-interfaces.sh"
+FILES="fw-forward.sh fw-no-forward.sh functions.sh build_ping_list.sh fix_settings.sh network-interfaces.sh"
 FILES="$FILES network-restart.sh autostart autostart.sh dhcpd-reconfigure.sh dhcpd-start.sh"
-FILES="$FILES dhcpd-stop.sh dhcpd-status.sh update_root.sh"
+FILES="$FILES dhcpd-stop.sh dhcpd-status.sh update_root.sh fw_get_forward_state.sh autostart_rebuild.sh"
 for f in $FILES
 do
 	chmod ug+x "/pia/include/$f"
@@ -99,7 +99,7 @@ if [ ! -f "/pia/cache/ip_list.txt" ]; then
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- ip_list.txt does not exist - rebuilding!"
 	echo -e "\tthis will take a couple of minutes...."
-	/pia/include/build_ping_list
+	/pia/include/build_ping_list.sh
 fi
 
 
@@ -108,15 +108,17 @@ cp -r /pia/htdocs/* /var/www
 rm -f /var/www/README.txt
 rm -f /var/www/monitor-windows.zip
 cd /pia/client_scripts ; zip -r /var/www/monitor-windows.zip monitor-windows/ &> /dev/null
+cp "/pia/docs/PIA-Tunnel Documentation.pdf" /var/www/pia-tunnel_documentation.pdf &> /dev/null
 chown -R www-data.www-data /var/www
 find /var/www -type d -exec chmod 0750 {} \;
 find /var/www -type f -exec chmod 0640 {} \;
 
 
 #add missing settings to settings.conf
-/pia/include/fix_settings
+/pia/include/fix_settings.sh
 
-
+# rebuild autostart.conf since it may have been reset by pia-update
+/pia/include/autostart_rebuild.sh &> /dev/null
 
 #ALWAYS RUN THIS LAST
 chown -R root.vpnvm /pia

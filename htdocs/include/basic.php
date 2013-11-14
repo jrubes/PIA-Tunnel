@@ -335,17 +335,23 @@ function VM_get_status( $output = 'html'){
       $ret_arr['vpn_port'] = ($port != '') ? "$port" : "not supported by location";
 
       //show forwarding info
-      if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
-        $ret_str .= "<tr><td>Port Forwarding</td><td>$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]</td></tr>";
-        $ret_arr['forwarding_port'] = "$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]";
-      }
-      if( $settings['FORWARD_VM_LAN'] == 'yes' ){
-        $ret_str .= "<tr><td>FW interfaces</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
-        $ret_arr['forwarding_if1'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
-      }
-      if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
-        $ret_str .= "<tr><td>FW interfaces</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
-        $ret_arr['forwarding_if2'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
+      $fw_forward_state = $_pia->check_forward_state();
+      if( $fw_forward_state === true ){
+        if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
+          $ret_str .= "<tr><td>Port Forwarding</td><td>$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]</td></tr>";
+          $ret_arr['forwarding_port'] = "$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]";
+        }
+        if( $settings['FORWARD_VM_LAN'] == 'yes' ){
+          $ret_str .= "<tr><td>FW interfaces</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+          $ret_arr['forwarding_if1'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
+        }
+        if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
+          $ret_str .= "<tr><td>FW interfaces</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+          $ret_arr['forwarding_if2'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
+        }
+      }else{
+        $ret_str .= "<tr><td>Port Forwarding</td><td>currently disabled</td></tr>";
+        $ret_arr['forwarding_port'] = "currently disabled";
       }
 
     }else{

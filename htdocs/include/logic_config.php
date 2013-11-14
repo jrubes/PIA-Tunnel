@@ -110,6 +110,17 @@ switch($_REQUEST['cmd']){
         $disp_body .= disp_network_default();
         break;
 
+      case 'daemon_settings':
+        $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
+        if( $ret_save !== '' ){
+            $_pia->rebuild_autostart();
+            $disp_body .= $ret_save;
+        }else{
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">Request to store settings but nothing was changed.</div>\n";
+        }
+        $disp_body .= disp_network_default();
+        break;
+
       default:
         $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
         if( $ret_save !== '' ){
@@ -370,7 +381,7 @@ function disp_pia_daemon_box($tokens){
             array( 'yes', 'yes'),
             array( 'no', 'no')
           );
-  $disp_body .= '<tr><td>Enable pia-daemon</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>Start after OS boot </td><td>'.build_select($sel).'</td></tr>'."\n";
 
   //Failover connection selection - fix hard coded loop later
   $fovers = 0;
@@ -468,6 +479,28 @@ function disp_network_box($tokens){
             array( 'no', 'no')
           );
   $disp_body .= '<tr><td>VPN Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+
+
+  //ping error threshold
+  $fields .= 'PING_MAX_LOSS,';
+  $sel = array(
+            'id' => 'PING_MAX_LOSS',
+            'selected' =>  $settings['PING_MAX_LOSS'],
+            array( '0', '0%'),
+            array( '5', '5%'),
+            array( '10', '10%'),
+            array( '15', '15%'),
+            array( '20', '20%'),
+            array( '30', '30%'),
+            array( '40', '40%'),
+            array( '50', '50%'),
+            array( '60', '60%'),
+            array( '70', '70%'),
+            array( '80', '80%'),
+            array( '90', '90%'),
+            array( '100', '100%')
+          );
+  $disp_body .= '<tr><td>Max allowed packet loss</td><td>'.build_select($sel).'</td></tr>'."\n";
 
   //management stuff
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";

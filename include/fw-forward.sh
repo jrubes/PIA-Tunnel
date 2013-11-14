@@ -125,7 +125,7 @@ if [ "$FORWARD_PUBLIC_LAN" = 'yes' ]; then
   iptables -A FORWARD -i $IF_TUNNEL -o $IF_EXT -m state --state RELATED,ESTABLISHED -j ACCEPT
   if [ "$VERBOSE_DEBUG" = "yes" ]; then
       echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-          "- forwarding $IF_TUNNEL => $IF_EXT has been enabled"
+          "- forwarding $IF_TUNNEL => $IF_EXT enabled"
   fi
 fi
 
@@ -136,7 +136,7 @@ if [ "$FORWARD_VM_LAN" = 'yes' ]; then
   iptables -A FORWARD -i $IF_TUNNEL -o $IF_INT -m state --state RELATED,ESTABLISHED -j ACCEPT
   if [ "$VERBOSE_DEBUG" = "yes" ]; then
       echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-          "- forwarding $IF_TUNNEL => $IF_INT has been enabled"
+          "- forwarding $IF_TUNNEL => $IF_INT enabled"
   fi
 fi
 
@@ -148,7 +148,7 @@ if [ "$PORT_FW" = 'enabled' ] && [ "$FORWARD_PORT_ENABLED" = 'yes' ]; then
 	iptables -A FORWARD -i $IF_TUNNEL -p udp --dport $TUN_PORT -d "$FORWARD_IP" -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- port forwaring $IF_TUNNEL => '$FORWARD_IP':$TUN_PORT has been enabled"
+			"- port forwaring $IF_TUNNEL => '$FORWARD_IP':$TUN_PORT enabled"
 	fi
 else
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
@@ -165,7 +165,7 @@ if [ ! -z "${FIREWALL_IF_SSH[0]}" ]; then
     iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- SSH has been enabled for interface: $interface"
+			"- SSH enabled for interface: $interface"
 	fi
   done
 fi
@@ -178,7 +178,7 @@ if [ ! -z "${FIREWALL_IF_WEB[0]}" ]; then
     iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- webUI has been enabled for interface: $interface"
+			"- webUI enabled for interface: $interface"
 	fi
   done
 fi

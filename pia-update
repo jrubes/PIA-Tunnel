@@ -6,6 +6,8 @@ export LANG
 clear
 echo "getting updates from https://github.com/KaiserSoft/PIA-Tunnel"
 cd /pia/
+git config core.fileMode false
+git reset --hard HEAD
 git pull origin
 
 #run pia-setup to fix permissions from git pull

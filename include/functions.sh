@@ -7,9 +7,14 @@ RET_PING_HOST=""
 RET_FILE_IS_WRITABLE="no"
 declare -a RET_MODIFIED_ARRAY
 RET_FORWARD_PORT="FALSE"
+RET_FORWARD_STATE="FUCK"
+RET_GET_PACKET_LOSS=""
 
 # WARNING DO NOT CHANGE the ping command! ping_host uses sed to modify the string
 PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
+#PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\" | gawk -F\",\" '{print \$3}' | gawk -F \"%\" '{print \$1}' | tr -d ' '"
+PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\""
+
 
 # fallback list
 PING_IP_LIST[0]="8.8.8.8"
@@ -174,11 +179,13 @@ function ping_host() {
     pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
     pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_EXT/g"`
 	PING_RESULT=`eval $pingthis`
+	#echo "$pingthis"
 
   elif [ "$1" = "vpn" ]; then
     pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
     pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_TUNNEL/g"`
     PING_RESULT=`eval $pingthis`
+	#echo "$pingthis"
 
   else
 	#use self to ping via VPN first then via Internet
@@ -222,6 +229,20 @@ function ping_host() {
 	fi
   fi
 
+}
+
+# checks if any rules are active in the FORWARD chain
+function check_forward_state(){
+    unset RET_FORWARD_STATE
+
+    ret=`iptables -L FORWARD | grep -c "ACCEPT"`
+    if [ $ret = 0 ]; then
+        RET_FORWARD_STATE="OFF"
+    else
+        RET_FORWARD_STATE="ON"
+    fi
+
+    return
 }
 
 #function to remove an item from any array and rebuilding the array without the item
@@ -539,4 +560,166 @@ function interface_exists() {
     RET_INTERFACE_EXISTS="no"
     return
   fi
+}
+
+# new ping function for pinging internet hosts
+# $s1 is either "internet", "vpn" or "any"
+#  "any" means either one or both, let the function figure it out
+# $2 the IP or Domain to ping
+# $3 or $4 "quick" for a fast ping or "keep" to keep the IP in the IP cache
+function ping_host_new() {
+	RET_PING_HOST="ERROR"
+
+	host_ip="not set"
+	if [ "$2" != "" ] || [ "$3" != "" ]; then
+		if [ "$2" != "quick" ] && [ "$2" != "keep" ]; then
+			host_ip="$2"
+		elif [ "$2" = "quick" ] && [ "$3" != "keep" ] && [ "$3" != "" ]; then
+			host_ip="$3"
+		fi
+	fi
+
+	if [ "$host_ip" = "not set" ]; then
+		#check PING_IP_LIST and ensure that it still has enough IPs since
+		# failed IPs get removed from the array further down
+		if [ ${#PING_IP_LIST[@]} -lt 2 ];then
+			if [ "$VERBOSE_DEBUG" = "yes" ]; then
+				echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+					"- PING_IP_LIST only has 1 entry left - rebuilding"
+			fi
+			gen_ip_list 15
+		fi
+
+		#pick one IP from $PING_IP_LIST[] to be used this time
+		ip_count=${#PING_IP_LIST[@]}
+		ip_count=$((ip_count - 1)) #zero based
+		rand=$[ ( $RANDOM % $ip_count )  + 1 ]
+		host_ip=${PING_IP_LIST[$rand]}
+	fi
+
+
+	#shall we make this a "quick" ping?
+	if [ "$2" = "quick" ] || [ "$3" = "quick" ]; then
+		pingthis=`echo "$PING_PACKET_LOSS" | sed -e "s/-i 0.5 -w 4 -W 0.5/-c 1 -w 1/g"`
+
+		if [ "$VERBOSE_DEBUG" = "yes" ]; then
+			echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- using \"quick\" ping command"
+		fi
+	else
+		pingthis=$PING_PACKET_LOSS
+	fi
+
+
+  if [ "$1" = "internet" ]; then
+    #replace IP in $PING_COMMAND with $host_ip
+    pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
+    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_EXT/g"`
+    PING_RESULT=`eval $pingthis`
+    #echo "$pingthis"
+    #exit
+
+  elif [ "$1" = "vpn" ]; then
+    pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
+    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_TUNNEL/g"`
+    PING_RESULT=`eval $pingthis`
+    #echo "$pingthis"
+    #exit
+
+  else
+    # handle "any" ping by calling itself with either "vpn" or "internet"
+    interface_exists "$IF_TUNNEL"
+    if [ "$RET_INTERFACE_EXISTS" = "yes" ]; then
+        ping_host_new "vpn" "$host_ip" "keep"
+        return
+    else
+        ping_host_new "internet" "$host_ip" "keep"
+        return
+    fi
+  fi
+
+  #retrieve return of ping
+  get_packet_loss "$PING_RESULT"
+  PING_RESULT="$RET_GET_PACKET_LOSS"
+
+  # see if the ping failed or is OK
+  if [ "$PING_RESULT" = "" ]; then
+    RET_PING_HOST="ERROR"
+    if [ "$VERBOSE_DEBUG" = "yes" ]; then
+        if [ "$1" = "internet" ]; then
+                echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+                        "- Internet ping failed $host_ip"
+        else
+                echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+                        "- VPN ping failed $host_ip"
+        fi
+    fi
+    return
+  fi
+
+  #if [ "$PING_RESULT" = "1" ]; then
+  if [ "$PING_RESULT" -lt "$PING_MAX_LOSS" ]; then
+    RET_PING_HOST="OK"
+    if [ "$VERBOSE_DEBUG" = "yes" ]; then
+        if [ "$1" = "internet" ]; then
+            echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+                "- Internet ping $host_ip OK failed:$PING_RESULT% max:$PING_MAX_LOSS%"
+        else
+            echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+                "- VPN ping $host_ip OK failed:$PING_RESULT% max:$PING_MAX_LOSS%"
+        fi
+    fi
+  else
+    if [ "$VERBOSE_DEBUG" = "yes" ]; then
+        if [ "$1" = "internet" ]; then
+            echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+                "- Internet ping $host_ip ERROR failed:$PING_RESULT% max:$PING_MAX_LOSS%"
+        else
+            echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+                "- VPN ping $host_ip ERROR failed:$PING_RESULT% max:$PING_MAX_LOSS%"
+        fi
+    fi
+
+
+    RET_PING_HOST="ERROR"
+    if [ "$VERBOSE_DEBUG" = "yes" ]; then
+        if [ "$1" = "internet" ]; then
+                echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+                        "- Internet ping failed $host_ip"
+        else
+                echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+                        "- VPN ping failed $host_ip"
+        fi
+    fi
+
+
+    if [ "$2" != "keep" ] && [ "$3" != "keep" ] && [ "$4" != "keep" ]; then
+            #ping failed remove the IP from the random ping pool PING_IP_LIST
+            remove_ip_from_array PING_IP_LIST[@] "$host_ip"
+            PING_IP_LIST=("${RET_MODIFIED_ARRAY[@]}")
+    fi
+  fi
+}
+
+
+# checks the inconsistent return of ping and only return the "packet loss" integer
+# example returns
+# ping with < 100% packet loss
+#   8 packets transmitted, 8 received, 0% packet loss, time 3588ms
+# ping with 100% packet loss
+#   6 packets transmitted, 0 received, +3 errors, 100% packet loss, time 2547ms
+function get_packet_loss(){
+    passed=$1
+    unset RET_GET_PACKET_LOSS
+
+    ret=`echo "$passed" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | tr -d ' '`
+    errors=`echo "$ret" | grep -c "errors"`
+
+    if [ "$errors" = "0" ]; then
+        RET_GET_PACKET_LOSS=$ret
+    else
+        #failure string detected, run grep again
+        RET_GET_PACKET_LOSS=`echo "$passed" | gawk -F"," '{print \$4}' | gawk -F "%" '{print \$1}' | tr -d ' '`
+    fi
+    return
 }
