@@ -58,7 +58,7 @@ do while outer_loop=true
 	'open http and catch any errors
 	On Error Resume Next
 	oHTTP.send
-	
+
 	If Err.Number <> 0 Then
 		select case Err.Number
 			case -2146697211
@@ -69,6 +69,8 @@ do while outer_loop=true
 				'invalid response from server - ignore
 			case -2147012866
 				'connection terminated due to error - ignore
+			case -2147019873
+				' something is not ready ... just ignore it
 			case else
 				call msgbox( Date() & " " & Time() & " -- UNKOWN ERROR: fetching the latest port data" &vbcrlf _
 						& "Please send the error information below to your support contact." &vbcrlf _
