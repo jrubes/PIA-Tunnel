@@ -1,7 +1,7 @@
 
 Dim tmp, oShell, oFSO,file, oHTTP, http_return, torrent_exe, current_port
 Dim outer_loop, outer_sleep, pattern, PWD, config_file, status_ip
-Dim torrent_config, torrent_client, development_run, demo_mode, args
+Dim torrent_config, torrent_client, development_run, demo_mode, args, failed_once
 Set oShell = WScript.CreateObject("WScript.Shell")
 Set oFSO  = CreateObject("Scripting.FileSystemObject")
 set args = Wscript.Arguments
@@ -27,6 +27,7 @@ current_port = 0
 outer_loop=true
 outer_sleep=5000 'run check every n milliseconds
 demo_mode=0 '0/1 will only log actions but will not terminate or start the torrent client
+failed_once=false
 
 wscript.echo( Date() & " " & Time() & " -- Software to manage: " & torrent_client)
 wscript.echo( Date() & " " & Time() & " -- Process to terminate: " & torrent_process)
@@ -98,6 +99,8 @@ do while outer_loop=true
 			'resart the application
 			foo=restart_process(torrent_process)
 		end if
+		failed_once=false
+		
 	elseif http_return = "not supported by location" then
 		if NOT http_return = current_port then
 			wscript.echo( Date() & " " & Time() & " -- location does not support port forwarding")
@@ -105,10 +108,17 @@ do while outer_loop=true
 			
 			'resart the application
 			foo=restart_process(torrent_process)
-		end if		
+		end if
+		failed_once=false
+		
 	else
 		'not connected or not yet
-		wscript.echo( Date() & " " & Time() & " -- VPN is not connected")
+		if failed_once = true then
+			wscript.echo( Date() & " " & Time() & " -- VPN is not connected")
+			failed_once=false
+		else
+			failed_once=true 'ignore an error once
+		end if
 	end if
 
 	wscript.sleep(outer_sleep)
