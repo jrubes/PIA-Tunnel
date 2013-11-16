@@ -135,6 +135,7 @@ class PIACommands {
   function pia_disconnect(){
     $this->clear_session();
 
+    $this->_files->rm('/pia/cache/php_pia-start.log');
     exec("bash -c \"sudo /pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
   }
 

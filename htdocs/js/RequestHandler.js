@@ -47,7 +47,7 @@ function RequestHandler(){
       //console.debug('aborting pending request for group: ' + request_group);
       //_this.http_request.request_group.abort();
     //}
-    console.debug('creating new request for group: ' + request_group);
+    //console.debug('creating new request for group: ' + request_group);
     _this.http_request.request_group = _request.get_http_obj();
 
     _this.http_request.request_group.onreadystatechange = function(){

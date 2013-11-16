@@ -49,6 +49,30 @@ function OverviewObj( ){
       time.setAttribute('id', 'feedback_expires');
       fele.appendChild(time);
     }
+  }
+
+  /* method reconfigured the network control UI when js is enabled*/
+  this.set_js_network_control = set_js_network_control;
+  function set_js_network_control(){
+    var rem = document.getElementById('ele_vpn_connect');
+    if( rem ){ rem.parentNode.removeChild(rem); }
+
+    rem = document.getElementById('ele_daemon_lbl');
+    if( rem ){ rem.parentNode.removeChild(rem); }
+
+    rem = document.getElementById('ele_firewall_lbl');
+    if( rem ){ rem.parentNode.removeChild(rem); }
+
+    rem = document.getElementById('ele_os_lbl');
+    if( rem ){ rem.parentNode.removeChild(rem); }
+
+    rem = document.getElementById('overview_net_status');
+    rem.setAttribute('class', 'overview_box');
+    rem = document.getElementById('overview_net_control');
+    rem.setAttribute('class', 'overview_box');
+
+
 
   }
+
 }

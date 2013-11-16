@@ -175,7 +175,7 @@ function array_is_value_unique( &$ar, $val ){
  * @param array $build_options *Optional* additional build_select() as array (besides name)
  * @return string/bool string containing HTML formated as <select> or FALSE
  */
-function VPN_get_connections($name, $build_options=array()){
+function VPN_get_connections( $name, $build_options=array()){
   $ret = array();
   $sel = array();
   $sel['id'] = $name;
@@ -380,7 +380,17 @@ function VPN_sessionlog_status(){
 
   $content = $_files->readfile('/pia/cache/session.log');
   if( $content == '' ){
-    return array('disconnected');
+    $content = $_files->readfile('/pia/cache/php_pia-start.log');
+    if( $content == '' ){
+      return array('disconnected');
+    }else{
+      $lines = explode("\n", $content);
+      if( substr($lines[0], 0, 13) === 'connecting to' ){
+        $location = substr($lines[0], strpos($content, 'connecting to')+13 ); //+13 to remove 'connecting to'
+        $_SESSION['connecting2'] = $location;
+        return array('connecting');
+      }
+    }
   }else{
     //get name of current connection and store in SESSION
     if(array_key_exists('connecting2', $_SESSION) !== true && strpos($content, 'connecting to') !== false ){
@@ -604,7 +614,8 @@ function load_login(){
  * @param array $content array with following structure
  * <ul><li>['id'] = "foo"; name and id of select element created</li>
  * <li>['initial'] = "empty|filled"; empty to have initial selection of nothing or filled to use [0]
- * <li>['selected'] = "male"; Otional - specify top item from list by option value</li>
+ * <li>['selected'] = "male"; Optional - specify top item from list by option value</li>
+ * <li>['onchange'] = "foo();" Optional - add onclick to \<select\>tag</li>
  * <li>array( 'option value', 'option display')</li>
  * <li>array( 'option value2', 'option display2')</li>
  * </ul>
@@ -614,7 +625,8 @@ function load_login(){
 function build_select( &$content, $double=false ){
 
   $hash = $content['id'];//md5($content['id']); //hash this to avoid problems with MYVPN[0] and PHP
-  $head = '<select id="'.$hash.'" name="'.$hash."\">\n";
+  $onchange = ( array_key_exists('onchange', $content) === true ) ? 'onchange="'.$content['onchange'].'"' : '';
+  $head = '<select id="'.$hash.'" name="'.$hash."\" $onchange>\n";
 
   /* 'selected' is option */
   if( array_key_exists('selected', $content) === true ){
@@ -629,6 +641,8 @@ function build_select( &$content, $double=false ){
   /* first line empty or filled */
   if( array_key_exists('initial', $content) === true && $content['initial'] === 'empty' ){
     $head .= '<option value="">&nbsp;</option>';
+  }elseif( array_key_exists('initial', $content) === true ){
+    $head .= '<option value="">'.$content['initial'].'</option>';
   }
 
   /* time to build the rest */

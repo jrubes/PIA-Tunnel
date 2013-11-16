@@ -154,6 +154,7 @@ function disp_default(){
   /* show VM network and VPN overview */
 
   //VPN control UI
+  $disp_body .= '<div id="overview_net_control">';
   $disp_body .= '<h2>Network Control</h2>';
 
   $pass = array('handle user request - start or stop pia-daemon');
@@ -162,7 +163,8 @@ function disp_default(){
   $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
   $disp_body .= '<table class="control_box">';
   $disp_body .= '<tr>';
-  $disp_body .= '<td>PIA VPN Daemon</td>';
+  $disp_body .= '<tr>';
+  $disp_body .= '<td id="ele_daemon_lbl">PIA VPN Daemon</td>';
   $disp_body .= '<td>';
   $disp_body .= ' <input type="submit" style="width: 9em;" name="daemon_start" value="Start pia-daemon">';
   $disp_body .= '</td>';
@@ -176,14 +178,14 @@ function disp_default(){
 
   $pass = array('handle user request - establish or disconnect VPN');
   $tokens = $_token->pgen($pass);
-  $disp_body .= '<form class="inline" action="/" method="post">';
+  $disp_body .= '<form id="frm_vpn_connection" class="inline" action="/" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
   $disp_body .= '<table class="control_box">';
   $disp_body .= '<tr>';
   $disp_body .= '<td>';
-  $disp_body .=   VPN_get_connections('vpn_connections')."\n";
+  $disp_body .=   VPN_get_connections('vpn_connections', array( 'initial' => 'Connect To', 'onchange' => 'vpn_connect();'))."\n"; // Connect VPN
   $disp_body .= '</td>';
-  $disp_body .= '<td>';
+  $disp_body .= '<td id="ele_vpn_connect">';
   $disp_body .= ' <input type="submit" style="width: 9em;" name="vpn_connect" value="Connect VPN">';
   $disp_body .= '</td>';
   $disp_body .= '<td>';
@@ -201,7 +203,7 @@ function disp_default(){
   $disp_body .= '<input type="hidden" name="cmd" value="firewall_control">';
   $disp_body .= '<table class="control_box">';
   $disp_body .= '<tr>';
-  $disp_body .= '<td>';
+  $disp_body .= '<td id="ele_firewall_lbl">';
   $disp_body .=   "Firewall control\n";
   $disp_body .= '</td>';
   $disp_body .= '<td>';
@@ -222,7 +224,7 @@ function disp_default(){
   $disp_body .= '<input type="hidden" name="cmd" value="os_control">';
   $disp_body .= '<table class="control_box">';
   $disp_body .= '<tr>';
-  $disp_body .= '<td>';
+  $disp_body .= '<td id="ele_os_lbl">';
   $disp_body .=   "OS control\n";
   $disp_body .= '</td>';
   $disp_body .= '<td>';
@@ -235,21 +237,34 @@ function disp_default(){
   $disp_body .= '</table>';
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form>\n";
+  $disp_body .= "</div>\n";
 
 
 
 
   /* show network status */
+  $disp_body .= '<div id="overview_net_status">';
   $disp_body .= '<h2>Network Status</h2>'
 								.'<noscript><p>please enable javascript for automatic status updates</p></noscript>';
   $disp_body .= '<div id="network_status">'.VM_get_status().'</div>';
+  $disp_body .= "</div>\n";
 
   $disp_body .= '<script type="text/javascript">'
                 .'var timr1=setInterval(function(){'
                   .'var _overview = new OverviewObj();'
                   .'_overview.refresh_status();'
                   .'_overview.clean_feedback();'
-                .'},2500);'
+                  .'},2500);'
+                  .'var _overview = new OverviewObj();_overview.set_js_network_control();'
+                .'/* handle the "connect" event on the overview page */
+                    function vpn_connect(){
+                    var submit_form = document.getElementById(\'frm_vpn_connection\');
+                    var ele_conn = document.createElement((\'input\'));
+                    ele_conn.setAttribute(\'type\', \'hidden\');
+                    ele_conn.setAttribute(\'name\', \'vpn_connect\');
+                    submit_form.appendChild(ele_conn);
+                    submit_form.submit();
+                  }'
                 .'</script>';
 
   return $disp_body;
