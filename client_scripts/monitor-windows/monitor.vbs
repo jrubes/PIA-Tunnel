@@ -1,7 +1,8 @@
 
 Dim tmp, oShell, oFSO,file, oHTTP, http_return, torrent_exe, current_port
 Dim outer_loop, outer_sleep, pattern, PWD, config_file, status_ip
-Dim torrent_config, torrent_client, development_run, demo_mode, args, failed_once
+Dim torrent_config, torrent_client, development_run, demo_mode, args
+Dim config_found, failed_once, ENV_APPDATA, ENV_PRO86, ENV_PRO, exe_found
 Set oShell = WScript.CreateObject("WScript.Shell")
 Set oFSO  = CreateObject("Scripting.FileSystemObject")
 set args = Wscript.Arguments
@@ -25,16 +26,115 @@ torrent_config = GetINIString("MAIN", "CONFIG_PATH", "", config_file)
 status_ip = GetINIString("MAIN", "STATUS_IP", "", config_file)
 current_port = 0
 outer_loop=true
-outer_sleep=5000 'run check every n milliseconds
+outer_sleep=30000 'run check every n milliseconds
 demo_mode=0 '0/1 will only log actions but will not terminate or start the torrent client
-failed_once=false
+failed_once=false 'reduces the amount of "erros" printed when the VPN is down
+config_found = false 'will be set to true by validation scripts
+exe_found=false 'will be set to true by validation scripts
+torrent_client=lcase(torrent_client) 'must be lower case!!
 
-wscript.echo( Date() & " " & Time() & " -- Software to manage: " & torrent_client)
-wscript.echo( Date() & " " & Time() & " -- Process to terminate: " & torrent_process)
-wscript.echo( Date() & " " & Time() & " -- Exe Path: " & torrent_exe)
-wscript.echo( Date() & " " & Time() & " -- Config Path: " & torrent_config)
-wscript.echo( Date() & " " & Time() & " -- Checking every: " & outer_sleep & "ms")
-wscript.echo( Date() & " " & Time() & " -- IP of PIA Tunnel: " & status_ip)
+'get name for torrent_process if empty
+if torrent_process = "" then
+	if torrent_client = "deluge" then
+		torrent_process="deluge.exe"
+	elseif torrent_client = "qbittorrent" then
+		torrent_process="qbittorrent.exe"
+	else
+		call msgbox( Date() & " " & Time() & " -- FATAL ERROR: unkown torrent client, please set the PROCESS_NAME= option in monitor.ini")
+		wscript.quit
+	end if
+end if
+
+
+'handle %APPDATA% in config path
+if InStr(torrent_config, "%APPDATA%") > 0 then
+	ENV_APPDATA = oShell.ExpandEnvironmentStrings( "%APPDATA%" )	
+	torrent_config = ENV_APPDATA & mid( torrent_config, 10 )
+end if
+
+'validate config file location
+if NOT oFSO.FileExists(torrent_config) = true then
+	' try to locate the config file on our own
+	ENV_APPDATA = oShell.ExpandEnvironmentStrings( "%APPDATA%" )
+	
+	tmp = ENV_APPDATA & "\deluge\core.conf"
+	if oFSO.FileExists(tmp) = true AND torrent_client = "deluge" AND NOT config_found = true then
+		torrent_config = tmp
+		config_found = true
+	end if
+	
+	tmp = ENV_APPDATA & "\qBittorrent\qBittorrent.ini"
+	if oFSO.FileExists(tmp) = true AND torrent_client = "qbittorrent" AND NOT config_found = true then
+		torrent_config = tmp
+		config_found = true
+	end if
+	
+else
+	config_found=true
+end if
+
+if config_found = false then
+	call msgbox( Date() & " " & Time() & " -- FATAL ERROR: Could not find your torrent clients config file in " & vbcrlf & torrent_config)
+	wscript.quit
+end if
+
+
+
+
+'handle %PROGRAMFILES%/%PROGRAMFILES(x86)% in torrent_exe
+if InStr(ucase(torrent_exe), "%PROGRAMFILES") > 0 then
+	if InStr(ucase(torrent_exe), "%PROGRAMFILES(X86)%") > 0 then
+		ENV_PRO86 = oShell.ExpandEnvironmentStrings( "%PROGRAMFILES(x86)%" )
+		torrent_exe = ENV_PRO86 & mid( torrent_exe, 21 )
+		call msgbox("expanded: " & torrent_exe)
+	else
+		ENV_PRO = oShell.ExpandEnvironmentStrings( "%PROGRAMFILES%" )	
+		torrent_exe = ENV_PRO & mid( torrent_exe, 15 )
+		call msgbox("expandedd: " & torrent_exe)
+	end if
+end if
+
+'validate torrent_exe
+if NOT oFSO.FileExists(torrent_exe) = true then
+	'check default location 
+	'%programfiles%\qBittorrent\qbittorrent.exe
+	'C:\Program Files (x86)\Deluge\deluge.exe
+	ENV_PRO86 = oShell.ExpandEnvironmentStrings( "%PROGRAMFILES(x86)%" )
+	ENV_PRO = oShell.ExpandEnvironmentStrings( "%PROGRAMFILES%" )	
+	
+	tmp = ENV_PRO86 & "\deluge\deluge.exe"
+	if oFSO.FileExists(tmp) = true AND torrent_client = "deluge" AND NOT exe_found = true then
+		torrent_exe = tmp
+		exe_found = true
+	end if
+	tmp = ENV_PRO & "\deluge\deluge.exe"
+	if oFSO.FileExists(tmp) = true AND torrent_client = "deluge" AND NOT exe_found = true then
+		torrent_exe = tmp
+		exe_found = true
+	end if
+	
+	tmp = ENV_PRO86 & "\qBittorrent\qbittorrent.exe"
+	if oFSO.FileExists(tmp) = true AND torrent_client = "qbittorrent" AND NOT exe_found = true then
+		torrent_exe = tmp
+		exe_found = true
+	end if
+	tmp = ENV_PRO & "\qBittorrent\qbittorrent.exe"
+	if oFSO.FileExists(tmp) = true AND torrent_client = "qbittorrent" AND NOT exe_found = true then
+		torrent_exe = tmp
+		exe_found = true
+	end if
+else
+	exe_found=true
+end if
+
+if exe_found = false then
+	call msgbox( Date() & " " & Time() & " -- FATAL ERROR: Could not find your torrent clients exe file in " & vbcrlf & torrent_exe)
+	wscript.quit
+end if
+
+
+
+
 
 'load replacement pattern
 tmp = file_get_text( PWD & "\" & torrent_client & ".pattern")
@@ -45,7 +145,16 @@ else
 	pattern = split(tmp, vbcrlf)
 end if
 
-wscript.echo( Date() & " " & Time() & " -- Torrent Monitor is now running.")
+
+'looks good - let's go!
+wscript.echo( Date() & " " & Time() & " -- Torrent Client: " & torrent_client)
+wscript.echo( Date() & " " & Time() & " -- Process Name: " & torrent_process)
+wscript.echo( Date() & " " & Time() & " -- Exe: " & torrent_exe)
+wscript.echo( Date() & " " & Time() & " -- Config: " & torrent_config)
+wscript.echo( Date() & " " & Time() & " -- Checking every: " & outer_sleep/1000 & "s")
+wscript.echo( Date() & " " & Time() & " -- IP of PIA Tunnel VM: " & status_ip)
+
+wscript.echo( Date() & " " & Time() & " -- * Torrent Monitor is now running *")
 wscript.echo("")
 wscript.sleep(1000)
 
@@ -63,22 +172,28 @@ do while outer_loop=true
 	If Err.Number <> 0 Then
 		select case Err.Number
 			case -2146697211
-				wscript.echo( Date() & " " & Time() & " -- ERROR: connecting to PIA Tunnel VM. Is the IP correct and the VM running?")
+				wscript.echo( Date() & " " & Time() & " -- Connection Error: Is the IP correct and the VM running?")
+				failed_once=false
 			case -2147012894
-				wscript.echo( Date() & " " & Time() & " -- ERROR: connection to PIA Tunnel VM timed out. Is the IP correct?")
+				wscript.echo( Date() & " " & Time() & " -- Timeout Error: Is the IP correct?")
+				failed_once=false
 			case -2147012744
 				'invalid response from server - ignore
+				failed_once=false
 			case -2147012866
 				'connection terminated due to error - ignore
+				failed_once=false
 			case -2147019873
 				' something is not ready ... just ignore it
+				failed_once=false
 			case else
 				call msgbox( Date() & " " & Time() & " -- UNKOWN ERROR: fetching the latest port data" &vbcrlf _
 						& "Please send the error information below to your support contact." &vbcrlf _
 						& "Errorcode: " & Err.Number & vbcrlf _
 						& "Source: " & Err.Source &vbcrlf _
 						& "Description: " & Err.Description)
-				wscript.quit
+				'wscript.quit
+				failed_once=false
 		end select
 	else
 		http_return = oHTTP.responseText
@@ -90,7 +205,7 @@ do while outer_loop=true
 	if NOT http_return = "" AND IsNumeric(http_return) = true then
 		' something returned
 		if NOT http_return = current_port then
-			wscript.echo( Date() & " " & Time() & " -- new port value: " & http_return)
+			wscript.echo( Date() & " " & Time() & " -- VPN Port: " & http_return)
 			current_port = http_return
 
 			'update the config file
@@ -146,7 +261,7 @@ function restart_process( byval process_name )
 		Set colProcessList = objWMIService.ExecQuery("SELECT * FROM Win32_Process WHERE Name = '" & process_name & "'")
 		For Each objProcess in colProcessList
 			if NOt demo_mode = 1 then
-				wscript.ech( Date() & " " & Time() & " -- terminating " & process_name)
+				wscript.echo( Date() & " " & Time() & " -- terminating " & process_name)
 				oShell.Exec "PSKill " & objProcess.ProcessId
 				count = count + 1
 			end if
