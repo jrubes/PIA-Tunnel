@@ -13,7 +13,7 @@ function OverviewObj( ){
   this.refresh_status = refresh_status;
   function refresh_status(){
 
-    var url = '/get_status.php?'+Math.random();
+    var url = '/get_status.php';
     var pdata = ''; //post data as string
     var callback;
 
