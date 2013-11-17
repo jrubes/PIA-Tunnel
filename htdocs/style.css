@@ -118,5 +118,12 @@ root {
   border-right-width: 0.1px;
   border-bottom-width: 0.1px;
   border-bottom-style: solid;
+}
 
+.float_hr{
+  display: block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
 }

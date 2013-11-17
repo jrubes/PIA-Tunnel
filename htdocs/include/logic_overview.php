@@ -154,6 +154,7 @@ function disp_default(){
   /* show VM network and VPN overview */
 
   //VPN control UI
+  $disp_body .= '<noscript><p>please enable javascript to activate the advanced UI</p></noscript>';
   $disp_body .= '<div id="overview_net_control">';
   $disp_body .= '<h2>Network Control</h2>';
 
@@ -244,8 +245,7 @@ function disp_default(){
 
   /* show network status */
   $disp_body .= '<div id="overview_net_status">';
-  $disp_body .= '<h2>Network Status</h2>'
-								.'<noscript><p>please enable javascript for automatic status updates</p></noscript>';
+  $disp_body .= '<h2>Network Status</h2>';
   $disp_body .= '<div id="network_status">'.VM_get_status().'</div>';
   $disp_body .= "</div>\n";
 

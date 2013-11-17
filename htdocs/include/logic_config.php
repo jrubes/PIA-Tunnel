@@ -678,8 +678,10 @@ function disp_network_default(){
   $disp_body = '';
 
 
+;
   $disp_body .= disp_network_box($tokens);
   $disp_body .= disp_pia_daemon_box($tokens);
+  $disp_body .= '<div class="float_hr"></div>';
   $disp_body .= disp_system_box($tokens);
   $disp_body .= disp_dhcpd_box($tokens);
   $disp_body .= disp_webui_box($tokens);
