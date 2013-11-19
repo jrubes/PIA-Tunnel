@@ -346,7 +346,7 @@ function disp_dhcpd_box($tokens){
   $fields .= 'DHCPD_STATIC_IP,';
   $disp_body .= '<tr><td>Fixed IP</td><td><input '.$disabled.' type="text" name="DHCPD_STATIC_IP" value="'.htmlspecialchars($settings['DHCPD_STATIC_IP']).'"></td></tr>'."\n";
   $fields .= 'DHCPD_STATIC_MAC,';
-  $disp_body .= '<tr><td>MAC for IP</td><td><input '.$disabled.' type="text" onkeyup="this.value = this.value.replace(/-/g, \':\');" class="long" name="DHCPD_STATIC_MAC" value="'.htmlspecialchars($settings['DHCPD_STATIC_MAC']).'" placeholder="00:00:00:00:00:00" title="MAC separated by colons (:)"></td></tr>'."\n";
+  $disp_body .= '<tr><td>MAC for IP</td><td><input '.$disabled.' type="text" onkeyup="this.value = this.value.replace(/-/g, \':\');" name="DHCPD_STATIC_MAC" value="'.htmlspecialchars($settings['DHCPD_STATIC_MAC']).'" placeholder="00:00:00:00:00:00" title="MAC separated by colons (:)"></td></tr>'."\n";
 
 
 
