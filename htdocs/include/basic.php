@@ -342,11 +342,11 @@ function VM_get_status( $output = 'html'){
           $ret_arr['forwarding_port'] = "$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]";
         }
         if( $settings['FORWARD_VM_LAN'] == 'yes' ){
-          $ret_str .= "<tr><td>FW interfaces</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+          $ret_str .= "<tr><td>FW Interfaces</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
           $ret_arr['forwarding_if1'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
         }
         if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
-          $ret_str .= "<tr><td>FW interfaces</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
+          $ret_str .= "<tr><td>FW Interfaces</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
           $ret_arr['forwarding_if2'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
         }
       }else{
