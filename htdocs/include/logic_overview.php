@@ -167,10 +167,10 @@ function disp_default(){
   $disp_body .= '<tr>';
   $disp_body .= '<td id="ele_daemon_lbl">PIA VPN Daemon</td>';
   $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="daemon_start" value="Start pia-daemon">';
+  $disp_body .= ' <input type="submit" name="daemon_start" value="Start pia-daemon">';
   $disp_body .= '</td>';
   $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="daemon_stop" value="Stop pia-daemon">';
+  $disp_body .= ' <input type="submit" name="daemon_stop" value="Stop pia-daemon">';
   $disp_body .= '</td>';
   $disp_body .= '</tr>';
   $disp_body .= '</table>';
@@ -187,10 +187,10 @@ function disp_default(){
   $disp_body .=   VPN_get_connections('vpn_connections', array( 'initial' => 'Connect To', 'onchange' => 'vpn_connect();'))."\n"; // Connect VPN
   $disp_body .= '</td>';
   $disp_body .= '<td id="ele_vpn_connect">';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="vpn_connect" value="Connect VPN">';
+  $disp_body .= ' <input type="submit" name="vpn_connect" value="Connect VPN">';
   $disp_body .= '</td>';
   $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="vpn_disconnect" value="Disconnect VPN">';
+  $disp_body .= ' <input type="submit" name="vpn_disconnect" value="Disconnect VPN">';
   $disp_body .= '</td>';
   $disp_body .= '</tr>';
   $disp_body .= '</table>';
@@ -208,10 +208,10 @@ function disp_default(){
   $disp_body .=   "Firewall control\n";
   $disp_body .= '</td>';
   $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="firewall_enable" value="Restart Firewall">';
+  $disp_body .= ' <input type="submit" name="firewall_enable" value="Restart Firewall">';
   $disp_body .= '</td>';
   $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="firewall_disable" value="Stop Forwarding">';
+  $disp_body .= ' <input type="submit" name="firewall_disable" value="Stop Forwarding">';
   $disp_body .= '</td>';
   $disp_body .= '</tr>';
   $disp_body .= '</table>';
@@ -229,10 +229,10 @@ function disp_default(){
   $disp_body .=   "OS control\n";
   $disp_body .= '</td>';
   $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="vm_restart" value="Restart PIA-VM">';
+  $disp_body .= ' <input type="submit" name="vm_restart" value="Restart PIA-VM">';
   $disp_body .= '</td>';
   $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" style="width: 9em;" name="vm_shutdown" value="Shutdown PIA-VM">';
+  $disp_body .= ' <input type="submit" name="vm_shutdown" value="Shutdown PIA-VM">';
   $disp_body .= '</td>';
   $disp_body .= '</tr>';
   $disp_body .= '</table>';
