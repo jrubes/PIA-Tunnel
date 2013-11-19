@@ -128,17 +128,6 @@ root {
   height: 0;
 }
 
-#overview_net_control{
-    width: 290px;
-    margin-right: 1em;
-    text-align: center;
-}
-
-#overview_net_status{
-    width: 470px;
-    margin-right: 1em;
-}
-
 .overview_box h2{
   display: block;
   font-size: 1.5em;
@@ -148,12 +137,11 @@ root {
   text-align: left;
 }
 
-.overview_box input[type="submit"]{
+#overview_net_control input[type="submit"]{
   width: 135px;
   text-align: center;
 }
 
-.overview_box select{
+#overview_net_control select{
   width: 135px;
-  text-align: center;
 }
