@@ -3,7 +3,12 @@
 LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
-source '/pia/include/functions.inc'
+source '/pia/include/functions.sh'
+
+# simulate packet loss
+#tc qdisc del root dev eth0 2> /dev/null
+#tc qdisc add dev eth0 root netem loss 50%
+#tc qdisc change dev eth0 root netem loss 25%
 
 HOSTS="startpage.com icann.org wikipedia.org internic.net"
 HOSTS="$HOSTS google.com google.de"
@@ -21,7 +26,7 @@ aIPS[0]=""
 #used for debug in this script
 VERBOSE="yes"
 
-IPCACHE="/pia/include/ip_list.txt"
+IPCACHE="/pia/cache/ip_list.txt"
 
 
 
@@ -43,7 +48,7 @@ if [ -f "$IPCACHE" ]; then
   fi
 else
   touch "$IPCACHE" 2> /dev/null
-  #check exit status 
+  #check exit status
   if [ "$?" = "1" ]; then
     echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
       "- \"$IPCACHE\" is not writable?!?"
@@ -69,7 +74,7 @@ do
 	"- dig failed with $RET_DIG"
 	RET_DIG=""
   fi
-  
+
   for ip in $RET_DIG
   do
     #$ip should now contain one of the records from 'dig'
@@ -77,45 +82,47 @@ do
     for (( x=1 ; x <= $max_ip_rounds ; x++ ))
     do
       # ping each host multiple times to ensure they are reliable
-      ping_host "any" "$ip"
+      ping_host_new "any" "$ip"
       if [ "$RET_PING_HOST" = "ERROR" ]; then
-		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- ping failed $x/$max_ip_rounds attempts - excluding $ip"
+		#echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+		#	"- ping failed $x/$max_ip_rounds attempts - excluding $ip"
 		break #stop on first sign of trouble
       fi
       sleep 0.2
     done
-    
+
     # or store if the IP is "good"
     if [ "$RET_PING_HOST" = "OK" ]; then
       #check if IP is unique before adding it to the list
       is_ip_unique "$ip" aIPS[@]
       if [ "$RET_IP_UNIQUE" = "yes" ]; then
-		aIPS[$ip_count]="$ip"
-		ip_count=$((ip_count + 1))
+				aIPS[$ip_count]="$ip"
+				ip_count=$((ip_count + 1))
       else
-	if [ "$VERBOSE_DEBUG" = "yes" ]; then
-	      echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+		if [ "$VERBOSE_DEBUG" = "yes" ]; then
+			echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 		      "- $ip not unique"
-		      
-	fi      	
+		fi
       fi
     fi
   done
 
 done
-ip_count=$((ip_count - 1))  #adjust since the last operation is to 
+ip_count=$((ip_count - 1))  #adjust since the last operation is to
 							#increment the count for the next array
 
 
 if [ $ip_count -lt 11 ]; then
-  echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-    "- did not find enough IPs to generate ip_list.txt. is you Internet working?"
-  echo -e "\tplease wait a few minutes then run pia-setup again."
+    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- did not find enough IPs to generate ip_list.txt. is you Internet working?"
+    echo -e "\tplease wait a few minutes then run pia-setup again."
+    #reset packet loss
+    #tc qdisc del root dev eth0
+    exit 99
 
 else
-  # IPS is now a string over IPs separated by space
-  # loop over and write to /pia/include/ip_list.txt
+  # aIPS is now a string over IPs separated by space
+  # loop over and write to /pia/cache/ip_list.txt
   echo "# generated on "$(date +"%Y-%m-%d %H:%M:%S") > "$IPCACHE"
   for ip in ${aIPS[@]}
   do
@@ -125,11 +132,8 @@ fi
 
 echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
   "- stored $ip_count IPs in ip_list.txt"
-echo -e "\ttesting list by getting 10 random IPs"
-#testing the generated ping list
-gen_ip_list 10
-for ip in ${PING_IP_LIST[@]}
-do
-  echo -e "\t  $ip"
-done
-  
+
+
+
+#reset packet loss
+#tc qdisc del root dev eth0

@@ -4,3 +4,8 @@
 /session.log
 /client_id
 /include/ip_list.txt
+/include/autostart.conf
+/cache/
+/nbproject/
+/php/PHP_sessions/
+/htdocs/nbproject/

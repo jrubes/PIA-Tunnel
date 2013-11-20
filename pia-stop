@@ -6,23 +6,27 @@ LANG=en_US.UTF-8
 export LANG
 
 
-if [ ! "$1" = "quite" ]; then
+if [ "$1" = "verbose" ]; then
 	killall openvpn
-	
+    rm -f /pia/cache/status.txt
+
 	#disable forwarding
 	/pia/pia-forward stop
-	
+
 	# restart networking to get default routes through eth0 working again
 	# service network restart #CentOS
 	ifdown eth0 && ifup eth0 #Debian
-	
+	ifdown eth1 && ifup eth1 #Debian
+
 else
-	killall openvpn 2>/dev/null
+	killall openvpn &>/dev/null
 	/pia/pia-forward stop quite
-	ifdown eth0 2>/dev/null && ifup eth0 2>/dev/null #Debian
+	ifdown eth0 &>/dev/null && ifup eth0 &>/dev/null #Debian
+	ifdown eth1 &>/dev/null && ifup eth1 &>/dev/null #Debian
 fi
 
 # remove old status.txt
-rm -r '/pia/include/status.txt' 2>/dev/null
+rm -f '/pia/cache/status.txt' &>/dev/null
+rm -f '/pia/cache/session.log' &>/dev/null
 
 exit 0

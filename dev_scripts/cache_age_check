@@ -5,13 +5,13 @@
 LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
-source '/pia/include/functions.inc'
+source '/pia/include/functions.sh'
 
 
-filechk="/pia/include/ip_list.txt"
+filechk="/pia/cache/ip_list.txt"
 cache_age_check "$filechk"
 echo "$filechk has $RET_CACHE_AGE_CHECK"
 
-filechk="/pia/include/status.txt"
+filechk="/pia/cache/status.txt"
 cache_age_check "$filechk"
 echo "$filechk has $RET_CACHE_AGE_CHECK"

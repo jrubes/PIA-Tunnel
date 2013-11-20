@@ -1,0 +1,147 @@
+/*
+    Document   : style
+    Created on : 19.08.2013, 14:04:12
+    Author     : mirkokaiser
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root {
+  display: block;
+}
+
+.mainmenu{
+  clear: both;
+  margin-top: 0.5em;
+  padding-bottom: 1em;
+}
+.mainmenu  a{
+  margin: 2px 2px;
+  height: 2em;
+  line-height: 2em;
+  float: left;
+  width: 8em;
+  display: block;
+  border: 0.1em solid #dcdce9;
+  color: #0d2474;
+  text-decoration: none;
+  text-align: center;
+  padding: 2px;
+  font-size: 1.2em;
+}
+.mainmenu  a:hover{
+  border-color: blue;
+}
+
+.inline{
+  display: inline;
+}
+
+#highlight a{
+  /*background-color: #E9BDBD; */
+  border-color: green;
+  font-weight: bold;
+}
+
+.content{
+  clear: both;
+  margin-top: 0.5em;
+  padding: 0 0.5em 1em 0.5em;
+  font-size: 1.2em;
+}
+.content h2{
+  display: block;
+  font-size: 1.5em;
+  margin: 0.5em 0 0.5em 0;
+  border-bottom: solid;
+  width: 12em;
+}
+
+.feedback{
+  margin-top: 0.5em;
+  padding: 0.2em;
+  background-color: lightyellow;
+  width: 80%;
+  border-style: solid;
+  border-width: 2px;
+}
+
+.options_box{
+  width: 420px;
+  display: inline;
+  float: left;
+  margin-top: 1em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-bottom: 1em;
+  border-right-style: solid;
+  border-right-width: 0.1px;
+  border-bottom-width: 0.1px;
+  border-bottom-style: solid;
+}
+
+.overview_box{
+  width: 420px;
+  display: inline;
+  float: left;
+  margin-top: 1em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-bottom: 1em;
+  border: none;
+}
+
+.control_box{
+  margin-bottom: 0.3em;
+}
+
+.control_box td{
+  width: 8em;
+}
+
+.long{
+  width: 16em;
+}
+.short{
+  width: 5em;
+}
+
+.wizard_box{
+  width: 550px;
+  display: inline;
+  float: left;
+  margin-top: 1em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-bottom: 1em;
+  border-right-style: solid;
+  border-right-width: 0.1px;
+  border-bottom-width: 0.1px;
+  border-bottom-style: solid;
+}
+
+.float_hr{
+  display: block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
+}
+
+.overview_box h2{
+  display: block;
+  font-size: 1.5em;
+  margin: 0.5em 0 0.5em 0;
+  border-bottom: solid;
+  width: auto;
+  text-align: left;
+}
+
+#overview_net_control input[type="submit"]{
+  width: 135px;
+  text-align: center;
+}
+
+#overview_net_control select{
+  width: 135px;
+}

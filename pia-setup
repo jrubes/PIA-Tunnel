@@ -4,13 +4,33 @@
 LANG=en_US.UTF-8
 export LANG
 
+#set file permissions as needed
+chmod 0770 /pia
+find /pia -type d -exec chmod 0770 {} \;
+find /pia -type f -exec chmod 0660 {} \;
+
+
 # the ping functions now require dig
 if [ ! -f "/usr/bin/dig" ]; then
 	apt-get -y install dnsutils > /dev/null
 fi
-# pia-daemon will need screen soon
-if [ ! -f "/usr/bin/screen" ]; then
-	apt-get -y install screen > /dev/null
+# add php5-cli for pia-daemon 2.0
+if [ ! -f "/usr/bin/php" ]; then
+    apt-get -y install php5-cli php5-curl
+fi
+# add zip
+if [ ! -f "/usr/bin/zip" ]; then
+    apt-get -y install zip unzip
+fi
+
+#remove /bin/bash from sudoers
+pos=`grep -n '/bin/bash,/sbin/shutdown' /etc/sudoers | gawk -F":" '{print $1}'`
+if [ ! -z "$pos" ]; then
+  sed -i /etc/sudoers -e "$pos"'s!\/bin\/bash,!!'
+  if [ "$?" != "0" ]; then
+    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- unable to remove bash entry from sudoers. you can fix this by getting the latest VM image."
+  fi
 fi
 
 #create a new login.conf if none exists
@@ -34,10 +54,24 @@ if [ ! -f "/pia/settings.conf" ]; then
 	echo 'IF_INT="eth1"' >> '/pia/settings.conf'
 	echo '# name of your VPN interface' >> '/pia/settings.conf'
 	echo 'IF_TUNNEL="tun0"' >> '/pia/settings.conf'
+	echo '# IP of target computer for port forwarding - if supported by location' >> '/pia/settings.conf'
+	echo 'FORWARD_IP="192.168.10.100"' >> '/pia/settings.conf'
+    echo '# Enable/Disable forwarding yes/no' >> '/pia/settings.conf'
+    echo 'FORWARD_PORT_ENABLED="no"' >> '/pia/settings.conf'
+    echo '# Enable/Disable forwarding for public LAN yes/no' >> '/pia/settings.conf'
+    echo 'FORWARD_PUBLIC_LAN="yes"' >> '/pia/settings.conf'
+    echo '# Enable/Disable forwarding for private VM LAN yes/no' >> '/pia/settings.conf'
+    echo 'FORWARD_VM_LAN="yes"' >> '/pia/settings.conf'
+    echo '# Enable ssh UI on the following interfaces' >> '/pia/settings.conf'
+    echo 'FIREWALL_IF_SSH[0]="eth0"' >> '/pia/settings.conf'
+    echo 'FIREWALL_IF_SSH[1]="eth1"' >> '/pia/settings.conf'
+    echo '# Enable web on the following interfaces' >> '/pia/settings.conf'
+    echo 'FIREWALL_IF_WEB[0]="eth0"' >> '/pia/settings.conf'
+    echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/pia/settings.conf'
 	echo '' >> '/pia/settings.conf'
 fi
 
-FILES="pia-start pia-stop pia-status pia-update"
+FILES="pia-start pia-stop pia-status pia-update pia-settings"
 FILES="$FILES pia-setup pia-forward  pia-prepare-ovpn pia-daemon"
 for f in $FILES
 do
@@ -45,33 +79,47 @@ do
 		rm "/bin/$f"
 	fi
 	ln -s "/pia/$f" "/bin/$f"
-	chmod u+x "/pia/$f"
+	chmod ug+x "/pia/$f"
 done
 
 #handle files in include, these don't get /bin/ links
-FILES="fw-forward fw-no-forward functions.inc build_ping_list"
+FILES="fw-forward.sh fw-no-forward.sh functions.sh build_ping_list.sh fix_settings.sh network-interfaces.sh"
+FILES="$FILES network-restart.sh autostart autostart.sh dhcpd-reconfigure.sh dhcpd-start.sh"
+FILES="$FILES dhcpd-stop.sh dhcpd-status.sh update_root.sh fw_get_forward_state.sh autostart_rebuild.sh"
 for f in $FILES
 do
-	chmod u+x "/pia/include/$f"
+	chmod ug+x "/pia/include/$f"
 done
 
-
+#reset-pia is special - ug+x but no /bin link
+chmod ug+x "/pia/reset-pia"
 
 #check ip cache
-if [ ! -f "/pia/include/ip_list.txt" ]; then
+if [ ! -f "/pia/cache/ip_list.txt" ]; then
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- ip_list.txt does not exist - rebuilding!"
 	echo -e "\tthis will take a couple of minutes...."
-	/pia/include/build_ping_list
+	/pia/include/build_ping_list.sh
 fi
 
 
+#update files in /var/www
+cp -r /pia/htdocs/* /var/www
+rm -f /var/www/README.txt
+rm -f /var/www/monitor-windows.zip
+cd /pia/client_scripts ; zip -r /var/www/monitor-windows.zip monitor-windows/ &> /dev/null
+cp "/pia/docs/PIA-Tunnel Documentation.pdf" /var/www/pia-tunnel_documentation.pdf &> /dev/null
+chown -R www-data.www-data /var/www
+find /var/www -type d -exec chmod 0750 {} \;
+find /var/www -type f -exec chmod 0640 {} \;
+
 
 #add missing settings to settings.conf
-/pia/include/fix_settings
+/pia/include/fix_settings.sh
 
-
+# rebuild autostart.conf since it may have been reset by pia-update
+/pia/include/autostart_rebuild.sh &> /dev/null
 
 #ALWAYS RUN THIS LAST
-chown -R root.root /pia
-chmod -R og-rwx /pia
+chown -R root.vpnvm /pia
+chmod -R o-rwx /pia

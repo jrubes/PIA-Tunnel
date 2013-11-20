@@ -3,7 +3,7 @@
 LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
-source '/pia/include/functions.inc'
+source '/pia/include/functions.sh'
 
 
 # How it works
@@ -12,9 +12,11 @@ source '/pia/include/functions.inc'
 # 	if the ping fails n times the tunnel is closed or restartet
 
 
+# check for "stop" $1 which kills all pia-daemons
+if [ "$1" = "stop" ]; then
+  killall "pia-daemon"
+fi
 
-# remove old status.txt
-rm -r '/pia/include/status.txt' 2>/dev/null
 
 
 # generate a few IPs for the uptime functions
@@ -47,7 +49,7 @@ fi
 # this is the outer endless loop #
 ##################################
 while true; do
-	ping_host "vpn"
+	ping_host_new "vpn"
 	vpn_up=$RET_PING_HOST
 	if [ "$RET_PING_HOST" = "ERROR" ]; then
 		#VPN connection has failed
@@ -59,15 +61,13 @@ while true; do
 		for (( x=1 ; x <= $FAIL_RETRY_VPN ; x++ ))
 		do
 			sleep $SLEEP_PING_RETEST
-			ping_host "vpn"
+			ping_host_new "vpn"
 			vpn_up=$RET_PING_HOST
 			if [ "$RET_PING_HOST" = "OK" ]; then
 				if [ "$VERBOSE" = "yes" ]; then
 					echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 						"- VPN ping worked this time...."
 				fi
-				/pia/pia-forward start quite #need to add a check for active
-							     #iptables rules soon
 				break
 			else
 				if [ "$VERBOSE" = "yes" ]; then
@@ -79,27 +79,46 @@ while true; do
 
 	fi
 	if [ "$vpn_up" = "ERROR" ]; then
-	  #VPN has completely failed. 
+	  #VPN has completely failed.
 	  if [ "$VERBOSE_DEBUG" = "yes" ]; then
 	    echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-		  "- VPN has failed, about to stop all FORWARDING!"	  
+		  "- VPN has failed, about to stop all FORWARDING!"
 	  fi
-	  # disable port forwarding and reset the firewall until this is fixed  
+	  # disable port forwarding and reset the firewall until this is fixed
 	  /pia/pia-forward stop quite
 	fi
 	#end of VPN test
 
+        #check that the firewall rules are as they should be
+        if [ "$vpn_up" = "OK" ]; then
+            check_forward_state
+            if [ "$RET_FORWARD_STATE" = 'OFF' ]; then
+                if [ "$FORWARD_PUBLIC_LAN" = 'yes' ] || [ "$FORWARD_VM_LAN" = 'yes' ]; then
+                    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+                    "- FW not enabled but it should be. restarting FW!"
+                    /pia/pia-forward start quite
+                fi
 
+            else
+                if [ "$FORWARD_PUBLIC_LAN" = 'no' ] && [ "$FORWARD_VM_LAN" = 'no' ]; then
+                    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+                    "- FW disabled but running. stopping FW!"
+                    /pia/pia-forward stop quite
+                fi
+            fi
+        fi
 
 	#check if the Internet is up but only if the VPN is down because
 	# the firewall is configured to block traffic over eth0 while tun0 is active
-	ping_host "internet" "keep" #keep first IP because this will always fail when the VPN is active. something for pia.daemon 2
-	if [ "$RET_PING_HOST" = "ERROR" ] && [ "$vpn_up" = "ERROR" ]; then
+	if [ "$vpn_up" = "ERROR" ]; then
+            ping_host_new "internet"
+        fi
+        if [ "$RET_PING_HOST" = "ERROR" ] && [ "$vpn_up" = "ERROR" ]; then
 		RAN_FORWARD_FIX="no"
 		LOOP_TIMEOUT=1
 		while true; do
 
-			ping_host "internet"
+			ping_host_new "internet"
 			if [ "$RET_PING_HOST" = "OK" ]; then
 				#internet works, keep going
 				if [ "$VERBOSE" = "yes" ]; then
@@ -126,11 +145,12 @@ while true; do
 					"- forwarding disabled until the VPN is back up."
 				echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
+                                rm -f "/pia/cache/session.log"
 				/pia/pia-forward stop quite
 				sleep $SLEEP_INTERNET_DOWN
 
 				#restarting pia-daemon because there is no goto :(
-				# will have to rewrite this script with support for contitions
+				# will have to rewrite this script as a later timer
 				/pia/pia-daemon shutup
 				exit
 				break
@@ -177,7 +197,7 @@ while true; do
 
 
 	# create and or maintain the status cache file
-	maintain_status_cache '/pia/include/status.txt'
+	maintain_status_cache '/pia/cache/status.txt'
 	if [ "$?" != "0" ]; then
 	  echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	    "- error during status cache maintenance\n\tpia-status will not work"
@@ -185,8 +205,8 @@ while true; do
 	fi
 
 	if [ "$VERBOSE" = "yes" ]; then
-	  vpn_port=`cat "/pia/include/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
-	  vpn_ip=`cat "/pia/include/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+	  vpn_port=`cat "/pia/cache/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+	  vpn_ip=`cat "/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
 	  if [ "$vpn_port" = "none" ]; then
 	    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 		    "- VPN is UP - VPN IP: $vpn_ip Port: no support"
@@ -195,11 +215,15 @@ while true; do
 		    "- VPN is UP - VPN IP: $vpn_ip Port: $vpn_port"
 	  fi
 	fi
-	
+
 	# trap keyboard interrupt (control-c)
 	trap control_c SIGINT
-	
+
 	sleep $SLEEP_MAIN_LOOP
+
+        #refresh settings after each run
+        source '/pia/settings.conf'
+
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 	  echo #print empty lines in debug mode to prevent cross eyes :)
 	  echo #print empty lines in debug mode to prevent cross eyes :)
