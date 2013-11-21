@@ -48,6 +48,41 @@ foreach( $meta as $key => $val ){
   }
 }
 
+$disp_header .= '<script type="text/javascript">
+    /* hides / unhides an element */
+/*
+    ele_id = element where class="hidden"
+    event_ele_id = "" OPTIONAL - id of the element causing the toggle operation
+    switch_value = "" OPTIONAL - comma separated labels for toggle_ele. if innerHTML matches one then the other string is put in place
+
+*/
+function toggle_hide( ele_id , event_ele_id, switch_value ){
+    var ele = document.getElementById( ele_id );
+    var event_ele;
+    var event_lbls;
+
+    if( event_ele_id != "" ){ event_ele = document.getElementById( event_ele_id ); }
+    if( switch_value != "" ){ event_lbls = switch_value.split(","); }
+
+    if( ele ){
+        if( ele.getAttribute("class") == "hidden" ){
+            ele.removeAttribute("class");
+        }else{
+            ele.setAttribute("class", "hidden");
+        }
+
+        if( event_ele && event_lbls.length == 2 ){
+            if( event_ele.innerHTML == event_lbls[0] ){
+                event_ele.innerHTML = event_lbls[1];
+            }else{
+                event_ele.innerHTML = event_lbls[0];
+            }
+        }
+    }
+}';
+$disp_header .= '</script>';
+
+
 $disp_header .= "</head>\n";
 
 ?>

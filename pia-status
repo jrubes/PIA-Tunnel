@@ -55,9 +55,9 @@ if [ "$RET_PING_HOST" = "OK" ]; then
   echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is UP!"
   port=`cat "/pia/cache/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
   if [ "$port" = "none" ]; then
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`cat "/pia/cache/status.txt" 2> /dev/null | grep "VPNIP" | gawk -F":" '{print $2}'`" Port: not supported"
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" '{print $2}' | gawk -F":" '{print $1}'`" Port: not supported"
   else
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`cat "/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`" Port: $port"
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" '{print $2}' | gawk -F":" '{print $1}'`" Port: $port"
   fi
 
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/pia/cache/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`

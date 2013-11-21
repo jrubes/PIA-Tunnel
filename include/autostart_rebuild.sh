@@ -8,6 +8,8 @@ cont="/pia/pia-forward stop quite\n"
 cont="${cont}rm -f /pia/cache/session.log\n"
 cont="${cont}rm -f /pia/cache/status.txt\n"
 cont="${cont}rm -f /pia/cache/webgui_port.txt\n"
+cont="${cont}rm -f /pia/cache/php_pia-start.log\n"
+cont="${cont}rm -f /pia/cache/pia-daemon.log\n"
 cont="${cont}/pia/pia-status\n"
 
 

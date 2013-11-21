@@ -110,6 +110,8 @@ function load_menu(){
  * method to shutdown the VM
  */
 function VM_shutdown(){
+  global $_pia;
+  $_pia->clear_session();
   exec('sudo /sbin/shutdown -h now &>/dev/null &');
 }
 
@@ -117,6 +119,8 @@ function VM_shutdown(){
  * method to reboot the VM
  */
 function VM_restart(){
+  global $_pia;
+  $_pia->clear_session();
   exec('sudo /sbin/shutdown -r now &>/dev/null &');
 }
 
@@ -271,19 +275,22 @@ function VM_get_status( $output = 'html'){
       $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
       $ret_str .= "<td id=\"vpn_status\">Connected to $_SESSION[connecting2]</td></tr>";
       $ret_arr['vpn_status'] = "Connected to $_SESSION[connecting2]";
+      $_SESSION['connecting2'] = '';
       break;
     case 'connecting':
-      $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
+      $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5643';
       $ret_str .= "<td id=\"vpn_status\">Connecting to $_SESSION[connecting2]</td></tr>";
       $ret_arr['vpn_status'] = "Connecting to $_SESSION[connecting2]";
       break;
     case 'disconnected':
       $ret_str .= "<td id=\"vpn_status\">VPN Disconnected</td></tr>";
       $ret_arr['vpn_status'] = "VPN Disconnected";
+      $_SESSION['connecting2'] = '';
       break;
     case 'error':
       $ret_str .= "<td id=\"vpn_status\">Error: $session_status[1]</td></tr>";
       $ret_arr['vpn_status'] = "Error: $session_status[1]";
+      $_SESSION['connecting2'] = '';
       break;
     default:
       var_dump($session_status);
@@ -331,8 +338,10 @@ function VM_get_status( $output = 'html'){
     if( array_key_exists( '0', $vpn_pub) === true ){
       $ret_str .= "<tr><td>VPN Public IP</td><td id=\"vpn_public_ip\">$vpn_pub[0]</td></tr>";
       $ret_arr['vpn_public_ip'] = $vpn_pub[0];
-      $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td id=\"vpn_port\">$port</td></tr>" : "<tr><td>VPN Port:</td><td>not supported by location</td></tr>";
-      $ret_arr['vpn_port'] = ($port != '') ? "$port" : "not supported by location";
+      $msg = ( $settings['FORWARD_PORT_ENABLED'] == 'no' ) ? '(Port Forwarding not enabled)' : '';
+      $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td id=\"vpn_port\">$port $msg</td></tr>" : "<tr><td>VPN Port:</td><td>not supported by location</td></tr>";
+
+      $ret_arr['vpn_port'] = ($port != '') ? "$port $msg" : "not supported by location";
 
       //show forwarding info
       $fw_forward_state = $_pia->check_forward_state();
@@ -415,6 +424,7 @@ function VPN_sessionlog_status(){
             && strpos($content, 'TUN/TAP device tun0 opened') !== false ){
       return array('connected');
     }elseif( strpos($content, 'Received AUTH_FAILED control message') !== false ){
+      exec('sudo /pia/pia-daemon stop &> /dev/null ; rm -rf /pia/cache/pia-daemon.log');
       return array('error', 'Authentication error. Please check your username and password.');
     }elseif( strpos($content, 'process exiting') !== false ){
       return array('disconnected');
@@ -616,6 +626,7 @@ function load_login(){
  * <li>['initial'] = "empty|filled"; empty to have initial selection of nothing or filled to use [0]
  * <li>['selected'] = "male"; Optional - specify top item from list by option value</li>
  * <li>['onchange'] = "foo();" Optional - add onclick to \<select\>tag</li>
+ * <li>['disabled'] = "" Optional - disables the select by default
  * <li>array( 'option value', 'option display')</li>
  * <li>array( 'option value2', 'option display2')</li>
  * </ul>
@@ -626,7 +637,8 @@ function build_select( &$content, $double=false ){
 
   $hash = $content['id'];//md5($content['id']); //hash this to avoid problems with MYVPN[0] and PHP
   $onchange = ( array_key_exists('onchange', $content) === true ) ? 'onchange="'.$content['onchange'].'"' : '';
-  $head = '<select id="'.$hash.'" name="'.$hash."\" $onchange>\n";
+  $disabled = ( array_key_exists('disabled', $content) === true ) ? 'disabled' : '';
+  $head = '<select id="'.$hash.'" name="'.$hash."\" $onchange $disabled>\n";
 
   /* 'selected' is option */
   if( array_key_exists('selected', $content) === true ){

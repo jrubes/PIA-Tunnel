@@ -155,6 +155,7 @@ class PIACommands {
         break;
       case 'start':
         exec('killall /pia/pia-daemon &> /dev/null');
+        exec('sudo /pia/pia-daemon stop');
         exec('bash -c "sudo /pia/pia-daemon &>/pia/cache/pia-daemon.log &" &>/dev/null &');
         break;
     }

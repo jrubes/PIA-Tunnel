@@ -70,7 +70,8 @@ root {
   width: 420px;
   display: inline;
   float: left;
-  margin-top: 1em;
+  /*margin-top: 1em;*/
+  margin-bottom: 1em;
   padding-left: 0.5em;
   padding-right: 0.5em;
   padding-bottom: 1em;
@@ -138,10 +139,35 @@ root {
 }
 
 #overview_net_control input[type="submit"]{
-  width: 135px;
+  width: 140px;
   text-align: center;
 }
 
 #overview_net_control select{
-  width: 135px;
+  width: 140px;
+}
+
+.hidden{
+  visibility: hidden;
+  display: none;
+  height: 1px;
+}
+
+
+.button{
+  margin: 2px 2px;
+  height: 2em;
+  line-height: 2em;
+  float: left;
+  display: block;
+  border: 0.1em solid #dcdce9;
+  color: #0d2474;
+  text-decoration: none;
+  text-align: center;
+  padding: 0 4px 0 4px;
+  font-size: 1.2em;
+}
+
+.button:hover{
+  border-color: blue;
 }

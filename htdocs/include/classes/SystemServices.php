@@ -23,6 +23,7 @@ function firewall_fw( $command ){
  * method to execute a full network restart
  */
 function network_restart(){
+  $_SESSION['connecting2'] = '';
   exec('sudo "/pia/include/network-restart.sh"');
 }
 
