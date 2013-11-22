@@ -277,15 +277,15 @@ function disp_dhcpd_box_new(){
     //Subnet 1 settings
     $disabled = ($settings['DHCPD_ENABLED'.$x] === 'no') ? 'disabled' : ''; //disable input fields when DHCP is set
     $GLOB_disp_network_default_fields .= 'DHCPD_SUBNET'.$x.',';
-    $disp_body .= '<tr><td>Subnet IP</td><td><input '.$disabled.' type="text" id="DHCPD_SUBNET'.$x.'" name="DHCPD_SUBNET'.$x.'" value="'.htmlspecialchars($settings['DHCPD_SUBNET'.$x]).'"></td></tr>'."\n";
+    $disp_body .= '<tr><td>Subnet IP '.$x.'</td><td><input '.$disabled.' type="text" id="DHCPD_SUBNET'.$x.'" name="DHCPD_SUBNET'.$x.'" value="'.htmlspecialchars($settings['DHCPD_SUBNET'.$x]).'"></td></tr>'."\n";
     $GLOB_disp_network_default_fields .= 'DHCPD_MASK'.$x.',';
-    $disp_body .= '<tr><td>Subnetmask</td><td><input '.$disabled.' type="text" id="DHCPD_MASK'.$x.'" name="DHCPD_MASK'.$x.'" value="'.htmlspecialchars($settings['DHCPD_MASK'.$x]).'"></td></tr>'."\n";
+    $disp_body .= '<tr><td>Subnetmask '.$x.'</td><td><input '.$disabled.' type="text" id="DHCPD_MASK'.$x.'" name="DHCPD_MASK'.$x.'" value="'.htmlspecialchars($settings['DHCPD_MASK'.$x]).'"></td></tr>'."\n";
     $GLOB_disp_network_default_fields .= 'DHCPD_BROADCAST'.$x.',';
-    $disp_body .= '<tr><td>Broadcast IP</td><td><input '.$disabled.' type="text" id="DHCPD_BROADCAST'.$x.'" name="DHCPD_BROADCAST'.$x.'" value="'.htmlspecialchars($settings['DHCPD_BROADCAST'.$x]).'"></td></tr>'."\n";
+    $disp_body .= '<tr><td>Broadcast IP '.$x.'</td><td><input '.$disabled.' type="text" id="DHCPD_BROADCAST'.$x.'" name="DHCPD_BROADCAST'.$x.'" value="'.htmlspecialchars($settings['DHCPD_BROADCAST'.$x]).'"></td></tr>'."\n";
     $GLOB_disp_network_default_fields .= 'DHCPD_ROUTER'.$x.',';
-    $disp_body .= '<tr><td>Router/Gateway</td><td><input '.$disabled.' type="text" id="DHCPD_ROUTER'.$x.'" name="DHCPD_ROUTER'.$x.'" value="'.htmlspecialchars($settings['DHCPD_ROUTER'.$x]).'"></td></tr>'."\n";
+    $disp_body .= '<tr><td>Router/Gateway '.$x.'</td><td><input '.$disabled.' type="text" id="DHCPD_ROUTER'.$x.'" name="DHCPD_ROUTER'.$x.'" value="'.htmlspecialchars($settings['DHCPD_ROUTER'.$x]).'"></td></tr>'."\n";
     $GLOB_disp_network_default_fields .= 'DHCPD_RANGE'.$x.',';
-    $disp_body .= '<tr><td>IP Range</td><td><input '.$disabled.' class="long" type="text" id="DHCPD_RANGE'.$x.'" name="DHCPD_RANGE'.$x.'" value="'.htmlspecialchars($settings['DHCPD_RANGE'.$x]).'"></td></tr>'."\n";;
+    $disp_body .= '<tr><td>IP Range '.$x.'</td><td><input '.$disabled.' class="long" type="text" id="DHCPD_RANGE'.$x.'" name="DHCPD_RANGE'.$x.'" value="'.htmlspecialchars($settings['DHCPD_RANGE'.$x]).'"></td></tr>'."\n";;
     $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   }
 
@@ -643,11 +643,11 @@ function disp_advanced_box(){
         );
   $disp_body .= '<tr><td>eth0 use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'IF_ETH0_IP,';
-  $disp_body .= '<tr><td>eth1 IP</td><td><input '.$disabled.' type="text" id="IF_ETH0_IP" name="IF_ETH0_IP" value="'.$settings['IF_ETH0_IP'].'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>eth0 IP</td><td><input '.$disabled.' type="text" id="IF_ETH0_IP" name="IF_ETH0_IP" value="'.$settings['IF_ETH0_IP'].'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'IF_ETH0_SUB,';
-  $disp_body .= '<tr><td>eth1 Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH0_SUB" name="IF_ETH0_SUB" value="'.$settings['IF_ETH0_SUB'].'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>eth0 Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH0_SUB" name="IF_ETH0_SUB" value="'.$settings['IF_ETH0_SUB'].'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'IF_ETH0_GW,';
-  $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" id="IF_ETH0_GW" name="IF_ETH0_GW" value="'.$settings['IF_ETH0_GW'].'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>eth0 Gateway</td><td><input '.$disabled.' type="text" id="IF_ETH0_GW" name="IF_ETH0_GW" value="'.$settings['IF_ETH0_GW'].'"></td></tr>'."\n";
 
   //eth1
   $disabled = ($settings['IF_ETH1_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
