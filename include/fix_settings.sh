@@ -95,8 +95,7 @@ fi
 
 if [ ! ${FIREWALL_IF_SSH[0]+abc} ]; then
   echo '# Enable ssh on the following interfaces' >> '/pia/settings.conf'
-  echo 'FIREWALL_IF_SSH[0]="eth0"' >> '/pia/settings.conf'
-  echo 'FIREWALL_IF_SSH[1]="eth1"' >> '/pia/settings.conf'
+  echo 'FIREWALL_IF_SSH[0]=""' >> '/pia/settings.conf'
 fi
 
 if [ ! ${FIREWALL_IF_WEB[0]+abc} ]; then
