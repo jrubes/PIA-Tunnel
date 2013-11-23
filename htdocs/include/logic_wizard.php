@@ -56,8 +56,7 @@ function disp_wizard_reset(){
   $disp_body = '';
 
   $disp_body .= '<p>Brand new setup detected!<br>';
-  $disp_body .= 'The software needs to check for updates and reset a few system programs.<br>'
-                .'This will take a few seconds to run and the VM will reboot to apply all changes.</p>'
+  $disp_body .= 'PIA-Tunnel needs to check for updates and reset some settings to unkown values.</p>'
                 .'<p>Please be patient, this is for your protection.</p>';
   $disp_body .= '<p><form action="/?page=wizard&amp;cmd=reset-system" method="post">'."\n";
   $disp_body .= '<br><input type="submit" name="reset-pia" value="Prepare the System and Reboot">';
