@@ -124,4 +124,4 @@ depmod -a ; update-initramfs -u
 
 
 12) Export to OVF Template and compress with
-    7z a -mx9 -m0=lzma2 -md=128m -ms=on -mmt=off -t7z "PIA_Tunnel2.7z" "PIA Tunnel 2/"
+    7z a -mx9 -m0=lzma2 -md=128m -ms=on -mmt=off -t7z "PIA-Tunnel-release_php-gui-2013-11-23.7z" "PIA-Tunnel-release_php-gui-2013-11-23/"
