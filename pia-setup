@@ -117,7 +117,7 @@ find /var/www -type f -exec chmod 0640 {} \;
 #add missing settings to settings.conf
 /pia/include/fix_settings.sh
 
-# rebuild autostart.conf since it may have been reset by pia-update
+# rebuild autostart.conf to apply new default values from update (pia-update runs pia-setup)
 /pia/include/autostart_rebuild.sh &> /dev/null
 
 #ALWAYS RUN THIS LAST
