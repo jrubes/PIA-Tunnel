@@ -78,7 +78,7 @@ function disp_wizard_default(){
   $disp_body = '';
   $fields = ''; //comma separate list of settings offered here
 
-  $disp_body .= '<div class="wizard_box">';
+  $disp_body .= '<div class="box wizard">';
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting" method="post">'."\n";
   $disp_body .= '<input type="hidden" name="store" value="dhcpd_settings">';
   $disp_body .= '<h2>PIA-Tunnel Setup Wizard</h2>'."\n";

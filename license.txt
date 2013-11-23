@@ -1,13 +1,21 @@
 /*
   * Project: PIA Tunnel VM
-  * Description: Linux virtual machine to be used as a VPN to network bridge
+  * Description:  
+  *		PIA Tunnel VM is a Debian 7 virtual machine for VMware Workstation, 
+  *		Player or ESXi. It is a VPN client designed to share the VPN connection
+  *		with any device on your network. The VM also supports port forwarding, 
+  *		failover locations and VM LAN segments.
+  *		Please see the documentation for details.
+  *
+  * Documentation: http://www.kaisersoft.net/r/?PIADOCU
   *
   * Author: Mirko Kaiser, http://www.KaiserSoft.net
+  * Support the software with Bitcoins !thank you!: 157Gh2dTCkrip8hqj3TKqzWiezHXTPqNrV
   * Copyright (C) 2013 Mirko Kaiser
   * First created in Germany on 2013-07-20
   * License: New BSD License
   *
-	Copyright (c) 201, Mirko Kaiser, http://www.KaiserSoft.net
+	Copyright (c) 2013, Mirko Kaiser, http://www.KaiserSoft.net
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without

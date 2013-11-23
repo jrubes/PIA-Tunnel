@@ -43,7 +43,7 @@ $meta['title'] = 'PIA-Tunnel Management Interface'; //default prefix
 $meta['name']['author'] = 'Mirko Kaiser';
 $meta['name']['keywords'] = '';
 $meta['name']['description'] = '';
-$meta['name']['robots'] = 'INDEX,FOLLOW';
+$meta['name']['robots'] = 'NOINDEX,NOFOLLOW';
 $meta['name']['dcterms.creator'] = 'Mirko Kaiser';
 $meta['charset'] = 'UTF-8';
 $meta['icon'] = ''; //'/favicon.ico';
@@ -640,15 +640,13 @@ function build_select( &$content, $double=false ){
   $disabled = ( array_key_exists('disabled', $content) === true ) ? 'disabled' : '';
   $head = '<select id="'.$hash.'" name="'.$hash."\" $onchange $disabled>\n";
 
-  /* 'selected' is option */
-  if( array_key_exists('selected', $content) === true ){
-    $cnt = count($content)-2;//skip id & selected
-  }else{
-    $cnt = count($content)-1;//skip only id
-  }
-  if( array_key_exists('initial', $content) === true ){
-    --$cnt; //-1 more if initial is set
-  }
+  /* find out how many options need to be skipped */
+  $cnt = count($content) - 1; //skip ['id']
+  if( array_key_exists('selected', $content) === true ){ --$cnt;}
+  if( array_key_exists('initial', $content) === true ){ --$cnt;}
+  if( array_key_exists('onchange', $content) === true ){ --$cnt;}
+  if( array_key_exists('disabled', $content) === true ){ --$cnt;}
+
 
   /* first line empty or filled */
   if( array_key_exists('initial', $content) === true && $content['initial'] === 'empty' ){
@@ -721,7 +719,7 @@ function build_checkbox( &$content, $double=false ){
     }
 
     /* handle default selection */
-    $opts .= "<input $checked type=\"checkbox\" name=\"{$content['id']}[$x]\" value=\"$dis\">$dis</option>\n";
+    $opts .= "<input $checked type=\"checkbox\" name=\"{$content['id']}[$x]\" value=\"$dis\">$dis\n";
   }
 
   /* return it all */

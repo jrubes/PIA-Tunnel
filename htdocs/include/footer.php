@@ -7,7 +7,8 @@ $disp_footer = '';
 
 
 
-$disp_footer .= "</body>\n";
+$disp_footer .= "<div class=\"clear\"></div><p>&nbsp;</p>\n";
+$disp_footer .= "<p style=\"text-align: center\">Bitcoin donations accepted at 157Gh2dTCkrip8hqj3TKqzWiezHXTPqNrV</p>\n";
 $disp_footer .= '<script type="text/javascript">
 /* sets or removes an attribute based on an elements source value
  - think toggeling an input box with "on" or "off" select dropdown
@@ -48,5 +49,5 @@ function toggle( ele_src, target_id, on_ele_src_value, attribute, value, callbac
   }
 }
 </script>';
-$disp_footer .= "</html>";
+$disp_footer .= "\n</body></html>";
 ?>

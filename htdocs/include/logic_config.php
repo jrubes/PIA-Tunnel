@@ -39,8 +39,8 @@ switch($_REQUEST['cmd']){
   case 'store_setting':
     // $_POST['store_fields'] contains a list of $_POST variables
 
-    //if( $_token->pval($_POST['token'], 'handle user request - update settings.conf - '.rtrim($_POST['store_fields'], ',')) === true ){
-    if( $_token->pval($_POST['token'], 'handle user request - update settings.conf') === true ){
+    if( $_token->pval($_POST['token'], 'handle user request - update settings.conf - '.rtrim($_POST['store_fields'], ',')) === true ){
+    //if( $_token->pval($_POST['token'], 'handle user request - update settings.conf') === true ){
       if(array_key_exists('store_fields', $_POST) !== true ){
         //opened by URL
         $disp_body .= disp_network_default();
@@ -235,11 +235,13 @@ function disp_vpn_default(){
 
   $disp_body = '';
   /* show Username and Password fields - expand this for more VPN providers */
-  $disp_body .= '<div><h2>PIA User Settings</h2>';
-  $disp_body .= 'You may update your PIA username and password below.';
+  $disp_body .= '<div class="box vpn"><h2>PrivateInternetAccess.com</h2>';
   $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
-  $disp_body .= '<input type="text" name="username" value="'.htmlentities($user['username']).'">';
-  $disp_body .= '<input type="password" name="password" value="" placeholder="************">';
+  $disp_body .= '<table><tr>';
+  $disp_body .= '<td>Username</td><td><input type="text" name="username" value="'.htmlentities($user['username']).'"></td>';
+  $disp_body .= '</tr><tr>';
+  $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
+  $disp_body .= '</tr></table>';
   $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form></div>";
@@ -258,7 +260,7 @@ function disp_dhcpd_box_new(){
   $settings = $_settings->get_settings();
   $disp_body = '';
 
-  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>DHCP Server  Settings</h2>'."\n";
   $disp_body .= "<table>\n";
 
@@ -317,7 +319,7 @@ function disp_dhcpd_box($tokens){
   $disp_body = '';
   $fields = ''; //comma separate list of settings offered here
 
-  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<div class="box options">';
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
   $disp_body .= '<input type="hidden" name="store" value="dhcpd_settings">';
   $disp_body .= '<h2>DHCP Server  Settings</h2>'."\n";
@@ -377,7 +379,7 @@ function disp_pia_daemon_box_new(){
   $settings = $_settings->get_settings();
   $disp_body = '';
 
-  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>PIA Daemon Settings</h2>'."\n";
   $disp_body .= "<table>\n";
 
@@ -396,7 +398,7 @@ function disp_pia_daemon_box_new(){
   for( $x = 0 ; $x < 30 ; ++$x ){
     if( array_key_exists('MYVPN['.$x.']', $settings) === true ){
 
-      $ovpn = VPN_get_connections('MYVPN['.$x.']', array( 'selected' => $settings['MYVPN['.$x.']'], array( '', '')) ); //empty array creates a space between the default selection
+      $ovpn = VPN_get_connections('MYVPN['.$x.']', array( 'selected' => $settings['MYVPN['.$x.']'], array( '', ' ')) ); //empty array creates a space between the default selection
       $disp_body .= '<tr><td>Failover '.$x.'</td><td>'.$ovpn.'</td></tr>'."\n";
       ++$fovers;
     }
@@ -420,7 +422,7 @@ function disp_pia_daemon_box($tokens){
   $disp_body = '';
   $fields = ''; //comma separate list of settings offered here
 
-  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<div class="box options">';
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
   $disp_body .= '<input type="hidden" name="store" value="daemon_settings">';
   $disp_body .= '<h2>PIA Daemon Settings</h2>'."\n";
@@ -479,7 +481,7 @@ function disp_webui_box($tokens){
   $disp_body = '';
   $fields = ''; //comma separate list of settings offered here
 
-  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<div class="box options">';
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
   $disp_body .= '<input type="hidden" name="store" value="web_ui_settings">';
   $disp_body .= '<h2>Web-UI Settings</h2>'."\n";
@@ -508,7 +510,7 @@ function disp_general_box(){
   $settings = $_settings->get_settings();
   $disp_body = '';
 
-  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>General Settings</h2>'."\n";
   $disp_body .= "<table>\n";
 
@@ -597,7 +599,7 @@ function disp_advanced_box(){
   $settings = $_settings->get_settings();
   $disp_body = '';
 
-  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>Advanced Settings</h2>'."\n";
   $disp_body .= "<table>\n";
 
@@ -731,7 +733,7 @@ function disp_network_box($tokens){
   $disp_body = '';
   $fields = ''; //comma separate list of settings offered here
 
-  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<div class="box options">';
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
   $disp_body .= '<input type="hidden" name="store" value="network_settings">';
   $disp_body .= '<h2>PIA Network Settings</h2>'."\n";
@@ -841,7 +843,7 @@ function disp_system_box($tokens){
   $disp_body = '';
   $fields = ''; //comma separate list of settings offered here
 
-  $disp_body .= '<div class="options_box">';
+  $disp_body .= '<div class="box options">';
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
   $disp_body .= '<input type="hidden" name="store" value="system_settings">';
   $disp_body .= '<h2>VM System Settings</h2>'."\n";
@@ -976,9 +978,9 @@ function disp_network_default(){
   //$disp_body .= disp_network_box($tokens);
   //$disp_body .= disp_pia_daemon_box($tokens);
   //$disp_body .= disp_webui_box($tokens);
-  $disp_body .= '<div class="float_hr"></div>';
-  $disp_body .= '<p><a id="toggle_advanced_settings_toggle" class="button" href="" onclick="toggle_hide(\'toggle_advanced_settings\', \'toggle_advanced_settings_toggle\', \'Show Advanced Settings,Hide Advanced Settings\'); return false;">Show Advanced Settings</a></p>';
-  $disp_body .= '<div class="float_hr"></div>';
+  $disp_body .= '<div class="clear"></div>';
+  $disp_body .= '<p class="hidden" id="advanced_button"><a id="toggle_advanced_settings_toggle" class="button" href="" onclick="toggle_hide(\'toggle_advanced_settings\', \'toggle_advanced_settings_toggle\', \'Show Advanced Settings,Hide Advanced Settings\'); return false;">Show Advanced Settings</a></p>';
+  $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<div id="toggle_advanced_settings">';
   $disp_body .= disp_advanced_box();
   //$disp_body .= disp_system_box($tokens);
@@ -987,14 +989,16 @@ function disp_network_default(){
 
 
   /* protect the form and input elements with a token */
-  //$pass = array('handle user request - update settings.conf - '.rtrim($GLOB_disp_network_default_fields, ','));
-  $pass = array('handle user request - update settings.conf');
+  $pass = array('handle user request - update settings.conf - '.rtrim($GLOB_disp_network_default_fields, ','));
+  //$pass = array('handle user request - update settings.conf');
   $tokens = $_token->pgen($pass);
 
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= '<input type="hidden" id="store_fields" name="store_fields" value="'.  rtrim($GLOB_disp_network_default_fields, ',').'">';
   $disp_body .= '</form>';
-  $disp_body .= '<script type="text/javascript">toggle_hide(\'toggle_advanced_settings\', \'\', \'\');</script>';
+  $disp_body .= '<script type="text/javascript">
+    toggle_hide(\'advanced_button\', \'\', \'\');
+    toggle_hide(\'toggle_advanced_settings\', \'\', \'\');</script>';
 
   return $disp_body;
 }

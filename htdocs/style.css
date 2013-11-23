@@ -17,8 +17,8 @@ root {
 }
 .mainmenu  a{
   margin: 2px 2px;
-  height: 2em;
-  line-height: 2em;
+  height: 1.5em;
+  line-height: 1.5em;
   float: left;
   width: 8em;
   display: block;
@@ -66,8 +66,19 @@ root {
   border-width: 2px;
 }
 
-.options_box{
+.options{
   width: 420px;
+  border-right-style: solid;
+  border-right-width: 0.1px;
+  border-bottom-width: 0.1px;
+  border-bottom-style: solid;
+}
+
+.overview{
+  width: 420px;
+}
+
+.box{
   display: inline;
   float: left;
   /*margin-top: 1em;*/
@@ -75,21 +86,26 @@ root {
   padding-left: 0.5em;
   padding-right: 0.5em;
   padding-bottom: 1em;
+}
+
+.tools{
+  width: 60%;
   border-right-style: solid;
   border-right-width: 0.1px;
   border-bottom-width: 0.1px;
   border-bottom-style: solid;
 }
 
-.overview_box{
-  width: 420px;
-  display: inline;
-  float: left;
-  margin-top: 1em;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  padding-bottom: 1em;
-  border: none;
+tools h2{
+  width: 80%;
+}
+
+.vpn{
+  width: 60%;
+}
+
+.vpn h2{
+  width: 80%;
 }
 
 .control_box{
@@ -103,25 +119,22 @@ root {
 .long{
   width: 16em;
 }
+.extralong{
+  width: 23em;
+}
 .short{
   width: 5em;
 }
 
-.wizard_box{
+.wizard{
   width: 550px;
-  display: inline;
-  float: left;
-  margin-top: 1em;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  padding-bottom: 1em;
   border-right-style: solid;
   border-right-width: 0.1px;
   border-bottom-width: 0.1px;
   border-bottom-style: solid;
 }
 
-.float_hr{
+.clear{
   display: block;
   clear: both;
   visibility: hidden;
@@ -129,7 +142,7 @@ root {
   height: 0;
 }
 
-.overview_box h2{
+.overview h2{
   display: block;
   font-size: 1.5em;
   margin: 0.5em 0 0.5em 0;
