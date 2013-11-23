@@ -198,16 +198,16 @@ function update_root_password( $new_pw = null ){
   $ret = "";
   switch($stat){
     case 0:
-      $ret = "<div id=\"feedback\" class=\"feedback\">the root password has been set to '".htmlspecialchars($new_pw)."'</div>\n";
+      $ret = "<div id=\"feedback\" class=\"feedback\">root password set to '".htmlspecialchars($new_pw)."'</div>\n";
       break;
     case 1:
-      $ret = "<div id=\"feedback\" class=\"feedback\">Unkown Error when changing root password...</div>\n";
+      $ret = "<div id=\"feedback\" class=\"feedback\">Unkown Error changing the root password...</div>\n";
       break;
     case 2:
       $ret = "<div id=\"feedback\" class=\"feedback\">invalid root password</div>\n";
       break;
     default:
-      $ret = "<div id=\"feedback\" class=\"feedback\">root password default text ???!?!?!</div>\n";
+      $ret = "<div id=\"feedback\" class=\"feedback\">SUPER MAJOR ERROR: root password default text ???!?!?!</div>\n";
       break;
   }
   return $ret;

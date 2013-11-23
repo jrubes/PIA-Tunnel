@@ -67,11 +67,11 @@ function OverviewObj( ){
     if( rem ){ rem.parentNode.removeChild(rem); }
 
     rem = document.getElementById('overview_net_status');
-    rem.setAttribute('class', 'overview_box');
+    rem.setAttribute('class', 'box overview');
     rem.setAttribute('style', 'width: 480px; margin-right: 1em;');
 
     rem = document.getElementById('overview_net_control');
-    rem.setAttribute('class', 'overview_box');
+    rem.setAttribute('class', 'box overview');
     rem.setAttribute('style', 'width: 290px; text-align: center;');
 
 

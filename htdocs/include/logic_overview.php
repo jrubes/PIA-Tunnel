@@ -164,7 +164,6 @@ function disp_default(){
   $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
   $disp_body .= '<table class="control_box">';
   $disp_body .= '<tr>';
-  $disp_body .= '<tr>';
   $disp_body .= '<td id="ele_daemon_lbl">PIA VPN Daemon</td>';
   $disp_body .= '<td>';
   $disp_body .= ' <input type="submit" name="daemon_start" value="Start pia-daemon">';
