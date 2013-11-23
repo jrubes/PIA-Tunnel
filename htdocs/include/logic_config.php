@@ -977,7 +977,7 @@ function disp_network_default(){
   //$disp_body .= disp_pia_daemon_box($tokens);
   //$disp_body .= disp_webui_box($tokens);
   $disp_body .= '<div class="float_hr"></div>';
-  $disp_body .= '<p><a id="toggle_advanced_settings_toggle" class="button" href="" onclick="toggle_hide(\'toggle_advanced_settings\', \'toggle_advanced_settings_toggle\', \'Show Advanced Settings,Hide Advanced Settings\'); return false;">Show Advanced Settings</a></p>';
+  $disp_body .= '<p class="hidden" id="advanced_button"><a id="toggle_advanced_settings_toggle" class="button" href="" onclick="toggle_hide(\'toggle_advanced_settings\', \'toggle_advanced_settings_toggle\', \'Show Advanced Settings,Hide Advanced Settings\'); return false;">Show Advanced Settings</a></p>';
   $disp_body .= '<div class="float_hr"></div>';
   $disp_body .= '<div id="toggle_advanced_settings">';
   $disp_body .= disp_advanced_box();
@@ -994,7 +994,9 @@ function disp_network_default(){
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= '<input type="hidden" id="store_fields" name="store_fields" value="'.  rtrim($GLOB_disp_network_default_fields, ',').'">';
   $disp_body .= '</form>';
-  $disp_body .= '<script type="text/javascript">toggle_hide(\'toggle_advanced_settings\', \'\', \'\');</script>';
+  $disp_body .= '<script type="text/javascript">
+    toggle_hide(\'advanced_button\', \'\', \'\');
+    toggle_hide(\'toggle_advanced_settings\', \'\', \'\');</script>';
 
   return $disp_body;
 }
