@@ -176,7 +176,7 @@ class PIACommands {
     $ret = array();
     $sret = '';
     $count = escapeshellarg($count);
-    exec('cd /pia ; git --no-pager log -n '.$count.' --pretty="format:%ci%n>> %s <<%n"', $ret);
+    exec('cd /pia ; git --no-pager log -n '.$count.' --pretty="format:%ci%n>> %s <<%n" origin', $ret);
 
     $cnt = count($ret);
     if( $cnt > 0 ){
