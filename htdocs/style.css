@@ -186,6 +186,18 @@ tools h2{
 }
 
 .update_client textarea{
-  width: 580px;
-  height: 220px;
+  width: 90%;
+  height: 200px;
+}
+
+.update_client{
+  width: 70%;
+  border-right-style: solid;
+  border-right-width: 0.1px;
+  border-bottom-width: 0.1px;
+  border-bottom-style: solid;
+}
+
+.update_client h2{
+  width: 80%;
 }
