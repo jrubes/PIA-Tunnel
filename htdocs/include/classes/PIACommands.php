@@ -1,6 +1,6 @@
 <?php
 /**
- * class to interact with the various pia-* commands
+ * class to interact with the various pia-* and system commands
  *
  * @author MirkoKaiser
  */
@@ -99,6 +99,99 @@ class PIACommands {
     return true;
   }
 
+
+  /**
+   * checks cache file or git for count of how many commits origin/ is ahead
+   * @param boolean $force_update=false true will ignore the cache
+   * @return string number as string containing commit number or a status string
+   */
+  function get_update_status($force_update=false){
+    $cache_file = '/pia/cache/webui-update_status.txt';
+
+    if( $force_update === true ){
+        $git_ret = $this->get_revlist_count();
+        if( $git_ret !== false ){
+          $txt = strtotime('now').'|'.$git_ret;
+          $this->_files->writefile($cache_file, $txt);
+          return $git_ret;
+        }else{
+          //file does not exist. create dummy file to show page as quickly as possible
+          // the next javascript status update will run the actuall check in the background
+          $txt = '0|0';
+          $this->_files->writefile($cache_file, $txt);
+          return 'error checking for updates';
+    }
+    }
+
+    //read from cache file or get fresh info
+    if( file_exists($cache_file) === true ){
+      $cont = explode('|', $this->_files->readfile($cache_file));
+
+      //cont(0) is timestamp of creation
+      //cont(1) contains the value
+      $expires = strtotime('-4 hours'); //time until session expires
+      if( trim($cont[0]) < $expires ){
+        $git_ret = $this->get_revlist_count();
+        if( $git_ret !== false ){
+          $txt = strtotime('now').'|'.$git_ret;
+          $this->_files->writefile($cache_file, $txt);
+          return $git_ret;
+        }
+
+      }else{
+        //return info from cache file
+        return trim($cont[1]);
+      }
+
+    }else{
+      //file does not exist. create dummy file to show page as quickly as possible
+      // the next javascript status update will run the actuall check in the background
+      $txt = '0|0';
+      $this->_files->writefile($cache_file, $txt);
+      return 'checking ...';
+    }
+  }
+
+  /**
+   * runs git fetch origin, then rev-list to get number of commits HEAD is in front
+   * @return integer|boolean integer containing the number of commits ahead, MIGHT be 0
+   *                         or boolean FALSE on failure
+   */
+  private function get_revlist_count(){
+    $ret = array();
+    exec('cd /pia ; git fetch origin &> /dev/null ; git rev-list HEAD... origin/release_php-gui --count 2> /dev/null', $ret);
+    if( array_key_exists(0, $ret) === true ){
+      return (int)$ret[0];
+    }else{
+      return false;
+    }
+  }
+
+  /**
+   * checks git log and returns information about last $count commits
+   * @param integer $count=3 number of log entries to return
+   * @return string|boolean string containing output or FALSE on failure
+   */
+  function git_log( $count=3 ){
+    $ret = array();
+    $sret = '';
+    $count = escapeshellarg($count);
+    exec('cd /pia ; git --no-pager log -n '.$count.' --pretty="format:%ci%n>> %s <<%n"', $ret);
+
+    $cnt = count($ret);
+    if( $cnt > 0 ){
+      for( $x=0 ; $x < $cnt ; ++$x ){
+        $sret .= "{$ret[$x]}\n";
+      }
+
+      //add a line breaks to make it look pretty
+      $sret = str_replace(' * ', "\n * ", $sret);
+      $sret = str_replace(' <<', "\n<<", $sret);
+      return trim($sret);
+    }else{
+      return false;
+    }
+  }
 
   /**
    * start /pia/pia-start with passed argument

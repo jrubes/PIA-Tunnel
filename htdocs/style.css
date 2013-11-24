@@ -184,3 +184,8 @@ tools h2{
 .button:hover{
   border-color: blue;
 }
+
+.update_client textarea{
+  width: 580px;
+  height: 220px;
+}

@@ -242,10 +242,10 @@ function disp_default(){
 
 
 
-  /* show network status */
+  /* show system status */
   $disp_body .= '<div id="overview_net_status">';
-  $disp_body .= '<h2>Network Status</h2>';
-  $disp_body .= '<div id="network_status">'.VM_get_status().'</div>';
+  $disp_body .= '<h2>System Status</h2>';
+  $disp_body .= '<div id="system_status">'.VM_get_status().'</div>';
   $disp_body .= "</div>\n";
 
   $disp_body .= '<script type="text/javascript">'
@@ -257,7 +257,6 @@ function disp_default(){
 
                   .'var _overview = new OverviewObj();'
                   .'_overview.set_js_network_control();'
-                  .'_overview.get_update_status();'
                 .'/* handle the "connect" event on the overview page */
                     function vpn_connect(){
                     var submit_form = document.getElementById(\'frm_vpn_connection\');

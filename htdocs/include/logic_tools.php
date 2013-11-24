@@ -20,6 +20,9 @@ if(array_key_exists('ovpn', $_SESSION) !== true ){
 
 //act on $CMD variable
 switch($_REQUEST['cmd']){
+  case 'update_software_client':
+    $disp_body .= disp_pia_update_client();
+    break;
   case 'run_pia_command':
     if( array_key_exists('pia-update', $_POST) === true ){
       //GUI access to pia-setup
@@ -173,6 +176,44 @@ function disp_pia_update(){
   $disp_body .= '<form class="inline" action="/?page=tools&amp;cid=tools" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';
   $disp_body .= 'Download the latest updates from the <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
+  $disp_body .= '<br><br><input type="submit" name="pia-update" value="Start Online Update">';
+  $disp_body .= "</form>\n";
+
+  $disp_body .= '</div>';
+  return $disp_body;
+}
+
+/**
+ * returns UI element to handle update process
+ * @return string string with HTML for body of this page
+ */
+function disp_pia_update_client(){
+  global $_pia;
+
+  //$up = $_pia->get_update_status(true); -- USE THIS FOR RELEASE!!
+  $up = $_pia->get_update_status();
+  if(is_int($up) === true && $up == 0 ){
+    $up_txt = 'latest release';
+  }elseif( $up > 0 ){
+    $s = ( $up > 1 ) ? 's' : '';
+    $up_txt = '<a href="/?page=tools&amp;cid=tools&amp;cmd=update_software_client">'."$up update{$s} available</a>";
+  }else{
+    $up_txt = $up;
+  }
+
+  $disp_body = '<div class="box tools update_client">';
+  $disp_body .= '<h2>Online Update Client</h2>';
+  $disp_body .= 'Updates are downloaded from the project\'s <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
+  $disp_body .= '<br>Update Status: '.$up_txt;
+
+  $disp_body .= '<div class="clear"></div>';
+  $disp_body .= '<p> </p>';
+  $disp_body .= '<a id="toggle_git_log" class="button" href="#" onclick="toggle_hide(\'git_log\', \'toggle_git_log\', \'Show Repository Log,Hide Repository Log\'); return false;">Show Repository Log</a>';
+  $disp_body .= '<div id="git_log" class="hidden"><textarea>'.$_pia->git_log($up).'</textarea></div>';
+  $disp_body .= '<div class="clear"></div>';
+
+  $disp_body .= '<form class="inline" action="/?page=tools&amp;cid=tools" method="post">';
+  $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';
   $disp_body .= '<br><br><input type="submit" name="pia-update" value="Start Online Update">';
   $disp_body .= "</form>\n";
 

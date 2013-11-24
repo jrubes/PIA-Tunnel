@@ -267,6 +267,18 @@ function VM_get_status( $output = 'html'){
   $ret_str = '<table id="vm_status">';
   $ret_arr = array();
 
+  $up = $_pia->get_update_status();
+  if(is_int($up) === true && $up == 0 ){
+    $up_txt = 'latest release';
+  }elseif( $up > 0 ){
+    $s = ( $up > 1 ) ? 's' : '';
+    $up_txt = '<a href="/?page=tools&amp;cid=tools&amp;cmd=update_software_client">'."$up update{$s} available</a>";
+  }else{
+    $up_txt = $up;
+  }
+  $ret_str .= '<tr><td>Software</td><td id="software_update">'.$up_txt.'</td></tr>';
+  $ret_arr['software_update'] = $up;
+
   //check session.log if for current status
   $session_status = VPN_sessionlog_status();
   $ret_str .= "<tr><td style=\"width:7em\">Status</td>";
