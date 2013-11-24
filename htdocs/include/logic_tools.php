@@ -87,8 +87,8 @@ $disp_body .= '<script type="text/javascript">'
 function disp_default(){
   $disp_body = '';
   $disp_body .= disp_docu();
-  $disp_body .= '<div class="clear"></div>';
-  $disp_body .= disp_pia_update();
+  //$disp_body .= '<div class="clear"></div>';
+  //$disp_body .= disp_pia_update();
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= disp_client_tools();
   $disp_body .= '<div class="clear"></div>';
