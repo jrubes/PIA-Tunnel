@@ -47,7 +47,7 @@ if( file_exists($cache_file) === true ){
 /* return integer count of how many commits origin is ahead */
 function get_info(){
   $ret = array();
-  exec('cd /pia ; git rev-list HEAD... origin/release_php-gui --count', $ret);
+  exec('cd /pia ; git fetch origin ; git rev-list HEAD... origin/release_php-gui --count', $ret);
   if( array_key_exists(0, $ret) === true ){
     return $ret[0];
   }else{
