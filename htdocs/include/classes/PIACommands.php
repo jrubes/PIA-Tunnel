@@ -107,7 +107,7 @@ class PIACommands {
    */
   function get_update_status($force_update=false){
     $cache_file = '/pia/cache/webui-update_status.txt';
-return 1;
+
     if( $force_update === true ){
         $git_ret = $this->get_revlist_count();
         if( $git_ret !== false ){
