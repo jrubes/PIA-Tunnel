@@ -21,6 +21,8 @@ if(array_key_exists('ovpn', $_SESSION) !== true ){
 //act on $CMD variable
 switch($_REQUEST['cmd']){
   case 'update_software_client':
+    global $meta;
+    $meta['javascript'][] = '/js/UpdateClient.js';
     $disp_body .= disp_pia_update_client();
     break;
   case 'run_pia_command':
@@ -208,14 +210,18 @@ function disp_pia_update_client(){
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<p> </p>';
   $disp_body .= '<a id="toggle_git_log" class="button" href="#" onclick="toggle_hide(\'git_log\', \'toggle_git_log\', \'Show Repository Log,Hide Repository Log\'); return false;">Show Repository Log</a>';
-  $disp_body .= '<div id="git_log" class="hidden"><textarea>'.$_pia->git_log($up).'</textarea></div>';
+  $disp_body .= '<div id="git_log" class="hidden"><textarea id="git_log_txt">'.$_pia->git_log($up).'</textarea></div>';
   $disp_body .= '<div class="clear"></div>';
 
   $disp_body .= '<form class="inline" action="/?page=tools&amp;cid=tools" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';
-  $disp_body .= '<br><br><input type="submit" name="pia-update" value="Start Online Update">';
+  $disp_body .= '<br><br><input type="submit" id="pia-update" name="pia-update" value="Start Online Update">';
   $disp_body .= "</form>\n";
 
+  $disp_body .= '<script type="text/javascript">';
+  $disp_body .= '   var _update = new UpdateClient();';
+  $disp_body .= '   _update.enhance_ui();';
+  $disp_body .= '</script>';
   $disp_body .= '</div>';
   return $disp_body;
 }

@@ -9,7 +9,7 @@ $disp_footer = '';
 
 $disp_footer .= "<div class=\"clear\"></div><p>&nbsp;</p>\n";
 
-$disp_footer .= '<p style="text-align: center">Bitcoin donations accepted at 157Gh2dTCkrip8hqj3TKqzWiezHXTPqNrV</p>';
+$disp_footer .= '<p style="text-align: center">Bitcoin donations accepted at 161YG8sTntvdd8ojuYh76LXpBqWfWumwvP</p>';
 $disp_footer .= '<script type="text/javascript">
 /* sets or removes an attribute based on an elements source value
  - think toggeling an input box with "on" or "off" select dropdown

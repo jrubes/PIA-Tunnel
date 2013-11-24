@@ -39,6 +39,7 @@ $disp_body = '';
 $disp_footer = '';
 $language = 'eng';
 
+global $meta;
 $meta['title'] = 'PIA-Tunnel Management Interface'; //default prefix
 $meta['name']['author'] = 'Mirko Kaiser';
 $meta['name']['keywords'] = '';
