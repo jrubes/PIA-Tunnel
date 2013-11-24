@@ -113,7 +113,7 @@ class PIACommands {
         if( $git_ret !== false ){
           $txt = strtotime('now').'|'.$git_ret;
           $this->_files->writefile($cache_file, $txt);
-          return $git_ret;
+          return (int)$git_ret;
         }else{
           //file does not exist. create dummy file to show page as quickly as possible
           // the next javascript status update will run the actuall check in the background
@@ -135,12 +135,12 @@ class PIACommands {
         if( $git_ret !== false ){
           $txt = strtotime('now').'|'.$git_ret;
           $this->_files->writefile($cache_file, $txt);
-          return $git_ret;
+          return (int)$git_ret;
         }
 
       }else{
         //return info from cache file
-        return trim($cont[1]);
+        return (int)trim($cont[1]);
       }
 
     }else{
