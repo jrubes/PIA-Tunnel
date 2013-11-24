@@ -190,7 +190,6 @@ function disp_pia_update(){
 function disp_pia_update_client(){
   global $_pia;
 
-  //$up = $_pia->get_update_status(true); -- USE THIS FOR RELEASE!!
   $up = $_pia->get_update_status();
   if(is_int($up) === true && $up == 0 ){
     $up_txt = 'latest release';
