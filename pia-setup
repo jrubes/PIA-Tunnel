@@ -112,6 +112,8 @@ chown -R www-data.www-data /var/www
 find /var/www -type d -exec chmod 0750 {} \;
 find /var/www -type f -exec chmod 0640 {} \;
 
+# clear webUI update cache
+rm -rf "/pia/cache/webui-update_status.txt"
 
 #add missing settings to settings.conf
 /pia/include/fix_settings.sh

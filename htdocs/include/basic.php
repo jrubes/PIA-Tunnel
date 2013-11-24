@@ -444,7 +444,7 @@ function VPN_sessionlog_status(){
   */
  function VPN_get_port(){
    global $_files;
-   $cache_file = '/pia/cache/webui_port.txt';
+   $cache_file = '/pia/cache/webui-port.txt';
 
    //check if we are connected yet
   $session_status = VPN_sessionlog_status();

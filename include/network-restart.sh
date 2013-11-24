@@ -11,7 +11,7 @@ killall /pia/pia-daemon &> /dev/null
 # clear the cache
 rm -f /pia/cache/session.log
 rm -f /pia/cache/status.txt
-rm -f /pia/cache/webgui_port.txt
+rm -f /pia/cache/webui-port.txt
 rm -f /pia/cache/php_pia-start.log
 rm -f /pia/cache/pia-daemon.log
 
