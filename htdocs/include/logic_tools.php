@@ -205,7 +205,7 @@ function disp_pia_update_client(){
   $disp_body = '<div class="box update_client">';
   $disp_body .= '<h2>Online Update Client</h2>';
   $disp_body .= 'Updates are downloaded from the project\'s <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
-  $disp_body .= '<br>Update Status: '.$up_txt;
+  $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
 
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<p> </p>';

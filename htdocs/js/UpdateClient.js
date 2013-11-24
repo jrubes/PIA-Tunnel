@@ -79,6 +79,7 @@ function UpdateClient( ){
       ele.innerHTML = '';
       ele.appendChild(log);
 
+      document.getElementById('update_refresh').innerHTML = '';
       document.getElementById('pia-update').disabled = false;
     };
 
