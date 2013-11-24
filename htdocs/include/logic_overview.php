@@ -254,7 +254,10 @@ function disp_default(){
                   .'_overview.refresh_status();'
                   .'_overview.clean_feedback();'
                   .'},2500);'
-                  .'var _overview = new OverviewObj();_overview.set_js_network_control();'
+
+                  .'var _overview = new OverviewObj();'
+                  .'_overview.set_js_network_control();'
+                  .'_overview.get_update_status();'
                 .'/* handle the "connect" event on the overview page */
                     function vpn_connect(){
                     var submit_form = document.getElementById(\'frm_vpn_connection\');

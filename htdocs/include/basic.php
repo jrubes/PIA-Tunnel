@@ -444,7 +444,7 @@ function VPN_sessionlog_status(){
   */
  function VPN_get_port(){
    global $_files;
-   $cache_file = '/pia/cache/webgui_port.txt';
+   $cache_file = '/pia/cache/webui_port.txt';
 
    //check if we are connected yet
   $session_status = VPN_sessionlog_status();
@@ -452,10 +452,10 @@ function VPN_sessionlog_status(){
     return 'not connected yet';
   }
 
-  unset($_SESSION['PIA_port_timestamp']);
+  //unset($_SESSION['PIA_port_timestamp']);
 
    //check if the port cache should be considered old
-   $session_settings_timeout = strtotime('-300 minutes'); //time until session expires
+   $session_settings_timeout = strtotime('-5 minutes'); //time until session expires
    if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
      //validate time
      if( $_SESSION['PIA_port_timestamp'] < $session_settings_timeout ){

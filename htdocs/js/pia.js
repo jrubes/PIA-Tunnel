@@ -78,4 +78,24 @@ function OverviewObj( ){
 
   }
 
+  /* query get_update_status.php */
+  this.get_update_status = get_update_status;
+  function get_update_status(){
+
+    var url = '/get_update_status.php';
+    var pdata = ''; //post data as string
+    var callback;
+
+    /* this will be executed after a successful http request */
+    callback = function(ret){
+      var ele = document.getElementById('update_check');
+      if( ret > 0 && ret !== 'false' ){
+        ele.innerHTML = ' * <strong><a href="/?page=tools&cid=tools">NEW UPDATE AVAILABLE</a></strong> * ';
+      }
+    };
+
+    _request.post( 'update_status', url, pdata, callback);
+
+  }
+
 }
