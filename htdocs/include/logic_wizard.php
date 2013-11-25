@@ -129,44 +129,6 @@ function disp_wizard_default(){
 
 
 
-  // Forwarding
-  $disp_body .= '<p>This VM supports port forwarding to one IP on either LAN segment.<br>'
-          .'You may share the VPN connection with multiple computers but port forwarding only works with'
-          .' a single target IP.<br>'
-          .'Enable the option below and select a VPN connection point marked with a * when creating a VPN connection later</p>';
-  $disp_body .= "<table>\n";
-  $fields .= 'FORWARD_PORT_ENABLED,';
-  $sel = array(
-          'id' => 'FORWARD_PORT_ENABLED',
-          'selected' =>  $settings['FORWARD_PORT_ENABLED'],
-          array( 'yes', 'yes'),
-          array( 'no', 'no')
-        );
-  $disp_body .= '<tr><td>Enable Port Forwarding</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $fields .= 'FORWARD_IP,';
-  $disp_body .= '<tr><td>Forward IP</td><td><input type="text" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'"></td></tr>'."\n";
-  $disp_body .= "</table>\n";
-  $disp_body .= '<hr>';
-
-
-
-  // pai-daemon
-  $disp_body .= '<p>pia-daemon will mointor the VPN connections by pinging hosts through the VPN tunnel.<br>'
-          .' It will block any traffic when an error is detected and will'
-          .' attempt to reestablish a connection every few minutes.<br>'
-          .' enable this option if you "just want your VPN to work"</p>';
-  $disp_body .= "<table>\n";
-  $fields .= 'DAEMON_ENABLED,';
-  $sel = array(
-            'id' => 'DAEMON_ENABLED',
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>Enable pia-daemon</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $disp_body .= "</table>\n";
-  $disp_body .= '<hr>';
-
-
   // set a proper root password
   $disp_body .= '<p>Please enter a new root password below or accept the generated one.'
                 .'You may reset the password at any time using the "Tools" menu.<br>'
