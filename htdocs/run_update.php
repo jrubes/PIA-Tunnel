@@ -29,5 +29,8 @@ if( array_key_exists('0', $result) === true ){
   }
 
 }
+
+$ret = str_replace(' * ', "\n * ", $ret);
+$ret = str_replace(' <<', "\n<<", $ret);
 echo $ret;
 ?>

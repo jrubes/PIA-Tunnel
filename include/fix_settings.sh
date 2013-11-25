@@ -26,10 +26,10 @@ if [ ! ${NAMESERVERS[0]+abc} ]; then
   echo 'MYVPN[0]="CA Toronto"' >> '/pia/settings.conf'
   echo 'MYVPN[1]="Switzerland"' >> '/pia/settings.conf'
   echo 'MYVPN[2]="Sweden"' >> '/pia/settings.conf'
-  echo 'MYVPN[3]="Romania"' >> '/pia/settings.conf'
-  echo 'MYVPN[4]="Germany"' >> '/pia/settings.conf'
-  echo 'MYVPN[5]="France"' >> '/pia/settings.conf'
-  echo 'MYVPN[6]="Netherlands"' >> '/pia/settings.conf'
+  #echo 'MYVPN[3]="Romania"' >> '/pia/settings.conf'
+  #echo 'MYVPN[4]="Germany"' >> '/pia/settings.conf'
+  #echo 'MYVPN[5]="France"' >> '/pia/settings.conf'
+  #echo 'MYVPN[6]="Netherlands"' >> '/pia/settings.conf'
 fi
 
 if [ -z "${SLEEP_INTERNET_DOWN}" ]; then

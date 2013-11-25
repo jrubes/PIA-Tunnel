@@ -161,8 +161,8 @@ function disp_docu(){
   //offer download links to client tools
   $disp_body .= '<h2>Support &amp; Documentation</h2>';
   $disp_body .= 'Please consult the <a href="/pia-tunnel_documentation.pdf" target="_blank">documentation</a> before <a href="http://www.kaisersoft.net/index.php?p=5&amp;lang=eng&amp;subject=PIA-Tunnel%20Help%20Request" target="_blank">contacting support</a>. Thank you.';
-  $disp_body .= '<br><br><a href="http://'.$ret_arr['lan_ip'].'/pia-tunnel_documentation.pdf" target="_blank">Open Documentation from LAN</a>';
-  $disp_body .= ' &nbsp; <a href="http://'.$ret_arr['vlan_ip'].'/pia-tunnel_documentation.pdf" target="_blank">Open Documentation from VM LAN</a>';
+  $disp_body .= '<br><br><a href="http://'.$ret_arr['lan_ip'].'/pia-tunnel_documentation.pdf" target="_blank">Open from LAN</a>';
+  $disp_body .= ' &nbsp; <a href="http://'.$ret_arr['vlan_ip'].'/pia-tunnel_documentation.pdf" target="_blank">Open from VM LAN</a>';
   $disp_body .= '</div>';
   return $disp_body;
 }
