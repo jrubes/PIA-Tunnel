@@ -159,7 +159,7 @@ class PIACommands {
    */
   private function get_revlist_count(){
     $ret = array();
-    exec('cd /pia ; git fetch origin &> /dev/null ; git rev-list HEAD... origin --count 2> /dev/null', $ret);
+    exec('cd /pia ; git fetch origin &> /dev/null ; git rev-list HEAD... origin/release_php-gui --count 2> /dev/null', $ret);
     if( array_key_exists(0, $ret) === true ){
       return (int)$ret[0];
     }else{
