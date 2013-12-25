@@ -272,6 +272,8 @@ class PIACommands {
     }
 
     $_SESSION['connecting2'] = '';
+    $_SESSION['conn_auth_perma_error'] = false;
+    $_SESSION['conn_auth_fail_cnt'] = 0;
     unset($_SESSION['client_id']);
   }
   /**

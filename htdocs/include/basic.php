@@ -303,7 +303,7 @@ function VM_get_status( $output = 'html'){
     case 'error':
       $ret_str .= "<td id=\"vpn_status\">Error: $session_status[1]</td></tr>";
       $ret_arr['vpn_status'] = "Error: $session_status[1]";
-      $_SESSION['connecting2'] = '';
+      $_SESSION['connecting2'] = 'error';
       break;
     default:
       var_dump($session_status);
@@ -399,6 +399,7 @@ function VM_get_status( $output = 'html'){
  */
 function VPN_sessionlog_status(){
   global $_files;
+  global $_pia;
 
   $content = $_files->readfile('/pia/cache/session.log');
   if( $content == '' ){
@@ -437,8 +438,23 @@ function VPN_sessionlog_status(){
             && strpos($content, 'TUN/TAP device tun0 opened') !== false ){
       return array('connected');
     }elseif( strpos($content, 'Received AUTH_FAILED control message') !== false ){
-      exec('sudo /pia/pia-daemon stop &> /dev/null ; rm -rf /pia/cache/pia-daemon.log');
-      return array('error', 'Authentication error. Please check your username and password.');
+      //auth will sometimes fail even with correct credentials
+      //will have to allow auth to fail a few times before terminating the connection attempt
+      if( !isset($_SESSION['conn_auth_fail_cnt']) ){
+        $_SESSION['conn_auth_fail_cnt'] = 0; //counts errors
+        $_SESSION['conn_auth_perma_error'] = false; //true if error count is exceeded
+      }
+      if( $_SESSION['conn_auth_fail_cnt'] > 3 ){
+        $_pia->clear_session();
+        $_SESSION['conn_auth_fail_cnt'] = 0;
+        $_SESSION['conn_auth_perma_error'] = true;
+        exec('killall pia-start; /pia/include/ovpn_kill.sh; sudo /pia/pia-daemon stop &> /dev/null ; rm -rf /pia/cache/pia-daemon.log');
+
+      }elseif( $_SESSION['conn_auth_perma_error'] === false ){
+        ++$_SESSION['conn_auth_fail_cnt'];
+      }
+      return array('error', 'Authentication failed '.$_SESSION['conn_auth_fail_cnt'].' of 3 times. Please check your username and password.');
+
     }elseif( strpos($content, 'process exiting') !== false ){
       return array('disconnected');
     }elseif( strpos($content, 'UDPv4 link remote: [AF_INET]') !== false
