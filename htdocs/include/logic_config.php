@@ -182,50 +182,60 @@ function VPN_get_post_storage_arrays($match=null){
 function socks_process_template(){
   global $_files;
   global $_settings;
-  $templ = $_files->readfile('/pia/include/dhcpd.conf');
-  $subnet_templ = "subnet SUBNET_IP_HERE netmask NETWORK_MASK_HERE {\n"
-                  ."  range IP_RANGE_HERE;\n"
-                  ."  option routers ROUTER_IP_HERE;\n"
-                  ."  option broadcast-address BROADCAST_HERE;\n"
-                  ."}\n";
-  $static_templ = "host statichost {\n"
-                  ."  hardware ethernet STATIC_MAC_HERE;\n"
-                  ."  fixed-address STATIC_IP_HERE;\n"
-                  ."}\n";
-  $subnet = ''; //contains assembled subnet declarations
-  $static_host = ''; //contains assembled static host info
+  $SometimesIreallyHatePHP = 1;
+  $templ = $_files->readfile('/pia/include/danted.conf');
+  $client_templ = "client pass {\n"
+                ."  from: INTERNAL_NETWORK_HERE port 1-65535 to: 0.0.0.0/0\n"
+                ."  log: connect disconnect error\n"
+                ."}\n\n"
+                ."pass {\n"
+                ."  from: INTERNAL_NETWORK_HERE to: 0.0.0.0/0\n"
+                ."  protocol: tcp udp\n"
+                ."}\n";
+
+  $clients = ''; //contains assembled network declaration
+  $internal = ''; //will replace the internal: line
   $settings = $_settings->get_settings();
 
-  //there are two dhcpd subnet config ranges
-  for( $x = 1 ; $x < 3 ; ++$x ){
-    if( $settings['DHCPD_ENABLED'.$x] == 'yes' ){
-      $subnet .= "$subnet_templ\n";
-      $SometimesIreallyHatePHP = 1; //passing this int bý reference will save tremendous ammounts of RAM - AWESOME SHIT!
-      $subnet = str_replace('SUBNET_IP_HERE', $settings['DHCPD_SUBNET'.$x], $subnet, $SometimesIreallyHatePHP);
-      $subnet = str_replace('NETWORK_MASK_HERE', $settings['DHCPD_MASK'.$x], $subnet, $SometimesIreallyHatePHP);
-      $subnet = str_replace('IP_RANGE_HERE', $settings['DHCPD_RANGE'.$x], $subnet, $SometimesIreallyHatePHP);
-      $subnet = str_replace('BROADCAST_HERE', $settings['DHCPD_BROADCAST'.$x], $subnet, $SometimesIreallyHatePHP);
-      $subnet = str_replace('ROUTER_IP_HERE', $settings['DHCPD_ROUTER'.$x], $subnet, $SometimesIreallyHatePHP);
-    }
+  //update the $template first
+  $templ = str_replace('EXTERNAL_IF_HERE', $settings['IF_TUNNEL'], $templ, $SometimesIreallyHatePHP);
+
+  if( $settings['SOCKS_EXT_ENABLED'] == 'yes' ){
+    $internal .= "internal: {$settings['IF_EXT']} port = {$settings['SOCKS_EXT_PORT']}\n";
+
+    // this is a placeholder since it is getting late and I want to test the new function
+    $network_info = '0.0.0.0/0';
+
+    $tmp = $client_templ;
+    $tmp = str_replace('INTERNAL_NETWORK_HERE', $network_info, $tmp, $SometimesIreallyHatePHP);
+
+    $clients .= $tmp;
+    unset($tmp);
   }
 
-  //static IP assignment
-  if( $settings['DHCPD_STATIC_IP'] != "" && $settings['DHCPD_STATIC_MAC'] != "" ){
-    $static_host = $static_templ;
-    $static_host = str_replace('STATIC_MAC_HERE', $settings['DHCPD_STATIC_MAC'], $static_host, $SometimesIreallyHatePHP);
-    $static_host = str_replace('STATIC_IP_HERE', $settings['DHCPD_STATIC_IP'], $static_host, $SometimesIreallyHatePHP);
+
+  if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
+    $internal .= "internal: {$settings['IF_INT']} port = {$settings['SOCKS_INT_PORT']}\n";
+
+    // this is a placeholder since it is getting late and I want to test the new function
+    $network_info = '0.0.0.0/0';
+
+    $tmp = $client_templ;
+    $tmp = str_replace('INTERNAL_NETWORK_HERE', $network_info, $tmp, $SometimesIreallyHatePHP);
+
+    $clients .= $tmp;
+    unset($tmp);
   }
 
-  // Global Option - NAMESERVERS is an array which may contain multiple entries, loop over it
-  $NAMESERVERS = $_settings->get_settings_array('NAMESERVERS');
-  $ins_dns = '';
-  foreach( $NAMESERVERS as $DNS){
-    $ins_dns .= ($ins_dns === '' ) ? $DNS[1] : ", $DNS[1]";
-  }
-  $templ = str_replace('DNSSERVER_HERE', $ins_dns, $templ, $SometimesIreallyHatePHP);
 
-  //all done - return
-  return $templ.$subnet.$static_host;
+  if( $internal == '' || $network == '' ){ return false; }
+  $internal = trim($internal)."\n";
+  $templ = str_replace('INTERNAL_SETTING_HERE', $internal, $templ, $SometimesIreallyHatePHP);
+
+  $clients = trim($clients)."\n";
+  $templ = str_replace('CLIENT_TEMPLATE_HERE', $clients, $templ, $SometimesIreallyHatePHP);
+
+  return $templ;
 }
 
 
@@ -238,6 +248,7 @@ function socks_process_template(){
 function dhcpd_process_template(){
   global $_files;
   global $_settings;
+  $SometimesIreallyHatePHP = 1;
   $templ = $_files->readfile('/pia/include/dhcpd.conf');
   $subnet_templ = "subnet SUBNET_IP_HERE netmask NETWORK_MASK_HERE {\n"
                   ."  range IP_RANGE_HERE;\n"
@@ -256,7 +267,6 @@ function dhcpd_process_template(){
   for( $x = 1 ; $x < 3 ; ++$x ){
     if( $settings['DHCPD_ENABLED'.$x] == 'yes' ){
       $subnet .= "$subnet_templ\n";
-      $SometimesIreallyHatePHP = 1; //passing this int bý reference will save tremendous ammounts of RAM - AWESOME SHIT!
       $subnet = str_replace('SUBNET_IP_HERE', $settings['DHCPD_SUBNET'.$x], $subnet, $SometimesIreallyHatePHP);
       $subnet = str_replace('NETWORK_MASK_HERE', $settings['DHCPD_MASK'.$x], $subnet, $SometimesIreallyHatePHP);
       $subnet = str_replace('IP_RANGE_HERE', $settings['DHCPD_RANGE'.$x], $subnet, $SometimesIreallyHatePHP);

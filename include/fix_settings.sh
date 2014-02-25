@@ -191,3 +191,12 @@ ret=`grep -c "PING_MAX_LOSS" /pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'PING_MAX_LOSS="20"' >> '/pia/settings.conf'
 fi
+
+#SOCKS proxy failure
+ret=`grep -c "SOCKS_ENABLED_EXT" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'SOCKS_EXT_ENABLED="no"' >> '/pia/settings.conf'
+  echo 'SOCKS_EXT_PORT="8080"' >> '/pia/settings.conf'
+  echo 'SOCKS_INT_ENABLED="no"' >> '/pia/settings.conf'
+  echo 'SOCKS_INT_PORT="8080"' >> '/pia/settings.conf'
+fi
