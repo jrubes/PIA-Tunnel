@@ -85,7 +85,7 @@ done
 FILES="fw-forward.sh fw-no-forward.sh functions.sh build_ping_list.sh fix_settings.sh network-interfaces.sh"
 FILES="$FILES network-restart.sh autostart autostart.sh dhcpd-reconfigure.sh dhcpd-start.sh"
 FILES="$FILES dhcpd-stop.sh dhcpd-status.sh update_root.sh fw_get_forward_state.sh autostart_rebuild.sh"
-FILES="$FILES ovpn_kill.sh"
+FILES="$FILES ovpn_kill.sh socks-start.sh socks-status.sh socks-stop.sh socks-reconfigure.sh"
 for f in $FILES
 do
 	chmod ug+x "/pia/include/$f"

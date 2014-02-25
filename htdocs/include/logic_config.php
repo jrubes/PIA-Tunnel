@@ -77,6 +77,7 @@ switch($_REQUEST['cmd']){
       $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
       VPN_generate_interfaces();
       VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
+      VPN_generate_socks_conf(); //create new danted.conf file
       $_pia->rebuild_autostart();
       $disp_body .= "<div id=\"feedback\" class=\"feedback\">Settings updated</div>\n";
       $disp_body .= disp_network_default();
@@ -228,7 +229,7 @@ function socks_process_template(){
   }
 
 
-  if( $internal == '' || $network == '' ){ return false; }
+  if( $internal == '' || $clients == '' ){ return false; }
   $internal = trim($internal)."\n";
   $templ = str_replace('INTERNAL_SETTING_HERE', $internal, $templ, $SometimesIreallyHatePHP);
 
