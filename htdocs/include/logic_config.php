@@ -334,7 +334,7 @@ function disp_dhcpd_box_new(){
   $disp_body = '';
 
   $disp_body .= '<div class="box options">';
-  $disp_body .= '<h2>DHCP Server  Settings</h2>'."\n";
+  $disp_body .= '<h2>DHCP Server</h2>'."\n";
   $disp_body .= "<table>\n";
 
   //show two subnets
@@ -380,6 +380,60 @@ function disp_dhcpd_box_new(){
 
   return $disp_body;
 }
+
+/**
+ * returns the default UI for this option
+ * @global object $_settings
+ * @return string string with HTML for body of this page
+ */
+function disp_socks_box_new(){
+  global $_settings;
+  global $GLOB_disp_network_default_fields;
+
+  $settings = $_settings->get_settings();
+  $disp_body = '';
+
+  $disp_body .= '<div class="box options">';
+  $disp_body .= '<h2>Dante SOCKS 5 Server</h2>'."\n";
+  $disp_body .= "<table>\n";
+
+  $GLOB_disp_network_default_fields .= 'SOCKS_EXT_ENABLED,';
+  $sel = array(
+          'id' => 'SOCKS_EXT_ENABLED',
+          'selected' => $settings['SOCKS_EXT_ENABLED'],
+          'onchange' => "toggle(this, 'SOCKS_EXT_PORT', 'no', 'disabled', '', '');",
+          array( 'no', 'disabled'),
+          array( 'yes', 'enabled')
+        );
+  $disp_body .= '<tr><td>Listen on Public Lan ('.$settings['IF_EXT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disabled = ($settings['SOCKS_EXT_ENABLED'] === 'no') ? 'disabled' : ''; //disable input fields when DHCP is set
+  $GLOB_disp_network_default_fields .= 'SOCKS_EXT_PORT,';
+  $disp_body .= '<tr><td>Listen Port</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_PORT" name="SOCKS_EXT_PORT" value="'.htmlspecialchars($settings['SOCKS_EXT_PORT']).'"></td></tr>'."\n";
+
+
+  $GLOB_disp_network_default_fields .= 'SOCKS_INT_ENABLED,';
+  $sel = array(
+          'id' => 'SOCKS_INT_ENABLED',
+          'selected' => $settings['SOCKS_INT_ENABLED'],
+          'onchange' => "toggle(this, 'SOCKS_INT_ENABLED', 'no', 'disabled', '', '');",
+          array( 'no', 'disabled'),
+          array( 'yes', 'enabled')
+        );
+  $disp_body .= '<tr><td>Listen on Private Lan ('.$settings['IF_INT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disabled = ($settings['SOCKS_INT_ENABLED'] === 'no') ? 'disabled' : ''; //disable input fields when DHCP is set
+  $GLOB_disp_network_default_fields .= 'SOCKS_INT_PORT,';
+  $disp_body .= '<tr><td>Listen Port</td><td><input '.$disabled.' type="text" id="SOCKS_INT_PORT" name="SOCKS_INT_PORT" value="'.htmlspecialchars($settings['SOCKS_INT_PORT']).'"></td></tr>'."\n";
+
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+
+  $disp_body .= "</table>\n";
+  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_socks" value="Restart SOCKS Server">';
+  $disp_body .= '</div>';
+
+  return $disp_body;
+}
+
 
 /**
  * returns the default UI for this option
@@ -796,6 +850,7 @@ function disp_network_default(){
   $disp_body .= '<div id="toggle_advanced_settings">';
   $disp_body .= disp_advanced_box();
   $disp_body .= disp_dhcpd_box_new();
+  $disp_body .= disp_socks_box_new();
   $disp_body .= '</div>';
 
 
