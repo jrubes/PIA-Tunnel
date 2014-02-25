@@ -121,10 +121,18 @@ function VPN_generate_interfaces(){
  * function to generate a new dhcpd.conf file after a config change
  */
 function VPN_generate_dhcpd_conf(){
-  //are not  controlled by this
   $template = dhcpd_process_template();
   $save = escapeshellarg($template);
   exec("sudo /pia/include/dhcpd-reconfigure.sh $save"); //write new dhcpd.conf
+}
+
+/**
+ * function to generate a new danted.conf file after a config change
+ */
+function VPN_generate_socks_conf(){
+  $template = socks_process_template();
+  $save = escapeshellarg($template);
+  exec("sudo /pia/include/socks-reconfigure.sh $save"); //write new dhcpd.conf
 }
 
 /**
@@ -165,6 +173,61 @@ function VPN_get_post_storage_arrays($match=null){
   if( count($ret) == 0 ){ return false; }
   else{ return $ret; }
 }
+
+/**
+ * function to modify /pia/include/danted.conf in RAM and return the changes
+ * @global object $_files
+ * @return string,bool string containing the modified dhcpd.conf file or false on error
+ */
+function socks_process_template(){
+  global $_files;
+  global $_settings;
+  $templ = $_files->readfile('/pia/include/dhcpd.conf');
+  $subnet_templ = "subnet SUBNET_IP_HERE netmask NETWORK_MASK_HERE {\n"
+                  ."  range IP_RANGE_HERE;\n"
+                  ."  option routers ROUTER_IP_HERE;\n"
+                  ."  option broadcast-address BROADCAST_HERE;\n"
+                  ."}\n";
+  $static_templ = "host statichost {\n"
+                  ."  hardware ethernet STATIC_MAC_HERE;\n"
+                  ."  fixed-address STATIC_IP_HERE;\n"
+                  ."}\n";
+  $subnet = ''; //contains assembled subnet declarations
+  $static_host = ''; //contains assembled static host info
+  $settings = $_settings->get_settings();
+
+  //there are two dhcpd subnet config ranges
+  for( $x = 1 ; $x < 3 ; ++$x ){
+    if( $settings['DHCPD_ENABLED'.$x] == 'yes' ){
+      $subnet .= "$subnet_templ\n";
+      $SometimesIreallyHatePHP = 1; //passing this int bý reference will save tremendous ammounts of RAM - AWESOME SHIT!
+      $subnet = str_replace('SUBNET_IP_HERE', $settings['DHCPD_SUBNET'.$x], $subnet, $SometimesIreallyHatePHP);
+      $subnet = str_replace('NETWORK_MASK_HERE', $settings['DHCPD_MASK'.$x], $subnet, $SometimesIreallyHatePHP);
+      $subnet = str_replace('IP_RANGE_HERE', $settings['DHCPD_RANGE'.$x], $subnet, $SometimesIreallyHatePHP);
+      $subnet = str_replace('BROADCAST_HERE', $settings['DHCPD_BROADCAST'.$x], $subnet, $SometimesIreallyHatePHP);
+      $subnet = str_replace('ROUTER_IP_HERE', $settings['DHCPD_ROUTER'.$x], $subnet, $SometimesIreallyHatePHP);
+    }
+  }
+
+  //static IP assignment
+  if( $settings['DHCPD_STATIC_IP'] != "" && $settings['DHCPD_STATIC_MAC'] != "" ){
+    $static_host = $static_templ;
+    $static_host = str_replace('STATIC_MAC_HERE', $settings['DHCPD_STATIC_MAC'], $static_host, $SometimesIreallyHatePHP);
+    $static_host = str_replace('STATIC_IP_HERE', $settings['DHCPD_STATIC_IP'], $static_host, $SometimesIreallyHatePHP);
+  }
+
+  // Global Option - NAMESERVERS is an array which may contain multiple entries, loop over it
+  $NAMESERVERS = $_settings->get_settings_array('NAMESERVERS');
+  $ins_dns = '';
+  foreach( $NAMESERVERS as $DNS){
+    $ins_dns .= ($ins_dns === '' ) ? $DNS[1] : ", $DNS[1]";
+  }
+  $templ = str_replace('DNSSERVER_HERE', $ins_dns, $templ, $SometimesIreallyHatePHP);
+
+  //all done - return
+  return $templ.$subnet.$static_host;
+}
+
 
 
 /**

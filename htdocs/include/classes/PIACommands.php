@@ -2,7 +2,7 @@
 /**
  * class to interact with the various pia-* and system commands
  *
- * @author MirkoKaiser
+ * @author Mirko Kaiser
  */
 class PIACommands {
   private $_files;
