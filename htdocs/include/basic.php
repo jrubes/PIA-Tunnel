@@ -320,14 +320,24 @@ function VM_get_status( $output = 'html'){
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
   $ret = array();
   exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  $ret_str .= "<tr><td>Public LAN IP</td><td id=\"public_ip\">$ret[0]</td></tr>";
+  $ret_str .= "<tr><td>Public LAN</td><td id=\"public_ip\">$ret[0]";
+    if( $settings['SOCKS_EXT_ENABLED'] == 'yes' ){
+      $ret_str .= "<br>SOCKS 5 Proxy  on port {$settings['SOCKS_EXT_PORT']}</td></tr>";
+      $ret_arr['SOCKS_EXT_ENABLED'] = "running on port {$settings['SOCKS_EXT_PORT']}";
+    }
+  $ret_str .= '</td></tr>';
   $ret_arr['public_ip'] = $ret[0];
   unset($ret);
 
   $ret = array();
   exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if(array_key_exists('0', $ret) ){
-    $ret_str .= "<tr><td>Private LAN IP</td><td id=\"private_ip\">$ret[0]</td></tr>";
+    $ret_str .= "<tr><td>Private LAN</td><td id=\"private_ip\">$ret[0]";
+    if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
+      $ret_str .= "<br>SOCKS 5 Proxy  on port {$settings['SOCKS_INT_PORT']}</td></tr>";
+      $ret_arr['SOCKS_INT_ENABLED'] = "running on port {$settings['SOCKS_INT_PORT']}";
+    }
+  $ret_str .= '</td></tr>';
     $ret_arr['private_ip'] = $ret[0];
   }else{
     $ret_str .= "<tr><td>Private IP</td><td id=\"private_ip\">please refresh the page</td></tr>";
@@ -349,7 +359,7 @@ function VM_get_status( $output = 'html'){
     $vpn_pub = array();
     exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
     if( array_key_exists( '0', $vpn_pub) === true ){
-      $ret_str .= "<tr><td>VPN Public IP</td><td id=\"vpn_public_ip\">$vpn_pub[0]</td></tr>";
+      $ret_str .= "<tr><td>VPN Public</td><td id=\"vpn_public_ip\">$vpn_pub[0]</td></tr>";
       $ret_arr['vpn_public_ip'] = $vpn_pub[0];
       $msg = ( $settings['FORWARD_PORT_ENABLED'] == 'no' ) ? '(Port Forwarding not enabled)' : '';
       $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td id=\"vpn_port\">$port $msg</td></tr>" : "<tr><td>VPN Port:</td><td>not supported by location</td></tr>";
