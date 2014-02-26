@@ -434,13 +434,14 @@ function disp_socks_box_new(){
   $GLOB_disp_network_default_fields .= 'SOCKS_EXT_PORT,';
   $disp_body .= '<tr><td>Listen Port</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_PORT" name="SOCKS_EXT_PORT" value="'.htmlspecialchars($settings['SOCKS_EXT_PORT']).'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'SOCKS_EXT_FROM,';
-  $disp_body .= '<tr><td>Allow network from range</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_FROM" name="SOCKS_EXT_FROM" value="'.htmlspecialchars($settings['SOCKS_EXT_FROM']).'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>Allow network from</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_FROM" name="SOCKS_EXT_FROM" value="'.htmlspecialchars($settings['SOCKS_EXT_FROM']).'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'SOCKS_EXT_TO,';
-  $disp_body .= '<tr><td>Allow network to range</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_TO" name="SOCKS_EXT_TO" value="'.htmlspecialchars($settings['SOCKS_EXT_TO']).'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>Allow network to</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_TO" name="SOCKS_EXT_TO" value="'.htmlspecialchars($settings['SOCKS_EXT_TO']).'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'SOCKS_EXT_FROM_PORTRANGE,';
-  $disp_body .= '<tr><td>Allow port range</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_FROM_PORTRANGE" name="SOCKS_EXT_FROM_PORTRANGE" value="'.htmlspecialchars($settings['SOCKS_EXT_FROM_PORTRANGE']).'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>Forward port range</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_FROM_PORTRANGE" name="SOCKS_EXT_FROM_PORTRANGE" value="'.htmlspecialchars($settings['SOCKS_EXT_FROM_PORTRANGE']).'"></td></tr>'."\n";
 
 
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
 
   $GLOB_disp_network_default_fields .= 'SOCKS_INT_ENABLED,';
@@ -456,11 +457,11 @@ function disp_socks_box_new(){
   $GLOB_disp_network_default_fields .= 'SOCKS_INT_PORT,';
   $disp_body .= '<tr><td>Listen Port</td><td><input '.$disabled.' type="text" id="SOCKS_INT_PORT" name="SOCKS_INT_PORT" value="'.htmlspecialchars($settings['SOCKS_INT_PORT']).'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'SOCKS_INT_FROM,';
-  $disp_body .= '<tr><td>Allow network from range</td><td><input '.$disabled.' type="text" id="SOCKS_INT_FROM" name="SOCKS_INT_FROM" value="'.htmlspecialchars($settings['SOCKS_INT_FROM']).'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>Allow network from</td><td><input '.$disabled.' type="text" id="SOCKS_INT_FROM" name="SOCKS_INT_FROM" value="'.htmlspecialchars($settings['SOCKS_INT_FROM']).'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'SOCKS_INT_TO,';
-  $disp_body .= '<tr><td>Allow network to range</td><td><input '.$disabled.' type="text" id="SOCKS_INT_TO" name="SOCKS_INT_TO" value="'.htmlspecialchars($settings['SOCKS_INT_TO']).'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>Allow network to</td><td><input '.$disabled.' type="text" id="SOCKS_INT_TO" name="SOCKS_INT_TO" value="'.htmlspecialchars($settings['SOCKS_INT_TO']).'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'SOCKS_INT_FROM_PORTRANGE,';
-  $disp_body .= '<tr><td>Allow port range</td><td><input '.$disabled.' type="text" id="SOCKS_INT_FROM_PORTRANGE" name="SOCKS_INT_FROM_PORTRANGE" value="'.htmlspecialchars($settings['SOCKS_INT_FROM_PORTRANGE']).'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>Forward port range</td><td><input '.$disabled.' type="text" id="SOCKS_INT_FROM_PORTRANGE" name="SOCKS_INT_FROM_PORTRANGE" value="'.htmlspecialchars($settings['SOCKS_INT_FROM_PORTRANGE']).'"></td></tr>'."\n";
 
 
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
