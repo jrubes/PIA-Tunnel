@@ -23,6 +23,13 @@ if [ ! -f "/usr/bin/zip" ]; then
     apt-get -y install zip unzip
 fi
 
+#install Dante SOCKS 5 Proxy
+if [ ! -f "/usr/sbin/danted" ]; then
+    apt-get -y install dante-server
+fi
+
+
+
 #remove /bin/bash from sudoers
 pos=`grep -n '/bin/bash,/sbin/shutdown' /etc/sudoers | gawk -F":" '{print $1}'`
 if [ ! -z "$pos" ]; then
