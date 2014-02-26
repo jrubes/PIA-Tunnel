@@ -153,11 +153,6 @@ class PIASettings {
     $new = array();
     $this->settings_array_changes = 0;
 
-//    var_dump($settings_array);
-//    var_dump($array2);
-//    var_dump($new);
-//    die('ends in compare_settings_arrays()');
-
     //do a count comparsion to check for removed values
     if( count($settings_array) != count($array2) ){
       ++$this->settings_array_changes;//count mismatch - something changed
