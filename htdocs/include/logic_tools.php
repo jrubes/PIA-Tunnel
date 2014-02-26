@@ -194,7 +194,7 @@ function disp_pia_update_client(){
 
   $up = $_pia->get_update_status();
   if(is_int($up) === true && $up == 0 ){
-    $up_txt = 'latest release';
+    $up_txt = '<a href="/?page=tools&amp;cid=tools&amp;cmd=update_software_client">latest release</a>';
   }elseif( $up > 0 ){
     $s = ( $up > 1 ) ? 's' : '';
     $up_txt = '<a href="/?page=tools&amp;cid=tools&amp;cmd=update_software_client">'."$up update{$s} available</a>";
@@ -206,6 +206,14 @@ function disp_pia_update_client(){
   $disp_body .= '<h2>Online Update Client</h2>';
   $disp_body .= 'Updates are downloaded from the project\'s <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
   $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
+
+  $disp_body .= '<br><br><span id="git_branch">Switch development branch (*<strong>super duper extra advanced option</strong>*)';
+    $disp_body .= '<br><select>';
+      $disp_body .= '<option value="release_php-gui">release_php-gui</option>';
+      $disp_body .= '<option value="auth_fail_test">auth_fail_test</option>';
+    $disp_body .= '</select>';
+    $disp_body .= ' <input type="submit" name="switch_branch" value="Switch Branch">';
+  $disp_body .= '</span>';
 
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<p> </p>';
