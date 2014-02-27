@@ -101,6 +101,14 @@ class PIACommands {
 
 
   /**
+   * deletes the status file so the next version check will be forced
+   */
+  function clear_update_status(){
+    $cache_file = '/pia/cache/webui-update_status.txt';
+    unlink($cache_file);
+  }
+
+  /**
    * checks cache file or git for count of how many commits origin/ is ahead
    * @param boolean $force_update=false true will ignore the cache
    * @return string number as string containing commit number or a status string
@@ -158,8 +166,9 @@ class PIACommands {
    *                         or boolean FALSE on failure
    */
   private function get_revlist_count(){
+    global $settings;
     $ret = array();
-    exec('cd /pia ; git fetch origin &> /dev/null ; git rev-list HEAD... auth_fail_test --count 2> /dev/null', $ret);
+    exec('cd /pia ; git fetch origin &> /dev/null ; git rev-list HEAD... '.$settings['GIT_BRANCH'].' --count 2> /dev/null', $ret);
     if( array_key_exists(0, $ret) === true ){
       return (int)$ret[0];
     }else{

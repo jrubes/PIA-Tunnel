@@ -22,6 +22,14 @@ if(array_key_exists('ovpn', $_SESSION) !== true ){
 switch($_REQUEST['cmd']){
   case 'update_software_client':
     global $meta;
+    global $settings;
+    if( array_key_exists('switch_branch', $_POST) === true ){
+      $_settings->save_settings('GIT_BRANCH', $_POST['selected_branch']);
+      $settings = $_settings->get_settings();
+      $_pia->clear_update_status(); //clear cache to refresh update checks
+    }
+
+
     $meta['javascript'][] = '/js/UpdateClient.js';
     $disp_body .= disp_pia_update_client();
     break;
@@ -191,6 +199,7 @@ function disp_pia_update(){
  */
 function disp_pia_update_client(){
   global $_pia;
+  global $settings;
 
   $up = $_pia->get_update_status();
   if(is_int($up) === true && $up == 0 ){
@@ -207,13 +216,17 @@ function disp_pia_update_client(){
   $disp_body .= 'Updates are downloaded from the project\'s <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
   $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
 
-  $disp_body .= '<br><br><span id="git_branch">Switch development branch (*<strong>super duper extra advanced option</strong>*)';
-    $disp_body .= '<br><select>';
-      $disp_body .= '<option value="release_php-gui">release_php-gui</option>';
-      $disp_body .= '<option value="auth_fail_test">auth_fail_test</option>';
-    $disp_body .= '</select>';
-    $disp_body .= ' <input type="submit" name="switch_branch" value="Switch Branch">';
-  $disp_body .= '</span>';
+  if( 1 === 2 )
+  { //switch branch option - disabled for now
+    $disp_body .= '<br><br><form method="post" name="branch" action="/?page=tools&cid=tools&cmd=update_software_client">';
+      $disp_body .= '<span id="git_branch">Switch development branch (*<strong>super duper extra advanced option</strong>*)';
+      $disp_body .= '<br><select name="selected_branch">';
+        $disp_body .= build_git_branch_options();
+      $disp_body .= '</select>';
+      $disp_body .= ' <input type="submit" name="switch_branch" value="Switch Branch">';
+      $disp_body .= '</span>';
+    $disp_body .= '</form>';
+  }
 
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<p> </p>';
@@ -234,6 +247,24 @@ function disp_pia_update_client(){
   $disp_body .= '</div>';
   return $disp_body;
 }
+
+/**
+ * build the dropdown box listing the available git repositories the user may select
+ */
+function build_git_branch_options(){
+  global $settings;
+  $branches = array( 'release_php-gui', 'auth_fail_test');
+  $ret = '';
+
+  $ret .= '<option value="'.$settings['GIT_BRANCH'].'">'.$settings['GIT_BRANCH'].'</option>';
+  foreach( $branches as $branch ){
+    if( $branch !== $settings['GIT_BRANCH'] ){
+      $ret .= '<option value="'.$branch.'">'.$branch.'</option>';
+    }
+  }
+  return $ret;
+}
+
 
 /**
  * returns UI elements in HTML

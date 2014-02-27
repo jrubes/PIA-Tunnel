@@ -207,3 +207,9 @@ if [ $ret = 0 ]; then
   echo 'SOCKS_INT_TO="0.0.0.0/0"' >> '/pia/settings.conf'
   echo 'SOCKS_INT_FROM_PORTRANGE="1-65535"' >> '/pia/settings.conf'
 fi
+
+# git branch setting for online updates
+ret=`grep -c "GIT_BRANCH" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'GIT_BRANCH="release_php-gui"' >> '/pia/settings.conf'
+fi
