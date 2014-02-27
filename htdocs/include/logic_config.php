@@ -201,14 +201,10 @@ function socks_process_template(){
   global $_files;
   global $_settings;
   $SometimesIreallyHatePHP = 1;
-  $templ = $_files->readfile('/pia/include/socks.conf');
+  $templ = $_files->readfile('/pia/include/sockd.conf');
   $client_templ = "client pass {\n"
                 ."  from: INTERNAL_NETWORK_HERE\n"
                 ."  log: connect disconnect error\n"
-                ."}\n\n"
-                ."pass {\n"
-                ."  from: INTERNAL_NETWORK_HERE\n"
-                ."  protocol: tcp udp\n"
                 ."}\n";
 
   $clients = ''; //contains assembled network declaration

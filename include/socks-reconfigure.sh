@@ -5,4 +5,4 @@ export LANG
 source '/pia/settings.conf'
 
 
-echo "$1" > '/etc/danted.conf';
+echo "$1" > '/etc/sockd.conf';

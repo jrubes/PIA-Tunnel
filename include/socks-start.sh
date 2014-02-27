@@ -5,4 +5,4 @@ export LANG
 source '/pia/settings.conf'
 
 
-service danted start 2>&1
+/usr/sbin/sockd -D 2>&1

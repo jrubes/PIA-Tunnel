@@ -5,4 +5,4 @@ export LANG
 source '/pia/settings.conf'
 
 
-service danted stop 2>&1
+killall sockd 2>&1
