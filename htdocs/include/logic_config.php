@@ -414,7 +414,9 @@ function disp_socks_box_new(){
   $disp_body = '';
 
   $disp_body .= '<div class="box options">';
-  $disp_body .= '<h2>Dante SOCKS 5 Server</h2>'."\n";
+  $disp_body .= '<h2>SOCKS 5 Proxy Server</h2>'."\n";
+  $disp_body .= '<strong>Warning</strong>: experimental feature! Currently without authentication'
+                .' so anyone on YOUR network will be able to use the proxy!'."\n";
   $disp_body .= "<table>\n";
 
   $GLOB_disp_network_default_fields .= 'SOCKS_EXT_ENABLED,';
@@ -425,17 +427,17 @@ function disp_socks_box_new(){
           array( 'no', 'disabled'),
           array( 'yes', 'enabled')
         );
-  $disp_body .= '<tr><td>Listen on Public Lan ('.$settings['IF_EXT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>Public Lan ('.$settings['IF_EXT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
   $disabled = ($settings['SOCKS_EXT_ENABLED'] === 'no') ? 'disabled' : ''; //disable input fields when DHCP is set
   $GLOB_disp_network_default_fields .= 'SOCKS_EXT_PORT,';
   $disp_body .= '<tr><td>Listen Port</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_PORT" name="SOCKS_EXT_PORT" value="'.htmlspecialchars($settings['SOCKS_EXT_PORT']).'"></td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'SOCKS_EXT_FROM,';
+/*  $GLOB_disp_network_default_fields .= 'SOCKS_EXT_FROM,';
   $disp_body .= '<tr><td>Allow network from</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_FROM" name="SOCKS_EXT_FROM" value="'.htmlspecialchars($settings['SOCKS_EXT_FROM']).'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'SOCKS_EXT_TO,';
   $disp_body .= '<tr><td>Allow network to</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_TO" name="SOCKS_EXT_TO" value="'.htmlspecialchars($settings['SOCKS_EXT_TO']).'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'SOCKS_EXT_FROM_PORTRANGE,';
   $disp_body .= '<tr><td>Forward port range</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_FROM_PORTRANGE" name="SOCKS_EXT_FROM_PORTRANGE" value="'.htmlspecialchars($settings['SOCKS_EXT_FROM_PORTRANGE']).'"></td></tr>'."\n";
-
+*/
 
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
@@ -448,23 +450,23 @@ function disp_socks_box_new(){
           array( 'no', 'disabled'),
           array( 'yes', 'enabled')
         );
-  $disp_body .= '<tr><td>Listen on Private Lan ('.$settings['IF_INT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>Private Lan ('.$settings['IF_INT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
   $disabled = ($settings['SOCKS_INT_ENABLED'] === 'no') ? 'disabled' : ''; //disable input fields when DHCP is set
   $GLOB_disp_network_default_fields .= 'SOCKS_INT_PORT,';
   $disp_body .= '<tr><td>Listen Port</td><td><input '.$disabled.' type="text" id="SOCKS_INT_PORT" name="SOCKS_INT_PORT" value="'.htmlspecialchars($settings['SOCKS_INT_PORT']).'"></td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'SOCKS_INT_FROM,';
+/*  $GLOB_disp_network_default_fields .= 'SOCKS_INT_FROM,';
   $disp_body .= '<tr><td>Allow network from</td><td><input '.$disabled.' type="text" id="SOCKS_INT_FROM" name="SOCKS_INT_FROM" value="'.htmlspecialchars($settings['SOCKS_INT_FROM']).'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'SOCKS_INT_TO,';
   $disp_body .= '<tr><td>Allow network to</td><td><input '.$disabled.' type="text" id="SOCKS_INT_TO" name="SOCKS_INT_TO" value="'.htmlspecialchars($settings['SOCKS_INT_TO']).'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'SOCKS_INT_FROM_PORTRANGE,';
   $disp_body .= '<tr><td>Forward port range</td><td><input '.$disabled.' type="text" id="SOCKS_INT_FROM_PORTRANGE" name="SOCKS_INT_FROM_PORTRANGE" value="'.htmlspecialchars($settings['SOCKS_INT_FROM_PORTRANGE']).'"></td></tr>'."\n";
-
+*/
 
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= ' &nbsp; <input type="submit" name="restart_socks" value="Restart SOCKS Server">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_socks" value="Restart Proxy Server">';
   $disp_body .= '</div>';
 
   return $disp_body;
@@ -659,7 +661,7 @@ function disp_general_box(){
   $disp_body .= '<tr><td>Enable Port Forwarding</td><td>'.build_select($sel).'</td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'FORWARD_IP,';
   $disabled = ( $settings['FORWARD_PORT_ENABLED'] === 'no' ) ? ' disabled ' : '';
-  $disp_body .= '<tr><td>Forward IP</td><td><input type="text" '.$disabled.' id="FORWARD_IP" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'" title="Use as IP in \'DHCP Server Settings\' - \'Fixed IP\'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>Forward to this IP</td><td><input type="text" '.$disabled.' id="FORWARD_IP" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'" title="Use as IP in \'DHCP Server Settings\' - \'Fixed IP\'"></td></tr>'."\n";
 
   //VM LAN segment forwarding
   $GLOB_disp_network_default_fields .= 'FORWARD_VM_LAN,';
@@ -880,13 +882,13 @@ function disp_network_default(){
 
   $disp_body .= disp_general_box();
   $disp_body .= disp_pia_daemon_box_new();
+  $disp_body .= disp_socks_box_new();
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<p class="hidden" id="advanced_button"><a id="toggle_advanced_settings_toggle" class="button" href="" onclick="toggle_hide(\'toggle_advanced_settings\', \'toggle_advanced_settings_toggle\', \'Show Advanced Settings,Hide Advanced Settings\'); return false;">Show Advanced Settings</a></p>';
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<div id="toggle_advanced_settings">';
   $disp_body .= disp_advanced_box();
   $disp_body .= disp_dhcpd_box_new();
-  $disp_body .= disp_socks_box_new();
   $disp_body .= '</div>';
 
 
