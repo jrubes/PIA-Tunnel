@@ -24,6 +24,12 @@ switch($_REQUEST['cmd']){
     global $meta;
     global $settings;
     if( array_key_exists('switch_branch', $_POST) === true ){
+      //check if the git branch needs to be switched
+      if( $settings['GIT_BRANCH'] !== $_POST['selected_branch'] ){
+        $sarg = escapeshellcmd($_POST['selected_branch']); //this is not proper!
+        echo('cd /pia ; git reset --hard ; git fetch origin ; git checkout '.$sarg.' &> /dev/null');
+      }
+
       $_settings->save_settings('GIT_BRANCH', $_POST['selected_branch']);
       $settings = $_settings->get_settings();
       $_pia->clear_update_status(); //clear cache to refresh update checks
@@ -216,7 +222,7 @@ function disp_pia_update_client(){
   $disp_body .= 'Updates are downloaded from the project\'s <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
   $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
 
-  if( 1 === 2 )
+  if( 1 === 1 )
   { //switch branch option - disabled for now
     $disp_body .= '<br><br><form method="post" name="branch" action="/?page=tools&cid=tools&cmd=update_software_client">';
       $disp_body .= '<span id="git_branch">Switch development branch (*<strong>super duper extra advanced option</strong>*)';
