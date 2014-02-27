@@ -182,10 +182,11 @@ class PIACommands {
    * @return string|boolean string containing output or FALSE on failure
    */
   function git_log( $count=3 ){
+    global $settings;
     $ret = array();
     $sret = '';
     $count = escapeshellarg($count);
-    exec('cd /pia ; git --no-pager log -n '.$count.' --pretty="format:%ci%n>> %s <<%n" origin', $ret);
+    exec('cd /pia ; git --no-pager log -n '.$count.' --pretty="format:%ci%n>> %s <<%n" origin/'.$settings['GIT_BRANCH'], $ret);
 
     $cnt = count($ret);
     if( $cnt > 0 ){
