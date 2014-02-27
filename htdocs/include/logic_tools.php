@@ -27,7 +27,7 @@ switch($_REQUEST['cmd']){
       //check if the git branch needs to be switched
       if( $settings['GIT_BRANCH'] !== $_POST['selected_branch'] ){
         $sarg = escapeshellcmd($_POST['selected_branch']); //this is not proper!
-        echo('cd /pia ; git reset --hard ; git fetch origin ; git checkout '.$sarg.' &> /dev/null');
+        exec('cd /pia ; git reset --hard ; git fetch origin ; git checkout '.$sarg.' &> /dev/null');
       }
 
       $_settings->save_settings('GIT_BRANCH', $_POST['selected_branch']);
