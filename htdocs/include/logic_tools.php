@@ -28,6 +28,7 @@ switch($_REQUEST['cmd']){
       if( $settings['GIT_BRANCH'] !== $_POST['selected_branch'] ){
         $sarg = escapeshellcmd($_POST['selected_branch']); //this is not proper!
         exec('cd /pia ; git reset --hard ; git fetch origin ; git checkout '.$sarg.' &> /dev/null');
+        exec('/pia/pia-update &> /dev/null');
       }
 
       $_settings->save_settings('GIT_BRANCH', $_POST['selected_branch']);
