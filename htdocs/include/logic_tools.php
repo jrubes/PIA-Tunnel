@@ -22,21 +22,6 @@ if(array_key_exists('ovpn', $_SESSION) !== true ){
 switch($_REQUEST['cmd']){
   case 'update_software_client':
     global $meta;
-    global $settings;
-    if( array_key_exists('switch_branch', $_POST) === true ){
-      //check if the git branch needs to be switched
-      if( $settings['GIT_BRANCH'] !== $_POST['selected_branch'] ){
-        $sarg = escapeshellcmd($_POST['selected_branch']); //this is not proper!
-        exec('cd /pia ; git reset --hard ; git fetch origin ; git checkout '.$sarg.' &> /dev/null');
-        exec('/pia/pia-update &> /dev/null');
-      }
-
-      $_settings->save_settings('GIT_BRANCH', $_POST['selected_branch']);
-      $settings = $_settings->get_settings();
-      $_pia->clear_update_status(); //clear cache to refresh update checks
-    }
-
-
     $meta['javascript'][] = '/js/UpdateClient.js';
     $disp_body .= disp_pia_update_client();
     break;
@@ -223,9 +208,7 @@ function disp_pia_update_client(){
   $disp_body .= 'Updates are downloaded from the project\'s <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
   $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
 
-  if( 1 === 1 )
-  { //switch branch option - disabled for now
-    $disp_body .= '<br><br><form method="post" name="branch" action="/?page=tools&cid=tools&cmd=update_software_client">';
+/*    $disp_body .= '<br><br><form method="post" name="branch" action="/?page=tools&cid=tools&cmd=update_software_client">';
       $disp_body .= '<span id="git_branch">Switch development branch (*<strong>super duper extra advanced option</strong>*)';
       $disp_body .= '<br><select name="selected_branch">';
         $disp_body .= build_git_branch_options();
@@ -233,7 +216,7 @@ function disp_pia_update_client(){
       $disp_body .= ' <input type="submit" name="switch_branch" value="Switch Branch">';
       $disp_body .= '</span>';
     $disp_body .= '</form>';
-  }
+*/
 
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<p> </p>';

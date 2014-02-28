@@ -91,6 +91,22 @@ switch($_REQUEST['cmd']){
         break;
       }
 
+      if( array_key_exists('GIT_BRANCH', $_POST ) === true && $_POST['GIT_BRANCH'] != '' ){
+        global $settings;
+          //check if the git branch needs to be switched
+          if( $settings['GIT_BRANCH'] !== $_POST['GIT_BRANCH'] ){
+            $sarg = escapeshellcmd($_POST['GIT_BRANCH']); //this is not proper!
+            exec('cd /pia ; git reset --hard HEAD ; git fetch origin ; git checkout '.$sarg.' &> /dev/null');
+            exec('/pia/pia-setup &> /dev/null');
+          }
+
+          $_settings->save_settings('GIT_BRANCH', $_POST['GIT_BRANCH']);
+          $settings = $_settings->get_settings();
+          $_pia->clear_update_status(); //clear cache to refresh update checks
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">git branch switch to $_POST[GIT_BRANCH]</div>\n";
+        break;
+      }
+
       $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
       VPN_generate_interfaces();
       VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
@@ -465,7 +481,7 @@ function disp_socks_box_new(){
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
   $disp_body .= "</table>\n";
-  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_socks" value="Restart Proxy Server">';
   $disp_body .= '</div>';
 
@@ -833,7 +849,7 @@ function disp_advanced_box(){
             array( '90', '90%'),
             array( '100', '100%')
           );
-  $disp_body .= '<tr><td>Max allowed packet loss</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>Max packet loss</td><td>'.build_select($sel).'</td></tr>'."\n";
 
   //command line stuff
   $GLOB_disp_network_default_fields .= 'VERBOSE,';
@@ -853,9 +869,20 @@ function disp_advanced_box(){
           );
   $disp_body .= '<tr><td>Debug Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
 
+  $GLOB_disp_network_default_fields .= 'GIT_BRANCH,';
+  $sel = array(
+            'id' => 'GIT_BRANCH',
+            'selected' =>  $settings['GIT_BRANCH'],
+            array( 'release_php-gui', 'release_php-gui'),
+            array( 'auth_fail_test', 'auth_fail_test')
+          );
+  $disp_body .= '<tr><td>Development branch</td><td>'.build_select($sel).'</td></tr>'."\n";
+
+
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';
-  $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Full Network Restart">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Network Restart">';
+  $disp_body .= ' &nbsp; <input type="submit" name="switch_branch" value="Switch Branch">';
   $disp_body .= '</div>';
 
   return $disp_body;
