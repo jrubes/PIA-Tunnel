@@ -102,7 +102,7 @@ switch($_REQUEST['cmd']){
             $_settings->save_settings('GIT_BRANCH', $_POST['GIT_BRANCH']);
             $settings = $_settings->get_settings();
             $_pia->clear_update_status(); //clear cache to refresh update check
-            $disp_body .= "<div id=\"feedback\" class=\"feedback\">git branch switch to $_POST[GIT_BRANCH]</div>\n";
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">git branch switched to $_POST[GIT_BRANCH]</div>\n";
           }
 
 
@@ -432,8 +432,10 @@ function disp_socks_box_new(){
 
   $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>SOCKS 5 Proxy Server</h2>'."\n";
-  $disp_body .= '<strong>Warning</strong>: experimental feature! Currently without authentication'
-                .' so anyone on YOUR network will be able to use the proxy!'."\n";
+  $disp_body .= '<strong>Warning</strong>: experimental feature! <a id="toggle_socks_settings_toggle" href="" onclick="toggle_hide(\'toggle_socks_settings\', \'toggle_socks_settings_toggle\', \'Show Settings,Hide Settings\'); return false;">Show Settings</a><br>';
+  $disp_body .= '<div class="hidden" id="toggle_socks_settings">';
+  $disp_body .= '<ol><li>Innitiate a VPN connection</li><li>Start the proxy using the "Restart Proxy Server" button</li></ol>';
+  $disp_body .= 'Currently without authentication so anyone on YOUR network will be able to use the proxy!'."\n";
   $disp_body .= "<table>\n";
 
   $GLOB_disp_network_default_fields .= 'SOCKS_EXT_ENABLED,';
@@ -484,6 +486,7 @@ function disp_socks_box_new(){
   $disp_body .= "</table>\n";
   $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_socks" value="Restart Proxy Server">';
+  $disp_body .= '</div>';
   $disp_body .= '</div>';
 
   return $disp_body;
@@ -874,8 +877,7 @@ function disp_advanced_box(){
   $sel = array(
             'id' => 'GIT_BRANCH',
             'selected' =>  $settings['GIT_BRANCH'],
-            array( 'release_php-gui', 'release_php-gui'),
-            array( 'auth_fail_test', 'auth_fail_test')
+            array( 'release_php-gui', 'release_php-gui')
           );
   $disp_body .= '<tr><td>Development branch</td><td>'.build_select($sel).'</td></tr>'."\n";
 
