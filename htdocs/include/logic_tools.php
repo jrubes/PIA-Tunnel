@@ -195,7 +195,7 @@ function disp_pia_update_client(){
 
   $up = $_pia->get_update_status();
   if(is_int($up) === true && $up == 0 ){
-    $up_txt = '<a href="/?page=tools&amp;cid=tools&amp;cmd=update_software_client">latest release</a>';
+    $up_txt = 'latest release';
   }elseif( $up > 0 ){
     $s = ( $up > 1 ) ? 's' : '';
     $up_txt = '<a href="/?page=tools&amp;cid=tools&amp;cmd=update_software_client">'."$up update{$s} available</a>";

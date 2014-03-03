@@ -26,7 +26,7 @@ fi
 #install Dante SOCKS 5 Proxy
 if [ ! -f "/usr/sbin/sockd" ]; then
     cp /pia/extra_software/dante-1.4.0-bin.tar.xz /tmp/
-    xz -d /tmp/dante-1.4.0-bin.tar.xz ; tar -xvf /tmp/dante-1.4.0-bin.tar -C /tmp/
+    xz -d /tmp/dante-1.4.0-bin.tar.xz ; tar -xf /tmp/dante-1.4.0-bin.tar -C /tmp/
     cp -r /tmp/dante-1.4.0-bin/* /usr/
     rm /tmp/dante-1.4.0-bin.tar ; rm -rf /tmp/dante-1.4.0-bin
 fi

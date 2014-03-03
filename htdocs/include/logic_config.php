@@ -97,14 +97,15 @@ switch($_REQUEST['cmd']){
           if( $settings['GIT_BRANCH'] !== $_POST['GIT_BRANCH'] ){
             $sarg = escapeshellcmd($_POST['GIT_BRANCH']); //this is not proper!
             exec('cd /pia ; git reset --hard HEAD ; git fetch origin ; git checkout '.$sarg.' &> /dev/null');
-            exec('/pia/pia-setup &> /dev/null');
+            exec('chmod ug+x /pia/pia-setup ; /pia/pia-setup &> /dev/null');
+
+            $_settings->save_settings('GIT_BRANCH', $_POST['GIT_BRANCH']);
+            $settings = $_settings->get_settings();
+            $_pia->clear_update_status(); //clear cache to refresh update check
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">git branch switch to $_POST[GIT_BRANCH]</div>\n";
           }
 
-          $_settings->save_settings('GIT_BRANCH', $_POST['GIT_BRANCH']);
-          $settings = $_settings->get_settings();
-          $_pia->clear_update_status(); //clear cache to refresh update checks
-        $disp_body .= "<div id=\"feedback\" class=\"feedback\">git branch switch to $_POST[GIT_BRANCH]</div>\n";
-        break;
+
       }
 
       $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
