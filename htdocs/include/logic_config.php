@@ -874,6 +874,7 @@ function disp_advanced_box(){
   $disp_body .= '<tr><td>Debug Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
 
   $GLOB_disp_network_default_fields .= 'GIT_BRANCH,';
+  $disp_body .= "br: ".$settings['GIT_BRANCH'];
   $sel = array(
             'id' => 'GIT_BRANCH',
             'selected' =>  $settings['GIT_BRANCH'],
@@ -885,7 +886,6 @@ function disp_advanced_box(){
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Network Restart">';
-  $disp_body .= ' &nbsp; <input type="submit" name="switch_branch" value="Switch Branch">';
   $disp_body .= '</div>';
 
   return $disp_body;
