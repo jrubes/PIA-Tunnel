@@ -874,7 +874,6 @@ function disp_advanced_box(){
   $disp_body .= '<tr><td>Debug Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
 
   $GLOB_disp_network_default_fields .= 'GIT_BRANCH,';
-  $disp_body .= "br: ".$settings['GIT_BRANCH'];
   $sel = array(
             'id' => 'GIT_BRANCH',
             'selected' =>  $settings['GIT_BRANCH'],
