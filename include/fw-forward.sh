@@ -170,6 +170,26 @@ if [ ! -z "${FIREWALL_IF_SSH[0]}" ]; then
   done
 fi
 
+#allowing incoming SOCKS traffic
+if [ "$SOCKS_INT_ENABLED" = 'yes' ]; then
+    iptables -A INPUT -i "$IF_INT" -p tcp --dport "$SOCKS_INT_PORT" -j ACCEPT
+    iptables -A INPUT -i "$IF_INT" -p udp --dport "$SOCKS_INT_PORT" -j ACCEPT
+    iptables -A OUTPUT -o "$IF_INT" -m state --state RELATED,ESTABLISHED -j ACCEPT
+	if [ "$VERBOSE_DEBUG" = "yes" ]; then
+		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- SOCKS enabled for interface: $IF_INT"
+	fi
+fi
+if [ "$SOCKS_EXT_ENABLED" = 'yes' ]; then
+    iptables -A INPUT -i "$IF_EXT" -p tcp --dport "$SOCKS_EXT_PORT" -j ACCEPT
+    iptables -A INPUT -i "$IF_EXT" -p udp --dport "$SOCKS_EXT_PORT" -j ACCEPT
+    iptables -A OUTPUT -o "$IF_EXT" -m state --state RELATED,ESTABLISHED -j ACCEPT
+	if [ "$VERBOSE_DEBUG" = "yes" ]; then
+		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- SOCKS enabled for interface: $IF_EXT"
+	fi
+fi
+
 #allowing incoming traffic to web UI
 if [ ! -z "${FIREWALL_IF_WEB[0]}" ]; then
   for interface in "${FIREWALL_IF_WEB[@]}"

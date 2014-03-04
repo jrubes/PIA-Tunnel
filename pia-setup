@@ -23,6 +23,16 @@ if [ ! -f "/usr/bin/zip" ]; then
     apt-get -y install zip unzip
 fi
 
+#install Dante SOCKS 5 Proxy
+if [ ! -f "/usr/sbin/sockd" ]; then
+    cp /pia/extra_software/dante-1.4.0-bin.tar.xz /tmp/
+    xz -d /tmp/dante-1.4.0-bin.tar.xz ; tar -xf /tmp/dante-1.4.0-bin.tar -C /tmp/
+    cp -r /tmp/dante-1.4.0-bin/* /usr/
+    rm /tmp/dante-1.4.0-bin.tar ; rm -rf /tmp/dante-1.4.0-bin
+fi
+
+
+
 #remove /bin/bash from sudoers
 pos=`grep -n '/bin/bash,/sbin/shutdown' /etc/sudoers | gawk -F":" '{print $1}'`
 if [ ! -z "$pos" ]; then
@@ -85,6 +95,7 @@ done
 FILES="fw-forward.sh fw-no-forward.sh functions.sh build_ping_list.sh fix_settings.sh network-interfaces.sh"
 FILES="$FILES network-restart.sh autostart autostart.sh dhcpd-reconfigure.sh dhcpd-start.sh"
 FILES="$FILES dhcpd-stop.sh dhcpd-status.sh update_root.sh fw_get_forward_state.sh autostart_rebuild.sh"
+FILES="$FILES ovpn_kill.sh socks-start.sh socks-status.sh socks-stop.sh socks-reconfigure.sh"
 for f in $FILES
 do
 	chmod ug+x "/pia/include/$f"

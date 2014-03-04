@@ -56,6 +56,20 @@ switch($_REQUEST['cmd']){
         break;
       }
 
+      if( array_key_exists('restart_socks', $_POST) ){
+        $ret = $_services->socks_restart();
+        if( $ret === true ){
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">Dante (SOCKS 5 Proxy) has been restarted</div>\n";
+        }else{
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">".nl2br($ret[1])."</div>\n";
+        }
+        $_services->firewall_fw('stop');
+        $_services->firewall_fw('start');
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
+        $disp_body .= disp_network_default();
+        break;
+      }
+
       if( array_key_exists('restart_dhcpd', $_POST) ){
         $ret = $_services->dhcpd_restart();
         if( $ret === true ){
@@ -63,6 +77,9 @@ switch($_REQUEST['cmd']){
         }else{
           $disp_body .= "<div id=\"feedback\" class=\"feedback\">".nl2br($ret[1])."</div>\n";
         }
+        $_services->firewall_fw('stop');
+        $_services->firewall_fw('start');
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
         $disp_body .= disp_network_default();
         break;
       }
@@ -74,9 +91,27 @@ switch($_REQUEST['cmd']){
         break;
       }
 
+      if( array_key_exists('GIT_BRANCH', $_POST ) === true && $_POST['GIT_BRANCH'] != '' ){
+        global $settings;
+          //check if the git branch needs to be switched
+          if( $settings['GIT_BRANCH'] !== $_POST['GIT_BRANCH'] ){
+            $sarg = escapeshellcmd($_POST['GIT_BRANCH']); //this is not proper!
+            exec('cd /pia ; git reset --hard HEAD ; git fetch origin ; git checkout '.$sarg.' &> /dev/null');
+            exec('chmod ug+x /pia/pia-setup ; /pia/pia-setup &> /dev/null');
+
+            $_settings->save_settings('GIT_BRANCH', $_POST['GIT_BRANCH']);
+            $settings = $_settings->get_settings();
+            $_pia->clear_update_status(); //clear cache to refresh update check
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">git branch switched to $_POST[GIT_BRANCH]</div>\n";
+          }
+
+
+      }
+
       $ret_save = $_settings->save_settings_logic($_POST['store_fields']);
       VPN_generate_interfaces();
       VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
+      VPN_generate_socks_conf(); //create new danted.conf file
       $_pia->rebuild_autostart();
       $disp_body .= "<div id=\"feedback\" class=\"feedback\">Settings updated</div>\n";
       $disp_body .= disp_network_default();
@@ -121,10 +156,18 @@ function VPN_generate_interfaces(){
  * function to generate a new dhcpd.conf file after a config change
  */
 function VPN_generate_dhcpd_conf(){
-  //are not  controlled by this
   $template = dhcpd_process_template();
   $save = escapeshellarg($template);
   exec("sudo /pia/include/dhcpd-reconfigure.sh $save"); //write new dhcpd.conf
+}
+
+/**
+ * function to generate a new danted.conf file after a config change
+ */
+function VPN_generate_socks_conf(){
+  $template = socks_process_template();
+  $save = escapeshellarg($template);
+  exec("sudo /pia/include/socks-reconfigure.sh $save"); //write new dhcpd.conf
 }
 
 /**
@@ -166,6 +209,73 @@ function VPN_get_post_storage_arrays($match=null){
   else{ return $ret; }
 }
 
+/**
+ * function to modify /pia/include/danted.conf in RAM and return the changes
+ * @global object $_files
+ * @return string,bool string containing the modified dhcpd.conf file or false on error
+ */
+function socks_process_template(){
+  global $_files;
+  global $_settings;
+  $SometimesIreallyHatePHP = 1;
+  $templ = $_files->readfile('/pia/include/sockd.conf');
+  $client_templ = "client pass {\n"
+                ."  from: INTERNAL_NETWORK_HERE\n"
+                ."  log: connect disconnect error\n"
+                ."}\n";
+
+  $clients = ''; //contains assembled network declaration
+  $internal = ''; //will replace the internal: line
+  $settings = $_settings->get_settings();
+
+  //update the $template first
+  $templ = str_replace('EXTERNAL_IF_HERE', $settings['IF_TUNNEL'], $templ, $SometimesIreallyHatePHP);
+
+  if( $settings['SOCKS_EXT_ENABLED'] == 'yes' ){
+    $internal .= "internal: {$settings['IF_EXT']} port = {$settings['SOCKS_EXT_PORT']}\n";
+
+    // this is a placeholder since it is getting late and I want to test the new function
+    $network_info = $settings['SOCKS_EXT_FROM'].' port '.$settings['SOCKS_EXT_FROM_PORTRANGE'].' to: '.$settings['SOCKS_EXT_TO'];
+
+    $tmp = $client_templ;
+    $tmp = str_replace('INTERNAL_NETWORK_HERE', $network_info, $tmp, $SometimesIreallyHatePHP);
+
+    $clients .= $tmp;
+    unset($tmp);
+  }
+
+
+  if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
+    $internal .= "internal: {$settings['IF_INT']} port = {$settings['SOCKS_INT_PORT']}\n";
+
+    if( $settings['SOCKS_EXT_FROM'] !== $settings['SOCKS_INT_FROM']
+            || $settings['SOCKS_EXT_FROM_PORTRANGE'] !== $settings['SOCKS_EXT_FROM_PORTRANGE']
+            || $settings['SOCKS_EXT_TO'] !== $settings['SOCKS_EXT_TO'] )
+    {
+      // this is a placeholder since it is getting late and I want to test the new function
+      $network_info = $settings['SOCKS_INT_FROM'].' port '.$settings['SOCKS_INT_FROM_PORTRANGE'].' to: '.$settings['SOCKS_INT_TO'];
+
+      $tmp = $client_templ;
+      $tmp = str_replace('INTERNAL_NETWORK_HERE', $network_info, $tmp, $SometimesIreallyHatePHP);
+    }
+
+
+    $clients .= $tmp;
+    unset($tmp);
+  }
+
+
+  if( $internal == '' || $clients == '' ){ return false; }
+  $internal = trim($internal)."\n";
+  $templ = str_replace('INTERNAL_SETTING_HERE', $internal, $templ, $SometimesIreallyHatePHP);
+
+  $clients = trim($clients)."\n";
+  $templ = str_replace('CLIENT_TEMPLATE_HERE', $clients, $templ, $SometimesIreallyHatePHP);
+  //var_dump($templ);
+  return $templ;
+}
+
+
 
 /**
  * function to modify /pia/include/dhcpd.conf in RAM and return the changes
@@ -175,6 +285,7 @@ function VPN_get_post_storage_arrays($match=null){
 function dhcpd_process_template(){
   global $_files;
   global $_settings;
+  $SometimesIreallyHatePHP = 1;
   $templ = $_files->readfile('/pia/include/dhcpd.conf');
   $subnet_templ = "subnet SUBNET_IP_HERE netmask NETWORK_MASK_HERE {\n"
                   ."  range IP_RANGE_HERE;\n"
@@ -193,7 +304,6 @@ function dhcpd_process_template(){
   for( $x = 1 ; $x < 3 ; ++$x ){
     if( $settings['DHCPD_ENABLED'.$x] == 'yes' ){
       $subnet .= "$subnet_templ\n";
-      $SometimesIreallyHatePHP = 1; //passing this int bý reference will save tremendous ammounts of RAM - AWESOME SHIT!
       $subnet = str_replace('SUBNET_IP_HERE', $settings['DHCPD_SUBNET'.$x], $subnet, $SometimesIreallyHatePHP);
       $subnet = str_replace('NETWORK_MASK_HERE', $settings['DHCPD_MASK'.$x], $subnet, $SometimesIreallyHatePHP);
       $subnet = str_replace('IP_RANGE_HERE', $settings['DHCPD_RANGE'.$x], $subnet, $SometimesIreallyHatePHP);
@@ -261,7 +371,7 @@ function disp_dhcpd_box_new(){
   $disp_body = '';
 
   $disp_body .= '<div class="box options">';
-  $disp_body .= '<h2>DHCP Server  Settings</h2>'."\n";
+  $disp_body .= '<h2>DHCP Server</h2>'."\n";
   $disp_body .= "<table>\n";
 
   //show two subnets
@@ -307,6 +417,81 @@ function disp_dhcpd_box_new(){
 
   return $disp_body;
 }
+
+/**
+ * returns the default UI for this option
+ * @global object $_settings
+ * @return string string with HTML for body of this page
+ */
+function disp_socks_box_new(){
+  global $_settings;
+  global $GLOB_disp_network_default_fields;
+
+  $settings = $_settings->get_settings();
+  $disp_body = '';
+
+  $disp_body .= '<div class="box options">';
+  $disp_body .= '<h2>SOCKS 5 Proxy Server</h2>'."\n";
+  $disp_body .= '<strong>Warning</strong>: experimental feature! <a id="toggle_socks_settings_toggle" href="" onclick="toggle_hide(\'toggle_socks_settings\', \'toggle_socks_settings_toggle\', \'Show Settings,Hide Settings\'); return false;">Show Settings</a><br>';
+  $disp_body .= '<div class="hidden" id="toggle_socks_settings">';
+  $disp_body .= '<ol><li>Innitiate a VPN connection</li><li>Start the proxy using the "Restart Proxy Server" button</li></ol>';
+  $disp_body .= 'Currently without authentication so anyone on YOUR network will be able to use the proxy!'."\n";
+  $disp_body .= "<table>\n";
+
+  $GLOB_disp_network_default_fields .= 'SOCKS_EXT_ENABLED,';
+  $sel = array(
+          'id' => 'SOCKS_EXT_ENABLED',
+          'selected' => $settings['SOCKS_EXT_ENABLED'],
+          'onchange' => "toggle(this, 'SOCKS_EXT_PORT,SOCKS_EXT_FROM,SOCKS_EXT_TO,SOCKS_EXT_FROM_PORTRANGE', 'no', 'disabled', '', '');",
+          array( 'no', 'disabled'),
+          array( 'yes', 'enabled')
+        );
+  $disp_body .= '<tr><td>Public Lan ('.$settings['IF_EXT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disabled = ($settings['SOCKS_EXT_ENABLED'] === 'no') ? 'disabled' : ''; //disable input fields when DHCP is set
+  $GLOB_disp_network_default_fields .= 'SOCKS_EXT_PORT,';
+  $disp_body .= '<tr><td>Listen Port</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_PORT" name="SOCKS_EXT_PORT" value="'.htmlspecialchars($settings['SOCKS_EXT_PORT']).'"></td></tr>'."\n";
+/*  $GLOB_disp_network_default_fields .= 'SOCKS_EXT_FROM,';
+  $disp_body .= '<tr><td>Allow network from</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_FROM" name="SOCKS_EXT_FROM" value="'.htmlspecialchars($settings['SOCKS_EXT_FROM']).'"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'SOCKS_EXT_TO,';
+  $disp_body .= '<tr><td>Allow network to</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_TO" name="SOCKS_EXT_TO" value="'.htmlspecialchars($settings['SOCKS_EXT_TO']).'"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'SOCKS_EXT_FROM_PORTRANGE,';
+  $disp_body .= '<tr><td>Forward port range</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_FROM_PORTRANGE" name="SOCKS_EXT_FROM_PORTRANGE" value="'.htmlspecialchars($settings['SOCKS_EXT_FROM_PORTRANGE']).'"></td></tr>'."\n";
+*/
+
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+
+
+  $GLOB_disp_network_default_fields .= 'SOCKS_INT_ENABLED,';
+  $sel = array(
+          'id' => 'SOCKS_INT_ENABLED',
+          'selected' => $settings['SOCKS_INT_ENABLED'],
+          'onchange' => "toggle(this, 'SOCKS_INT_PORT,SOCKS_INT_FROM,SOCKS_INT_TO,SOCKS_INT_FROM_PORTRANGE', 'no', 'disabled', '', '');",
+          array( 'no', 'disabled'),
+          array( 'yes', 'enabled')
+        );
+  $disp_body .= '<tr><td>Private Lan ('.$settings['IF_INT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disabled = ($settings['SOCKS_INT_ENABLED'] === 'no') ? 'disabled' : ''; //disable input fields when DHCP is set
+  $GLOB_disp_network_default_fields .= 'SOCKS_INT_PORT,';
+  $disp_body .= '<tr><td>Listen Port</td><td><input '.$disabled.' type="text" id="SOCKS_INT_PORT" name="SOCKS_INT_PORT" value="'.htmlspecialchars($settings['SOCKS_INT_PORT']).'"></td></tr>'."\n";
+/*  $GLOB_disp_network_default_fields .= 'SOCKS_INT_FROM,';
+  $disp_body .= '<tr><td>Allow network from</td><td><input '.$disabled.' type="text" id="SOCKS_INT_FROM" name="SOCKS_INT_FROM" value="'.htmlspecialchars($settings['SOCKS_INT_FROM']).'"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'SOCKS_INT_TO,';
+  $disp_body .= '<tr><td>Allow network to</td><td><input '.$disabled.' type="text" id="SOCKS_INT_TO" name="SOCKS_INT_TO" value="'.htmlspecialchars($settings['SOCKS_INT_TO']).'"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'SOCKS_INT_FROM_PORTRANGE,';
+  $disp_body .= '<tr><td>Forward port range</td><td><input '.$disabled.' type="text" id="SOCKS_INT_FROM_PORTRANGE" name="SOCKS_INT_FROM_PORTRANGE" value="'.htmlspecialchars($settings['SOCKS_INT_FROM_PORTRANGE']).'"></td></tr>'."\n";
+*/
+
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+
+  $disp_body .= "</table>\n";
+  $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_socks" value="Restart Proxy Server">';
+  $disp_body .= '</div>';
+  $disp_body .= '</div>';
+
+  return $disp_body;
+}
+
 
 /**
  * returns the default UI for this option
@@ -473,36 +658,6 @@ function disp_pia_daemon_box($tokens){
   return $disp_body;
 }
 
-function disp_webui_box($tokens){
-  global $_settings;
-
-
-  $settings = $_settings->get_settings();
-  $disp_body = '';
-  $fields = ''; //comma separate list of settings offered here
-
-  $disp_body .= '<div class="box options">';
-  $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
-  $disp_body .= '<input type="hidden" name="store" value="web_ui_settings">';
-  $disp_body .= '<h2>Web-UI Settings</h2>'."\n";
-  $disp_body .= "<table>\n";
-  $disp_body .= '<tr><td>Web-UI Username</td><td><input type="text" name="WEB_UI_USER" value="'.htmlspecialchars($settings['WEB_UI_USER']).'"></td></tr>'."\n";
-  $disp_body .= '<tr><td>Web-UI Password</td><td><input type="password" name="WEB_UI_PASSWORD" value="" placeholder="*********"></td></tr>'."\n";
-
-  $fields .= 'WEB_UI_COOKIE_LIFETIME,';
-  $disp_body .= '<tr><td>Remember Me for</td><td><input type="text" class="short" name="WEB_UI_COOKIE_LIFETIME" value="'.htmlspecialchars($settings['WEB_UI_COOKIE_LIFETIME']).'"> days</td></tr>'."\n";
-
-  $disp_body .= "</table>\n";
-  $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
-  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
-  $disp_body .= '</form>';
-  $disp_body .= '</div>';
-
-  return $disp_body;
-
-}
-
 function disp_general_box(){
   global $_settings;
   global $GLOB_disp_network_default_fields;
@@ -526,7 +681,7 @@ function disp_general_box(){
   $disp_body .= '<tr><td>Enable Port Forwarding</td><td>'.build_select($sel).'</td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'FORWARD_IP,';
   $disabled = ( $settings['FORWARD_PORT_ENABLED'] === 'no' ) ? ' disabled ' : '';
-  $disp_body .= '<tr><td>Forward IP</td><td><input type="text" '.$disabled.' id="FORWARD_IP" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'" title="Use as IP in \'DHCP Server Settings\' - \'Fixed IP\'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>Forward to this IP</td><td><input type="text" '.$disabled.' id="FORWARD_IP" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'" title="Use as IP in \'DHCP Server Settings\' - \'Fixed IP\'"></td></tr>'."\n";
 
   //VM LAN segment forwarding
   $GLOB_disp_network_default_fields .= 'FORWARD_VM_LAN,';
@@ -698,7 +853,7 @@ function disp_advanced_box(){
             array( '90', '90%'),
             array( '100', '100%')
           );
-  $disp_body .= '<tr><td>Max allowed packet loss</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>Max packet loss</td><td>'.build_select($sel).'</td></tr>'."\n";
 
   //command line stuff
   $GLOB_disp_network_default_fields .= 'VERBOSE,';
@@ -718,242 +873,23 @@ function disp_advanced_box(){
           );
   $disp_body .= '<tr><td>Debug Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
 
+  $GLOB_disp_network_default_fields .= 'GIT_BRANCH,';
+  $sel = array(
+            'id' => 'GIT_BRANCH',
+            'selected' =>  $settings['GIT_BRANCH'],
+            array( 'release_php-gui', 'release_php-gui')
+          );
+  $disp_body .= '<tr><td>Development branch</td><td>'.build_select($sel).'</td></tr>'."\n";
+
+
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';
-  $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Full Network Restart">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Network Restart">';
   $disp_body .= '</div>';
 
   return $disp_body;
 }
 
-
-function disp_network_box($tokens){
-  global $_settings;
-  $settings = $_settings->get_settings();
-  $disp_body = '';
-  $fields = ''; //comma separate list of settings offered here
-
-  $disp_body .= '<div class="box options">';
-  $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
-  $disp_body .= '<input type="hidden" name="store" value="network_settings">';
-  $disp_body .= '<h2>PIA Network Settings</h2>'."\n";
-  $disp_body .= "<table>\n";
-
-  //basic interface and network
-  $fields .= 'FORWARD_PORT_ENABLED,';
-  $sel = array(
-          'id' => 'FORWARD_PORT_ENABLED',
-          'selected' =>  $settings['FORWARD_PORT_ENABLED'],
-          'onchange' => "toggle(this, 'FORWARD_IP', 'no', 'disabled', '', '');",
-          array( 'yes', 'yes'),
-          array( 'no', 'no')
-        );
-  $disp_body .= '<tr><td>Enable Port Forwarding</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $fields .= 'FORWARD_IP,';
-  $disabled = ( $settings['FORWARD_PORT_ENABLED'] === 'no' ) ? ' disabled ' : '';
-  $disp_body .= '<tr><td>Forward IP</td><td><input type="text" '.$disabled.' id="FORWARD_IP" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'"></td></tr>'."\n";
-
-  //VM LAN segment forwarding
-  $fields .= 'FORWARD_VM_LAN,';
-  $sel = array(
-            'id' => 'FORWARD_VM_LAN',
-            'selected' =>  $settings['FORWARD_VM_LAN'],
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>VPN Gateway for VM LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
-  //use public LAN segment for forwarding
-  $fields .= 'FORWARD_PUBLIC_LAN,';
-  $sel = array(
-            'id' => 'FORWARD_PUBLIC_LAN',
-            'selected' =>  $settings['FORWARD_PUBLIC_LAN'],
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>VPN Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
-
-
-  //ping error threshold
-  $fields .= 'PING_MAX_LOSS,';
-  $sel = array(
-            'id' => 'PING_MAX_LOSS',
-            'selected' =>  $settings['PING_MAX_LOSS'],
-            array( '0', '0%'),
-            array( '5', '5%'),
-            array( '10', '10%'),
-            array( '15', '15%'),
-            array( '20', '20%'),
-            array( '30', '30%'),
-            array( '40', '40%'),
-            array( '50', '50%'),
-            array( '60', '60%'),
-            array( '70', '70%'),
-            array( '80', '80%'),
-            array( '90', '90%'),
-            array( '100', '100%')
-          );
-  $disp_body .= '<tr><td>Max allowed packet loss</td><td>'.build_select($sel).'</td></tr>'."\n";
-
-  //management stuff
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-
-  //these are array settings so get them first then loop over to display them
-  $use = 'FIREWALL_IF_SSH';
-  $fields .= 'FIREWALL_IF_SSH,';
-  $fw_ssh = $_settings->get_settings_array($use);
-  //Wvar_dump($fw_ssh);die();
-  $sel = array(
-            'id' => $use,
-            'selected' =>  $fw_ssh,
-            array( 'FIREWALL_IF_SSH[0]', 'eth0'),
-            array( 'FIREWALL_IF_SSH[1]', 'eth1')
-          );
-  //$sel = array_merge($sel, $fw_ssh);
-  $disp_body .= '<tr><td>Allow ssh logins on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
-
-
-  //now FIREWALL_IF_WEB options
-  $use = 'FIREWALL_IF_WEB';
-  $fields .= 'FIREWALL_IF_WEB,';
-  $fw_ssh = $_settings->get_settings_array($use);
-  //Wvar_dump($fw_ssh);die();
-  $sel = array(
-            'id' => $use,
-            'selected' =>  $fw_ssh,
-            array( 'FIREWALL_IF_WEB[0]', 'eth0'),
-            array( 'FIREWALL_IF_WEB[1]', 'eth1')
-          );
-  //$sel = array_merge($sel, $fw_ssh);
-  $disp_body .= '<tr><td>Allow web logins on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
-
-  $disp_body .= "</table>\n";
-  $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
-  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firewall">';
-  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
-  $disp_body .= '</form>';
-  $disp_body .= '</div>';
-
-  return $disp_body;
-}
-
-function disp_system_box($tokens){
-  global $_settings;
-  $settings = $_settings->get_settings();
-  $disp_body = '';
-  $fields = ''; //comma separate list of settings offered here
-
-  $disp_body .= '<div class="box options">';
-  $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
-  $disp_body .= '<input type="hidden" name="store" value="system_settings">';
-  $disp_body .= '<h2>VM System Settings</h2>'."\n";
-  $disp_body .= "<table>\n";
-
-  //interface assignment
-  $fields .= 'IF_EXT,';
-  $sel = array(
-          'id' => 'IF_EXT',
-          'selected' =>  $settings['IF_EXT'],
-          array( 'eth0', 'eth0'),
-          array( 'eth1', 'eth1'),
-          array( 'tun0', 'tun0')
-        );
-  $disp_body .= '<tr><td>Public LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $fields .= 'IF_INT,';
-  $sel = array(
-          'id' => 'IF_INT',
-          'selected' =>  $settings['IF_INT'],
-          array( 'eth0', 'eth0'),
-          array( 'eth1', 'eth1'),
-          array( 'tun0', 'tun0')
-        );
-  $disp_body .= '<tr><td>VM LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $fields .= 'IF_TUNNEL,';
-  $sel = array(
-          'id' => 'IF_TUNNEL',
-          'selected' =>  $settings['IF_TUNNEL'],
-          array( 'eth0', 'eth0'),
-          array( 'eth1', 'eth1'),
-          array( 'tun0', 'tun0')
-        );
-  $disp_body .= '<tr><td>VPN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
-
-  //eth0
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $disabled = ($settings['IF_ETH0_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
-  $fields .= 'IF_ETH0_DHCP,';
-  $sel = array(
-          'id' => 'IF_ETH0_DHCP',
-          'selected' => $settings['IF_ETH0_DHCP'],
-          'onchange' => "toggle(this, 'IF_ETH0_IP,IF_ETH0_SUB,IF_ETH0_GW', 'yes', 'disabled', '', '');",
-          array( 'yes', 'yes'),
-          array( 'no', 'no')
-        );
-  $disp_body .= '<tr><td>eth0 use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $fields .= 'IF_ETH0_IP,';
-  $disp_body .= '<tr><td>eth1 IP</td><td><input '.$disabled.' type="text" id="IF_ETH0_IP" name="IF_ETH0_IP" value="'.$settings['IF_ETH0_IP'].'"></td></tr>'."\n";
-  $fields .= 'IF_ETH0_SUB,';
-  $disp_body .= '<tr><td>eth1 Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH0_SUB" name="IF_ETH0_SUB" value="'.$settings['IF_ETH0_SUB'].'"></td></tr>'."\n";
-  $fields .= 'IF_ETH0_GW,';
-  $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" id="IF_ETH0_GW" name="IF_ETH0_GW" value="'.$settings['IF_ETH0_GW'].'"></td></tr>'."\n";
-
-  //eth1
-  $disabled = ($settings['IF_ETH1_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $fields .= 'IF_ETH1_DHCP,';
-  $sel = array(
-          'id' => 'IF_ETH1_DHCP',
-          'selected' => $settings['IF_ETH1_DHCP'],
-          'onchange' => "toggle(this, 'IF_ETH1_IP,IF_ETH1_SUB,IF_ETH1_GW', 'yes', 'disabled', '', '');",
-          array( 'yes', 'yes'),
-          array( 'no', 'no')
-        );
-  $disp_body .= '<tr><td>eth1 use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $fields .= 'IF_ETH1_IP,';
-  $disp_body .= '<tr><td>eth1 IP</td><td><input '.$disabled.' type="text" id="IF_ETH1_IP" name="IF_ETH1_IP" value="'.$settings['IF_ETH1_IP'].'"></td></tr>'."\n";
-  $fields .= 'IF_ETH1_SUB,';
-  $disp_body .= '<tr><td>eth1 Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH1_SUB" name="IF_ETH1_SUB" value="'.$settings['IF_ETH1_SUB'].'"></td></tr>'."\n";
-  $fields .= 'IF_ETH1_GW,';
-  $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" id="IF_ETH1_GW" name="IF_ETH1_GW" value="'.$settings['IF_ETH1_GW'].'"></td></tr>'."\n";
-
-  //DNS
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $fields .= 'NAMESERVERS,';
-  $disp_body .= '<tr><td>DNS 1</td><td><input type="text" name="NAMESERVERS[0]" value="'.$settings['NAMESERVERS[0]'].'"></td></tr>'."\n";
-  $disp_body .= '<tr><td>DNS 2</td><td><input type="text" name="NAMESERVERS[1]" value="'.$settings['NAMESERVERS[1]'].'"></td></tr>'."\n";
-  $disp_body .= '<tr><td>DNS 3</td><td><input type="text" name="NAMESERVERS[2]" value="'.$settings['NAMESERVERS[2]'].'"></td></tr>'."\n";
-  $disp_body .= '<tr><td>DNS 4</td><td><input type="text" name="NAMESERVERS[3]" value="'.$settings['NAMESERVERS[3]'].'"></td></tr>'."\n";
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-
-  //command line stuff
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $fields .= 'VERBOSE,';
-  $sel = array(
-            'id' => 'VERBOSE',
-            'selected' =>  $settings['VERBOSE'],
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $fields .= 'VERBOSE_DEBUG,';
-  $sel = array(
-            'id' => 'VERBOSE_DEBUG',
-            'selected' =>  $settings['VERBOSE_DEBUG'],
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>Debug Verbose</td><td>'.build_select($sel).'</td></tr>'."\n";
-
-  $disp_body .= "</table>\n";
-  $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
-  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';
-  $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Full Network Restart">';
-  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
-  $disp_body .= '</form>';
-  $disp_body .= '</div>';
-
-  return $disp_body;
-}
 
 /**
  * returns the default UI for this option
@@ -975,15 +911,12 @@ function disp_network_default(){
 
   $disp_body .= disp_general_box();
   $disp_body .= disp_pia_daemon_box_new();
-  //$disp_body .= disp_network_box($tokens);
-  //$disp_body .= disp_pia_daemon_box($tokens);
-  //$disp_body .= disp_webui_box($tokens);
+  $disp_body .= disp_socks_box_new();
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<p class="hidden" id="advanced_button"><a id="toggle_advanced_settings_toggle" class="button" href="" onclick="toggle_hide(\'toggle_advanced_settings\', \'toggle_advanced_settings_toggle\', \'Show Advanced Settings,Hide Advanced Settings\'); return false;">Show Advanced Settings</a></p>';
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<div id="toggle_advanced_settings">';
   $disp_body .= disp_advanced_box();
-  //$disp_body .= disp_system_box($tokens);
   $disp_body .= disp_dhcpd_box_new();
   $disp_body .= '</div>';
 

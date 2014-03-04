@@ -191,6 +191,7 @@ function disp_pia_update(){
  */
 function disp_pia_update_client(){
   global $_pia;
+  global $settings;
 
   $up = $_pia->get_update_status();
   if(is_int($up) === true && $up == 0 ){
@@ -206,6 +207,16 @@ function disp_pia_update_client(){
   $disp_body .= '<h2>Online Update Client</h2>';
   $disp_body .= 'Updates are downloaded from the project\'s <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
   $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
+
+/*    $disp_body .= '<br><br><form method="post" name="branch" action="/?page=tools&cid=tools&cmd=update_software_client">';
+      $disp_body .= '<span id="git_branch">Switch development branch (*<strong>super duper extra advanced option</strong>*)';
+      $disp_body .= '<br><select name="selected_branch">';
+        $disp_body .= build_git_branch_options();
+      $disp_body .= '</select>';
+      $disp_body .= ' <input type="submit" name="switch_branch" value="Switch Branch">';
+      $disp_body .= '</span>';
+    $disp_body .= '</form>';
+*/
 
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<p> </p>';
@@ -226,6 +237,24 @@ function disp_pia_update_client(){
   $disp_body .= '</div>';
   return $disp_body;
 }
+
+/**
+ * build the dropdown box listing the available git repositories the user may select
+ */
+function build_git_branch_options(){
+  global $settings;
+  $branches = array( 'release_php-gui', 'auth_fail_test');
+  $ret = '';
+
+  $ret .= '<option value="'.$settings['GIT_BRANCH'].'">'.$settings['GIT_BRANCH'].'</option>';
+  foreach( $branches as $branch ){
+    if( $branch !== $settings['GIT_BRANCH'] ){
+      $ret .= '<option value="'.$branch.'">'.$branch.'</option>';
+    }
+  }
+  return $ret;
+}
+
 
 /**
  * returns UI elements in HTML

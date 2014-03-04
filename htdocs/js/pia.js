@@ -31,7 +31,7 @@ function OverviewObj( ){
   /* remove feedback boxes after a few seconds */
   this.clean_feedback = clean_feedback;
   function clean_feedback(){
-    var keep = 3; //keep feedback for at least this many seconds (further delayed by timer)
+    var keep = 10; //keep feedback for at least this many seconds (further delayed by timer)
     var xele = document.getElementById('feedback_expires');
     var fele = document.getElementById('feedback');
     var now = Math.round(Date.now()/1000);
