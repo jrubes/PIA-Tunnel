@@ -303,7 +303,7 @@ function VM_get_status( $output = 'html'){
     case 'error':
       $ret_str .= "<td id=\"vpn_status\">Error: $session_status[1]</td></tr>";
       $ret_arr['vpn_status'] = "Error: $session_status[1]";
-      $_SESSION['connecting2'] = '';
+      $_SESSION['connecting2'] = 'error';
       break;
     default:
       var_dump($session_status);
@@ -320,14 +320,24 @@ function VM_get_status( $output = 'html'){
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
   $ret = array();
   exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  $ret_str .= "<tr><td>Public LAN IP</td><td id=\"public_ip\">$ret[0]</td></tr>";
+  $ret_str .= "<tr><td>Public LAN</td><td id=\"public_ip\">$ret[0]";
+    if( $settings['SOCKS_EXT_ENABLED'] == 'yes' ){
+      $ret_str .= "<br>SOCKS 5 Proxy  on port {$settings['SOCKS_EXT_PORT']}</td></tr>";
+      $ret_arr['SOCKS_EXT_ENABLED'] = "running on port {$settings['SOCKS_EXT_PORT']}";
+    }
+  $ret_str .= '</td></tr>';
   $ret_arr['public_ip'] = $ret[0];
   unset($ret);
 
   $ret = array();
   exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if(array_key_exists('0', $ret) ){
-    $ret_str .= "<tr><td>Private LAN IP</td><td id=\"private_ip\">$ret[0]</td></tr>";
+    $ret_str .= "<tr><td>Private LAN</td><td id=\"private_ip\">$ret[0]";
+    if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
+      $ret_str .= "<br>SOCKS 5 Proxy  on port {$settings['SOCKS_INT_PORT']}</td></tr>";
+      $ret_arr['SOCKS_INT_ENABLED'] = "running on port {$settings['SOCKS_INT_PORT']}";
+    }
+  $ret_str .= '</td></tr>';
     $ret_arr['private_ip'] = $ret[0];
   }else{
     $ret_str .= "<tr><td>Private IP</td><td id=\"private_ip\">please refresh the page</td></tr>";
@@ -349,7 +359,7 @@ function VM_get_status( $output = 'html'){
     $vpn_pub = array();
     exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
     if( array_key_exists( '0', $vpn_pub) === true ){
-      $ret_str .= "<tr><td>VPN Public IP</td><td id=\"vpn_public_ip\">$vpn_pub[0]</td></tr>";
+      $ret_str .= "<tr><td>VPN Public</td><td id=\"vpn_public_ip\">$vpn_pub[0]</td></tr>";
       $ret_arr['vpn_public_ip'] = $vpn_pub[0];
       $msg = ( $settings['FORWARD_PORT_ENABLED'] == 'no' ) ? '(Port Forwarding not enabled)' : '';
       $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td id=\"vpn_port\">$port $msg</td></tr>" : "<tr><td>VPN Port:</td><td>not supported by location</td></tr>";
@@ -399,6 +409,7 @@ function VM_get_status( $output = 'html'){
  */
 function VPN_sessionlog_status(){
   global $_files;
+  global $_pia;
 
   $content = $_files->readfile('/pia/cache/session.log');
   if( $content == '' ){
@@ -437,8 +448,23 @@ function VPN_sessionlog_status(){
             && strpos($content, 'TUN/TAP device tun0 opened') !== false ){
       return array('connected');
     }elseif( strpos($content, 'Received AUTH_FAILED control message') !== false ){
-      exec('sudo /pia/pia-daemon stop &> /dev/null ; rm -rf /pia/cache/pia-daemon.log');
-      return array('error', 'Authentication error. Please check your username and password.');
+      //auth will sometimes fail even with correct credentials
+      //will have to allow auth to fail a few times before terminating the connection attempt
+      if( !isset($_SESSION['conn_auth_fail_cnt']) ){
+        $_SESSION['conn_auth_fail_cnt'] = 0; //counts errors
+        $_SESSION['conn_auth_perma_error'] = false; //true if error count is exceeded
+      }
+      if( $_SESSION['conn_auth_fail_cnt'] > 3 ){
+        $_pia->clear_session();
+        $_SESSION['conn_auth_fail_cnt'] = 0;
+        $_SESSION['conn_auth_perma_error'] = true;
+        exec('killall pia-start; /pia/include/ovpn_kill.sh; sudo /pia/pia-daemon stop &> /dev/null ; rm -rf /pia/cache/pia-daemon.log');
+
+      }elseif( $_SESSION['conn_auth_perma_error'] === false ){
+        ++$_SESSION['conn_auth_fail_cnt'];
+      }
+      return array('error', 'Authentication failed '.$_SESSION['conn_auth_fail_cnt'].' of 3 times. Please check your username and password.');
+
     }elseif( strpos($content, 'process exiting') !== false ){
       return array('disconnected');
     }elseif( strpos($content, 'UDPv4 link remote: [AF_INET]') !== false

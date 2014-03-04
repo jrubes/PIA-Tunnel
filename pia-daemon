@@ -7,9 +7,10 @@ source '/pia/include/functions.sh'
 
 
 # How it works
-# *) pia-start initiates a connection
-# *) this daemon script is startet which will send one ping every n seconds through the tunnel
-# 	if the ping fails n times the tunnel is closed or restartet
+# *) pia-start initiates the VPN connection
+# *) pia-daeomon is started when VPN is established. the script will send one ping every
+     n seconds through the tunnel to check if the VPN is still up.
+#       if the ping fails n times the tunnel is closed or restarted
 
 
 # check for "stop" $1 which kills all pia-daemons

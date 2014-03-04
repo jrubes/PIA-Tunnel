@@ -191,3 +191,25 @@ ret=`grep -c "PING_MAX_LOSS" /pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'PING_MAX_LOSS="20"' >> '/pia/settings.conf'
 fi
+
+#SOCKS proxy failure
+ret=`grep -c "SOCKS_EXT_ENABLED" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'SOCKS_EXT_ENABLED="no"' >> '/pia/settings.conf'
+  echo 'SOCKS_EXT_PORT="8080"' >> '/pia/settings.conf'
+  echo 'SOCKS_EXT_FROM="0.0.0.0/0"' >> '/pia/settings.conf'
+  echo 'SOCKS_EXT_TO="0.0.0.0/0"' >> '/pia/settings.conf'
+  echo 'SOCKS_EXT_FROM_PORTRANGE="1-65535"' >> '/pia/settings.conf'
+
+  echo 'SOCKS_INT_ENABLED="no"' >> '/pia/settings.conf'
+  echo 'SOCKS_INT_PORT="8080"' >> '/pia/settings.conf'
+  echo 'SOCKS_INT_FROM="0.0.0.0/0"' >> '/pia/settings.conf'
+  echo 'SOCKS_INT_TO="0.0.0.0/0"' >> '/pia/settings.conf'
+  echo 'SOCKS_INT_FROM_PORTRANGE="1-65535"' >> '/pia/settings.conf'
+fi
+
+# git branch setting for online updates
+ret=`grep -c "GIT_BRANCH" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'GIT_BRANCH="release_php-gui"' >> '/pia/settings.conf'
+fi

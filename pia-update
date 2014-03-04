@@ -12,6 +12,7 @@ git pull origin
 
 #run pia-setup to fix permissions from git pull
 echo
+chmod u+x /pia/pia-setup
 /pia/pia-setup
 
 

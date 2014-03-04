@@ -88,6 +88,25 @@ host statichost {
 }
 
 
+5) Install dante 1.4
+I include a dante binary in /extra_software/ within the git repo because the VM does not come with a
+build environment. use it or roll your own
+   apt-get install build-essential
+   Download 1.4 release from http://www.inet.no/dante/download.html
+   tar -zxvf dante-1.4.0.tar.gz
+   cd dante-1.4.0
+   ./configure --without-upnp --without-libwrap --prefix=/usr/src/dante-1.4.0-bin/
+   make
+   make install
+
+OR
+  cd /tmp ; cp /pia/extra_software/dante-1.4.0-bin.tar.xz .
+  xz -d dante-1.4.0-bin.tar.xz ; tar -xvf dante-1.4.0-bin.tar
+  cp -r dante-1.4.0-bin/* /usr/
+  rm dante-1.4.0-bin.tar ; rm -rf dante-1.4.0-bin
+
+
+
 5) crontab -e
     0 6/* * * * ntpd -q > /dev/null
 

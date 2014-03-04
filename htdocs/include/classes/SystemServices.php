@@ -129,6 +129,55 @@ function dhcpd_stop(){
 
 }
 
+/**
+ * stop dante (SOCKS 5) and verify status with service status
+ * @return bool,array true on success or [0])false, [1]=error message
+ */
+function socks_start(){
+  //this function is a quick hack which needs to match dhcpd_start() later
+
+  /* dante does not support "service foo status" --- this is DEV - so just fucking start it :) */
+  $restart = array();
+  exec('sudo "/pia/include/socks-start.sh"', $restart );
+  return true;
+
+}
+
+
+/**
+ * stop dante (SOCKS 5) and verify status with service status
+ * @return bool,array true on success or [0])false, [1]=error message
+ */
+function socks_stop(){
+  //this function is a quick hack which needs to match dhcpd_stop() later
+
+  /* dante does not support "service foo status" --- this is DEV - so just fucking kill it :) */
+  $restart = array();
+  exec('sudo "/pia/include/socks-stop.sh"', $restart );
+  return true;
+
+}
+
+/**
+ * method to restart a service using NAME-restart.sh and check the return
+ * @return bool,array TRUE on success or [0]=false [1]=error message
+ */
+function socks_restart(){
+
+  $ret = $this->socks_stop();
+  if( $ret !== true ){
+    return $ret;
+  }
+
+
+  $ret = $this->socks_start();
+  if( $ret !== true ){
+    return $ret;
+  }
+
+  return true;
+}
+
 
 
 }
