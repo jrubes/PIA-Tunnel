@@ -1,19 +1,21 @@
 This is a cut and paste file so getting everything working should only take a few minutes!
 
-1) Install minimum Debian with SSH Server, nothing else!
+10) Install minimum Debian with SSH Server, nothing else!
   * 2GB VM disk
     * 100MB for SWAP, rest for /
   * 92MB RAM for VM - 128MB during installation
   * Set to en_US.UTF-8 locale or change with 'dpkg-reconfigure locales' later on
 
-1.2) For Debian without SSH Server
+20) For Debian without SSH Server
       apt-get install -y openssh-server
 
-1.5)   echo 'APT::Install-Recommends "0" ; APT::Install-Suggests "0" ;' >> /etc/apt/apt.conf.d/70debconf
+30)	echo 'APT::Install-Recommends "0" ; APT::Install-Suggests "0" ;' >> /etc/apt/apt.conf.d/70debconf
 
-1.6) delete non root user with userdel -r USER
+40)	delete non root user with userdel -r USER
 
-2) apt-get install -y psmisc openvpn dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt sudo ca-certificates
+
+
+50) apt-get install -y psmisc openvpn dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt sudo ca-certificates
 update-rc.d  ntp remove
 update-rc.d  mpt-statusd remove
 update-rc.d lighttpd enable
@@ -24,15 +26,17 @@ usermod -G vpnvm www-data
 usermod -G vpnvm root
 
 
-2.4)  avoid using SWAP
+60)  avoid using SWAP
       echo "0" > /proc/sys/vm/swappiness
 
 
-2.5) vi /etc/dhcp/dhclient.conf
+	  
+70) vi /etc/dhcp/dhclient.conf
   on line 21 add
     supersede domain-name-servers 8.8.8.8, 208.67.222.222, 8.8.4.4, 208.67.220.220;
 
-3) in /etc/network/interfaces add the following
+	
+80) in /etc/network/interfaces add the following
 
 # The primary network interface
 allow-hotplug eth0
@@ -48,8 +52,9 @@ iface eth1 inet static
         netmask 255.255.255.0
 
 
+		
 
-4) /etc/dhcp/dhcpd.conf (delete all and paste below)
+90) /etc/dhcp/dhcpd.conf (delete all and paste below)
 # dhcpd.conf
 # option definitions common to all supported networks...
 option domain-name "localdomain.local";
@@ -88,49 +93,72 @@ host statichost {
 }
 
 
-5) Install dante 1.4
-I include a dante binary in /extra_software/ within the git repo because the VM does not come with a
-build environment. use it or roll your own
-   apt-get install build-essential
-   Download 1.4 release from http://www.inet.no/dante/download.html
-   tar -zxvf dante-1.4.0.tar.gz
-   cd dante-1.4.0
-   ./configure --without-upnp --without-libwrap --prefix=/usr/src/dante-1.4.0-bin/
-   make
-   make install
-
-OR
-  cd /tmp ; cp /pia/extra_software/dante-1.4.0-bin.tar.xz .
-  xz -d dante-1.4.0-bin.tar.xz ; tar -xvf dante-1.4.0-bin.tar
-  cp -r dante-1.4.0-bin/* /usr/
-  rm dante-1.4.0-bin.tar ; rm -rf dante-1.4.0-bin
 
 
+100) Build your own Dante 1.4 binary (optional)
+Debian provides an obsolete Dante v1.1 binary and PIA-Tunnel requires features from Dante 1.4.
+You may use the included binary which will be installed by pia-setup, so you should skip this step.
+You may also compile your own using the following steps.
+	*WARNING* pia-setup will use the repo version if "/usr/sbin/sockd" is not found. It is also possible
+	that a later software update will overwrite your custom solution. This depends on how I will implement
+	a Dante 1.4.0 to Dante 1.4.x upgrade....
+	
+	apt-get install build-essential
+  Download latest 1.4 release from http://www.inet.no/dante/download.html
+  Example command (may not be latest): wget http://www.inet.no/dante/files/dante-1.4.0.tar.gz
+	tar -zxf dante-1.4.0.tar.gz
+	cd dante-1.4.0
+	./configure --without-upnp --without-libwrap
+	make
+	make install
 
-5) crontab -e
+OR this is how I created the package in /pia/extra_software/
+	apt-get install build-essential
+	cd /usr/src
+  Download latest 1.4 release from http://www.inet.no/dante/download.html
+  Example command (may not be latest): wget http://www.inet.no/dante/files/dante-1.4.0.tar.gz
+	tar -zxf dante-1.4.0.tar.gz
+	cd dante-1.4.0
+	./configure --without-upnp --without-libwrap --prefix=/usr/src/dante-1.4.0-bin/
+	make
+	make install
+	cd /usr/src/ ; tar -cvf dante-1.4.0-bin.tar /usr/src/dante-1.4.0-bin/
+	xz -z -e dante-1.4.0-bin.tar
+	rm -rf /usr/src/dante-1.4.0/
+	rm -rf /usr/src/dante-1.4.0-bin/
+
+
+110) crontab -e
     0 6/* * * * ntpd -q > /dev/null
 
-6) vi /etc/inittab
-  Replace this (line 54)
-  1:2345:respawn:/sbin/getty 38400 tty1
-  with
-  1:2345:respawn:/sbin/getty --noclear 38400 tty1
+	
+	
+120) vi /etc/inittab
+	Replace this (line 54)
+	1:2345:respawn:/sbin/getty 38400 tty1
+	with
+	1:2345:respawn:/sbin/getty --noclear 38400 tty1
 
-6.5) vi /etc/sudoers
+  
+130) vi /etc/sudoers
   Add this on line 21
     www-data pia-tunnel = NOPASSWD: /pia/*,/pia/include/*,/sbin/shutdown
 
 
-7) mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
-   git clone https://github.com/KaiserSoft/PIA-Tunnel.git /pia
+140) 
+	mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
+	git clone https://github.com/KaiserSoft/PIA-Tunnel.git /pia
 
-8) chmod 777 /pia/pia-setup ; /pia/pia-setup
+   
+150)	chmod 777 /pia/pia-setup ; /pia/pia-setup
 
-9) vi /etc/rc.local
+
+160) vi /etc/rc.local
 #execute PIA start scripts
 /pia/include/autostart.sh
 
-10) paste the block below into a bash terminal
+
+170) paste the block below into a bash terminal
 BLMODS="psmouse snd snd_pcm snd_pcsp snd_timer parport parport_pc pcspkr floppy"
 for mod in $BLMODS
 do
@@ -139,8 +167,10 @@ done
 depmod -a ; update-initramfs -u
 
 
-11) /pia/reset-pia ; halt
 
 
-12) Export to OVF Template and compress with
+
+180) /pia/reset-pia ; halt
+
+190) Export to OVF Template and compress with
     7z a -mx9 -m0=lzma2 -md=128m -ms=on -mmt=off -t7z "PIA-Tunnel-release_php-gui-2013-11-23.7z" "PIA-Tunnel-release_php-gui-2013-11-23/"
