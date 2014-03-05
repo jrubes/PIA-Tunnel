@@ -134,12 +134,24 @@ function dhcpd_stop(){
  * @return bool,array true on success or [0])false, [1]=error message
  */
 function socks_start(){
-  //this function is a quick hack which needs to match dhcpd_start() later
 
-  /* dante does not support "service foo status" --- this is DEV - so just fucking start it :) */
-  $restart = array();
-  exec('sudo "/pia/include/socks-start.sh"', $restart );
-  return true;
+  //try to start the process 10 times before giving up
+  for( $protect = 0 ; $protect < 10 ; ++$protect ){
+    $stat = $this->socks_status(false);
+
+    if( $stat === 'not running' )
+    {
+      exec('sudo "/pia/include/socks-start.sh"');
+      usleep(50000);
+
+    }elseif( $stat === 'running' ){
+      return true;
+
+    }else{
+      return array( false, 'unexpected return in socks_stop();');
+    }
+  }
+  return array( false, 'ERROR: Unable to start the SOCKS 5 proxy server!');
 
 }
 
@@ -149,12 +161,24 @@ function socks_start(){
  * @return bool,array true on success or [0])false, [1]=error message
  */
 function socks_stop(){
-  //this function is a quick hack which needs to match dhcpd_stop() later
 
-  /* dante does not support "service foo status" --- this is DEV - so just fucking kill it :) */
-  $restart = array();
-  exec('sudo "/pia/include/socks-stop.sh"', $restart );
-  return true;
+  //try to kill the process 10 times before giving up
+  for( $protect = 0 ; $protect < 10 ; ++$protect ){
+    $stat = $this->socks_status(false);
+
+    if( $stat === 'running' )
+    {
+      exec('sudo "/pia/include/socks-stop.sh"');
+      usleep(50000);
+
+    }elseif( $stat === 'not running' ){
+      return true;
+
+    }else{
+      return array( false, 'unexpected return in socks_stop();');
+    }
+  }
+  return array( false, 'ERROR: Unable to terminate the SOCKS 5 proxy server! A restart could fix this ;)');
 
 }
 
@@ -167,26 +191,37 @@ function socks_stop(){
  *                    <li>'error'</li>
  *                </ul>
  */
-function socks_status(){
-  $ret = array();
-  exec('sudo "/pia/include/socks-status.sh"', $ret );
+function socks_status( $use_cache = true ){
+  static $cached = ''; //short time cache for multiple calls to this method
 
-  switch( $ret[0] )
+  if( $use_cache === false || $cached === '' )
   {
-    case 'pid file not found':
-      return $ret[0];
+    $ret = array();
+    exec('sudo "/pia/include/socks-status.sh"', $ret );
 
-    case 'running':
-      return $ret[0];
+    switch( $ret[0] )
+    {
+      case 'pid file not found':
+        $cached = 'pid file not found';
+        return $ret[0];
 
-    case 'not running':
-      return $ret[0];
+      case 'running':
+        $cached = 'running';
+        return $ret[0];
 
-    default:
-      return 'error';
+      case 'not running':
+        $cached = 'not running';
+        return $ret[0];
+
+      default:
+        $cached = 'not running';
+        return 'error';
+    }
+    return 'error';
+
+  }else{
+    return $cached;
   }
-
-  return 'error';
 }
 
 
@@ -196,18 +231,26 @@ function socks_status(){
  */
 function socks_restart(){
 
-  $ret = $this->socks_stop();
-  if( $ret !== true ){
-    return $ret;
+  if( $this->socks_status() === 'running' )
+  {
+    $ret = $this->socks_stop();
+    if( $ret !== true ){
+      return $ret;
+    }
   }
 
 
-  $ret = $this->socks_start();
-  if( $ret !== true ){
-    return $ret;
+  if( $this->socks_status() === 'not running' )
+  {
+    $ret = $this->socks_start();
+    if( $ret === true ){
+      return true;
+    }else{
+      return $ret;
+    }
   }
 
-  return true;
+  return false;
 }
 
 
