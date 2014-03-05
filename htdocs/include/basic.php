@@ -265,7 +265,7 @@ function VM_get_status( $output = 'html'){
   global $_pia;
   $settings = $_settings->get_settings();
 
-  $ret_str = '<table id="vm_status">';
+  $ret_str = '<table id="vm_status"><tbody>';
   $ret_arr = array();
 
   $up = $_pia->get_update_status();
@@ -391,7 +391,7 @@ function VM_get_status( $output = 'html'){
     }
   }
 
-  $ret_str .= "</table>\n";
+  $ret_str .= "</tbody></table>\n";
 
   if( $output === 'array'){
     return $ret_arr;
