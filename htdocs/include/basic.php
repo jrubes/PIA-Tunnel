@@ -381,7 +381,7 @@ function VM_get_status( $output = 'html'){
   $ret = array();
   exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if(array_key_exists('0', $ret) ){
-    $ret_str .= '<tr><td style="vertical-align: top;">Private LAN</td>';
+    $ret_str .= '<tr><td style="vertical-align: top;">VM LAN</td>';
     $ret_str .= "<td id=\"private_ip\">IP $ret[0]<br>";
 
     $fw_forward_state = $_pia->check_forward_state();
