@@ -319,13 +319,12 @@ function VM_get_status( $output = 'html'){
 
             $ret_str .= '</td></tr>';
 
-          }else{
+          }
+        }else{
+          if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
             $ret_str .= "<tr><td>Forwarding</td><td>currently disabled</td></tr>";
             $ret_arr['forwarding_port'] = "currently disabled";
           }
-        }else{
-          $ret_str .= "<tr><td>Forwarding</td><td>currently disabled</td></tr>";
-          $ret_arr['forwarding_port'] = "currently disabled";
         }
 
 
