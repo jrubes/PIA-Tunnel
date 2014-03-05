@@ -20,8 +20,10 @@ function OverviewObj( ){
     /* this will be executed after a successful http request */
     callback = function(ret){
       var ele = document.getElementById('system_status');
-      ele.innerHTML = '';
-      ele.innerHTML = ret;
+      if( ele.innerHTML !== ret ){
+        ele.innerHTML = '';
+        ele.innerHTML = ret;
+      }
     };
 
     _request.post( 'status_update', url, pdata, callback);
