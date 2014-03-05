@@ -127,14 +127,6 @@ find /var/www -type f -exec chmod 0640 {} \;
 rm -rf "/pia/cache/webui-update_status.txt"
 
 
-#ensure socks pid file is proper
-if [ ! -f "/run/sockd.pid" ]; then
-  touch /run/sockd.pid
-fi
-chown proxy /run/sockd.pid
-chmod u+rw /run/sockd.pid
-
-
 # add "automatic update" cronjob
 crontab -l > /tmp/crontab.piaout
 ret=`grep -c "apt-get upgrade" /tmp/crontab.piaout`

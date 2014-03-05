@@ -470,6 +470,7 @@ function VPN_sessionlog_status(){
     if( strpos($content, 'Initialization Sequence Completed') !== false
             && strpos($content, 'TUN/TAP device tun0 opened') !== false ){
       return array('connected');
+      
     }elseif( strpos($content, 'Received AUTH_FAILED control message') !== false ){
       //auth will sometimes fail even with correct credentials
       //will have to allow auth to fail a few times before terminating the connection attempt
@@ -490,9 +491,11 @@ function VPN_sessionlog_status(){
 
     }elseif( strpos($content, 'process exiting') !== false ){
       return array('disconnected');
+
     }elseif( strpos($content, 'UDPv4 link remote: [AF_INET]') !== false
             || strpos($content, 'connecting to') !== false ){ //needs to be after error checks!
       return array('connecting');
+
     }else{
       return array('unkown status');
     }

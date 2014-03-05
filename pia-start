@@ -91,6 +91,12 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 	  if [ "$RET_PING_HOST" = "OK" ]; then
 	    # show connection data
 	    echo_conn_established $filename
+
+        #time to (re)start the proxy
+        if [ "${SOCKS_EXT_ENABLED}" = 'yes' ] || [ "${SOCKS_INT_ENABLED}" = 'yes' ]; then
+          /pia/include/socks-start.sh
+        fi
+
 	    #start firewall and enable forwarding
 	    /pia/pia-forward start quite
 
@@ -110,7 +116,7 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 	  #endless loop protect, about 30 seconds
 	  if [ "$LOOP_PROTECT" -eq 30 ]; then
 		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- VPN connectionfail- please check /pia/cache/session.log for details."
+			"- VPN connection fail - please check /pia/cache/session.log for details."
 	    killall openvpn 2>/dev/null
 	    /pia/pia-forward stop quite
 	    exit
