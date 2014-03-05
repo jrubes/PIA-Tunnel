@@ -135,6 +135,17 @@ chown proxy /run/sockd.pid
 chmod u+rw /run/sockd.pid
 
 
+# add "automatic update" cronjob
+crontab -l > /tmp/crontab.piaout
+ret=`grep -c "apt-get upgrade" /tmp/crontab.piaout`
+if [ $ret = 0 ]; then
+  echo '00 04 * * * apt-get update -y ; apt-get upgrade -y' >> '/tmp/crontab.piaout'
+  crontab /tmp/crontab.piaout
+  rm /tmp/crontab.piaout
+fi
+
+
+
 #add missing settings to settings.conf
 /pia/include/fix_settings.sh
 
