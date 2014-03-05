@@ -16,7 +16,6 @@ if [ "${socks_stat}" = 'running' ]; then
       /pia/include/socks-stop.sh
 
     elif [ "${socks_stat}" = 'not running' ]; then
-      echo "sockd stopped"
       break
     fi
 
