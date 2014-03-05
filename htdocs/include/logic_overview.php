@@ -86,23 +86,36 @@ switch($_REQUEST['cmd']){
   case 'socks_proxy_control':
     if( $_token->pval($_POST['token'], 'handle user request - start or restart SOCKS proxy') === true ){
       if( array_key_exists('socks_start', $_POST) === true ){
-        $socks_stat = $_services->socks_status();
-        if( $socks_stat === 'running' ){
+        if( $_services->socks_status() === 'running' ){
           $_services->socks_stop();
           $_services->socks_start();
           $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been restarted</div>\n";
-        }elseif( $socks_stat === 'not running'){
-          $_services->socks_stop();
+
+          $_services->firewall_fw('stop');
+          $_services->firewall_fw('start');
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
+
+        }elseif( $_services->socks_status() === 'not running'){
           $_services->socks_start();
           $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been started</div>\n";
+
+          $_services->firewall_fw('stop');
+          $_services->firewall_fw('start');
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
+
+
         }else{
-          $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS 5 Proxy. Please send the following to the devloper: return of socks-status.sh: $socks_stat</div>\n";
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS 5 Proxy. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
         }
 
 
       }elseif( array_key_exists('socks_stop', $_POST) === true ){
         $_services->socks_stop();
         $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been stopped</div>\n";
+
+        $_services->firewall_fw('stop');
+        $_services->firewall_fw('start');
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
       }
     }else{
       $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
@@ -111,7 +124,7 @@ switch($_REQUEST['cmd']){
     $disp_body .= disp_default();
     break;
 
-    
+
   case 'firewall_control':
     if( $_token->pval($_POST['token'], 'handle user request - start or stop the firewall') === true ){
       if( array_key_exists('firewall_enable', $_POST) === true ){
