@@ -56,20 +56,6 @@ switch($_REQUEST['cmd']){
         break;
       }
 
-      if( array_key_exists('restart_socks', $_POST) ){
-        $ret = $_services->socks_restart();
-        if( $ret === true ){
-          $disp_body .= "<div id=\"feedback\" class=\"feedback\">Dante (SOCKS 5 Proxy) has been restarted</div>\n";
-        }else{
-          $disp_body .= "<div id=\"feedback\" class=\"feedback\">".nl2br($ret[1])."</div>\n";
-        }
-        $_services->firewall_fw('stop');
-        $_services->firewall_fw('start');
-        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
-        $disp_body .= disp_network_default();
-        break;
-      }
-
       if( array_key_exists('restart_dhcpd', $_POST) ){
         $ret = $_services->dhcpd_restart();
         if( $ret === true ){
@@ -485,7 +471,6 @@ function disp_socks_box_new(){
 
   $disp_body .= "</table>\n";
   $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= ' &nbsp; <input type="submit" name="restart_socks" value="Restart Proxy Server">';
   $disp_body .= '</div>';
   $disp_body .= '</div>';
 

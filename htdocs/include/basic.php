@@ -281,6 +281,15 @@ function VM_get_status( $output = 'html'){
   $ret_str .= '<tr><td>Software</td><td id="software_update">'.$up_txt.'</td></tr>';
   $ret_arr['software_update'] = $up;
 
+  if( $_pia->status_pia_daemon() === 'running' ){
+    $ret_str .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
+    $ret_arr['daemon_status'] = "running (autostart:{$settings['DAEMON_ENABLED']})";
+  }else{
+    $ret_str .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">not running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
+    $ret_arr['daemon_status'] = "not running (autostart:{$settings['DAEMON_ENABLED']})";
+  }
+
+
   //check session.log if for current status
   $session_status = VPN_sessionlog_status();
   $ret_str .= "<tr><td style=\"width:7em\">Status</td>";
@@ -290,6 +299,38 @@ function VM_get_status( $output = 'html'){
       $ret_str .= "<td id=\"vpn_status\">Connected to $_SESSION[connecting2]</td></tr>";
       $ret_arr['vpn_status'] = "Connected to $_SESSION[connecting2]";
       $_SESSION['connecting2'] = '';
+      $ret_str .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
+
+      $port = VPN_get_port();
+      $vpn_pub = array();
+      exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
+      if( array_key_exists( '0', $vpn_pub) === true ){
+        $ret_str .= "<tr><td style=\"vertical-align: top;\">Public VPN</td><td id=\"vpn_public_ip\">IP $vpn_pub[0] ";
+        $ret_arr['vpn_public_ip'] = $vpn_pub[0];
+        $ret_str .= ($port != '') ? "Port $port $msg<br>" : '';
+        $ret_arr['vpn_port'] = ($port != '') ? "$port $msg" : '';
+        $ret_str .= '</td></tr>';
+
+        $fw_forward_state = $_pia->check_forward_state();
+        if( $fw_forward_state === true && $port != '' ){
+          if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
+            $ret_str .= "<tr><td style=\"vertical-align: top;\">Forwarding</td><td>$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]<br>";
+            $ret_arr['forwarding_port'] = "$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]";
+
+            $ret_str .= '</td></tr>';
+
+          }else{
+            $ret_str .= "<tr><td>Forwarding</td><td>currently disabled</td></tr>";
+            $ret_arr['forwarding_port'] = "currently disabled";
+          }
+        }else{
+          $ret_str .= "<tr><td>Forwarding</td><td>currently disabled</td></tr>";
+          $ret_arr['forwarding_port'] = "currently disabled";
+        }
+
+
+      }
+      unset($vpn_pub);
       break;
     case 'connecting':
       $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5643';
@@ -310,34 +351,54 @@ function VM_get_status( $output = 'html'){
       var_dump($session_status);
   }
 
-  if( $_pia->status_pia_daemon() === 'running' ){
-    $ret_str .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
-    $ret_arr['daemon_status'] = "running (autostart:{$settings['DAEMON_ENABLED']})";
-  }else{
-    $ret_str .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">not running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
-    $ret_arr['daemon_status'] = "not running (autostart:{$settings['DAEMON_ENABLED']})";
-  }
 
+  $ret_str .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
   $ret = array();
   exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  $ret_str .= "<tr><td>Public LAN</td><td id=\"public_ip\">$ret[0]";
-    if( $_services->socks_status() === 'running' && $settings['SOCKS_EXT_ENABLED'] == 'yes' ){
-      $ret_str .= "<br>SOCKS 5 Proxy  on port {$settings['SOCKS_EXT_PORT']}";
-      $ret_arr['SOCKS_EXT_ENABLED'] = "running on port {$settings['SOCKS_EXT_PORT']}";
+  $ret_str .= '<tr><td style="vertical-align: top;">Public LAN</td>';
+
+  $ret_str .= "<td id=\"public_ip\">IP $ret[0]<br>";
+
+  $fw_forward_state = $_pia->check_forward_state();
+  $ret_str .= ( $fw_forward_state === true && $settings['FORWARD_PUBLIC_LAN'] === 'yes' )
+                ? 'VPN Gateway enabled<br>'
+                : 'VPN Gateway disabled<br>';
+
+  if( $settings['SOCKS_EXT_ENABLED'] == 'yes' ){
+    if( $_services->socks_status() === 'running' ){
+      $ret_str .= "SOCKS 5 Proxy on port {$settings['SOCKS_EXT_PORT']}";
+      $ret_arr['SOCKS_EXT_ENABLED'] = "on port {$settings['SOCKS_EXT_PORT']}";
+    }else{
+      $ret_str .= "SOCKS 5 Proxy NOT running";
+      $ret_arr['SOCKS_EXT_ENABLED'] = "NOT running";
     }
+  }
   $ret_str .= '</td></tr>';
   $ret_arr['public_ip'] = $ret[0];
   unset($ret);
 
+  $ret_str .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
   $ret = array();
   exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if(array_key_exists('0', $ret) ){
-    $ret_str .= "<tr><td>Private LAN</td><td id=\"private_ip\">$ret[0]";
-    if( $_services->socks_status() === 'running' && $settings['SOCKS_INT_ENABLED'] == 'yes' ){
-      $ret_str .= "<br>SOCKS 5 Proxy  on port {$settings['SOCKS_INT_PORT']}";
-      $ret_arr['SOCKS_INT_ENABLED'] = "running on port {$settings['SOCKS_INT_PORT']}";
+    $ret_str .= '<tr><td style="vertical-align: top;">Private LAN</td>';
+    $ret_str .= "<td id=\"private_ip\">IP $ret[0]<br>";
+
+    $fw_forward_state = $_pia->check_forward_state();
+    $ret_str .= ( $fw_forward_state === true && $settings['FORWARD_VM_LAN'] === 'yes' )
+                  ? 'VPN Gateway enabled<br>'
+                  : 'VPN Gateway disabled<br>';
+
+  if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
+    if( $_services->socks_status() === 'running' ){
+      $ret_str .= "SOCKS 5 Proxy on port {$settings['SOCKS_INT_ENABLED']}";
+      $ret_arr['SOCKS_INT_ENABLED'] = "on port {$settings['SOCKS_INT_ENABLED']}";
+    }else{
+      $ret_str .= "SOCKS 5 Proxy NOT running";
+      $ret_arr['SOCKS_INT_ENABLED'] = "NOT running";
     }
+  }
   $ret_str .= '</td></tr>';
     $ret_arr['private_ip'] = $ret[0];
   }else{
@@ -352,44 +413,6 @@ function VM_get_status( $output = 'html'){
     $ret_arr['vpn_port'] = '';
     $ret_arr['vpn_ip'] = '';
     $ret_arr['vpn_public_ip'] = '';
-  }else{
-    //VPN is enabled. Display info
-    $port = VPN_get_port();
-    //$ret_str .= "<tr><td>VPN IP</td><td id=\"vpn_ip\">$ret[0]</td></tr>";
-    //$ret_arr['vpn_ip'] = $ret[0];
-    $vpn_pub = array();
-    exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
-    if( array_key_exists( '0', $vpn_pub) === true ){
-      $ret_str .= "<tr><td>VPN Public</td><td id=\"vpn_public_ip\">$vpn_pub[0]</td></tr>";
-      $ret_arr['vpn_public_ip'] = $vpn_pub[0];
-      $msg = ( $settings['FORWARD_PORT_ENABLED'] == 'no' ) ? '(Port Forwarding not enabled)' : '';
-      $ret_str .= ($port != '') ? "<tr><td>VPN Port</td><td id=\"vpn_port\">$port $msg</td></tr>" : "<tr><td>VPN Port:</td><td>not supported by location</td></tr>";
-
-      $ret_arr['vpn_port'] = ($port != '') ? "$port $msg" : "not supported by location";
-
-      //show forwarding info
-      $fw_forward_state = $_pia->check_forward_state();
-      if( $fw_forward_state === true ){
-        if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
-          $ret_str .= "<tr><td>Port Forwarding</td><td>$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]</td></tr>";
-          $ret_arr['forwarding_port'] = "$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]";
-        }
-        if( $settings['FORWARD_VM_LAN'] == 'yes' ){
-          $ret_str .= "<tr><td>FW Interfaces</td><td>$settings[IF_INT] =&gt; $settings[IF_TUNNEL]</td></tr>";
-          $ret_arr['forwarding_if1'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
-        }
-        if( $settings['FORWARD_PUBLIC_LAN'] == 'yes' ){
-          $ret_str .= "<tr><td>FW Interfaces</td><td>$settings[IF_EXT] =&gt; $settings[IF_TUNNEL]</td></tr>";
-          $ret_arr['forwarding_if2'] = "$settings[IF_INT] =&gt; $settings[IF_TUNNEL]";
-        }
-      }else{
-        $ret_str .= "<tr><td>Port Forwarding</td><td>currently disabled</td></tr>";
-        $ret_arr['forwarding_port'] = "currently disabled";
-      }
-
-    }else{
-      $ret_str .= "<tr id=\"vpn_down\"><td>VPN</td><td>down</td></tr>";
-    }
   }
 
   $ret_str .= "</tbody></table>\n";
