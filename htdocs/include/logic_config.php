@@ -420,9 +420,9 @@ function disp_socks_box_new(){
   $disp_body .= '<h2>SOCKS 5 Proxy Server</h2>'."\n";
   $disp_body .= '<strong>Warning</strong>: experimental feature! <a id="toggle_socks_settings_toggle" href="" onclick="toggle_hide(\'toggle_socks_settings\', \'toggle_socks_settings_toggle\', \'Show Settings,Hide Settings\'); return false;">Show Settings</a><br>';
   $disp_body .= '<div class="hidden" id="toggle_socks_settings">';
-  $disp_body .= '<ol><li>Innitiate a VPN connection</li><li>Start the proxy using the "Restart Proxy Server" button</li></ol>';
-  $disp_body .= 'Currently without authentication so anyone on YOUR network will be able to use the proxy!'."\n";
-  $disp_body .= "<table>\n";
+  $disp_body .= '<ul><li>Will be started automatically after a VPN connection has been establishd</li>';
+  $disp_body .= '<li>Currently without authentication so anyone on YOUR network will be able to use the proxy!</i>';
+  $disp_body .= "</ul><table>\n";
 
   $GLOB_disp_network_default_fields .= 'SOCKS_EXT_ENABLED,';
   $sel = array(
@@ -432,7 +432,7 @@ function disp_socks_box_new(){
           array( 'no', 'disabled'),
           array( 'yes', 'enabled')
         );
-  $disp_body .= '<tr><td>Public Lan ('.$settings['IF_EXT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>Public LAN ('.$settings['IF_EXT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
   $disabled = ($settings['SOCKS_EXT_ENABLED'] === 'no') ? 'disabled' : ''; //disable input fields when DHCP is set
   $GLOB_disp_network_default_fields .= 'SOCKS_EXT_PORT,';
   $disp_body .= '<tr><td>Listen Port</td><td><input '.$disabled.' type="text" id="SOCKS_EXT_PORT" name="SOCKS_EXT_PORT" value="'.htmlspecialchars($settings['SOCKS_EXT_PORT']).'"></td></tr>'."\n";
@@ -455,7 +455,7 @@ function disp_socks_box_new(){
           array( 'no', 'disabled'),
           array( 'yes', 'enabled')
         );
-  $disp_body .= '<tr><td>Private Lan ('.$settings['IF_INT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>VM LAN ('.$settings['IF_INT'].')</td><td>'.build_select($sel).'</td></tr>'."\n";
   $disabled = ($settings['SOCKS_INT_ENABLED'] === 'no') ? 'disabled' : ''; //disable input fields when DHCP is set
   $GLOB_disp_network_default_fields .= 'SOCKS_INT_PORT,';
   $disp_body .= '<tr><td>Listen Port</td><td><input '.$disabled.' type="text" id="SOCKS_INT_PORT" name="SOCKS_INT_PORT" value="'.htmlspecialchars($settings['SOCKS_INT_PORT']).'"></td></tr>'."\n";

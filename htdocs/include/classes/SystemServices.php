@@ -202,8 +202,8 @@ function socks_status( $use_cache = true ){
     switch( $ret[0] )
     {
       case 'pid file not found':
-        $cached = 'pid file not found';
-        return $ret[0];
+        $cached = 'not running'; //do it like this for now since the pid will not exist after a reboot - this is a quikc fix
+        return $cached;
 
       case 'running':
         $cached = 'running';
