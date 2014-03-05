@@ -159,6 +159,38 @@ function socks_stop(){
 }
 
 /**
+ * checks the current status of the proxy server
+ * @return string possible values of return string<ul>
+ *                    <li>'pid file not found'</li>
+ *                    <li>'running'</li>
+ *                    <li>'not running'</li>
+ *                    <li>'error'</li>
+ *                </ul>
+ */
+function socks_status(){
+  $ret = array();
+  exec('sudo "/pia/include/socks-status.sh"', $ret );
+
+  switch( $ret[0] )
+  {
+    case 'pid file not found':
+      return $ret[0];
+
+    case 'running':
+      return $ret[0];
+
+    case 'not running':
+      return $ret[0];
+
+    default:
+      return 'error';
+  }
+
+  return 'error';
+}
+
+
+/**
  * method to restart a service using NAME-restart.sh and check the return
  * @return bool,array TRUE on success or [0]=false [1]=error message
  */

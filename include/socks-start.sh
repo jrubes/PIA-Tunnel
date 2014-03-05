@@ -5,4 +5,4 @@ export LANG
 source '/pia/settings.conf'
 
 
-/usr/sbin/sockd -D 2>&1
+/usr/sbin/sockd -f /etc/sockd.conf -p /run/sockd.pid -D 2>&1

@@ -1,7 +1,6 @@
 <?php
 /*
- * script to allow other scripts to check the current status of the VPN connection
- * returns status info as JSON array
+ * script used by online updater to execute pia-update and return the results
  */
 /* @var $_settings PIASettings */
 /* @var $_pia PIACommands */

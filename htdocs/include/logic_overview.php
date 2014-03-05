@@ -83,6 +83,35 @@ switch($_REQUEST['cmd']){
       break;
     }
 
+  case 'socks_proxy_control':
+    if( $_token->pval($_POST['token'], 'handle user request - start or restart SOCKS proxy') === true ){
+      if( array_key_exists('socks_start', $_POST) === true ){
+        $socks_stat = $_services->socks_status();
+        if( $socks_stat === 'running' ){
+          $_services->socks_stop();
+          $_services->socks_start();
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been restarted</div>\n";
+        }elseif( $socks_stat === 'not running'){
+          $_services->socks_stop();
+          $_services->socks_start();
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been started</div>\n";
+        }else{
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS 5 Proxy. Please send the following to the devloper: return of socks-status.sh: $socks_stat</div>\n";
+        }
+
+
+      }elseif( array_key_exists('socks_stop', $_POST) === true ){
+        $_services->socks_stop();
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been stopped</div>\n";
+      }
+    }else{
+      $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
+    }
+
+    $disp_body .= disp_default();
+    break;
+
+    
   case 'firewall_control':
     if( $_token->pval($_POST['token'], 'handle user request - start or stop the firewall') === true ){
       if( array_key_exists('firewall_enable', $_POST) === true ){
@@ -150,6 +179,7 @@ switch($_REQUEST['cmd']){
  */
 function disp_default(){
   global $_token;
+  global $settings;
   $disp_body = '';
   /* show VM network and VPN overview */
 
@@ -157,24 +187,6 @@ function disp_default(){
   $disp_body .= '<noscript><p>please enable javascript to activate the advanced UI</p></noscript>';
   $disp_body .= '<div id="overview_net_control">';
   $disp_body .= '<h2>Network Control</h2>';
-
-  $pass = array('handle user request - start or stop pia-daemon');
-  $tokens = $_token->pgen($pass);
-  $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
-  $disp_body .= '<table class="control_box">';
-  $disp_body .= '<tr>';
-  $disp_body .= '<td id="ele_daemon_lbl">PIA VPN Daemon</td>';
-  $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" name="daemon_start" value="Start pia-daemon">';
-  $disp_body .= '</td>';
-  $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" name="daemon_stop" value="Stop pia-daemon">';
-  $disp_body .= '</td>';
-  $disp_body .= '</tr>';
-  $disp_body .= '</table>';
-  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
-  $disp_body .= " </form>\n";
 
   $pass = array('handle user request - establish or disconnect VPN');
   $tokens = $_token->pgen($pass);
@@ -196,6 +208,48 @@ function disp_default(){
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= " </form>\n";
 
+  $pass = array('handle user request - start or stop pia-daemon');
+  $tokens = $_token->pgen($pass);
+  $disp_body .= '<form class="inline" action="/" method="post">';
+  $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
+  $disp_body .= '<table class="control_box">';
+  $disp_body .= '<tr>';
+  $disp_body .= '<td id="ele_daemon_lbl">PIA VPN Daemon</td>';
+  $disp_body .= '<td>';
+  $disp_body .= ' <input type="submit" name="daemon_start" value="Start pia-daemon">';
+  $disp_body .= '</td>';
+  $disp_body .= '<td>';
+  $disp_body .= ' <input type="submit" name="daemon_stop" value="Stop pia-daemon">';
+  $disp_body .= '</td>';
+  $disp_body .= '</tr>';
+  $disp_body .= '</table>';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
+  $disp_body .= " </form>\n";
+
+  if( $settings['SOCKS_INT_ENABLED'] == 'yes' || $settings['SOCKS_EXT_ENABLED'] == 'yes' )
+  {
+    $pass = array('handle user request - start or restart SOCKS proxy');
+    $tokens = $_token->pgen($pass);
+    $disp_body .= '<form id="frm_socks_proxy" class="inline" action="/" method="post">';
+    $disp_body .= '<input type="hidden" name="cmd" value="socks_proxy_control">';
+    $disp_body .= '<table class="control_box">';
+    $disp_body .= '<tr>';
+    $disp_body .= '<td id="ele_socks_lbl">';
+    $disp_body .=   "SOCKS 5 Proxy\n";
+    $disp_body .= '</td>';
+    $disp_body .= '</td>';
+    $disp_body .= '<td>';
+    $disp_body .= ' <input type="submit" name="socks_start" value="Start Proxy Server">';
+    $disp_body .= '</td>';
+    $disp_body .= '<td>';
+    $disp_body .= ' <input type="submit" name="socks_stop" value="Stop Proxy Server">';
+    $disp_body .= '</td>';
+    $disp_body .= '</tr>';
+    $disp_body .= '</table>';
+    $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
+    $disp_body .= " </form>\n";
+  }
+
   //firewall control UI
   $pass = array('handle user request - start or stop the firewall');
   $tokens = $_token->pgen($pass);
@@ -204,7 +258,7 @@ function disp_default(){
   $disp_body .= '<table class="control_box">';
   $disp_body .= '<tr>';
   $disp_body .= '<td id="ele_firewall_lbl">';
-  $disp_body .=   "Firewall control\n";
+  $disp_body .=   "Firewall\n";
   $disp_body .= '</td>';
   $disp_body .= '<td>';
   $disp_body .= ' <input type="submit" name="firewall_enable" value="Restart Firewall">';
@@ -224,8 +278,11 @@ function disp_default(){
   $disp_body .= '<input type="hidden" name="cmd" value="os_control">';
   $disp_body .= '<table class="control_box">';
   $disp_body .= '<tr>';
+  $disp_body .= '<td>&nbsp;</td><td>&nbsp;</td>'; //empty row to move buttons out of the way
+  $disp_body .= '</tr>';
+  $disp_body .= '<tr>';
   $disp_body .= '<td id="ele_os_lbl">';
-  $disp_body .=   "OS control\n";
+  $disp_body .=   "Operating System\n";
   $disp_body .= '</td>';
   $disp_body .= '<td>';
   $disp_body .= ' <input type="submit" name="vm_restart" value="Restart PIA-VM">';

@@ -5,4 +5,28 @@ export LANG
 source '/pia/settings.conf'
 
 
-service danted status 2>&1
+#checks status of sockd using pid in /run/sockd.pid
+if [ ! -f "/run/sockd.pid" ]; then
+  echo 'pid file not found'
+  exit 99
+fi
+
+sockd_pid=`cat /run/sockd.pid`
+
+if [ ! -z "${sockd_pid}" ]; then
+  # daemon should be running
+  ps_out=`ps s "${sockd_pid}" | tail -n1 | gawk -F" " '{print $10}'`
+
+  if [ "${ps_out}" = '/usr/sbin/sockd' ]; then
+    echo 'running'
+    exit
+
+  else
+    echo 'not running'
+    exit;
+  fi
+
+else
+  echo 'not running'
+  exit
+fi
