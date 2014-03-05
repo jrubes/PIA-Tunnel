@@ -219,8 +219,8 @@ class PIACommands {
       $c = "connecting to $s\n\n";
       $_SESSION['connecting2'] = $s; //store for messages
     }else{
-      $c = "connecting to $arg\n\n";
-      $_SESSION['connecting2'] = $arg; //store for messages
+      $c = "connecting to $ovpn\n\n";
+      $_SESSION['connecting2'] = $ovpn; //store for messages
     }
 
     $f = '/pia/cache/php_pia-start.log';
