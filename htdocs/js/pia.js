@@ -68,6 +68,9 @@ function OverviewObj( ){
     rem = document.getElementById('ele_os_lbl');
     if( rem ){ rem.parentNode.removeChild(rem); }
 
+    rem = document.getElementById('ele_socks_lbl');
+    if( rem ){ rem.parentNode.removeChild(rem); }
+
     rem = document.getElementById('overview_net_status');
     rem.setAttribute('class', 'box overview');
     rem.setAttribute('style', 'width: 480px; margin-right: 1em;');
