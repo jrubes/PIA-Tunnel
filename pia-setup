@@ -132,7 +132,7 @@ if [ ! -f "/run/sockd.pid" ]; then
   touch /run/sockd.pid
 fi
 chown proxy /run/sockd.pid
-chmod u+x rw /run/sockd.pid
+chmod u+rw /run/sockd.pid
 
 
 #add missing settings to settings.conf
