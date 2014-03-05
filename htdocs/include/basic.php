@@ -323,7 +323,7 @@ function VM_get_status( $output = 'html'){
   exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   $ret_str .= "<tr><td>Public LAN</td><td id=\"public_ip\">$ret[0]";
     if( $_services->socks_status() === 'running' && $settings['SOCKS_EXT_ENABLED'] == 'yes' ){
-      $ret_str .= "<br>SOCKS 5 Proxy  on port {$settings['SOCKS_EXT_PORT']}</td></tr>";
+      $ret_str .= "<br>SOCKS 5 Proxy  on port {$settings['SOCKS_EXT_PORT']}";
       $ret_arr['SOCKS_EXT_ENABLED'] = "running on port {$settings['SOCKS_EXT_PORT']}";
     }
   $ret_str .= '</td></tr>';
@@ -335,7 +335,7 @@ function VM_get_status( $output = 'html'){
   if(array_key_exists('0', $ret) ){
     $ret_str .= "<tr><td>Private LAN</td><td id=\"private_ip\">$ret[0]";
     if( $_services->socks_status() === 'running' && $settings['SOCKS_INT_ENABLED'] == 'yes' ){
-      $ret_str .= "<br>SOCKS 5 Proxy  on port {$settings['SOCKS_INT_PORT']}</td></tr>";
+      $ret_str .= "<br>SOCKS 5 Proxy  on port {$settings['SOCKS_INT_PORT']}";
       $ret_arr['SOCKS_INT_ENABLED'] = "running on port {$settings['SOCKS_INT_PORT']}";
     }
   $ret_str .= '</td></tr>';
