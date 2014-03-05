@@ -36,3 +36,11 @@ fi
 
 
 /usr/sbin/sockd -f /etc/sockd.conf -p /tmp/sockd.pid -D 2>&1
+socks_stat=`/pia/include/socks-status.sh`
+if [ "${socks_stat}" = 'running' ]; then
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- Dante SOCKS 5 Proxy Server has been started."
+else
+  echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- Unable to start Dante SOCKS 5 Proxy Server. Please check /etc/var/sockd.log"
+fi
