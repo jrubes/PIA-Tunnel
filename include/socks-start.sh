@@ -22,7 +22,7 @@ if [ "${socks_stat}" = 'running' ]; then
     #endless loop protect, about 30 seconds
     if [ "$LOOP_PROTECT" -eq 30 ]; then
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-          "- Unable to start Dante SOCKS 5 Proxy Server. Please check /etc/var/sockd.log"
+          "- Unable to start Dante SOCKS 5 Proxy Server. Please check /var/log/sockd.log"
       exit
     else
       sleep 1
