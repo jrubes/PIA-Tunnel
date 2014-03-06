@@ -391,8 +391,8 @@ function VM_get_status( $output = 'html'){
 
   if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
     if( $_services->socks_status() === 'running' ){
-      $ret_str .= "SOCKS 5 Proxy on port {$settings['SOCKS_INT_ENABLED']}";
-      $ret_arr['SOCKS_INT_ENABLED'] = "on port {$settings['SOCKS_INT_ENABLED']}";
+      $ret_str .= "SOCKS 5 Proxy on port {$settings['SOCKS_INT_PORT']}";
+      $ret_arr['SOCKS_INT_ENABLED'] = "on port {$settings['SOCKS_INT_PORT']}";
     }else{
       $ret_str .= "SOCKS 5 Proxy NOT running";
       $ret_arr['SOCKS_INT_ENABLED'] = "NOT running";
@@ -470,7 +470,7 @@ function VPN_sessionlog_status(){
     if( strpos($content, 'Initialization Sequence Completed') !== false
             && strpos($content, 'TUN/TAP device tun0 opened') !== false ){
       return array('connected');
-      
+
     }elseif( strpos($content, 'Received AUTH_FAILED control message') !== false ){
       //auth will sometimes fail even with correct credentials
       //will have to allow auth to fail a few times before terminating the connection attempt
