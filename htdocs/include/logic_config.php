@@ -420,7 +420,9 @@ function disp_socks_box_new(){
   $disp_body .= '<h2>SOCKS 5 Proxy Server</h2>'."\n";
   $disp_body .= '<strong>Warning</strong>: experimental feature! <a id="toggle_socks_settings_toggle" href="" onclick="toggle_hide(\'toggle_socks_settings\', \'toggle_socks_settings_toggle\', \'Show Settings,Hide Settings\'); return false;">Show Settings</a><br>';
   $disp_body .= '<div class="hidden" id="toggle_socks_settings">';
-  $disp_body .= '<ul><li><a href="http://www.KaiserSoft.net/r/?SOCKS5" target="_blank">Support Forum ReadMe/Thread</a></li>';
+  $disp_body .= '<ul>';
+  $disp_body .= '<li>requires at least 164MB RAM or performance will degrade within minutes!</li>';
+  $disp_body .= '<li><a href="http://www.KaiserSoft.net/r/?SOCKS5" target="_blank">Support Forum ReadMe/Thread</a></li>';
   $disp_body .= '<li>Currently without authentication so anyone on YOUR network will be able to use the proxy!</i>';
   $disp_body .= "</ul><table>\n";
 
