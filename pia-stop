@@ -7,8 +7,10 @@ export LANG
 
 
 if [ "$1" = "verbose" ]; then
+
+    /pia/include/socks-stop.sh
+
 	killall openvpn
-    rm -f /pia/cache/status.txt
 
 	#disable forwarding
 	/pia/pia-forward stop
@@ -19,6 +21,7 @@ if [ "$1" = "verbose" ]; then
 	ifdown eth1 && ifup eth1 #Debian
 
 else
+    /pia/include/socks-stop.sh &>/dev/null
 	killall openvpn &>/dev/null
 	/pia/pia-forward stop quite
 	ifdown eth0 &>/dev/null && ifup eth0 &>/dev/null #Debian
@@ -28,5 +31,6 @@ fi
 # remove old status.txt
 rm -f '/pia/cache/status.txt' &>/dev/null
 rm -f '/pia/cache/session.log' &>/dev/null
+rm -f '/pia/cache/php_pia-start.log' &>/dev/null
 
 exit 0
