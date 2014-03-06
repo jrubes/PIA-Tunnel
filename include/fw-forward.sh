@@ -96,12 +96,9 @@ iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 
 #allow dhcpd traffic if enabled
 if [ "$DHCPD_ENABLED1" = 'yes' ] || [ "$DHCPD_ENABLED2" = 'yes' ]; then
-	if [ "$FORWARD_PUBLIC_LAN" = 'yes' ]; then
-		iptables -A INPUT -i $IF_EXT -p udp --dport 67:68 --sport 67:68 -j ACCEPT
-	fi
-	if [ "$FORWARD_VM_LAN" = 'yes' ]; then
-		iptables -A INPUT -i $IF_INT -p udp --dport 67:68 --sport 67:68 -j ACCEPT
-	fi
+    iptables -A INPUT -i $IF_EXT -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+
+    iptables -A INPUT -i $IF_INT -p udp --dport 67:68 --sport 67:68 -j ACCEPT
 fi
 
 #allow dhcp traffic if interface is not static
