@@ -36,6 +36,8 @@ fi
 
 
 /usr/sbin/sockd -f /etc/sockd.conf -p /tmp/sockd.pid -D 2>&1
+
+
 socks_stat=`/pia/include/socks-status.sh`
 if [ "${socks_stat}" = 'running' ]; then
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\

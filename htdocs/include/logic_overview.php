@@ -36,6 +36,7 @@ switch($_REQUEST['cmd']){
 
     }elseif( array_key_exists('vpn_disconnect', $_POST) === true ){
       if( $_token->pval($_POST['token'], 'handle user request - establish or disconnect VPN') === true ){
+        $_services->socks_stop();
         $_pia->pia_disconnect();
         //$disp_body .= "<div id=\"feedback\" class=\"feedback\">Disconnecting VPN</div>\n";
       }else{
@@ -87,22 +88,30 @@ switch($_REQUEST['cmd']){
     if( $_token->pval($_POST['token'], 'handle user request - start or restart SOCKS proxy') === true ){
       if( array_key_exists('socks_start', $_POST) === true ){
         if( $_services->socks_status() === 'running' ){
-          $_services->socks_stop();
-          $_services->socks_start();
-          $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been restarted</div>\n";
 
-          $_services->firewall_fw('stop');
-          $_services->firewall_fw('start');
-          $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
+          if( $_services->socks_start() === true )
+          {
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been restarted</div>\n";
+
+            $_services->firewall_fw('stop');
+            $_services->firewall_fw('start');
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
+          }else{
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS 5 Proxy in 'running'. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
+          }
 
         }elseif( $_services->socks_status() === 'not running'){
-          $_services->socks_start();
-          $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been started</div>\n";
 
-          $_services->firewall_fw('stop');
-          $_services->firewall_fw('start');
-          $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
+          if( $_services->socks_start() === true )
+          {
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been started</div>\n";
 
+            $_services->firewall_fw('stop');
+            $_services->firewall_fw('start');
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
+          }else{
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS 5 Proxy in 'not running'. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
+          }
 
         }else{
           $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS 5 Proxy. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
