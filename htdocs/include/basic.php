@@ -292,7 +292,7 @@ function VM_get_status( $output = 'html'){
 
   //check session.log if for current status
   $session_status = VPN_sessionlog_status();
-  $ret_str .= "<tr><td style=\"width:7em\">Status</td>";
+  $ret_str .= "<tr><td style=\"width:7em\">VPN Status</td>";
   switch( $session_status[0] ){
     case 'connected':
       $_SESSION['connecting2'] = ($_SESSION['connecting2'] != '') ? $_SESSION['connecting2'] : 'ERROR 5642';
@@ -354,15 +354,16 @@ function VM_get_status( $output = 'html'){
   $ret_str .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
   $ret = array();
-  exec('/sbin/ip addr show eth0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+  exec('/sbin/ip addr show '.$settings['IF_EXT'].' | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   $ret_str .= '<tr><td style="vertical-align: top;">Public LAN</td>';
 
   $ret_str .= "<td id=\"public_ip\">IP $ret[0]<br>";
 
-  $fw_forward_state = $_pia->check_forward_state();
-  $ret_str .= ( $fw_forward_state === true && $settings['FORWARD_PUBLIC_LAN'] === 'yes' )
-                ? 'VPN Gateway enabled<br>'
-                : 'VPN Gateway disabled<br>';
+  $fw_forward_state = $_pia->check_forward_state($settings['IF_EXT']);
+  if( $fw_forward_state === true || $settings['FORWARD_PUBLIC_LAN'] === 'yes' )
+  {
+    $ret_str .= ( $fw_forward_state === true ) ? 'VPN Gateway enabled<br>' : 'VPN Gateway disabled<br>';
+  }
 
   if( $settings['SOCKS_EXT_ENABLED'] == 'yes' ){
     if( $_services->socks_status() === 'running' ){
@@ -379,15 +380,16 @@ function VM_get_status( $output = 'html'){
 
   $ret_str .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
   $ret = array();
-  exec('/sbin/ip addr show eth1 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+  exec('/sbin/ip addr show '.$settings['IF_INT'].' | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if(array_key_exists('0', $ret) ){
     $ret_str .= '<tr><td style="vertical-align: top;">VM LAN</td>';
     $ret_str .= "<td id=\"private_ip\">IP $ret[0]<br>";
 
-    $fw_forward_state = $_pia->check_forward_state();
-    $ret_str .= ( $fw_forward_state === true && $settings['FORWARD_VM_LAN'] === 'yes' )
-                  ? 'VPN Gateway enabled<br>'
-                  : 'VPN Gateway disabled<br>';
+    $fw_forward_state = $_pia->check_forward_state($settings['IF_INT']);
+    if( $fw_forward_state === true || $settings['FORWARD_VM_LAN'] === 'yes' )
+    {
+      $ret_str .= ( $fw_forward_state === true ) ? 'VPN Gateway enabled<br>' : 'VPN Gateway disabled<br>';
+    }
 
   if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
     if( $_services->socks_status() === 'running' ){
@@ -406,7 +408,7 @@ function VM_get_status( $output = 'html'){
   }
   unset($ret);
 
-  exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+  exec('/sbin/ip addr show '.$settings['IF_TUNNEL'].' 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if( array_key_exists( '0', $ret) !== true ){
     //$ret_str .= "<tr id=\"vpn_down\"><td>VPN</td><td>down</td></tr>";
     $ret_arr['vpn_port'] = '';

@@ -53,9 +53,10 @@ class PIACommands {
    * @return boolean TRUE when forwarding is enabled, FALSE if not
    *
    */
-  function check_forward_state(){
+  function check_forward_state( $interface = '' ){
     $ret = array();
-    exec('sudo /pia/include/fw_get_forward_state.sh', $ret);
+    $pass = escapeshellarg($interface);
+    exec('sudo /pia/include/fw_get_forward_state.sh '.$pass, $ret);
     if( array_key_exists( '0', $ret) === true ){
         if( $ret[0] === 'ON' ){
             return true;

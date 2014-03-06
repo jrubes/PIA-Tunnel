@@ -232,10 +232,17 @@ function ping_host() {
 }
 
 # checks if any rules are active in the FORWARD chain
+# $s1 is optional and may be used to specify a single interface
 function check_forward_state(){
     unset RET_FORWARD_STATE
 
-    ret=`iptables -L FORWARD | grep -c "ACCEPT"`
+    if [ "${1}" = "" ]; then
+      ret=`iptables -nL FORWARD | grep -c "ACCEPT"`
+    else
+      ret=`iptables -vnL FORWARD | grep "ACCEPT" | grep -c "${1}"`
+    fi
+
+
     if [ $ret = 0 ]; then
         RET_FORWARD_STATE="OFF"
     else

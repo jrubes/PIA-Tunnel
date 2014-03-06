@@ -6,5 +6,5 @@ export LANG
 source '/pia/settings.conf'
 source '/pia/include/functions.sh'
 
-check_forward_state
+check_forward_state "${1}"
 echo "$RET_FORWARD_STATE"
