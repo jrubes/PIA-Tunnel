@@ -9,7 +9,7 @@ source '/pia/include/functions.sh'
 # How it works
 # *) pia-start initiates the VPN connection
 # *) pia-daemon is started when VPN is established. the script will send one ping every
-     n seconds through the tunnel to check if the VPN is still up.
+#     n seconds through the tunnel to check if the VPN is still up.
 #       if the ping fails n times the tunnel is closed or restarted
 
 
@@ -90,6 +90,21 @@ while true; do
 	fi
 	#end of VPN test
 
+        #check if SOCKS proxy is up
+        if [ "${vpn_up}" = "OK" ] && [ "${SOCKS_EXT_ENABLED}" = "yes" ] || [ "${SOCKS_INT_ENABLED}" = "yes" ]; then
+          socks_stat=`/pia/include/socks-status.sh`
+          if [ "${socks_stat}" = 'not running' ]; then
+            /pia/include/socks-start.sh
+          fi
+
+        elif [ ! "{$vpn_up}" = "OK" ] && [ "${SOCKS_EXT_ENABLED}" = "yes" ] || [ "${SOCKS_INT_ENABLED}" = "yes" ]; then
+          socks_stat=`/pia/include/socks-status.sh`
+          if [ "${socks_stat}" = 'running' ]; then
+            /pia/include/socks-stop.sh
+          fi
+
+        fi
+
         #check that the firewall rules are as they should be
         if [ "$vpn_up" = "OK" ]; then
             check_forward_state
@@ -133,6 +148,7 @@ while true; do
 					#only do this once per internet connection failure
 					echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 						"- Internet connection appears to be down"
+
 					echo -e "\trunning ${bold}pia-forward fix${normal}"
 					RAN_FORWARD_FIX="yes"
 					/pia/pia-forward fix quite
@@ -144,6 +160,7 @@ while true; do
 			if [ "$LOOP_TIMEOUT" -gt $FAIL_RETRY_INTERNET ]; then
 				echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- forwarding disabled until the VPN is back up."
+
 				echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
                                 rm -f "/pia/cache/session.log"

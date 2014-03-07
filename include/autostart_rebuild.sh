@@ -20,7 +20,8 @@ if [ "${DAEMON_ENABLED}" = 'yes' ]; then
 	cont="${cont}rm -f /pia/cache/status.txt\n"
 	cont="${cont}rm -f /pia/cache/php_pia-start.log\n"
     cont="${cont}echo -e \"connecting to ${first}\\\n\\\n\" > /pia/cache/session.log\n"
-	cont="${cont}bash -c \"/pia/pia-start ${first} &>> /pia/cache/session.log ; /pia/pia-daemon &>/pia/cache/pia-daemon.log &\" &>/dev/null &\n"
+	cont="${cont}bash -c \"/pia/pia-start daemon\" &>> /pia/cache/session.log &\n"
+    #cont="${cont}bash -c \"/pia/pia-start daemon\"\n"
 fi
 
 cont="${cont}\n"

@@ -16,7 +16,7 @@ elif [ "${socks_stat}" = 'running' ]; then
   while true; do
      socks_stat=`/pia/include/socks-status.sh`
     if [ "${socks_stat}" = 'running' ]; then
-      killall sockd 2>&1
+      killall sockd &> /dev/null
 
     elif [ "${socks_stat}" = 'not running' ]; then
       exit
