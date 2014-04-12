@@ -10,7 +10,7 @@ $disp_footer = '';
 $disp_footer .= "<div class=\"clear\"></div>\n";
 
 $disp_footer .= '<p style="text-align: center">';
-$disp_footer .= '<a href="http://www.KaiserSoft.net/r/?PIAFORUM" target="_blank">PIA-Tunnel Support Forum</a><br>';
+//$disp_footer .= '<a href="http://www.KaiserSoft.net/r/?PIAFORUM" target="_blank">PIA-Tunnel Support Forum</a><br>';
 $disp_footer .= 'Bitcoin donations accepted at 1NLojvfK5a1c3S5YUiyEZytfMnQkSVNNZv</p>';
 $disp_footer .= '<script type="text/javascript">
 /* sets or removes an attribute based on an elements source value
