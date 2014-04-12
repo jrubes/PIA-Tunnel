@@ -234,7 +234,9 @@ function socks_process_template(){
   if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
     $internal .= "internal: {$settings['IF_INT']} port = {$settings['SOCKS_INT_PORT']}\n";
 
-    if( $settings['SOCKS_EXT_FROM'] !== $settings['SOCKS_INT_FROM']
+    //avoid duplicate entries
+    if( $settings['SOCKS_EXT_ENABLED'] == 'no'
+            || $settings['SOCKS_EXT_FROM'] !== $settings['SOCKS_INT_FROM']
             || $settings['SOCKS_EXT_FROM_PORTRANGE'] !== $settings['SOCKS_EXT_FROM_PORTRANGE']
             || $settings['SOCKS_EXT_TO'] !== $settings['SOCKS_EXT_TO'] )
     {
@@ -421,7 +423,7 @@ function disp_socks_box_new(){
   $disp_body .= '<strong>Warning</strong>: experimental feature! <a id="toggle_socks_settings_toggle" href="" onclick="toggle_hide(\'toggle_socks_settings\', \'toggle_socks_settings_toggle\', \'Show Settings,Hide Settings\'); return false;">Show Settings</a><br>';
   $disp_body .= '<div class="hidden" id="toggle_socks_settings">';
   $disp_body .= '<ul>';
-  $disp_body .= '<li>requires at least 164MB RAM or performance will degrade within minutes!</li>';
+  $disp_body .= '<li>requires at least 256MB RAM or performance will degrade within minutes!</li>';
   $disp_body .= '<li><a href="http://www.KaiserSoft.net/r/?SOCKS5" target="_blank">Support Forum ReadMe/Thread</a></li>';
   $disp_body .= '<li>Currently without authentication so anyone on YOUR network will be able to use the proxy!</i>';
   $disp_body .= "</ul><table>\n";
@@ -689,6 +691,28 @@ function disp_general_box(){
           );
   $disp_body .= '<tr><td>VPN Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
 
+/*  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'NETWORK_MAX_SPEED,';
+  $sel = array(
+            'id' => 'NETWORK_MAX_SPEED',
+            'selected' =>  $settings['NETWORK_MAX_SPEED'],
+            array( '0', 'no limit'),
+            array( '1600', '200KB/s'),
+            array( '3200', '400KB/s'),
+            array( '4800', '600KB/s'),
+            array( '6400', '800KB/s'),
+            array( '8192', '1MB/s'),
+            array( '12288', '1.5MB/s'),
+            array( '16384', '2MB/s'),
+            array( '20480', '2.5MB/s'),
+            array( '24576', '3MB/s'),
+            array( '32768', '4MB/s'),
+            array( '40960', '5MB/s'),
+            array( '81920', '10MB/s'),
+            array( '819200', '100MB/s')
+          );
+  $disp_body .= '<tr><td><strong>Experimental</strong><br>Limit network throughput<br></td><td>'.build_select($sel).'</td></tr>'."\n";
+*/
 
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
