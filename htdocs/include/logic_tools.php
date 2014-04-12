@@ -115,13 +115,11 @@ function disp_client_tools(){
 
   $ret = array();
   exec('/sbin/ip addr show '.$if_LAN.' | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  $ret_str .= "<tr><td>Public LAN IP</td><td id=\"public_ip\">$ret[0]</td></tr>";
   $ret_arr['lan_ip'] = $ret[0];
   unset($ret);
 
   $ret = array();
   exec('/sbin/ip addr show '.$if_VLAN.' | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  $ret_str .= "<tr><td>Public LAN IP</td><td id=\"public_ip\">$ret[0]</td></tr>";
   $ret_arr['vlan_ip'] = $ret[0];
   unset($ret);
 
