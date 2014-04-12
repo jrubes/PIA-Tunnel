@@ -253,7 +253,7 @@ function socks_process_template(){
   }
 
 
-  if( $internal == '' || $clients == '' ){ echo 'wtf';return false; }
+  if( $internal == '' || $clients == '' ){ return false; }
   $internal = trim($internal)."\n";
   $templ = str_replace('INTERNAL_SETTING_HERE', $internal, $templ, $SometimesIreallyHatePHP);
 
