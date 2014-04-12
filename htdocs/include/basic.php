@@ -307,8 +307,8 @@ function VM_get_status( $output = 'html'){
       if( array_key_exists( '0', $vpn_pub) === true ){
         $ret_str .= "<tr><td style=\"vertical-align: top;\">Public VPN</td><td id=\"vpn_public_ip\">IP $vpn_pub[0] ";
         $ret_arr['vpn_public_ip'] = $vpn_pub[0];
-        $ret_str .= ($port != '') ? "Port $port $msg<br>" : '';
-        $ret_arr['vpn_port'] = ($port != '') ? "$port $msg" : '';
+        $ret_str .= ($port != '') ? "Port $port" : '';
+        $ret_arr['vpn_port'] = ($port != '') ? "$port" : '';
         $ret_str .= '</td></tr>';
 
         $fw_forward_state = $_pia->check_forward_state();
@@ -635,6 +635,30 @@ function VPN_sessionlog_status(){
   curl_setopt($ch,CURLOPT_POSTFIELDS, $post_vars);
   curl_setopt($ch,CURLOPT_TIMEOUT, 10); //max runtime for CURL
   curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, 4); //only the connection timeout
+
+
+  $curl_timeout = strtotime('-5 minutes'); //time until timeout lock expires
+  if( array_key_exists('PIA_port_timeout', $_SESSION) === true ){
+    //validate time
+    if( $_SESSION['PIA_port_timeout'] < $curl_timeout ){
+      //echo 'debug: ran curl after timeout';
+      $curl_ret = curl_exec($ch);
+    }else{
+      //echo 'debug: lock still good';
+      return false;
+    }
+  }else{
+    //echo 'debug: ran curl';
+    $curl_ret = curl_exec($ch);
+  }
+  if( $curl_ret === false ){
+    //timeout or connection error, preventing retrying with every request
+    //echo 'debug: curl failed, setting timeout';
+    $_SESSION['PIA_port_timeout'] = strtotime('now');
+  }else{
+    //worked
+    if( array_key_exists('PIA_port_timeout', $_SESSION) === true ){ unset($_SESSION['PIA_port_timeout']); }
+  }
 
   // grab URL and pass it to the browser
   $return = json_decode(curl_exec($ch), true);
