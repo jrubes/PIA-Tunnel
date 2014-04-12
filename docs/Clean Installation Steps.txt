@@ -5,6 +5,7 @@ This is a cut and paste file so getting everything working should only take a fe
     * 100MB for SWAP, rest for /
   * 92MB RAM for VM - 128MB during installation
   * Set to en_US.UTF-8 locale or change with 'dpkg-reconfigure locales' later on
+  * make sure you set the hostname to   pia-tunnel   before you start with this guide
 
 20) For Debian without SSH Server
       apt-get install -y openssh-server
