@@ -633,11 +633,11 @@ function VPN_sessionlog_status(){
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($ch,CURLOPT_POST, count(explode('&', $post_vars)));
   curl_setopt($ch,CURLOPT_POSTFIELDS, $post_vars);
-  curl_setopt($ch,CURLOPT_TIMEOUT, 10); //max runtime for CURL
+  curl_setopt($ch,CURLOPT_TIMEOUT, 4); //max runtime for CURL
   curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, 4); //only the connection timeout
 
 
-  $curl_timeout = strtotime('-5 minutes'); //time until timeout lock expires
+  $curl_timeout = strtotime('-10 minutes'); //time until timeout lock expires
   if( array_key_exists('PIA_port_timeout', $_SESSION) === true ){
     //validate time
     if( $_SESSION['PIA_port_timeout'] < $curl_timeout ){
