@@ -282,6 +282,10 @@ class PIACommands {
       unset($_SESSION['PIA_port_timestamp']);
     }
 
+    if( array_key_exists('PIA_port_timeout', $_SESSION) === true ){
+      unset($_SESSION['PIA_port_timeout']);
+    }
+
     $_SESSION['connecting2'] = '';
     $_SESSION['conn_auth_perma_error'] = false;
     $_SESSION['conn_auth_fail_cnt'] = 0;
