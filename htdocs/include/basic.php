@@ -629,12 +629,13 @@ function VPN_sessionlog_status(){
 
   // set URL and other appropriate options
   curl_setopt($ch, CURLOPT_URL, 'https://www.privateinternetaccess.com/vpninfo/port_forward_assignment');
+  curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
   curl_setopt($ch, CURLOPT_HEADER, 0);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($ch,CURLOPT_POST, count(explode('&', $post_vars)));
-  curl_setopt($ch,CURLOPT_POSTFIELDS, $post_vars);
-  curl_setopt($ch,CURLOPT_TIMEOUT, 4); //max runtime for CURL
-  curl_setopt($ch,CURLOPT_CONNECTTIMEOUT, 4); //only the connection timeout
+  curl_setopt($ch, CURLOPT_POST, count(explode('&', $post_vars)));
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $post_vars);
+  curl_setopt($ch, CURLOPT_TIMEOUT, 4); //max runtime for CURL
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 4); //only the connection timeout
 
 
   $curl_timeout = strtotime('-10 minutes'); //time until timeout lock expires
