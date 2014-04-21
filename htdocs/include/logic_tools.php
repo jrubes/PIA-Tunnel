@@ -274,6 +274,7 @@ function disp_update_root(){
   $disp_body .= '<form class="inline" action="/?page=tools&amp;cid=tools" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';
   $disp_body .= 'New passwords need to be at least three characters long.';
+  $disp_body .= '<br><strong>WARNING</strong> The console is set to a German QWERTZ keyboard layout. Run "dpkg-reconfigure keyboard-configuration" to change the layout. (only required if you login to command line)';
   $disp_body .= '<input type="text" class="extralong" name="new_root_password" value="'.$_pia->rand_string(35).'">'."\n";
   $disp_body .= '<input type="submit" name="update_root" value="Update Password">';
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';

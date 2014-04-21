@@ -133,6 +133,7 @@ function disp_wizard_default(){
   $disp_body .= '<p>Please enter a new root password below or accept the generated one.'
                 .'You may reset the password at any time using the "Tools" menu.<br>'
                 .'Passwords may not be less than 3 characters long!</p>';
+  $disp_body .= '<br><strong>WARNING</strong> The console is set to a German QWERTZ keyboard layout. Run "dpkg-reconfigure keyboard-configuration" to change the layout. (only required if you login to command line)';
   $disp_body .= "<table>\n";
   $disp_body .= '<tr><td>root password</td><td><input type="text" style="width:25em;" name="new_root_password" value="'.$_pia->rand_string(50).'"></td></tr>'."\n";
   $disp_body .= "</table>\n";
