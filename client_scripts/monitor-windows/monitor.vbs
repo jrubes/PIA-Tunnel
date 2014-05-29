@@ -180,6 +180,9 @@ do while outer_loop=true
 			case -2147012744
 				'invalid response from server - ignore
 				failed_once=false
+			case -2147012867
+				'connection error only happened during PIA Tunnel restart so far - ignore
+				failed_once=false
 			case -2147012866
 				'connection terminated due to error - ignore
 				failed_once=false
