@@ -1,5 +1,7 @@
 *~
 /login.conf
+/login-pia.conf
+/login-frootvpn.conf
 /settings.conf
 /session.log
 /client_id

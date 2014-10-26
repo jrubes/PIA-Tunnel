@@ -3,6 +3,7 @@
 LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
+source '/pia/include/functions.sh'
 RET_FORWARD_PORT="FALSE"
 
 #get default gateway of tunnel interface using "ip"
@@ -25,46 +26,38 @@ EXT_GW=`ip route show | grep "default" | gawk -F" " '{print $3}'`
 
 
 
-#get PIA username and password from /pia/login.conf
-PIA_UN=`sed -n '1p' /pia/login.conf`
-PIA_PW=`sed -n '2p' /pia/login.conf`
+# check for default username and exit
+check_default_username
 
-#check the for default value
-if [ "$PIA_UN" = "your PIA account name on this line" ]; then
-	killall openvpn
-	echo
-	echo "Please add your Private Internet Access account information"
-	echo "to /pia/login.conf"
-	echo "Try"
-	echo -e "\tvi /pia/login.conf"
-	echo "or"
-	echo -e "\tnano /pia/login.conf"
-	echo
-	exit
-fi
+
 
 #function to get the port used for port forwarding
 # "returns" RET_FORWARD_PORT with the port number as the value or FALSE
 function get_forward_port() {
   RET_FORWARD_PORT="FALSE"
 
-  #check if the client ID has been generated and get it
-  if [ ! -f "/pia/client_id" ]; then
-    head -n 100 /dev/urandom | md5sum | tr -d " -" > "/pia/client_id"
-  fi
-  PIA_CLIENT_ID=`cat /pia/client_id`
-  PIA_UN=`sed -n '1p' /pia/login.conf`
-  PIA_PW=`sed -n '2p' /pia/login.conf`
-  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  #this only works with pia
+  get_provider
+  if [ "$RET_PROVIDER_NAME" = "pia" ]; then
 
-  #get open port of tunnel connection
-  TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
+    #check if the client ID has been generated and get it
+    if [ ! -f "/pia/client_id" ]; then
+      head -n 100 /dev/urandom | md5sum | tr -d " -" > "/pia/client_id"
+    fi
+    PIA_CLIENT_ID=`cat /pia/client_id`
+    PIA_UN=`sed -n '1p' /pia/login-pia.conf`
+    PIA_PW=`sed -n '2p' /pia/login-pia.conf`
+    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
 
-  #the location may not support port forwarding
-  if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
-    RET_FORWARD_PORT=$TUN_PORT
-  else
-    RET_FORWARD_PORT="FALSE"
+    #get open port of tunnel connection
+    TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
+
+    #the location may not support port forwarding
+    if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
+      RET_FORWARD_PORT=$TUN_PORT
+    else
+      RET_FORWARD_PORT="FALSE"
+    fi
   fi
 }
 

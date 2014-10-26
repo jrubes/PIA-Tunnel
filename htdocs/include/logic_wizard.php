@@ -95,7 +95,7 @@ function disp_wizard_default(){
 
   //username
   $disp_body .= '<p>Please enter your <a href="https://www.privateinternetaccess.com" target="_blank">https://www.privateinternetaccess.com</a>
-                    account information below. The information will be stored in /pia/login.conf with read access for root and this webUI.</p>';
+                    account information below. The information will be stored in /pia/login-pia.conf with read access for root and this webUI.</p>';
   $disp_body .= "<table>\n";
   $disp_body .= '<tr><td>VPN Username</td><td><input type="text" style="width: 15em" name="username" value="" placeholder="Your Account Username" required></td>';
   $disp_body .= '<tr><td>VPN Password</td><td><input type="password" style="width: 15em" name="password" value="" placeholder="Your Account Password" required></td>';

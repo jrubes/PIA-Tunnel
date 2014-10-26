@@ -1,4 +1,4 @@
-<?php
+  <?php
 /* @var $_settings PIASettings */
 /* @var $_pia PIACommands */
 /* @var $_files FilesystemOperations */
@@ -326,13 +326,14 @@ function dhcpd_process_template(){
  */
 function disp_vpn_default(){
   global $_token;
-  $user = VPN_get_user();
+
 
   $pass = array('update VPN username and password');
   $tokens = $_token->pgen($pass);
 
   $disp_body = '';
   /* show Username and Password fields - expand this for more VPN providers */
+  $user = VPN_get_user('pia');
   $disp_body .= '<div class="box vpn"><h2>PrivateInternetAccess.com</h2>';
   $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
   $disp_body .= '<table><tr>';
@@ -341,8 +342,23 @@ function disp_vpn_default(){
   $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
   $disp_body .= '</tr></table>';
   $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= '<input type="hidden" name="vpn_provider" value="pia">';
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form></div>";
+
+  $user = VPN_get_user('frootvpn');
+  $disp_body .= '<div class="box vpn"><h2>FrootVPN.com</h2>';
+  $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
+  $disp_body .= '<table><tr>';
+  $disp_body .= '<td>Username</td><td><input type="text" name="username" value="'.htmlentities($user['username']).'"></td>';
+  $disp_body .= '</tr><tr>';
+  $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
+  $disp_body .= '</tr></table>';
+  $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= '<input type="hidden" name="vpn_provider" value="frootvpn">';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
+  $disp_body .= "</form></div>";
+
   return $disp_body;
 }
 
@@ -946,20 +962,5 @@ function disp_network_default(){
     toggle_hide(\'toggle_advanced_settings\', \'\', \'\');</script>';
 
   return $disp_body;
-}
-
-/**
- * method read /pia/login.conf into an array
- * @return array,bool array with ['name'], ['password'] OR FALSE on failure
- */
-function VPN_get_user(){
-  //get username and password from file or SESSION
-  if( array_key_exists('login.conf', $_SESSION) !== true ){
-    $ret = load_login();
-    if( $ret !== false ){
-      return $ret;
-    }
-  }
-  return $_SESSION['login.conf'];
 }
 ?>

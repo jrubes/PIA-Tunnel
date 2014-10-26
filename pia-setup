@@ -43,10 +43,14 @@ if [ ! -z "$pos" ]; then
   fi
 fi
 
-#create a new login.conf if none exists
-if [ ! -f '/pia/login.conf' ]; then
-	echo "your PIA account name on this line" > '/pia/login.conf'
-	echo "your PIA account password on this line" >> '/pia/login.conf'
+#create new login files if none exist
+if [ ! -f '/pia/login-pia.conf' ]; then
+	echo "your PIA account name on this line" > '/pia/login-pia.conf'
+	echo "your PIA account password on this line" >> '/pia/login-pia.conf'
+fi
+if [ ! -f '/pia/login-frootvpn.conf' ]; then
+    echo "your FrootVPN account name on this line" > /pia/login-frootvpn.conf
+    echo "your FrootVPN account password on this line" >> /pia/login-frootvpn.conf
 fi
 
 #create a fresh settings file
@@ -143,6 +147,11 @@ fi
 
 # rebuild autostart.conf to apply new default values from update (pia-update runs pia-setup)
 /pia/include/autostart_rebuild.sh &> /dev/null
+
+if [ ! -d "/pia/cache/" ]; then
+  mkdir /pia/cache/
+fi
+
 
 #ALWAYS RUN THIS LAST
 chown -R root.vpnvm /pia

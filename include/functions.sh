@@ -23,6 +23,32 @@ PING_IP_LIST[2]="208.67.222.222"
 PING_IP_LIST[3]="208.67.220.220"
 
 
+# checks if at least one of the login files has been filled
+function check_default_username(){
+	#check the for default value
+    if [ -f "/pia/login-pia.conf" ]; then
+      PIA_UN1=`sed -n '1p' /pia/login-pia.conf`
+    fi
+
+    if [ -f "/pia/login-frootvpn.conf" ]; then
+      PIA_UN2=`sed -n '1p' /pia/login-frootvpn.conf`
+    fi
+
+	if [ "$PIA_UN1" = "your PIA account name on this line" ] && [ "$PIA_UN2" = "your FrootVPN account name on this line" ]; then
+		echo
+		echo "Please add your VPN account information to either"
+		echo "to /pia/login-pia.conf"
+		echo "or /pia/login-frootvpn.conf"
+		echo "Try"
+		echo -e "\tvi /pia/login-pia.conf"
+		echo -e "\tvi /pia/login-frootvpn.conf"
+		echo "or"
+		echo -e "\tnano /pia/login-pia.conf"
+		echo -e "\tnano /pia/login-frootvpn.conf"
+		echo
+		exit
+	fi
+}
 
 
 # checks if $1 is found in the PING_IP_LIST array
@@ -348,28 +374,47 @@ function switch_vpn() {
 }
 
 
+# retrieve provider from cache file
+# "returns" RET_PROVIDER_NAME with the provider string "pia", "frootvpn"
+function get_provider(){
+  if [ -f "/pia/cache/provider.txt" ];then
+    RET_PROVIDER_NAME=`cat /pia/cache/provider.txt`
+  else
+    echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+				"- /pia/cache/provider.txt does not exist."
+    exit 1;
+  fi
+}
+
+
 #function to get the port used for port forwarding
 # "returns" RET_FORWARD_PORT with the port number as the value or FALSE
 function get_forward_port() {
   RET_FORWARD_PORT="FALSE"
 
-  #check if the client ID has been generated and get it
-  if [ ! -f "/pia/client_id" ]; then
-    head -n 100 /dev/urandom | md5sum | tr -d " -" > "/pia/client_id"
-  fi
-  PIA_CLIENT_ID=`cat /pia/client_id`
-  PIA_UN=`sed -n '1p' /pia/login.conf`
-  PIA_PW=`sed -n '2p' /pia/login.conf`
-  TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  #this only works with pia
+  get_provider
+  if [ "$RET_PROVIDER_NAME" = "pia" ]; then
 
-  #get open port of tunnel connection
-  TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
+    #check if the client ID has been generated and get it
+    if [ ! -f "/pia/client_id" ]; then
+      head -n 100 /dev/urandom | md5sum | tr -d " -" > "/pia/client_id"
+    fi
+    PIA_CLIENT_ID=`cat /pia/client_id`
+    PIA_UN=`sed -n '1p' /pia/login-pia.conf`
+    PIA_PW=`sed -n '2p' /pia/login-pia.conf`
+    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
 
-  #the location may not support port forwarding
-  if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
-    RET_FORWARD_PORT=$TUN_PORT
-  else
-    RET_FORWARD_PORT="FALSE"
+    #get open port of tunnel connection
+    TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
+
+    #the location may not support port forwarding
+    if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
+      RET_FORWARD_PORT=$TUN_PORT
+    else
+      RET_FORWARD_PORT="FALSE"
+    fi
+
   fi
 }
 
@@ -515,26 +560,33 @@ function maintain_status_cache() {
     TUN_IP=""
   fi
 
-  #get PIA username and password from /pia/login.conf
-  PIA_UN=`sed -n '1p' /pia/login.conf`
-  PIA_PW=`sed -n '2p' /pia/login.conf`
+  #this only works with pia
+  get_provider
+  if [ "$RET_PROVIDER_NAME" = "pia" ]; then
+
+    #get PIA username and password from /pia/login-pia.conf
+    PIA_UN=`sed -n '1p' /pia/login-pia.conf`
+    PIA_PW=`sed -n '2p' /pia/login-pia.conf`
 
 
-  #check if the client ID has been generated and get it
-  if [ ! -f /pia/client_id ]; then
-    head -n 100 /dev/urandom | md5sum | tr -d " -" > /pia/client_id
-  fi
-  PIA_CLIENT_ID=`cat /pia/client_id`
+    #check if the client ID has been generated and get it
+    if [ ! -f /pia/client_id ]; then
+      head -n 100 /dev/urandom | md5sum | tr -d " -" > /pia/client_id
+    fi
+    PIA_CLIENT_ID=`cat /pia/client_id`
 
 
-  #get open port of tunnel connection
-  TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
+    #get open port of tunnel connection
+    TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
 
-  #the location may not support port forwarding
-  if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
-	  PORT_FW="enabled"
+    #the location may not support port forwarding
+    if [[ "$TUN_PORT" =~ ^[0-9]+$ ]]; then
+        PORT_FW="enabled"
+    else
+        PORT_FW="disabled"
+    fi
   else
-	  PORT_FW="disabled"
+    PORT_FW="disabled"
   fi
 
   #write info to cache file

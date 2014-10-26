@@ -229,30 +229,105 @@ function supports_forwarding( $conn_name ){
   return false;
 }
 
+
+/**
+ * method read /pia/login-pia.conf into an array
+ * @return array,bool array with ['name'], ['password'] OR FALSE on failure
+ */
+function VPN_get_user( $provider ){
+  //get username and password from file or SESSION
+  switch( $provider ){
+    case 'pia':
+      if( array_key_exists('login-pia.conf', $_SESSION) !== true ){
+        $ret = load_login($provider);
+        if( $ret !== false ){
+          $_SESSION['login-pia.conf'] = $ret;
+          return $ret;
+        }else{
+          return false;
+        }
+      }
+      return $_SESSION['login-pia.conf'];
+
+    case 'frootvpn':
+      if( array_key_exists('login-frootvpn.conf', $_SESSION) !== true ){
+        $ret = load_login($provider);
+        if( $ret !== false ){
+          $_SESSION['login-frootvpn.conf'] = $ret;
+          return $ret;
+        }else{
+          return false;
+        }
+      }
+      return $_SESSION['login-frootvpn.conf'];
+
+  }
+  return false;
+}
+
+/**
+ * checks which VPN provider is currently used for the VPN connection
+ * @global object $_files
+ * @param string $provider hard coded string 'pia', 'frootvpn'
+ * @return string/boolean containing the current provider or FALSE if file is not found
+ */
+function VPN_provider_connected(){
+  global $_files;
+
+  $c = $_files->readfile('/pia/cache/provider.txt');
+  if( $c !== false ){
+    return trim($c);
+  }
+  return false;
+}
+
+/**
+ * checks if the login files contain two lines which are longer then 1 char
+ * @param type $provider
+ */
+function VPN_is_provider_active( &$provider ){
+  $users = VPN_get_user($provider);
+  if( $users !== false ){
+    if( $provider === 'pia' ){
+      if( count($_SESSION['login-pia.conf']) === 2 ){ return true; }else{ return false; }
+    }elseif( $provider === 'frootvpn' ){
+      if( count($_SESSION['login-frootvpn.conf']) === 2 ){ return true; }else{ return false; }
+    }
+  }
+  throw new Exception('FATAL ERROR: unkown VPN provider. - '.$provider);
+}
+
+
+
 /**
  * function to load the .ovpn files into $_SESSION['ovpn'][]
  * @global array $_SESSION['ovpn']
  * @return boolean true on success or false on failure - dir does not exist
  */
 function VPN_ovpn_to_session(){
-  if( is_dir('/pia/ovpn') ){
-    global $_files;
+  $providers = array( 'pia', 'frootvpn'); //possible providers
+  $_SESSION['ovpn'] = array();
 
-    $tmp = array('ovpn');
-    $_files->set_ls_filter($tmp, 2);
-    $_files->set_ls_filter_mode('include');
+  foreach( $providers as $p ){
+    if( VPN_is_provider_active( $p) && is_dir('/pia/ovpn/'.$p) ){
+      global $_files;
 
-    //strip .ovpn before storing in session
-    $ls = $_files->ls('/pia/ovpn');
-    $ret = array();
-    foreach($ls as $val ){
-      $ret[] = substr($val, 0, (mb_strlen($val)-5) );
+      $tmp = array('ovpn');
+      $_files->set_ls_filter($tmp, 2);
+      $_files->set_ls_filter_mode('include');
+
+      //strip .ovpn before storing in session
+      $ls = $_files->ls('/pia/ovpn/'.$p);
+      foreach( $ls as $val ){
+         //$_SESSION['ovpn'][] = "$p/".substr($val, 0, (mb_strlen($val)-5) );
+         $_SESSION['ovpn'][] = substr($val, 0, (mb_strlen($val)-5) );
+      }
+    }else{
+      die('not active');
     }
-    $_SESSION['ovpn'] = $ret;
-    return true;
   }
-  return false;
 
+  if( count($_SESSION['ovpn']) > 0 ){ return true; }else{ return false; }
 }
 
 /**
@@ -303,7 +378,11 @@ function VM_get_status( $output = 'html'){
 
       $port = VPN_get_port();
       $vpn_pub = array();
-      exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
+      if( VPN_provider_connected() === 'pia' ){
+        exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
+      }else{
+        exec('ip -4 addr show tun0 | grep inet | gawk -F" " \'{print $2}\' | gawk -F"/" \'{print $1}\'', $vpn_pub);
+      }
       if( array_key_exists( '0', $vpn_pub) === true ){
         $ret_str .= "<tr><td style=\"vertical-align: top;\">Public VPN</td><td id=\"vpn_public_ip\">IP $vpn_pub[0] ";
         $ret_arr['vpn_public_ip'] = $vpn_pub[0];
@@ -321,9 +400,13 @@ function VM_get_status( $output = 'html'){
 
           }
         }else{
-          if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
+          if( $settings['FORWARD_PORT_ENABLED'] == 'yes' && VPN_provider_connected() === 'pia' ){
             $ret_str .= "<tr><td>Forwarding</td><td>currently disabled</td></tr>";
             $ret_arr['forwarding_port'] = "currently disabled";
+
+          }elseif( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
+            $ret_str .= "<tr><td>Forwarding</td><td>no VPN provider support</td></tr>";
+            $ret_arr['forwarding_port'] = "no VPN provider support";
           }
         }
 
@@ -591,7 +674,7 @@ function VPN_sessionlog_status(){
  function get_port(){
    global $_files;
   //get username and password from file or SESSION
-  if( array_key_exists('login.conf', $_SESSION) !== true ){
+  if( array_key_exists('login-pia.conf', $_SESSION) !== true ){
    if( load_login() === false ){
      return false;
    }
@@ -613,8 +696,8 @@ function VPN_sessionlog_status(){
   // create a new cURL resource
   $ch = curl_init();
 
-  $PIA_UN = urlencode($_SESSION['login.conf']['username']);
-  $PIA_PW = urlencode($_SESSION['login.conf']['password']);
+  $PIA_UN = urlencode($_SESSION['login-pia.conf']['username']);
+  $PIA_PW = urlencode($_SESSION['login-pia.conf']['password']);
   $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
   $ret = array();
   exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
@@ -681,21 +764,24 @@ function eol($string) {
 }
 
 /**
- * this function loads login.conf into an array, stores it in session and return it
+ * this function loads login-pia.conf into an array, stores it in session and return it
  * ['username']
  * ['password']
  * @global object $_files
  * @return array,boolean or false on failure
  */
-function load_login(){
+function load_login( $provider ){
   global $_files;
 
-  if( array_key_exists('login.conf', $_SESSION) === true
-          && $_SESSION['login.conf']['username'] != 'your PIA account name on this line' )
+  $fname = ($provider === 'frootvpn') ? 'login-frootvpn.conf' : 'login-pia.conf';
+
+  if( array_key_exists( $fname, $_SESSION) === true
+          && $_SESSION[$fname]['username'] != 'your PIA account name on this line' )
   {
-    return $_SESSION['login.conf'];
+    return $_SESSION[$fname];
+
   }else{
-    $c = $_files->readfile('/pia/login.conf');
+    $c = $_files->readfile('/pia/'.$fname);
     if( $c !== false ){
       $c = explode( "\n", eol($c));
       $un = ( mb_strlen($c[0]) > 0 ) ? $c[0] : '';
@@ -703,8 +789,8 @@ function load_login(){
       if( $un == '' || $pw == '' ){
         return false;
       }
-      $_SESSION['login.conf'] = array( 'username' => $un , 'password' => $pw); //store for later
-      return $_SESSION['login.conf'];
+      $_SESSION[$fname] = array( 'username' => $un , 'password' => $pw); //store for later
+      return $_SESSION[$fname];
     }else{
       return false;
     }
@@ -827,9 +913,24 @@ function update_user_settings(){
   global $_files;
 
   $ret = '';
-  $login_file = '/pia/login.conf';
-  $username = ( array_key_exists('username', $_POST) ) ? $_POST['username'] : '';
-  $password = ( array_key_exists('password', $_POST) ) ? $_POST['password'] : '';
+  if( !array_key_exists('vpn_provider', $_POST) ){throw new Exception('FATAL ERROR: vpn_provider not set'); }
+
+  switch( $_POST['vpn_provider'] ){
+    case 'pia':
+      $login_file = '/pia/login-pia.conf';
+      $session = 'login-pia.conf';
+      $username = ( array_key_exists('username', $_POST) ) ? $_POST['username'] : '';
+      $password = ( array_key_exists('password', $_POST) ) ? $_POST['password'] : '';
+      break;
+    case 'frootvpn':
+      $login_file = '/pia/login-frootvpn.conf';
+      $session = 'login-frootvpn.conf';
+      $username = ( array_key_exists('username', $_POST) ) ? $_POST['username'] : '';
+      $password = ( array_key_exists('password', $_POST) ) ? $_POST['password'] : '';
+      break;
+    default:
+      throw new Exception('FATAL ERROR: unkown VPN provider.');
+  }
 
   //can not empty values right now ... but there is a reset command
   if( $username != '' ){
@@ -838,8 +939,9 @@ function update_user_settings(){
       $ct = explode( "\n", eol($c));
       if( $username !== $ct[0] ){
         $content = "$username\n$ct[1]"; //write new username with old password
-        $_files->writefile($login_file, $content); //back to login.conf
+        $_files->writefile($login_file, $content); //back to login-pia.conf
         $ret .= "<div id=\"feedback\" class=\"feedback\">Username updated</div>\n";
+        unset($_SESSION[$session]);
       }
     }
   }
@@ -849,12 +951,13 @@ function update_user_settings(){
       $ct = explode( "\n", eol($c));
       if( $password !== $ct[1] ){
         $content = "$ct[0]\n$password"; //write old username with new password
-        $_files->writefile($login_file, $content); //back to login.conf
+        $_files->writefile($login_file, $content); //back to login-pia.conf
         $ret .= "<div id=\"feedback\" class=\"feedback\">Password updated</div>\n";
+        unset($_SESSION[$session]);
       }
     }
   }
-  unset($_SESSION['login.conf']);
+
   return $ret;
 }
 ?>

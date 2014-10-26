@@ -34,19 +34,10 @@ function control_c() {
 }
 
 
-#final check before the loop starts
-PIA_UN=`sed -n '1p' /pia/login.conf`
-if [ "$PIA_UN" = "your PIA account name on this line" ]; then
-	echo
-	echo "Please add your Private Internet Access account information"
-	echo "to /pia/login.conf"
-	echo "Try"
-	echo -e "\tvi /pia/login.conf"
-	echo "or"
-	echo -e "\tnano /pia/login.conf"
-	echo
-	exit
-fi
+# check for default username and exit
+check_default_username
+
+
 # this is the outer endless loop #
 ##################################
 while true; do
