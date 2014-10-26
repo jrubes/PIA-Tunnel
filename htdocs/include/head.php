@@ -61,8 +61,8 @@ function toggle_hide( ele_id , event_ele_id, switch_value ){
     var event_ele;
     var event_lbls;
 
-    if( event_ele_id != "" ){ event_ele = document.getElementById( event_ele_id ); }
-    if( switch_value != "" ){ event_lbls = switch_value.split(","); }
+    if( event_ele_id && event_ele_id != "" ){ event_ele = document.getElementById( event_ele_id ); }
+    if( switch_value && switch_value != "" ){ event_lbls = switch_value.split(","); }
 
     if( ele ){
         if( ele.getAttribute("class") == "hidden" ){
