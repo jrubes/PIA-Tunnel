@@ -107,6 +107,7 @@ done
 
 #reset-pia is special - ug+x but no /bin link
 chmod ug+x "/pia/reset-pia"
+chmod ug+x "/pia/system-update.sh"
 
 #check ip cache
 if [ ! -f "/pia/cache/ip_list.txt" ]; then
@@ -131,15 +132,35 @@ find /var/www -type f -exec chmod 0640 {} \;
 rm -rf "/pia/cache/webui-update_status.txt"
 
 
-# add "automatic update" cronjob
+# add "automatic update" cronjob - remove these soon
+#crontab -l > /tmp/crontab.piaout
+#ret=`grep -c "apt-get upgrade" /tmp/crontab.piaout`
+#if [ $ret = 0 ]; then
+#  echo '00 04 * * * apt-get update -y ; apt-get upgrade -y' >> '/tmp/crontab.piaout'
+#  crontab /tmp/crontab.piaout
+#  rm /tmp/crontab.piaout
+#fi
+
+# change "automatic update" to every 8 hours
 crontab -l > /tmp/crontab.piaout
-ret=`grep -c "apt-get upgrade" /tmp/crontab.piaout`
-if [ $ret = 0 ]; then
-  echo '00 04 * * * apt-get update -y ; apt-get upgrade -y' >> '/tmp/crontab.piaout'
+ret1=`grep -c "00 04 \* \* \* apt-get update -y ; apt-get upgrade -y" /tmp/crontab.piaout`
+ret2=`grep -c "00 8/\* \* \* \* /pia/system-update.sh" /tmp/crontab.piaout`
+if [ $ret1 = 1 ] && [ $ret2 = 0 ]; then
+  pos=`grep -n '00 04 \* \* \* apt-get update -y' /tmp/crontab.piaout | gawk -F":" '{print $1}'`
+  sed -i".tmp" "${pos}d" /tmp/crontab.piaout
+  echo '00 8/* * * * /pia/system-update.sh' >> '/tmp/crontab.piaout'
   crontab /tmp/crontab.piaout
+  rm /tmp/crontab.piaout
+else
+  #echo "already up to date"
   rm /tmp/crontab.piaout
 fi
 
+
+# move login.conf to login-pia.conf
+if [ -f '/pia/login.conf' ]; then
+  mv '/pia/login.conf' '/pia/login-pia.conf'
+fi
 
 
 #add missing settings to settings.conf
