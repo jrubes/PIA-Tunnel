@@ -83,6 +83,8 @@ if [ ! -f "/pia/settings.conf" ]; then
     echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/pia/settings.conf'
 	echo '' >> '/pia/settings.conf'
 fi
+#add missing (new) settings to settings.conf
+/pia/include/fix_settings.sh
 
 FILES="pia-start pia-stop pia-status pia-update pia-settings"
 FILES="$FILES pia-setup pia-forward  pia-prepare-ovpn pia-daemon"
@@ -162,9 +164,6 @@ if [ -f '/pia/login.conf' ]; then
   mv '/pia/login.conf' '/pia/login-pia.conf'
 fi
 
-
-#add missing settings to settings.conf
-/pia/include/fix_settings.sh
 
 # rebuild autostart.conf to apply new default values from update (pia-update runs pia-setup)
 /pia/include/autostart_rebuild.sh &> /dev/null
