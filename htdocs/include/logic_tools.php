@@ -1,4 +1,4 @@
-<?php
+  <?php
 /* execute tools for the PIA VPN GUI Management */
 /* @var $_settings PIASettings */
 /* @var $_pia PIACommands */
@@ -20,11 +20,22 @@ if(array_key_exists('ovpn', $_SESSION) !== true ){
 
 //act on $CMD variable
 switch($_REQUEST['cmd']){
+  case 'force_update':
+    if( $_token->pval($_GET['token'], 'force operating system update') === true ){
+      exec("bash -c \"sudo /pia/system-update.sh &> /dev/null &\" &>/dev/null &");
+      $disp_body .= "<div id=\"feedback\" class=\"feedback\">Operating System Update is now running in the background.</div>\n";
+    }else{
+      $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
+    }
+    $disp_body .= disp_default();
+    break;
+
   case 'update_software_client':
     global $meta;
     $meta['javascript'][] = '/js/UpdateClient.js';
     $disp_body .= disp_pia_update_client();
     break;
+
   case 'run_pia_command':
     if( array_key_exists('pia-update', $_POST) === true ){
       //GUI access to pia-setup
@@ -86,6 +97,9 @@ $disp_body .= '<script type="text/javascript">'
 				.'</script>';
 
 
+
+
+
 function disp_default(){
   $disp_body = '';
   $disp_body .= disp_docu();
@@ -94,12 +108,35 @@ function disp_default(){
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= disp_client_tools();
   $disp_body .= '<div class="clear"></div>';
+  $disp_body .= disp_force_update();
+  $disp_body .= '<div class="clear"></div>';
   $disp_body .= disp_update_root();
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= disp_reset_pia();
   $disp_body .= '<div class="clear"></div>';
   return $disp_body;
 }
+
+
+function disp_force_update(){
+  global $settings;
+  global $_token;
+  $disp_body = '<div class="box tools">';
+  $ret_arr = array();
+
+  $pass = array( 'force operating system update' );
+  $tokens = $_token->pgen($pass);
+
+  //offer download links to client tools
+  $disp_body .= '<h2>Force System Update</h2>';
+  $disp_body .= 'The VM will attempt to update the operating system every 8 hours but '
+                .' you may also force a manual update here';
+  $disp_body .= '<p><a href="/?page=tools&amp;cid=tools&amp;cmd=force_update&amp;token='.$tokens[0].'">Start Manual System Update</a></p>';
+
+  $disp_body .= '</div>';
+  return $disp_body;
+}
+
 
 /**
  * returns UI elements in HTML
