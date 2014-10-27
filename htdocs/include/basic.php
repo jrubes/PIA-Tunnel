@@ -285,13 +285,17 @@ function VPN_provider_connected(){
  * checks if the login files contain two lines which are longer then 1 char
  * @param type $provider
  */
-function VPN_is_provider_active( &$provider ){
+function VPN_is_provider_active( $provider ){
   $users = VPN_get_user($provider);
   if( $users !== false ){
     if( $provider === 'pia' ){
-      if( count($_SESSION['login-pia.conf']) === 2 ){ return true; }else{ return false; }
+      if( count($_SESSION['login-pia.conf']) === 2
+              && $_SESSION['login-pia.conf']['username'] != 'your PIA account name on this line')
+      { return true; }else{ return false; }
     }elseif( $provider === 'frootvpn' ){
-      if( count($_SESSION['login-frootvpn.conf']) === 2 ){ return true; }else{ return false; }
+      if( count($_SESSION['login-frootvpn.conf']) === 2
+          && $_SESSION['login-frootvpn.conf']['username'] != 'your FrootVPN account name on this line')
+      { return true; }else{ return false; }
     }
   }
   throw new Exception('FATAL ERROR: unkown VPN provider. - '.$provider);
@@ -776,7 +780,8 @@ function load_login( $provider ){
   $fname = ($provider === 'frootvpn') ? 'login-frootvpn.conf' : 'login-pia.conf';
 
   if( array_key_exists( $fname, $_SESSION) === true
-          && $_SESSION[$fname]['username'] != 'your PIA account name on this line' )
+          && $_SESSION[$fname]['username'] != 'your PIA account name on this line'
+          && $_SESSION[$fname]['username'] != 'your FrootVPN account name on this line' )
   {
     return $_SESSION[$fname];
 
