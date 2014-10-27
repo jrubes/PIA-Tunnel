@@ -326,8 +326,6 @@ function VPN_ovpn_to_session(){
          //$_SESSION['ovpn'][] = "$p/".substr($val, 0, (mb_strlen($val)-5) );
          $_SESSION['ovpn'][] = substr($val, 0, (mb_strlen($val)-5) );
       }
-    }else{
-      die('not active');
     }
   }
 

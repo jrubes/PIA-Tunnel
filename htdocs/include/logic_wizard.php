@@ -15,6 +15,10 @@ switch($_REQUEST['cmd']){
     $disp_body .= update_user_settings();
     $disp_body .= $_settings->save_settings_logic($_POST['store_fields']);
     $disp_body .= $_pia->update_root_password($_POST['new_root_password']);
+
+    $disp_body .= '<div class="box">';
+    $disp_body .= '<p>All done! <a href="/?page=main">Please login to continue</a></p>';
+    $disp_body .= '</div>';
     break;
   case 'reset-system':
     $settings = $_settings->get_settings();
