@@ -407,8 +407,8 @@ function VM_get_status( $output = 'html'){
             $ret_arr['forwarding_port'] = "currently disabled";
 
           }elseif( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
-            $ret_str .= "<tr><td>Forwarding</td><td>no VPN provider support</td></tr>";
-            $ret_arr['forwarding_port'] = "no VPN provider support";
+            $ret_str .= "<tr><td>Forwarding</td><td>not supported by VPN provider</td></tr>";
+            $ret_arr['forwarding_port'] = "not supported by VPN provider";
           }
         }
 
@@ -602,6 +602,11 @@ function VPN_sessionlog_status(){
   $session_status = VPN_sessionlog_status();
   if( $session_status[0] != 'connected'){
     return 'not connected yet';
+  }
+
+  //currently PIA is only provider supporting port forwarding
+  if( VPN_provider_connected() !== 'pia' ){
+    return false;
   }
 
   //unset($_SESSION['PIA_port_timestamp']);
