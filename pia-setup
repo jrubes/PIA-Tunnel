@@ -47,11 +47,13 @@ fi
 if [ ! -f '/pia/login-pia.conf' ]; then
 	echo "your PIA account name on this line" > '/pia/login-pia.conf'
 	echo "your PIA account password on this line" >> '/pia/login-pia.conf'
+    chown -R root.vpnvm /pia/login-pia.conf
     chmod 0660 /pia/login-pia.conf
 fi
 if [ ! -f '/pia/login-frootvpn.conf' ]; then
     echo "your FrootVPN account name on this line" > /pia/login-frootvpn.conf
     echo "your FrootVPN account password on this line" >> /pia/login-frootvpn.conf
+    chown -R root.vpnvm /pia/login-frootvpn.conf
     chmod 0660 /pia/login-frootvpn.conf
 fi
 
@@ -124,6 +126,8 @@ if [ ! -f "/pia/ip_list.txt" ]; then
 	  "- ip_list.txt does not exist - rebuilding!"
 	echo -e "\tthis will take a couple of minutes...."
 	/pia/include/build_ping_list.sh
+    chown -R root.vpnvm /pia/ip_list.txt
+    chmod 0660 /pia/ip_list.txt
 fi
 
 
@@ -177,12 +181,12 @@ fi
 
 if [ ! -d "/pia/cache/" ]; then
   mkdir /pia/cache/
+  chown -R root.vpnvm /pia/cache/
+  chmod 0770 /pia/cache/
 fi
 
 
 #ALWAYS RUN THIS LAST
 chown -R root.vpnvm /pia
 chmod 0770 /pia
-find /pia -type d -exec chmod 0770 {} \;
-find /pia -type f -exec chmod 0660 {} \;
 chmod -R o-rwx /pia
