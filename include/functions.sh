@@ -85,13 +85,13 @@ function is_ip_unique() {
   RET_IP_UNIQUE="yes"
 }
 
-#function to grab a few IPs from /pia/cache/ip_list.txt
+#function to grab a few IPs from /pia/ip_list.txt
 # and store them for later in $PING_eIP_LIST[]
 function gen_ip_list() {
 
-	if [ ! -f "/pia/cache/ip_list.txt" ]; then
+	if [ ! -f "/pia/ip_list.txt" ]; then
 		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-		  "- \"/pia/cache/ip_list.txt\" does not exist. Please run pia-setup first"
+		  "- \"/pia/ip_list.txt\" does not exist. Please run pia-setup first"
 		exit
 	fi
 
@@ -107,7 +107,7 @@ function gen_ip_list() {
   fi
 
   #read list of IPs into IP_LIST array
-  IFS=$'\r\n' IP_LIST=($(cat "/pia/cache/ip_list.txt" | tail -n+2))
+  IFS=$'\r\n' IP_LIST=($(cat "/pia/ip_list.txt" | tail -n+2))
   #get array length
   IP_COUNT=${#IP_LIST[@]}
   IP_COUNT=$((IP_COUNT - 1)) #zero based

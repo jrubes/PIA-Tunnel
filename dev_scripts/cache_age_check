@@ -8,7 +8,7 @@ source '/pia/settings.conf'
 source '/pia/include/functions.sh'
 
 
-filechk="/pia/cache/ip_list.txt"
+filechk="/pia/ip_list.txt"
 cache_age_check "$filechk"
 echo "$filechk has $RET_CACHE_AGE_CHECK"
 

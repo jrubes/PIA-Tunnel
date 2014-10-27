@@ -117,7 +117,7 @@ chmod ug+x "/pia/system-update.sh"
 
 
 #check ip cache
-if [ ! -f "/pia/cache/ip_list.txt" ]; then
+if [ ! -f "/pia/ip_list.txt" ]; then
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- ip_list.txt does not exist - rebuilding!"
 	echo -e "\tthis will take a couple of minutes...."

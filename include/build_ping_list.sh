@@ -26,7 +26,7 @@ aIPS[0]=""
 #used for debug in this script
 VERBOSE="yes"
 
-IPCACHE="/pia/cache/ip_list.txt"
+IPCACHE="/pia/ip_list.txt"
 
 
 
@@ -122,7 +122,7 @@ if [ $ip_count -lt 11 ]; then
 
 else
   # aIPS is now a string over IPs separated by space
-  # loop over and write to /pia/cache/ip_list.txt
+  # loop over and write to /pia/ip_list.txt
   echo "# generated on "$(date +"%Y-%m-%d %H:%M:%S") > "$IPCACHE"
   for ip in ${aIPS[@]}
   do
