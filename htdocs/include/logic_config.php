@@ -82,13 +82,17 @@ switch($_REQUEST['cmd']){
           //check if the git branch needs to be switched
           if( $settings['GIT_BRANCH'] !== $_POST['GIT_BRANCH'] ){
             $sarg = escapeshellcmd($_POST['GIT_BRANCH']); //this is not proper!
-            exec('cd /pia ; git reset --hard HEAD ; git fetch origin ; git checkout '.$sarg.' &> /dev/null');
+            exec('cd /pia ; git reset --hard; git fetch ; git checkout '.$sarg.' &> /dev/null');
             exec('chmod ug+x /pia/pia-setup ; /pia/pia-setup &> /dev/null');
+            exec('/pia/pia-update &> /dev/null');
 
             $_settings->save_settings('GIT_BRANCH', $_POST['GIT_BRANCH']);
             $settings = $_settings->get_settings();
             $_pia->clear_update_status(); //clear cache to refresh update check
-            $disp_body .= "<div id=\"feedback\" class=\"feedback\">git branch switched to $_POST[GIT_BRANCH]</div>\n";
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">git branch switched to $_POST[GIT_BRANCH]<br>"
+                    . "<a href=\"/?page=main\">Please login again to refresh your settings.</a></div>\n";
+            $_auth->logout();
+            break;
           }
 
 
