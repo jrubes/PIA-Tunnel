@@ -106,7 +106,7 @@ class PIACommands {
    */
   function clear_update_status(){
     $cache_file = '/pia/cache/webui-update_status.txt';
-    unlink($cache_file);
+    if( file_exists($cache_file) ){ unlink($cache_file); }
   }
 
   /**

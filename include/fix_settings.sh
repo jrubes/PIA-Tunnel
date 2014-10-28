@@ -211,5 +211,14 @@ fi
 # git branch setting for online updates
 ret=`grep -c "GIT_BRANCH" /pia/settings.conf`
 if [ $ret = 0 ]; then
-  echo 'GIT_BRANCH="release_php-gui"' >> '/pia/settings.conf'
+  CURRENT_BRANCH=`cd /pia/ ; git branch | grep '*' | gawk -F" " '{print $2}'`
+  if [ "$CURRENT_BRANCH" != "" ]; then
+    echo "using ${CURRENT_BRANCH}"
+    echo "GIT_BRANCH='${CURRENT_BRANCH}'" >> '/pia/settings.conf'
+  else
+    echo "default to stable branch"
+    echo 'GIT_BRANCH="release_php-gui"' >> '/pia/settings.conf'
+  fi
+else
+  echo "branch already set"
 fi
