@@ -1,9 +1,10 @@
 This is a cut and paste file so getting everything working should only take a few minutes!
 
 10) Install minimum Debian with SSH Server, nothing else!
+  * tested with debian-7.7.0-i386-netinst.iso
   * 2GB VM disk
     * 100MB for SWAP, rest for /
-  * 92MB RAM for VM - 128MB during installation
+  * 256MB RAM for VM - 92MB if you don't need socks proxy (not recommended)
   * Set to en_US.UTF-8 locale or change with 'dpkg-reconfigure locales' later on
   * make sure you set the hostname to   pia-tunnel   before you start with this guide
 
@@ -149,12 +150,13 @@ OR this is how I created the package in /pia/extra_software/
 140) 
 	mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
 	git clone https://github.com/KaiserSoft/PIA-Tunnel.git /pia
+	cd /pia ; git checkout release_php-gui
 
    
 150)	chmod 777 /pia/pia-setup ; /pia/pia-setup
 
 
-160) vi /etc/rc.local
+160) vi /etc/rc.local (add above exit 0)
 #execute PIA start scripts
 /pia/include/autostart.sh
 
