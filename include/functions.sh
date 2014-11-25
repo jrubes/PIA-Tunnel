@@ -358,6 +358,7 @@ function switch_vpn() {
 				#start firewall and enable forwarding
 				/pia/pia-forward start quite
 				RAN_FORWARD_FIX="no" #reset on working connection
+                rm "/pia/cache/status.txt"
 				return
 			fi
 
