@@ -654,20 +654,25 @@ function VPN_sessionlog_status(){
         }
       }
 
-     if( is_int($pia_ret['port']) === true && $pia_ret['port'] > 0 && $pia_ret['port'] < 65536 ){
-      $_SESSION['PIA_port'] = $pia_ret['port']; //needs to be refreshed later on
-      $_SESSION['PIA_port_timestamp'] = strtotime('now');
+      if( is_int($pia_ret['port']) === true && $pia_ret['port'] > 0 && $pia_ret['port'] < 65536 ){
+        $_SESSION['PIA_port'] = $pia_ret['port']; //needs to be refreshed later on
+        $_SESSION['PIA_port_timestamp'] = strtotime('now');
 
-      //update cache
-      $txt = strtotime('now').'|'.$pia_ret['port'];
-      $_files->writefile($cache_file, $txt);
-     }elseif( is_array($pia_ret) === false && $pia_ret === false ){
-      //unable to get port info - PIA may be down
-      $_SESSION['PIA_port'] = "ERROR: getting port info. is the website up?";
-      $_SESSION['PIA_port_timestamp'] = strtotime('now');
-     }else{
-       return false;
-     }
+        //update cache
+        $txt = strtotime('now').'|'.$pia_ret['port'];
+        $_files->writefile($cache_file, $txt);
+      }elseif( is_array($pia_ret) === false && $pia_ret === false ){
+        if( supports_forwarding($_SESSION['connecting2']) === true ){
+          //unable to get port info - PIA may be down
+          $_SESSION['PIA_port'] = "ERROR: getting port info. is the website up?";
+          $_SESSION['PIA_port_timestamp'] = strtotime('now');
+        }else{
+          $_SESSION['PIA_port'] = "";
+          $_SESSION['PIA_port_timestamp'] = strtotime('now');
+        }
+      }else{
+        return false;
+      }
    }
 
    return $_SESSION['PIA_port'];
