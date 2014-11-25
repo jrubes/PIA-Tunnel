@@ -22,11 +22,13 @@ rm -r '/pia/cache/status.txt' 2>/dev/null
 
 #show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
-	LIST=`ls -1 /pia/ovpn/ | gawk -F"." '{print $1}'`
+	LIST1=`ls -I "ca.crt" -1 /pia/ovpn/pia/ | gawk -F"." '{print $1}'`
+    LIST2=`ls -1 /pia/ovpn/frootvpn/ | gawk -F"." '{print $1}'`
 
 	echo
 	echo "Listing available VPN connections:"
-	echo "$LIST"
+	echo "$LIST1"
+	echo "$LIST2"
 	echo
 	echo "Examples:"
 	echo -e "\tpia-start Germany"
@@ -44,20 +46,9 @@ if [ "$1" = "daemon" ]; then
 fi
 
 #execute if .ovpn file exists with name passed
-if [ -f "/pia/ovpn/$filename.ovpn" ]; then
-	#check the for default value
-	PIA_UN=`sed -n '1p' /pia/login.conf`
-	if [ "$PIA_UN" = "your PIA account name on this line" ]; then
-		echo
-		echo "Please add your Private Internet Access account information"
-		echo "to /pia/login.conf"
-		echo "Try"
-		echo -e "\tvi /pia/login.conf"
-		echo "or"
-		echo -e "\tnano /pia/login.conf"
-		echo
-		exit
-	fi
+if [ -f "/pia/ovpn/pia/$filename.ovpn" ] || [ -f "/pia/ovpn/frootvpn/$filename.ovpn" ]; then
+	# check for default username and exit
+    check_default_username
 
 
 	#see if we have a tunnel open
@@ -79,7 +70,15 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 		"- establishing a VPN connection to $filename."
 	echo -e "\tsee ${bold}/pia/cache/session.log${normal} for details"
     echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $filename" > /pia/cache/session.log
-	openvpn "/pia/ovpn/$filename.ovpn" &>> /pia/cache/session.log &
+
+    #this is a hack until I come up with a good way to providers dynamically
+    if [ -f "/pia/ovpn/pia/$filename.ovpn" ]; then
+      echo "pia" > /pia/cache/provider.txt
+      openvpn "/pia/ovpn/pia/$filename.ovpn" &>> /pia/cache/session.log &
+    else
+      echo "frootvpn" > /pia/cache/provider.txt
+      openvpn "/pia/ovpn/frootvpn/$filename.ovpn" &>> /pia/cache/session.log &
+    fi
 
 
 

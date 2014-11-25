@@ -13,8 +13,7 @@ $inc_dir = './include/';
 require_once $inc_dir.'basic.php';
 
 //force setup wizard if PIA username is set to default
-$login_dta = load_login();
-if( $login_dta['username'] == 'your PIA account name on this line' ){
+if( !VPN_is_provider_active('pia') && !VPN_is_provider_active('frootvpn') ){
   $_REQUEST['page'] = 'setup-wizard';
 }
 unset($login_dta);
@@ -27,15 +26,15 @@ if( $settings['WEB_UI_USER'] == "" && $_REQUEST['page'] != 'setup-wizard'){
   //only allow authenticated users past this point
   if(array_key_exists('username', $_POST) !== true ){ $_POST['username'] = ''; }
   if(array_key_exists('password', $_POST) !== true ){ $_POST['password'] = ''; }
-  
+
   //check if this a new login and validate the token if it is
   if( array_key_exists('Login', $_POST) === true ){
     if( $_token->pval($_POST['token']) !== true ){
       die('invalid login token, the script ends here!');
     }
-    
+
   }
-  
+
   $expected = array( 'username' => $settings['WEB_UI_USER'], 'password' => $settings['WEB_UI_PASSWORD']);
   $supplied = array( 'username' => $_POST['username'], 'password' => $_POST['password']);
   $_auth->authenticate( $expected, $supplied );

@@ -43,10 +43,18 @@ if [ ! -z "$pos" ]; then
   fi
 fi
 
-#create a new login.conf if none exists
-if [ ! -f '/pia/login.conf' ]; then
-	echo "your PIA account name on this line" > '/pia/login.conf'
-	echo "your PIA account password on this line" >> '/pia/login.conf'
+#create new login files if none exist
+if [ ! -f '/pia/login-pia.conf' ]; then
+	echo "your PIA account name on this line" > '/pia/login-pia.conf'
+	echo "your PIA account password on this line" >> '/pia/login-pia.conf'
+    chown -R root.vpnvm /pia/login-pia.conf
+    chmod 0660 /pia/login-pia.conf
+fi
+if [ ! -f '/pia/login-frootvpn.conf' ]; then
+    echo "your FrootVPN account name on this line" > /pia/login-frootvpn.conf
+    echo "your FrootVPN account password on this line" >> /pia/login-frootvpn.conf
+    chown -R root.vpnvm /pia/login-frootvpn.conf
+    chmod 0660 /pia/login-frootvpn.conf
 fi
 
 #create a fresh settings file
@@ -73,7 +81,7 @@ if [ ! -f "/pia/settings.conf" ]; then
     echo '# Enable/Disable forwarding for private VM LAN yes/no' >> '/pia/settings.conf'
     echo 'FORWARD_VM_LAN="yes"' >> '/pia/settings.conf'
     echo '# Enable ssh UI on the following interfaces' >> '/pia/settings.conf'
-    echo 'FIREWALL_IF_SSH[0]=""' >> '/pia/settings.conf'
+    echo 'FIREWALL_IF_SSH[0]="eth0"' >> '/pia/settings.conf'
     echo '# Enable web on the following interfaces' >> '/pia/settings.conf'
     echo 'FIREWALL_IF_WEB[0]="eth0"' >> '/pia/settings.conf'
     echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/pia/settings.conf'
@@ -103,13 +111,30 @@ done
 
 #reset-pia is special - ug+x but no /bin link
 chmod ug+x "/pia/reset-pia"
+chmod ug+x "/pia/system-update.sh"
+
+#add missing (new) settings to settings.conf
+/pia/include/fix_settings.sh
+
+### add changes below this lines as settings.conf may not be upto date above
+
+
+
+# move ip list from old to new location
+if [ ! -f '/pia/ip_list.txt' ] && [ -f '/pia/cache/ip_list.txt' ]; then
+  mv '/pia/cache/ip_list.txt' '/pia/ip_list.txt'
+fi
+
+
 
 #check ip cache
-if [ ! -f "/pia/cache/ip_list.txt" ]; then
+if [ ! -f '/pia/ip_list.txt' ]; then
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- ip_list.txt does not exist - rebuilding!"
 	echo -e "\tthis will take a couple of minutes...."
 	/pia/include/build_ping_list.sh
+    chown -R root.vpnvm /pia/ip_list.txt
+    chmod 0660 /pia/ip_list.txt
 fi
 
 
@@ -127,23 +152,48 @@ find /var/www -type f -exec chmod 0640 {} \;
 rm -rf "/pia/cache/webui-update_status.txt"
 
 
-# add "automatic update" cronjob
+# add "automatic update" cronjob - remove these soon
+#crontab -l > /tmp/crontab.piaout
+#ret=`grep -c "apt-get upgrade" /tmp/crontab.piaout`
+#if [ $ret = 0 ]; then
+#  echo '00 04 * * * apt-get update -y ; apt-get upgrade -y' >> '/tmp/crontab.piaout'
+#  crontab /tmp/crontab.piaout
+#  rm /tmp/crontab.piaout
+#fi
+
+# change "automatic update" to every 8 hours
 crontab -l > /tmp/crontab.piaout
-ret=`grep -c "apt-get upgrade" /tmp/crontab.piaout`
-if [ $ret = 0 ]; then
-  echo '00 04 * * * apt-get update -y ; apt-get upgrade -y' >> '/tmp/crontab.piaout'
+ret1=`grep -c "00 04 \* \* \* apt-get update -y ; apt-get upgrade -y" /tmp/crontab.piaout`
+ret2=`grep -c "00 8/\* \* \* \* /pia/system-update.sh" /tmp/crontab.piaout`
+if [ $ret1 = 1 ] && [ $ret2 = 0 ]; then
+  pos=`grep -n '00 04 \* \* \* apt-get update -y' /tmp/crontab.piaout | gawk -F":" '{print $1}'`
+  sed -i".tmp" "${pos}d" /tmp/crontab.piaout
+  echo '00 8/* * * * /pia/system-update.sh' >> '/tmp/crontab.piaout'
   crontab /tmp/crontab.piaout
+  rm /tmp/crontab.piaout
+else
+  #echo "already up to date"
   rm /tmp/crontab.piaout
 fi
 
 
+# move login.conf to login-pia.conf
+if [ -f '/pia/login.conf' ]; then
+  mv '/pia/login.conf' '/pia/login-pia.conf'
+fi
 
-#add missing settings to settings.conf
-/pia/include/fix_settings.sh
 
 # rebuild autostart.conf to apply new default values from update (pia-update runs pia-setup)
 /pia/include/autostart_rebuild.sh &> /dev/null
 
+if [ ! -d "/pia/cache/" ]; then
+  mkdir /pia/cache/
+  chown -R root.vpnvm /pia/cache/
+  chmod 0770 /pia/cache/
+fi
+
+
 #ALWAYS RUN THIS LAST
 chown -R root.vpnvm /pia
+chmod 0770 /pia
 chmod -R o-rwx /pia

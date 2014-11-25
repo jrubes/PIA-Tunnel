@@ -21,19 +21,8 @@ fi
 source '/pia/settings.conf'
 source '/pia/include/functions.sh'
 
-#check the for default value
-if [ "$PIA_UN" = "your PIA account name on this line" ]; then
-  killall openvpn
-  echo
-  echo "Please add your Private Internet Access account information"
-  echo "to /pia/login.conf"
-  echo "Try"
-  echo -e "\tvi /pia/login.conf"
-  echo "or"
-  echo -e "\tnano /pia/login.conf"
-  echo
-  exit
-fi
+# check for default username and exit
+check_default_username
 
 
 

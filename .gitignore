@@ -1,9 +1,12 @@
 *~
 /login.conf
+/login-pia.conf
+/login-frootvpn.conf
 /settings.conf
 /session.log
 /client_id
 /include/ip_list.txt
+/ip_list.txt
 /include/autostart.conf
 /cache/
 /nbproject/

@@ -15,6 +15,10 @@ switch($_REQUEST['cmd']){
     $disp_body .= update_user_settings();
     $disp_body .= $_settings->save_settings_logic($_POST['store_fields']);
     $disp_body .= $_pia->update_root_password($_POST['new_root_password']);
+
+    $disp_body .= '<div class="box">';
+    $disp_body .= '<p>All done! <a href="/?page=main">Please login to continue</a></p>';
+    $disp_body .= '</div>';
     break;
   case 'reset-system':
     $settings = $_settings->get_settings();
@@ -94,11 +98,17 @@ function disp_wizard_default(){
   $fields .= 'WEB_UI_USER,WEB_UI_PASSWORD,WEB_UI_NAMESPACE,WEB_UI_COOKIE,';
 
   //username
-  $disp_body .= '<p>Please enter your <a href="https://www.privateinternetaccess.com" target="_blank">https://www.privateinternetaccess.com</a>
-                    account information below. The information will be stored in /pia/login.conf with read access for root and this webUI.</p>';
+  $disp_body .= '<p>Please enter your VPN account information for one provider.<br>'
+                .'You may configure additional accounts after the setup wizard is finished.</p>';
   $disp_body .= "<table>\n";
-  $disp_body .= '<tr><td>VPN Username</td><td><input type="text" style="width: 15em" name="username" value="" placeholder="Your Account Username" required></td>';
-  $disp_body .= '<tr><td>VPN Password</td><td><input type="password" style="width: 15em" name="password" value="" placeholder="Your Account Password" required></td>';
+  $disp_body .= '<tr><td>VPN Provider</td><td>';
+    $disp_body .= '<select name="vpn_provider">';
+    $disp_body .= '<option value="pia">PrivateInternetAccess.com</option>';
+    $disp_body .= '<option value="frootvpn">FrootVPN.com</option>';
+    $disp_body .= '</select>';
+  $disp_body .= '</td>';
+  $disp_body .= '<tr><td>VPN Account Username</td><td><input type="text" style="width: 15em" name="username" value="" placeholder="Your Account Username" required></td>';
+  $disp_body .= '<tr><td>VPN Account Password</td><td><input type="password" style="width: 15em" name="password" value="" placeholder="Your Account Password" required></td>';
   $disp_body .= "</table>\n";
   $disp_body .= '<hr>';
 

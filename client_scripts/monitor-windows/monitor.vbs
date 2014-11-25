@@ -48,7 +48,7 @@ end if
 
 'handle %APPDATA% in config path
 if InStr(torrent_config, "%APPDATA%") > 0 then
-	ENV_APPDATA = oShell.ExpandEnvironmentStrings( "%APPDATA%" )	
+	ENV_APPDATA = oShell.ExpandEnvironmentStrings( "%APPDATA%" )
 	torrent_config = ENV_APPDATA & mid( torrent_config, 10 )
 end if
 
@@ -56,19 +56,19 @@ end if
 if NOT oFSO.FileExists(torrent_config) = true then
 	' try to locate the config file on our own
 	ENV_APPDATA = oShell.ExpandEnvironmentStrings( "%APPDATA%" )
-	
+
 	tmp = ENV_APPDATA & "\deluge\core.conf"
 	if oFSO.FileExists(tmp) = true AND torrent_client = "deluge" AND NOT config_found = true then
 		torrent_config = tmp
 		config_found = true
 	end if
-	
+
 	tmp = ENV_APPDATA & "\qBittorrent\qBittorrent.ini"
 	if oFSO.FileExists(tmp) = true AND torrent_client = "qbittorrent" AND NOT config_found = true then
 		torrent_config = tmp
 		config_found = true
 	end if
-	
+
 else
 	config_found=true
 end if
@@ -88,7 +88,7 @@ if InStr(ucase(torrent_exe), "%PROGRAMFILES") > 0 then
 		torrent_exe = ENV_PRO86 & mid( torrent_exe, 21 )
 		call msgbox("expanded: " & torrent_exe)
 	else
-		ENV_PRO = oShell.ExpandEnvironmentStrings( "%PROGRAMFILES%" )	
+		ENV_PRO = oShell.ExpandEnvironmentStrings( "%PROGRAMFILES%" )
 		torrent_exe = ENV_PRO & mid( torrent_exe, 15 )
 		call msgbox("expandedd: " & torrent_exe)
 	end if
@@ -96,12 +96,12 @@ end if
 
 'validate torrent_exe
 if NOT oFSO.FileExists(torrent_exe) = true then
-	'check default location 
+	'check default location
 	'%programfiles%\qBittorrent\qbittorrent.exe
 	'C:\Program Files (x86)\Deluge\deluge.exe
 	ENV_PRO86 = oShell.ExpandEnvironmentStrings( "%PROGRAMFILES(x86)%" )
-	ENV_PRO = oShell.ExpandEnvironmentStrings( "%PROGRAMFILES%" )	
-	
+	ENV_PRO = oShell.ExpandEnvironmentStrings( "%PROGRAMFILES%" )
+
 	tmp = ENV_PRO86 & "\deluge\deluge.exe"
 	if oFSO.FileExists(tmp) = true AND torrent_client = "deluge" AND NOT exe_found = true then
 		torrent_exe = tmp
@@ -112,7 +112,7 @@ if NOT oFSO.FileExists(torrent_exe) = true then
 		torrent_exe = tmp
 		exe_found = true
 	end if
-	
+
 	tmp = ENV_PRO86 & "\qBittorrent\qbittorrent.exe"
 	if oFSO.FileExists(tmp) = true AND torrent_client = "qbittorrent" AND NOT exe_found = true then
 		torrent_exe = tmp
@@ -186,6 +186,9 @@ do while outer_loop=true
 			case -2147012866
 				'connection terminated due to error - ignore
 				failed_once=false
+			case -2147012867
+				wscript.echo( Date() & " " & Time() & " -- Connection Error: Is PIA-Tunnel up and running?")
+				failed_once=false
 			case -2147019873
 				' something is not ready ... just ignore it
 				failed_once=false
@@ -202,8 +205,8 @@ do while outer_loop=true
 		http_return = oHTTP.responseText
 	end if
 	On Error Goto 0	'Resume default error handeling
-	
-	
+
+
 	'wscript.echo http_return
 	if NOT http_return = "" AND IsNumeric(http_return) = true then
 		' something returned
@@ -212,23 +215,23 @@ do while outer_loop=true
 			current_port = http_return
 
 			'update the config file
-			foo=update_config(http_return)			
-			
+			foo=update_config(http_return)
+
 			'resart the application
 			foo=restart_process(torrent_process)
 		end if
 		failed_once=false
-		
+
 	elseif http_return = "not supported by location" then
 		if NOT http_return = current_port then
 			wscript.echo( Date() & " " & Time() & " -- location does not support port forwarding")
 			current_port = http_return
-			
+
 			'resart the application
 			foo=restart_process(torrent_process)
 		end if
 		failed_once=false
-		
+
 	else
 		'not connected or not yet
 		if failed_once = true then
@@ -268,9 +271,9 @@ function restart_process( byval process_name )
 				oShell.Exec "PSKill " & objProcess.ProcessId
 				count = count + 1
 			end if
-		Next		
+		Next
 		wscript.sleep(1000) 'give process a little while to exit
-		
+
 		if count = 0 then
 			'no more process left, exit
 			run = false
@@ -297,7 +300,7 @@ end function
 function update_config( byref openport )
 	Dim cont, foo, newconf
 	cont = file_get_text(torrent_config)
-	
+
 	Set reg = New RegExp
 	reg.IgnoreCase = True
 	reg.Global = false 'only one match
@@ -334,11 +337,11 @@ function update_one_per_line( byref file, byref look4, byref newval)
 				line=current & newval
 				changed=true
 			end if
-			
+
 			newfile = newfile & vbcrlf & line
 		Loop
 		oFile.Close
-		
+
 		'write content back
 		if NOT newfile = "" AND changed = true then
 			foo=del(file)
@@ -353,7 +356,7 @@ function file_write_text( byref file, byref content)
 	'Writes information to text file, returns true if ok, false when something went wrong
 	Dim oFSO
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
-	
+
 	Const ForAppending = 8
 	Const ForWriting = 2
 	if oFSO.FileExists(file) then
@@ -361,7 +364,7 @@ function file_write_text( byref file, byref content)
 	else
 		Set oFile = oFSO.CreateTextFile (file, ForWriting)
 	end if
-	
+
 	oFile.WriteLine content
 	oFile.Close
 	file_write_text = true
@@ -373,9 +376,9 @@ function del( byref file)
 	'Returns true if the file was deleted, false if not
 	Dim oFSO
 	Set oFSO = CreateObject("Scripting.FileSystemObject")
-	
+
 	if oFSO.FileExists(file) = true then
-		
+
 		On Error Resume Next
 			call oFSO.DeleteFile( file, true)
 			If Err.Number <> 0 Then
@@ -391,8 +394,8 @@ function del( byref file)
 						wscript.quit
 				end select
 			End If
-		On Error Goto 0	'Resume default error handeling		
-				
+		On Error Goto 0	'Resume default error handeling
+
 		'check if the file is really gone
 		if oFSO.FileExists(file) = true then
 			del = false
@@ -431,7 +434,7 @@ function strip_q( byref str )
 	if mid(str, 1, 1) = """" then
 		str = mid(str, 2) 'Get String without quotes
 	end if
-	
+
 	'Check if str ends with a quote
 	if mid(str, len(str), 1) = """" then
 		str = mid(str, 1, len(str)-1)
@@ -452,7 +455,7 @@ end function
 
 Sub WriteINIString(Section, KeyName, Value, FileName)
   Dim INIContents, PosSection, PosEndSection
-  
+
   'Get contents of the INI file As a string
   INIContents = GetFile(FileName)
 
@@ -463,7 +466,7 @@ Sub WriteINIString(Section, KeyName, Value, FileName)
     PosEndSection = InStr(PosSection, INIContents, vbCrLf & "[")
     '?Is this last section?
     If PosEndSection = 0 Then PosEndSection = Len(INIContents)+1
-    
+
     'Separate section contents
     Dim OldsContents, NewsContents, Line
     Dim sKeyName, Found
@@ -495,8 +498,8 @@ Sub WriteINIString(Section, KeyName, Value, FileName)
       NewsContents & Mid(INIContents, PosEndSection)
   else'if PosSection>0 Then
     'Section Not found. Add section data at the end of file contents.
-    If Right(INIContents, 2) <> vbCrLf And Len(INIContents)>0 Then 
-      INIContents = INIContents & vbCrLf 
+    If Right(INIContents, 2) <> vbCrLf And Len(INIContents)>0 Then
+      INIContents = INIContents & vbCrLf
     End If
     INIContents = INIContents & "[" & Section & "]" & vbCrLf & _
       KeyName & "=" & Value
@@ -506,7 +509,7 @@ End Sub
 
 Function GetINIString(Section, KeyName, Default, FileName)
   Dim INIContents, PosSection, PosEndSection, sContents, Value, Found
-  
+
   'Get contents of the INI file As a string
   INIContents = GetFile(FileName)
 
@@ -517,7 +520,7 @@ Function GetINIString(Section, KeyName, Default, FileName)
     PosEndSection = InStr(PosSection, INIContents, vbCrLf & "[")
     '?Is this last section?
     If PosEndSection = 0 Then PosEndSection = Len(INIContents)+1
-    
+
     'Separate section contents
     sContents = Mid(INIContents, PosSection, PosEndSection - PosSection)
 
@@ -548,7 +551,7 @@ End Function
 Function GetFile(ByVal FileName)
   Dim FS: Set FS = CreateObject("Scripting.FileSystemObject")
   'Go To windows folder If full path Not specified.
-  If InStr(FileName, ":\") = 0 And Left (FileName,2)<>"\\" Then 
+  If InStr(FileName, ":\") = 0 And Left (FileName,2)<>"\\" Then
     FileName = FS.GetSpecialFolder(0) & "\" & FileName
   End If
   On Error Resume Next
@@ -557,12 +560,12 @@ Function GetFile(ByVal FileName)
 End Function
 
 Function WriteFile(ByVal FileName, ByVal Contents)
-  
+
   Dim FS: Set FS = CreateObject("Scripting.FileSystemObject")
   'On Error Resume Next
 
   'Go To windows folder If full path Not specified.
-  If InStr(FileName, ":\") = 0 And Left (FileName,2)<>"\\" Then 
+  If InStr(FileName, ":\") = 0 And Left (FileName,2)<>"\\" Then
     FileName = FS.GetSpecialFolder(0) & "\" & FileName
   End If
 

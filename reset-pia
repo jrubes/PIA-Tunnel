@@ -1,5 +1,5 @@
 #!/bin/bash
-# will delete any cache files and create login.conf and settings.conf
+# will delete any cache files and create login files and settings.conf
 # this command is named reset-pia on purpose (pia-reset). DO NOT run this for fun!
 
 LANG=en_US.UTF-8
@@ -24,7 +24,7 @@ cd /var/lib/dhcp/ ; rm -f *.leases~
 cd /var/lib/dhcp/ ; touch dhcpd.leases
 
 #delete pia-* files
-FILES="session.log login.conf client_id status.txt include/status.txt"
+FILES="session.log login.conf login-pia.conf login-frootvpn.conf client_id status.txt include/status.txt"
 for f in $FILES
 do
 	if [ -f "/pia/$f" ]; then
@@ -33,17 +33,13 @@ do
 done
 
 #delete cache files
-FILES="session.log client_id status.txt"
-for f in $FILES
-do
-	if [ -f "/pia/cache/$f" ]; then
-		rm -f "/pia/cache/$f"
-	fi
-done
+rm -rf "/pia/cache/"
 
 #create empty login.conf file
-echo "your PIA account name on this line" > /pia/login.conf
-echo "your PIA account password on this line" >> /pia/login.conf
+echo "your PIA account name on this line" > /pia/login-pia.conf
+echo "your PIA account password on this line" >> /pia/login-pia.conf
+echo "your FrootVPN account name on this line" > /pia/login-frootvpn.conf
+echo "your FrootVPN account password on this line" >> /pia/login-frootvpn.conf
 
 #delete settings.conf
 rm -f /pia/settings.conf

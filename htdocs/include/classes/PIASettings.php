@@ -311,7 +311,7 @@ function is_settings_array( $array_name ){
   }
 
   //check if $config_value[0] is in settings
-  if( array_key_exists($config_value.'[0]', $settings) === true ){
+  if( array_key_exists($config_value.'[0]', $settings) === true || $config_value === 'MYVPN' ){
     return true;
   }else{
     return false;
