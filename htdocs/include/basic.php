@@ -640,7 +640,7 @@ function VPN_sessionlog_status(){
         $expires = strtotime('-96 hours'); //time until session expires
         if( trim($cont[0]) < $expires ){
           $pia_ret = get_port();
-          if(array_key_exists('port', $pia_ret) === true ){
+          if( $pia_ret !== false && array_key_exists('port', $pia_ret) ){
             settype($pia_ret['port'], 'integer');
           }
 
@@ -649,7 +649,7 @@ function VPN_sessionlog_status(){
         }
       }else{
         $pia_ret = get_port();
-        if(array_key_exists('port', $pia_ret) === true ){
+        if( $pia_ret !== false && array_key_exists('port', $pia_ret) ){
           settype($pia_ret['port'], 'integer');
         }
       }
