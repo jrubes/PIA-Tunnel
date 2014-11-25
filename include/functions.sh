@@ -319,7 +319,8 @@ function echo_conn_established() {
   # show connection data
   maintain_status_cache '/pia/cache/status.txt'
   vpn_port=`cat "/pia/cache/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
-  vpn_ip=`cat "/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+  #vpn_ip=`cat "/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+  vpn_ip=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
   echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- VPN connection to $1 established\n\tVPN IP: $vpn_ip Port: $vpn_port"
 }
@@ -335,7 +336,15 @@ function switch_vpn() {
 		fi
 		killall openvpn &> /dev/null
         echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $CONN" > /pia/cache/session.log
-		openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/cache/session.log &
+
+        #this is a hack until I come up with a good way to providers dynamically
+        if [ -f "/pia/ovpn/pia/$CONN.ovpn" ]; then
+          echo "pia" > /pia/cache/provider.txt
+          openvpn "/pia/ovpn/pia/$CONN.ovpn" &>> /pia/cache/session.log &
+        else
+          echo "frootvpn" > /pia/cache/provider.txt
+          openvpn "/pia/ovpn/frootvpn/$CONN.ovpn" &>> /pia/cache/session.log &
+        fi
 
 		#wait until connection has been established
 		LOOP_PROTECT=0

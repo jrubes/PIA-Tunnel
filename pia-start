@@ -71,6 +71,7 @@ if [ -f "/pia/ovpn/pia/$filename.ovpn" ] || [ -f "/pia/ovpn/frootvpn/$filename.o
 	echo -e "\tsee ${bold}/pia/cache/session.log${normal} for details"
     echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $filename" > /pia/cache/session.log
 
+    #this is a hack until I come up with a good way to providers dynamically
     if [ -f "/pia/ovpn/pia/$filename.ovpn" ]; then
       echo "pia" > /pia/cache/provider.txt
       openvpn "/pia/ovpn/pia/$filename.ovpn" &>> /pia/cache/session.log &

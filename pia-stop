@@ -28,6 +28,13 @@ else
 	ifdown eth1 &>/dev/null && ifup eth1 &>/dev/null #Debian
 fi
 
+#verify that we have a default route
+GATEWAY=`/sbin/ip route show | grep "0.0.0.0/1" | gawk -F" " '{print $3}'`
+if [ "$GATEWAY" = '' ]; then
+  EXT_IP=`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  route add default gw $EXT_IP $IF_EXT
+fi
+
 # remove old status.txt
 rm -f '/pia/cache/status.txt' &>/dev/null
 rm -f '/pia/cache/session.log' &>/dev/null
