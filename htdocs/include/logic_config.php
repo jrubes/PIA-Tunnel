@@ -338,7 +338,7 @@ function disp_vpn_default(){
   $pass = array('update VPN username and password');
   $tokens = $_token->pgen($pass);
 
-  $disp_body = '';
+  $disp_body = '<div class="box vpn">Please logoff after you enter the username and password for a VPN provider for the first time. The providers VPN connections will not work until you logff.</div>';
   /* show Username and Password fields - expand this for more VPN providers */
   $user = VPN_get_user('pia');
   $disp_body .= '<div class="box vpn"><h2>PrivateInternetAccess.com</h2>';
