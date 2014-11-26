@@ -174,6 +174,9 @@ do while outer_loop=true
 			case -2146697211
 				wscript.echo( Date() & " " & Time() & " -- Connection Error: Is the IP correct and the VM running?")
 				failed_once=false
+			case -2147012867
+				wscript.echo( Date() & " " & Time() & " -- Connection Error: Unable to connect - possible network issue?")
+				failed_once=false
 			case -2147012894
 				wscript.echo( Date() & " " & Time() & " -- Timeout Error: Is the IP correct?")
 				failed_once=false
