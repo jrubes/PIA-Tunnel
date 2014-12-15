@@ -124,7 +124,7 @@ OR this is how I created the package in /pia/extra_software/
 	./configure --without-upnp --without-libwrap --prefix=/usr/src/dante-1.4.0-bin/
 	make
 	make install
-	cd /usr/src/ ; tar -cvf dante-1.4.0-bin.tar /usr/src/dante-1.4.0-bin/
+	cd /usr/src/ ; tar -cvf dante-1.4.0-bin.tar dante-1.4.0-bin/
 	xz -z -e dante-1.4.0-bin.tar
 	rm -rf /usr/src/dante-1.4.0/
 	rm -rf /usr/src/dante-1.4.0-bin/
