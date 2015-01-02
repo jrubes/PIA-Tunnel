@@ -941,9 +941,9 @@ function disp_encryption(){
   $sel = array(
             'id' => 'VPN_ENCRYPTION',
             'selected' =>  $settings['VPN_ENCRYPTION'],
-            array( 'AES-128', 'AES 128bit - (default)'),
-            array( 'AES-256', 'AES 256bit'),
-            array( 'BLOWFISH', 'Blowfish 128bit')
+            array( 'AES-128-CBC', 'AES-128-CBC (default)'),
+            array( 'AES-256-CBC', 'AES-256-CBC'),
+            array( 'BF-CBC', 'Blowfish-CBC')
           );
   $html .= '<tr><td>VPN encryption</td><td>'.build_select($sel).'</td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'VPN_ENCRYPTION,';
@@ -952,12 +952,14 @@ function disp_encryption(){
   $sel = array(
             'id' => 'VPN_AUTHENTICATION',
             'selected' =>  $settings['VPN_AUTHENTICATION'],
-            array( 'SHA1', 'SHA 160bit - (default)'),
-            array( 'SHA256', 'SHA 256bit')
+            array( 'SHA1', 'SHA1 (160bit) - (default)'),
+            array( 'SHA256', 'SHA256 (256bit)')
           );
   $html .= '<tr><td>VPN authentication</td><td>'.build_select($sel).'</td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'VPN_AUTHENTICATION,';
 
+//1196
+//1194
 
   $sel = array(
             'id' => 'VPN_HANDSHAKE',
@@ -971,6 +973,17 @@ function disp_encryption(){
           );
   $html .= '<tr><td>Handshake encryption</td><td>'.build_select($sel).'</td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'VPN_HANDSHAKE,';
+
+  $sel = array(
+            'id' => 'VPN_LOGLEVEL',
+            'selected' =>  $settings['VPN_LOGLEVEL'],
+            array( '1', '1 (default)'),
+            array( '4', '4'),
+            array( '6', '6 (debug)'),
+            array( '9', '9 (extreme)')
+          );
+  $html .= '<tr><td>VPN log verbosity</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'VPN_LOGLEVEL,';
 
   return $html;
 }
