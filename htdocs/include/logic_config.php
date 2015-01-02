@@ -868,6 +868,11 @@ function disp_advanced_box(){
   $disp_body .= '<tr><td>DNS 4</td><td><input type="text" name="NAMESERVERS[3]" value="'.$settings['NAMESERVERS[3]'].'"></td></tr>'."\n";
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
+
+  //encryption settings
+  $disp_body .= disp_encryption();
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+
   //ping error threshold
   $GLOB_disp_network_default_fields .= 'PING_MAX_LOSS,';
   $sel = array(
@@ -911,9 +916,8 @@ function disp_advanced_box(){
   $sel = array(
             'id' => 'GIT_BRANCH',
             'selected' =>  $settings['GIT_BRANCH'],
-            array( 'release_php-gui', 'release_php-gui'),
-            array( 'frootVPN', 'frootVPN'),
-            array( $settings['GIT_BRANCH'], $settings['GIT_BRANCH'])
+            array( 'release_php-gui', 'release_php-gui')
+            //,array( $settings['GIT_BRANCH'], $settings['GIT_BRANCH'])
           );
   $disp_body .= '<tr><td>Development branch</td><td>'.build_select($sel).'</td></tr>'."\n";
 
@@ -924,6 +928,51 @@ function disp_advanced_box(){
   $disp_body .= '</div>';
 
   return $disp_body;
+}
+
+
+/**
+ * generates HTML form element for encryption settings
+ */
+function disp_encryption(){
+  global $GLOB_disp_network_default_fields;
+  $html = '';
+
+  $sel = array(
+            'id' => 'VPN_ENCRYPTION',
+            'selected' =>  $settings['VPN_ENCRYPTION'],
+            array( 'AES-128', 'AES 128bit - (default)'),
+            array( 'AES-256', 'AES 256bit'),
+            array( 'BLOWFISH', 'Blowfish 128bit')
+          );
+  $html .= '<tr><td>VPN encryption</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'VPN_ENCRYPTION,';
+
+
+  $sel = array(
+            'id' => 'VPN_AUTHENTICATION',
+            'selected' =>  $settings['VPN_AUTHENTICATION'],
+            array( 'SHA1', 'SHA 160bit - (default)'),
+            array( 'SHA256', 'SHA 256bit')
+          );
+  $html .= '<tr><td>VPN authentication</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'VPN_AUTHENTICATION,';
+
+
+  $sel = array(
+            'id' => 'VPN_HANDSHAKE',
+            'selected' =>  $settings['VPN_HANDSHAKE'],
+            array( 'RSA-2048', 'RSA 2048bit (default)'),
+            array( 'RSA-3072', 'RSA 3072bit'),
+            array( 'RSA-4096', 'RSA 4096bit'),
+            array( 'ECC-256k1', 'ECC secp256k1 256bit'),
+            array( 'ECC-256r1', 'ECC secp256r1 256bit'),
+            array( 'ECC-521', 'ECC secp521r1 521bit')
+          );
+  $html .= '<tr><td>Handshake encryption</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'VPN_HANDSHAKE,';
+
+  return $html;
 }
 
 
