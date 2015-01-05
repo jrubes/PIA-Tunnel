@@ -181,6 +181,7 @@ function array_is_value_unique( &$ar, $val ){
  * @return string/bool string containing HTML formated as <select> or FALSE
  */
 function VPN_get_connections( $name, $build_options=array()){
+  $fw_ret = array();
   $ret = array();
   $sel = array();
   $sel['id'] = $name;
@@ -197,7 +198,7 @@ function VPN_get_connections( $name, $build_options=array()){
     $html = htmlentities($ovpn);
     //$ret .= "<option value=\"$html\">$html</option>\n";
     if( supports_forwarding($html) === true ){
-      $ret[] = array( $html, '*'.$html);
+      $fw_ret[] = array( $html, '*'.$html);
     }else{
       $ret[] = array( $html, $html);
     }
@@ -205,8 +206,8 @@ function VPN_get_connections( $name, $build_options=array()){
 
   if( $ret == '' ){ return false; }
 
-  sort($ret);
-  $t = array_merge($sel, $ret);
+  sort($ret);sort($fw_ret);
+  $t = array_merge($sel, $fw_ret, $ret);
   $assembled = build_select($t);
   //return "<select name=\"vpn_connections\">\n$ret</select>\n";
   return $assembled;
@@ -218,7 +219,7 @@ function VPN_get_connections( $name, $build_options=array()){
  * @param string $conn_name name OVPN file without .ovpn
  */
 function supports_forwarding( $conn_name ){
-  $locations = array( 'Canada', 'CA Toronto', 'Switzerland', 'Sweden', 'Romania', 'Germany', 'France', 'Netherlands' );
+  $locations = array( 'CA North York', 'CA Toronto', 'Switzerland', 'Sweden', 'Romania', 'Germany', 'France', 'Netherlands' );
   $lc = strtolower($conn_name);
 
   foreach( $locations as $l ){

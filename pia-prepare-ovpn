@@ -3,11 +3,13 @@
 # https://www.privateinternetaccess.com/openvpn/openvpn.zip
 # only run this after a fresh download or if you know why you want to run it :)
 
-# hardcode path to PIA ca.cert file into a .ovpn files
- sed -i 's/ca \/pia\/ovpn\/ca.crt/ca \/pia\/ovpn\/pia\/ca.crt/g' /pia/ovpn/pia/*.ovpn
+# hardcode path to PIA ca.cert
+ sed -i 's/ca ca.crt/ca \/pia\/ovpn\/pia\/ca.crt/g' /pia/ovpn/pia/*.ovpn
+
+# hardcode path to PIA crl.pem
+ sed -i 's/crl-verify crl.pem/crl-verify \/pia\/ovpn\/pia\/crl.pem/g' /pia/ovpn/pia/*.ovpn
 
 # use login.conf to store the password localy instead of prompting for it
-sed -i 's/auth-user-pass/auth-user-pass\ \/pia\/login.conf/g' /pia/ovpn/*.ovpn
-sed -i 's/auth-user-pass \/pia\/login.conf/auth-user-pass \/pia\/login-pia.conf /g' /pia/ovpn/pia/*.ovpn
+sed -i 's/auth-user-pass/auth-user-pass \/pia\/login-pia.conf /g' /pia/ovpn/pia/*.ovpn
 
 echo "Files have been updated"
