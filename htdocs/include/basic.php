@@ -347,6 +347,11 @@ function VM_get_status( $output = 'html'){
   $ret_str = '<table id="vm_status"><tbody>';
   $ret_arr = array();
 
+
+  $sysload = get_system_load();
+  $ret_str .= "<tr><td>System</td><td id=\"system_load\">".nl2br($sysload)."</td></tr>";
+  $ret_arr['system_load'] = $sysload;
+
   $up = $_pia->get_update_status();
   if(is_int($up) === true && $up == 0 ){
     $up_txt = 'latest release';
@@ -509,6 +514,92 @@ function VM_get_status( $output = 'html'){
   }else{
     return $ret_str;
   }
+}
+
+function get_system_load(){
+  $ret = '';
+
+  $cpu = get_cpuload();
+  //$ret .= "CPU {$cpu['sy']}% usr,  {$cpu['sy']}% sys, {$cpu['id']}% idle\n";
+  $cpu = sys_getloadavg();
+  $ret .= "load average $cpu[0], $cpu[1], $cpu[2]\n";
+
+  $mem = get_meminfo();
+  $used = $mem['total'] - $mem['free'];
+  $ret .= "RAM {$used}/{$mem['total']} MB used";
+
+  return $ret;
+}
+
+
+function get_cpuload(){
+  $cpu = array();
+  $output = shell_exec('vmstat 2>&1');
+  $vmstat_array = explode("\n", $output);
+  $data_line = explode(" ", $vmstat_array[2]);
+
+  //cpu data is at the end of vmstat output
+  $cnt = count($data_line)-1; //start at 0
+  //var_dump($data_line);die();
+  $cpu['us'] = $data_line[$cnt-5];
+  $cpu['sy'] = $data_line[$cnt-3];
+  $cpu['id'] = $data_line[$cnt-2];
+  return $cpu;
+}
+
+
+/* returns the system memory info as an array */
+function get_meminfo(){
+  $ram_info = array();
+  $output = shell_exec('cat /proc/meminfo 2>&1');
+  $ram_array = explode("\n", $output);
+  foreach( $ram_array as $key => $val )
+  {
+    //get total
+    if( strstr( $val , 'MemTotal') )
+    {
+      $tmp = explode(':', $val);
+      $tmp = trim(substr($tmp[1], 1, count($tmp[1])-3)); //strip white space and remove KB
+      $ram_info['total'] = (int)round($tmp/1024); //round to full MB and store as int
+    }
+    //get free
+    if( strstr( $val , 'MemFree') )
+    {
+      $tmp = explode(':', $val);
+      $tmp = trim(substr($tmp[1], 1, count($tmp[1])-3)); //strip white space and remove KB
+      $ram_info['free'] = (int)round($tmp/1024); //round to full MB and store as int
+    }
+    //get cache
+    if( strstr( $val , 'Cached') && !strstr( $val , 'SwapCached') )
+    {
+      $tmp = explode(':', $val);
+      $tmp = trim(substr($tmp[1], 1, count($tmp[1])-3)); //strip white space and remove KB
+      $ram_info['cached'] = (int)round($tmp/1024); //round to full MB and store as int
+    }
+
+    //swap total
+    if( strstr( $val , 'SwapTotal') )
+    {
+      $tmp = explode(':', $val);
+      $tmp = trim(substr($tmp[1], 1, count($tmp[1])-3)); //strip white space and remove KB
+      $ram_info['swap_total'] = (int)round($tmp/1024); //round to full MB and store as int
+    }
+    //swap free
+    if( strstr( $val , 'SwapFree') )
+    {
+      $tmp = explode(':', $val);
+      $tmp = trim(substr($tmp[1], 1, count($tmp[1])-3)); //strip white space and remove KB
+      $ram_info['swap_free'] = (int)round($tmp/1024); //round to full MB and store as int
+    }
+    //get cache
+    if( strstr( $val , 'SwapCached') )
+    {
+      $tmp = explode(':', $val);
+      $tmp = trim(substr($tmp[1], 1, count($tmp[1])-3)); //strip white space and remove KB
+      $ram_info['swap_cached'] = (int)round($tmp/1024); //round to full MB and store as int
+    }
+  }
+  return $ram_info;
 }
 
 
