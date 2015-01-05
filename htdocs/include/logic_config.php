@@ -869,9 +869,11 @@ function disp_advanced_box(){
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
 
-  //encryption settings
-  $disp_body .= disp_encryption();
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  //encryption settings - no official support for third party client ... will have to look into it later
+  // for future reference port 1196 support AES-128-CBC but not AES256-CBC
+  // looking at the PIA client - I think it switches encryption after establishing a connection ... will have to investigate
+  //$disp_body .= disp_encryption();
+  //$disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
   //ping error threshold
   $GLOB_disp_network_default_fields .= 'PING_MAX_LOSS,';
@@ -934,6 +936,9 @@ function disp_advanced_box(){
 /**
  * generates HTML form element for encryption settings
  */
+//encryption settings - no official support for third party client ... will have to look into it later
+// for future reference port 1196 support AES-128-CBC but not AES256-CBC
+// looking at the PIA client - I think it switches encryption after establishing a connection ... will have to investigate
 function disp_encryption(){
   global $GLOB_disp_network_default_fields;
   $html = '';
@@ -957,9 +962,6 @@ function disp_encryption(){
           );
   $html .= '<tr><td>VPN authentication</td><td>'.build_select($sel).'</td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'VPN_AUTHENTICATION,';
-
-//1196
-//1194
 
   $sel = array(
             'id' => 'VPN_HANDSHAKE',
