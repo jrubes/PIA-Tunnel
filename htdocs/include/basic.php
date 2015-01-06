@@ -349,7 +349,7 @@ function VM_get_status( $output = 'html'){
 
 
   $sysload = get_system_load();
-  $ret_str .= "<tr><td>System</td><td id=\"system_load\">".nl2br($sysload)."</td></tr>";
+  $ret_str .= "<tr><td>System</td><td id=\"system_load\">$sysload</td></tr>";
   $ret_arr['system_load'] = $sysload;
 
   $up = $_pia->get_update_status();
@@ -519,10 +519,10 @@ function VM_get_status( $output = 'html'){
 function get_system_load(){
   $ret = '';
 
-  $cpu = get_cpuload();
+  //$cpu = get_cpuload();
   //$ret .= "CPU {$cpu['sy']}% usr,  {$cpu['sy']}% sys, {$cpu['id']}% idle\n";
   $cpu = sys_getloadavg();
-  $ret .= "load average $cpu[0], $cpu[1], $cpu[2]\n";
+  $ret .= "load average $cpu[0], $cpu[1], $cpu[2]<br>";
 
   $mem = get_meminfo();
   $used = $mem['total'] - $mem['free'];
