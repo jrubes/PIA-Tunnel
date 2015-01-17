@@ -424,6 +424,7 @@ function disp_dhcpd_box_new(){
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_dhcpd" value="Restart dhcpd">';
+  $disp_body .= ' &nbsp; <a href="/plugin/phpdhcpd/index.php" target="_blank">Show leases</a>';
   $disp_body .= '</div>';
 
   return $disp_body;
