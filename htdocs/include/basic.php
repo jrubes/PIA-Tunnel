@@ -526,7 +526,8 @@ function get_system_load(){
 
   $mem = get_meminfo();
   $used = $mem['total'] - $mem['free'];
-  $ret .= "RAM {$used}/{$mem['total']} MB used";
+  $used_swap = $mem['swap_total'] - $mem['swap_free'];
+  $ret .= "Mem {$used}/{$mem['total']} MB &nbsp;&nbsp; Swap {$used_swap}/{$mem['swap_total']} MB";
 
   return $ret;
 }
