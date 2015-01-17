@@ -222,3 +222,13 @@ if [ $ret = 0 ]; then
 else
   echo "branch already set"
 fi
+
+
+# initial setup of phpDCHPD
+ret=`grep -c "GIT_SUB_PDHCPD" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  cd /pia/
+  git submodule init htdocs/plugin/phpdhcpd
+  git submodule update htdocs/plugin/phpdhcpd
+  echo 'GIT_SUB_PDHCPD="ran setup"' >> '/pia/settings.conf'
+fi
