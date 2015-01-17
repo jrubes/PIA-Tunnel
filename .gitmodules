@@ -1,0 +1,3 @@
+[submodule "htdocs/plugin/phpdhcpd"]
+	path = htdocs/plugin/phpdhcpd
+	url = https://github.com/KaiserSoft/phpdhcpd
