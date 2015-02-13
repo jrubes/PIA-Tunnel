@@ -32,6 +32,10 @@ function get_forward_port() {
     #print output to aid in debugging
     echo -e "[info] cID: $PIA_CLIENT_ID UN: $PIA_UN PW: $PIA_PW"
     echo -e "[info] asking PIA for IP: $TUN_IP - returned $TUN_PORT"
+    echo -e "[info] rerunning curl with error reporting enabled ...."
+    curl -ksS -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment
+    echo
+
 
 
     #the location may not support port forwarding
