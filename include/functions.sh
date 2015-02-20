@@ -35,10 +35,21 @@ function check_default_username(){
     fi
 
 	if [ "$PIA_UN1" = "your PIA account name on this line" ] && [ "$PIA_UN2" = "your FrootVPN account name on this line" ]; then
+
+        # FATAL ERROR: make sure to always print IP info
+        INT_IP=`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+        EXT_IP=`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+        echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: $EXT_IP"
+        echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: $INT_IP"
+
+        echo
 		echo
-		echo "Please add your VPN account information to either"
-		echo "to /pia/login-pia.conf"
-		echo "or /pia/login-frootvpn.conf"
+		echo "No VPN account info found! Please use the WebUI to configure "
+        echo "your account or add the information manually to the following files."
+        echo
+		echo -e "\t/pia/login-pia.conf"
+		echo -e "\t/pia/login-frootvpn.conf"
+        echo
 		echo "Try"
 		echo -e "\tvi /pia/login-pia.conf"
 		echo -e "\tvi /pia/login-frootvpn.conf"
