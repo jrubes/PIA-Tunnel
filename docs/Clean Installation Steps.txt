@@ -26,6 +26,10 @@ lighttpd-enable-mod fastcgi fastcgi-php
 addgroup vpnvm
 usermod -G vpnvm www-data
 usermod -G vpnvm root
+sed '/modprobe vmsync/d' -i /etc/rc*.d/S01open-vm-tools
+sed '/modprobe vmhgfs/d' -i /etc/rc*.d/S01open-vm-tools
+sed '/modprobe vmsync/d' -i /etc/init.d/open-vm-tools
+sed '/modprobe vmhgfs/d' -i /etc/init.d/open-vm-tools
 
 
 60)  avoid using SWAP
