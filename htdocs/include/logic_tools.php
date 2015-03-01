@@ -106,6 +106,8 @@ function disp_default(){
   //$disp_body .= '<div class="clear"></div>';
   //$disp_body .= disp_pia_update();
   $disp_body .= '<div class="clear"></div>';
+  $disp_body .= disp_diagnostics();
+  $disp_body .= '<div class="clear"></div>';
   $disp_body .= disp_client_tools();
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= disp_force_update();
@@ -114,6 +116,27 @@ function disp_default(){
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= disp_reset_pia();
   $disp_body .= '<div class="clear"></div>';
+  return $disp_body;
+}
+
+
+function disp_diagnostics(){
+  global $settings;
+  global $_token;
+  $disp_body = '<div class="box tools">';
+  $ret_arr = array();
+
+  $pass = array( 'diagnostic utilities' );
+  $tokens = $_token->pgen($pass);
+
+  //offer download links to client tools
+  $disp_body .= '<h2>Diagnostic Utilities</h2>';
+  $disp_body .= 'The webUI is nice when everything works but will get in the way when it does not.';
+
+  $disp_body .= '<p><a href="/tools/ping.php">Ping Utility</a></p>';
+  $disp_body .= '<p><a href="/tools/log_view.php?openvpn">LOG: openVPN</a></p>';
+
+  $disp_body .= '</div>';
   return $disp_body;
 }
 

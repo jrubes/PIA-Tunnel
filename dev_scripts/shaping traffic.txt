@@ -1,0 +1,10 @@
+tc qdisc del root dev tun0
+
+# define IF
+tc qdisc add dev tun0 root handle 1: cbq avpkt 1000 bandwidth 1mbit
+
+# limit to 70kBit
+tc class add dev tun0 parent 1: classid 1:1 cbq rate 560kbit allot 1500 prio 5 bounded isolated
+
+# create rule
+tc filter add dev tun0 parent 1: protocol ip prio 16 u32 match ip dst 0.0.0.0/0 flowid 1:1
