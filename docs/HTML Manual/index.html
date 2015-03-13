@@ -32,7 +32,7 @@
 <div id="overview">
 	<a name="overview"></a><h2>Overview</h2>
 	<p>
-		PIA-Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player or ESXi. It is a VPN client designed to share the VPN connection with any device on your network. The VM also supports port forwarding, SOCKS 5 proxy, failover locations, VM LAN segments and an easy to use web browser interface. 
+		PIA-Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player or ESXi. It is a VPN client designed to share the VPN connection with any device on your network. The VM also supports port forwarding, SOCKS 5 proxy, failover locations, VM LAN segments and an easy to use web browser interface.
 	</p>
 
 	<h3>Features</h3>
@@ -123,6 +123,7 @@
 			This step is NOT OPTIONAL so click on “Prepare the System and Reboot” to continue.</li>
 		<li>Wait until you see “pia-tunnel login:” again, then refresh the page.</li>
 		<li>The “PIA-Tunnel Setup Wizard” will now open.</li>
+		<a href="./grfx/fresh_boot.png"><img src="./grfx/fresh_boot_small.png"></a>
 	</ol>
 	
 </div>
@@ -309,6 +310,52 @@
 	</ul>
 	</div>
 	
+</div>
+
+<div id="client_setup_overview">
+	<a href="client_setup_overview"></a><h2>Configure Client Devices to use the VPN</h2>
+	
+	<p>
+		PIA-Tunnel may share your VPN connection as a SOCKS5 proxy server or as a default gateway for your nework.
+		<ul>
+			<li>
+				<strong>Using the build in SOCKS5 proxy server</strong> is very easy to setup but every program needs to be configured individually. This options works great if you want to switch your webbrowser to use the VPN but does not support incoming port forwarding.
+			</li>
+			<li>
+				<strong>PIA-Tunnel as a default gateway</strong> for the rest of your network. The computer sharing the connection needs to have two ip addresses. One will be used to create the VPN connection and the other is used by your clients to access the VPN.<br>
+				PIA-Tunnel is designed for this environment and supports all features when setup this way.
+			</li>
+		</ul>
+	</p>
+	
+</div>
+
+
+<div id="client_setup_overview">
+	<a href="client_setup_overview"></a><h2>SOCKS5 Proxy Setup</h2>
+	
+	<p>
+		Using the SOCKS5 proxy is a great way to get around country blocks without major changes. Simply change your browser settings and your are done.<br>
+	</p>
+	
+	<ul>
+		<li>Goto "Settings" and set "Enable Port Forwarding" to "no"</li>
+		<li>Goto "Settings" => "SOCKS5 Proxy Server" and set "Public LAN" to enable</li>
+		<li>Disconnect or change your current VPN connection. The SOCKS5 server will be started once the VPN connection is established.</li>
+		<li>All done. Use the "Public LAN IP" and the SOCKS5 port in your browser or other programs that support SOCKS5 servers.</li>
+	</ul>
+	
+	<p>
+		<a href="http://www.proxifier.com/proxychecker/" target="_blank">Proxychecker</a> is a free tool to check if everything is working properly.<br>
+		<a href="./grfx/proxychecker_settings.png"><img src="./grfx/proxychecker_settings-small.png"></a>
+		<a href="./grfx/proxychecker_test.png"><img src="./grfx/proxychecker_test-small.png"></a>
+	</p>
+	
+	<p>
+		Example of the required settings for FireFox. Don't forget to exclude the Public LAN IP or you will not be able to access the webUI while using the proxy ("No Proxy for" box).<br>
+		<a href="./grfx/firefox_socks.png"><img src="./grfx/firefox_socks-small.png"></a>
+		
+	</p>
 	
 	
 </div>
