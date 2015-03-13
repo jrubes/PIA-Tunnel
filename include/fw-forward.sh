@@ -162,8 +162,11 @@ fi
 
 #allowing incoming SOCKS traffic
 if [ "$SOCKS_INT_ENABLED" = 'yes' ]; then
+    INT_IP=`/sbin/ip addr show "$IF_INT" | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+
     iptables -A INPUT -i "$IF_INT" -p tcp --dport "$SOCKS_INT_PORT" -j ACCEPT
     iptables -A INPUT -i "$IF_INT" -p udp --dport "$SOCKS_INT_PORT" -j ACCEPT
+    iptables -A OUTPUT -o "$IF_TUNNEL" -p tcp --sport 8080 --s "$INT_IP" -j ACCEPT
     iptables -A OUTPUT -o "$IF_INT" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
@@ -173,6 +176,7 @@ fi
 if [ "$SOCKS_EXT_ENABLED" = 'yes' ]; then
     iptables -A INPUT -i "$IF_EXT" -p tcp --dport "$SOCKS_EXT_PORT" -j ACCEPT
     iptables -A INPUT -i "$IF_EXT" -p udp --dport "$SOCKS_EXT_PORT" -j ACCEPT
+    iptables -A OUTPUT -o "$IF_TUNNEL" -p tcp --sport 8080 --s "$EXT_IP" -j ACCEPT
     iptables -A OUTPUT -o "$IF_EXT" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
