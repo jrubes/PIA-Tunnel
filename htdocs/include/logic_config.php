@@ -444,8 +444,6 @@ function disp_socks_box_new(){
 
   $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>SOCKS 5 Proxy Server</h2>'."\n";
-  $disp_body .= '<strong>Warning</strong>: experimental feature! <a id="toggle_socks_settings_toggle" href="" onclick="toggle_hide(\'toggle_socks_settings\', \'toggle_socks_settings_toggle\', \'Show Settings,Hide Settings\'); return false;">Show Settings</a><br>';
-  $disp_body .= '<div class="hidden" id="toggle_socks_settings">';
   $disp_body .= '<ul>';
   $disp_body .= '<li>requires at least 256MB RAM or performance will degrade within minutes!</li>';
   $disp_body .= '<li><a href="http://www.KaiserSoft.net/r/?SOCKS5" target="_blank">Support Forum ReadMe/Thread</a></li>';
@@ -499,7 +497,6 @@ function disp_socks_box_new(){
 
   $disp_body .= "</table>\n";
   $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= '</div>';
   $disp_body .= '</div>';
 
   return $disp_body;
@@ -1012,6 +1009,7 @@ function disp_network_default(){
 
   $disp_body .= disp_general_box();
   $disp_body .= disp_pia_daemon_box_new();
+  $disp_body .= '<div class="clear"></div>';
   $disp_body .= disp_socks_box_new();
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<p class="hidden" id="advanced_button"><a id="toggle_advanced_settings_toggle" class="button" href="" onclick="toggle_hide(\'toggle_advanced_settings\', \'toggle_advanced_settings_toggle\', \'Show Advanced Settings,Hide Advanced Settings\'); return false;">Show Advanced Settings</a></p>';
