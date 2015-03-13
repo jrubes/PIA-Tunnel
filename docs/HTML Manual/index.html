@@ -1,0 +1,317 @@
+<html>
+<body>
+
+<h1>PIA-Tunnel Documentation</h1>
+
+<h2>Index</h2>
+<ul>
+<li><a href="#overview">Overview</a></li>
+
+<li>Initial Setup</li>
+
+<li>PIA-Tunnel Setup Wizard</li>
+
+<li>PIA-Tunnel Web-based user interface (Management Interface)</li>
+
+<li>Tools</li>
+
+<li>Settings</li>
+
+<li>Configuring your Client PC/Devices to use the VPN connection</li>
+
+<li>Running a Server or Torrent Client</li>
+
+<li>Starting your Torrent client with monitor.vbs</li>
+
+<li>Known Issues</li>
+
+</ul>
+
+
+
+<div id="overview">
+	<a name="overview"></a><h2>Overview</h2>
+	<p>
+		PIA-Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player or ESXi. It is a VPN client designed to share the VPN connection with any device on your network. The VM also supports port forwarding, SOCKS 5 proxy, failover locations, VM LAN segments and an easy to use web browser interface. 
+	</p>
+
+	<h3>Features</h3>
+	<ul>
+	  <li>Open by design! PIA-Tunnel is script based, so no binaries
+		  with hidden features and you may roll your own VM by
+		  following the steps in 'Clean Installation Steps.txt'</li>  
+	  <li>Complete network isolation with VM LAN segment (leak protection)</li>
+	  <li>Simple Web-interface and/or command line support</li>
+	  <li>SOCKS 5 proxy for LAN or VM LAN segment. proxifier.com compatible</li>
+	  <li>Port forwarding to 1 IP on your LAN or private VM LAN</li>
+	  <li>Runs on existing hardware, your Computer, Laptop or Homeserver</li>
+	  <li>Requires 1 CPU core, 256MB RAM and less then 2GB free drive space</li>
+	  <li>Supports PrivateInternetAccess.com and FrootVPN.com out of the box</li>
+	</ul>
+</div>
+
+
+<div id="fresh_setup">
+	<a name="fresh_setup"></a><h2>Initial Setup</h2>
+	<ol>
+		<li>Download the compressed OVF Template from <a href="http://www.kaisersoft.net/r/?PIAIMG" target="_blank">http://www.kaisersoft.net/r/?PIAIMG</a></li>
+		<li>Extract the 7-Zip archive. 7-Zip is a free compression utility <a href="http://www.7-zip.org/" target="_blank">http://www.7-zip.org</a></li>
+	<ol>
+	
+	<h3>VMware Workstation and Player</h3>
+	<p>
+	<ol>
+		<li>Add the OVF Template to VMware Workstation or Player by double clicking on "PIA-Tunnel.ovf" then on "Import".</li>
+		<li>Ensure that the second network adapter is a member of a private LAN segment
+			<ol>
+				<li>Select "Network Adapter 2"</li>
+				<li>Click "LAN Segments" => "Add"</li>
+				<li>Enter name of LAN segment. For example: "VPN Bridge"</li>
+				<li>Click OK to close</li>
+				<li>Use Dropdown to select the LAN segment you just created and click OK</li>
+			</ol>
+			<br>
+			Note:  Connect client VMs to this LAN segment and remove or disable their other network cards for complete isolation.
+		</li>	
+	</ol>
+	</p>
+	
+	<h3>ESXi</h3>
+	<p>
+	<ol>
+	<li>Setup private VM LAN segment first using vSphere Client
+		<ol>
+			<li>select your ESXi server and choose "Configuration"</li>
+			<li>Click on "Networking" => "Add Networking..."</li>
+			<li>"Virtual Machine" => "Create a vSphere standard switch" uncheck any selected interfaces!<br>
+				NOTE: The preview must list "No adapters" on the "Physical Adapters" side!</li>
+			<li>Enter a network name. For example “VPN Network - PIA”</li>
+		</ol>
+	</li>
+
+	<li>Import the OVF Image
+		<ol>
+			<li>Extract the file you downloaded. You should now have a folder with tree files</li>
+			<li>"File" => "Deploy OVF Template..."</li>
+			<li> Browse to the extracted files and select "PIA-Tunnel.ovf" => "Next" => "Next"</li>
+			<li>Give the VM a name and select a datastore to keep the machine on => "Next"</li>
+			<li>Use "Thin Provision" since the VM will not change much</li>
+			<li>Select your external Network on the "Network Mapping" screen</li>
+			<li>Do not auto power the machine once deployment is complete</li>
+		</ol>
+	</li>
+	
+	<li>Configure the VM
+		<ol>
+			<li>Select the VM => "Edit Settings"</li>
+			<li>Make sure that "Network adapter 1" is connected to the network with Internet access and that "Network adapter 2" is connected to the private LAN segment you created in step 1 above.</li>
+			<li>RAM should be set to at least 256MB RAM. You may set it to as little as 92MB if you don't intend to run the SOCKS proxy server.</li>
+		</ol>
+	</li>
+</div>
+
+
+
+<div id="start_vm">
+	<a name="start_vm"></a><h2>Power on / starting PIA Tunnel VM</h2>
+	
+	<ol>
+		<li>Verify that the machine has one CPU and at least 256MB of RAM.</li>
+		<li>Start the VM and wait until you see “pia-tunnel login:”</li>
+		<li>Open the “Public LAN IP” in your web browser</li>
+		<li>The “PIA-Tunnel Management Interface” should open and prompt you to reset your system.<br>
+			This step is NOT OPTIONAL so click on “Prepare the System and Reboot” to continue.</li>
+		<li>Wait until you see “pia-tunnel login:” again, then refresh the page.</li>
+		<li>The “PIA-Tunnel Setup Wizard” will now open.</li>
+	</ol>
+	
+</div>
+
+<div id="wizard">
+	<a name="wizard"></a><h2>Setup Wizard</h2>
+
+	<p>The “PIA-Tunnel Setup Wizard” will be executed every time the VM is reset. It ensures that the basic configuration options are set properly.</p>
+	
+	<ul>
+		<li>Web-UI Username and Web-UI Password<br>
+			Access to the Web-UI will be restricted to this user.</li>
+			
+		<li>VPN Username and VPN Password<br>
+			Please enter your PIA username and password into these fields</li>
+		
+		<li>VPN Gateway for public LAN<br>
+		Set this option to “yes” if you want to share the VPN connection with other computers on your network.</li>
+
+		<li>VPN Gateway for VM LAN<br>
+		Set this option to “yes” if you want to share the VPN connection with a private VM LAN segment</li>
+
+		<li>root password<br>
+		<li>This option will change the default root password from “pia” to something sane. You may enter your own password or accept the randomly generated one.</li>
+	</ul>
+	
+	NOTE: The web GUI is supposed to replace any command line interaction so I recommend that you accept the generated password. You may reset the root password later via the “Tools” menu.
+	</p>	
+</div>
+
+
+<div id="webUI">
+	<a name="webUI"></a><h2>PIA-Tunnel WebUI - Management Interface</h2>
+	
+	<p>
+		The WebUI should work with any basic HTML5 browser, even with javascript disabled.  Enabling javascript will activate the “advanced UI” which will reconfigure some UI elements, enable automatic Network Status updates and make the Settings page easier to use.
+	</p>
+	
+	
+	<div id="s_general">
+	<h3>Settings - General Settings</h3>
+	<p>These are the important settings for PIA-Tunnel. Please take a moment to understand what they do.
+	<ul>
+		<li><strong>Enable Port Forwarding</strong> : <yes/no> (default: no)<br>
+			This option enables port forwarding to a computer connected to PIA-Tunnel. Only set this to yes if you intend to run a server or torrent client. Please see “Running a Server or Torrent Client” for details
+		</li>
+		
+		<li><strong>Forward IP</strong>: <some IP> (default: 192.168.10.100)<br>
+			This is the target IP of the open port. The option is only available when “Enable Port Forwarding” is set to “yes”.
+		</li>
+
+		<li><strong>VPN Gateway for VM LAN</strong>:  <yes/no> (default: yes)<br>
+			Setting this option to “yes” will share the VPN connection with any computer on your private “VM LAN Segment”. The LAN segment is called “VPN Bridge” in the setup portion of this guide.
+		</li>
+
+		<li><strong>VPN Gateway for public LAN</strong>:  <yes/no> (default: yes)<br>
+			Setting this option to “yes” will share the VPN connection with any computer on your public  “LAN Segment”. This is your home network, so any computer that may use your current Internet connection will be able to use PIA-Tunnel to access the VPN.
+		</li>
+
+		<li><strong>Allow web-UI access on</strong>: <eth0> <eth1> (default: both checked)<br>
+			This option will open port 80 on the selected interfaces. This is needs to be enabled if you want to use the web-UI to mange PIA-Tunnel and if you want to use “Torrent Monitor” client.<br>
+			<strong>Warning</strong>: Unchecking both options will prevent you from accessing the web-UI. You may regain access by adding   FIREWALL_IF_WEB[0]=’eth0’    back into /pia/settings.conf
+		</li>
+
+		<li><strong>Allow ssh connections on</strong>: <eth0> <eth1> (default: both NOT checked)<br>
+			Same as “Allow web-UI access” but for port 22, remote SSH access. Don’t enable this if you don’t know what SSH is or if you don’t indent to use it.
+		</li>
+
+		<li><strong>Web-UI Username and Web-UI Password</strong><br>
+			This option specifies the username and password for the Web-UI. Note: You may reset the password by setting the following options to nothing in /pia/settings.conf<br>
+			WEB_UI_USER=’’<br>
+			WEB_UI_PASSWORD=’’<br>
+		</li>
+
+	 	<li><strong>Remember Me for</strong>: <some integer> (default: 120) days<br>
+			No login required for this many days. Set to 0 (zero) to disable this feature.
+		</li>
+	</ul>
+	</p>
+	<div>
+	
+	
+	<div id="s_daemon">
+	<h3>Settings - PIA Daemon Settings</h3>
+	<p>PIA Daemon is a script that may be used to keep your network connected to the VPN.<br>
+		It will test the VPN connection every few minutes, stop all VPN forwarding on error and attempt to reconnect when the connection is down.
+	</p>
+	<ul>
+		<li><strong>Start after OS boot</strong>: <yes/no> (default: yes)<br>
+			PIA-Tunnel VM will attempt to establish a VPN after the operating system has finished booting. Once this option is enabled, you only need to turn on the virtual machine and the VPN connection will be established a few minutes later.
+		</li>
+
+		<li><strong>Failvoer 0 – n</strong><br>
+			These are the locations pia-daemon will use to initiate a VPN connection. Connections are used in sequence so pia-daemon will always create the initial connection with “Failover 0”, try “Failover 1” if the connection fails and so on.<br>
+			Setting “Failover n” to an empty value will remove the Failover setting entirely.
+			Warning: Locations marked with a * support port forwarding. Keep in mind that the open network port is assigned to you by your VPN provider and will change when you connect to a different location! I provide a monitoring script to detect these port changes, reconfigure your torrent client and restart the application.<br>
+			Please see “Starting your Torrent client with monitor.vbs” for details.
+		</li>
+	</ul>
+	</div>
+	
+	<div id="s_adv">
+	<h3>Settings - Advanced Settings</h3>
+	<p>
+		The advanced settings are below the General Settings. Click on “Show Advanced Settings” to display the options.<br>
+		<strong>WARNING</strong>: You can really mess things up in here and may even compromise your security by changing the wrong option.
+	</p>
+	<ul>
+		<li><strong>Public LAN interface</strong>: <eth0/eth1/tun0> (default: eth0)<br>
+			Specifies which interface is connected to your public LAN.
+			WARNING: Don’t change this!
+		<li><strong>VM LAN interface</strong>: <eth0/eth1/tun0> (default: eth1)<br>
+			Specifies which interface is connected to the private VM LAN segment.
+			WARNING: Don’t change this!</li>
+		<li><strong>VPN interface</strong>: <eth0/eth1/tun0> (default: tun0)<br>
+			Specifies which interface will be handling the VPN connection.
+			WARNING: Don’t change this!</li>
+		<li><strong>eth0 use DHCP</strong>: <yes/no> (default: yes)<br>
+			Allows you to configure a fixed IP for eth0 or use an existing DHCP server. This interface will be connected to your LAN where your cable/DSL router is providing DHCP service. Don’t change this unless you need to set a static IP.
+		<li><strong>eth0 IP/Subnet/Gateway</strong> (default: all empty)<br>
+			These options are enabled when “eth0 use DHCP” is set to no.</li>
+		<li><strong>eth1 use DHCP</strong>: <yes/no> (default: no)<br>
+			Allows you to configure a fixed IP for eth1 or use an existing DHCP server. This interface is connected to your private VM LAN segment without a DHCP server. PIA-Tunnel provides DHCP service for this segment so the IP must be fixed.<br>
+			I recommend that you don’t change this unless you know networking.</li>
+		<li><strong>eth1 IP/Subnet/Gateway</strong> (default: IP:192.168.10.1 Subnet: 255.255.255.0 Gateway: empty)<br>
+			These options are enabled when “eth1 use DHCP” is set to no.</li>
+		<li><strong>DNS 1-4</strong><br>
+			Specifies the DNS servers used by PIA-Tunnel VM. The VM ships with the following defaults:<br>
+			8.8.8.8 is a public DNS Server hosted by Google.com<br>
+			208.67.222.222 is a public DNS Server hosted by OpenDNS.com<br>
+			8.8.4.4 is a public DNS Server hosted by Google.com<br>
+			208.67.220.220 is a public DNS Server hosted by OpenDNS.com</li>
+
+		<li><strong>Max allowed packet loss</strong>: <0%-100%> (default: 20%)<br>
+			Specifies how many ping packets may be lost, per check, before pia-daemon considers the VPN connect as down/bad. Pia-daemon will attempt to connect to Failover 1 through n when the ping failure rate is above this threshold.</li>
+		<li><strong>Verbose / Debug Verbose</strong>: <yes/no> (default: no)<br>
+			Enables verbose or verbose debug mode on the command line. This option is not used by the web-UI.
+		</li>
+		</ul>
+	</div>
+	
+	<div id="s_dhcpd">
+	<h3>Settings - DHCP Server Settings</h3>
+	<p>This box gives you access to the configuration file of the DHCP Server running inside PIA-Tunnel. 
+		The current UI supports up to two subnets.<br>
+		Please contact support (from Tools page) if you require more subnet options.
+	</p>
+	
+	<ul>
+		<li><strong>Subnet 1</strong>:  <enabled/disabled> (default: enabled)<br>
+			Adds the following settings to the configuration file if “enabled” or removes them when “disabled”.
+		</li>
+		<li><strong>Subnet  IP 1</strong>: <IP Address> (default: 192.168.10.0)<br>
+			IP address of the network
+		</li>
+		<li><strong>Subnetmask 1</strong>: < IP Address > (default: 255.255.255.0)<br>
+			Subnetmask used by any DHCP clients on your network
+		</li>
+		<li><strong>Broadcast IP 1</strong>: <IP Address> (default: 192.168.10.255)<br>
+			Broadcast IP used by any DHCP clients on your network
+		</li>
+		<li><strong>Router/Gateway 1</strong>: <IP Address> (default: 192.168.10.1)<br>
+			Gateway IP used by any DHCP clients on your network
+		</li>
+		<li><strong>IP Range 1</strong>: <IP_Address IP_Address> (default: 192.168.10.1<br>01 192.168.10.151)
+			Range of IPs used by the DHCP server.<br>
+			Please note the format of “<IP Address><SPACE><IP Address>”
+		</li>
+		<li><strong>Subnet 2</strong>: <enabled/disabled> (default: disabled)<br>
+			You may setup a second IP Range using the “Subnet 2” option.<br>
+			Warning: Only use this if you know networking!
+		</li>
+		<li><strong>Subnet IP/Subnetmask/Broadcast IP/Router/Gateway/IP Range</strong><br>
+			Same definition as “Subnet 1” but the settings must not define the same range.<br>
+			Warning: Only use this if you know networking!
+		</li>
+		<li><strong>Fixed IP</strong>: <IP Address> (default: empty)<br>
+			Specifies one fixed IP that will be assigned to a computer with a MAC address matching the “MAX for IP” setting. You should also enter this IP into “Forward IP” found in “General Settings”
+		</li>
+		<li><strong>MAC for IP</strong>: <MAC Address> (default: empty)<br>
+			Specifies which computer will receive the Fixed IP specified above.<br>
+			Please note: The MAC Address must be separated by colons (:). Example: 00:0D:28:A7:3C:45
+		</li>
+	</ul>
+	</div>
+	
+	
+	
+</div>
+
+</body>
+</html>

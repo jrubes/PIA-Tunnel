@@ -111,27 +111,29 @@ You may also compile your own using the following steps.
 	
 	apt-get install build-essential
   Download latest 1.4 release from http://www.inet.no/dante/download.html
-  Example command (may not be latest): wget http://www.inet.no/dante/files/dante-1.4.0.tar.gz
-	tar -zxf dante-1.4.0.tar.gz
-	cd dante-1.4.0
+  Example commands (may not be latest): http://www.inet.no/dante/files/dante-1.4.1.tar.gz
+	tar -zxf dante-1.4.1.tar.gz
+	cd dante-1.4.1
 	./configure --without-upnp --without-libwrap
 	make
 	make install
 
 OR this is how I created the package in /pia/extra_software/
 	apt-get install build-essential
-	cd /usr/src
   Download latest 1.4 release from http://www.inet.no/dante/download.html
-  Example command (may not be latest): wget http://www.inet.no/dante/files/dante-1.4.0.tar.gz
-	tar -zxf dante-1.4.0.tar.gz
-	cd dante-1.4.0
-	./configure --without-upnp --without-libwrap --prefix=/usr/src/dante-1.4.0-bin/
+  
+  Example commands (may not be latest): 
+    cd /usr/src/
+    wget http://www.inet.no/dante/files/dante-1.4.1.tar.gz
+	tar -zxf dante-1.4.1.tar.gz
+	cd dante-1.4.1
+	./configure --without-upnp --without-libwrap --prefix=/usr/src/dante-1.4.1-bin/
 	make
 	make install
-	cd /usr/src/ ; tar -cvf dante-1.4.0-bin.tar dante-1.4.0-bin/
-	xz -z -e dante-1.4.0-bin.tar
-	rm -rf /usr/src/dante-1.4.0/
-	rm -rf /usr/src/dante-1.4.0-bin/
+	cd /usr/src/ ; tar -cvf dante-1.4.1-bin.tar dante-1.4.1-bin/
+	xz -z -e dante-1.4.1-bin.tar
+	rm -rf /usr/src/dante-1.4.1/
+	rm -rf /usr/src/dante-1.4.1-bin/
 
 
 110) crontab -e
