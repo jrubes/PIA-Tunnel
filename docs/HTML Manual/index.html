@@ -1,5 +1,14 @@
 <!DOCTYPE html>
 <html>
+<head>
+<meta charset="UTF-8">
+<title>PIA-Tunnel Documentation</title>
+<meta name="author" content="Mirko Kaiser">
+<meta name="keywords" content="">
+<meta name="description" content="Official documentation for the PIA-Tunnel VM">
+<meta name="robots" content="NOINDEX,NOFOLLOW">
+<meta name="dcterms.creator" content="Mirko Kaiser">
+</head>
 <body>
 
 <h1>PIA-Tunnel Documentation</h1>
@@ -370,7 +379,81 @@
       Example of the required settings for FireFox. Don't forget to exclude the Public LAN IP or you will not be able to access the webUI while using the proxy ("No Proxy for" box).<br>
       <a href="./grfx/firefox_socks.png"><img src="./grfx/firefox_socks-small.png"></a>
 	</p>
+</div>
 
+
+<div id="pi_setup">
+  <h2>PIA Tunnel on a Raspberry PI</h2>
+  <p>
+    You can use an inexpensive <a href="http://www.raspberrypi.org/" target="_blank">Rasperry Pi</a> to setup a permanent VPN router on your network.
+    The PI is relatively inexpensive and does not use much power so it is a great candidate when you don't
+    run a local server.<br>
+    This section of the guide explains how to set up the RasbPi using only one network card.
+    It is also possible to set it up with two network cards which completely isolates your
+    LAN from the non-VPN tunneled Internet.
+  </p>
+
+  <ul>
+    <li>Start by installing Raspberrian onto your SD card</li>
+    <li>Login as root or put "sudo" in front of every command.
+      <pre>
+        sudo su -
+      </pre>
+    </li>
+    <li>Make sure the OS is up to date</li>
+    <li>Make sure you have the "en_US.UTF-8" locale installed. Use raspi-config</li>
+    <li>
+      run the following command to install the required software. You may receive an error message when installing the DHCP server. You may ignore  it at this point.<br>
+      <pre>
+        apt-get install -y psmisc openvpn dnsutils isc-dhcp-server vim git-core gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt sudo ca-certificates
+      </pre>
+    </li>
+    <li>
+      Run the following commands
+      <pre>
+        update-rc.d lighttpd enable
+        lighttpd-enable-mod fastcgi fastcgi-php
+        /etc/init.d/lighttpd force-reload
+        addgroup vpnvm
+        usermod -G vpnvm www-data
+        usermod -G vpnvm root
+        echo "0" > /proc/sys/vm/swappiness
+      </pre>
+    </li>
+
+    <li>
+      Add the following to line 21 in /etc/sudoers
+      <pre>
+        www-data ALL = NOPASSWD: /pia/*,/pia/include/*,/sbin/shutdown
+      </pre>
+    </li>
+
+    <li>
+      Almost done. Time to pull the PIA Tunnel scripts .... this will take a bit
+      <pre>
+        mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
+        git clone https://github.com/KaiserSoft/PIA-Tunnel.git /pia
+        cd /pia ; git checkout release_php-gui
+        chmod 777 /pia/pia-setup ; /pia/pia-setup
+      </pre>
+    </li>
+
+    <li>
+      Add the following line to /etc/rc.local make sure you paste it above "exit 0"
+      <pre>
+        /pia/include/autostart.sh
+      </pre>
+    </li>
+
+    <li>
+      <p>
+        Reboot your system  and open the IP of your Rasberry Pi in your webbrowser.
+        Your RasbPi is now setup to act as a stand alone VPN router. Please follow the
+        the setup Wizard Tutorial next.
+      </p>
+      <a href="./grfx/static_ip_wizard.png"><img alt="start wizard after reboot" src="./grfx/static_ip_wizard-small.png"></a>
+    </li>
+  </ul>
 
 </div>
 
