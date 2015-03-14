@@ -26,12 +26,31 @@ fi
 
 #install Dante SOCKS 5 Proxy
 if [ ! -f "/usr/sbin/sockd" ]; then
-    cp /pia/extra_software/dante-1.4.0-bin.tar.xz /tmp/
-    xz -d /tmp/dante-1.4.0-bin.tar.xz ; tar -xf /tmp/dante-1.4.0-bin.tar -C /tmp/
-    cp -r /tmp/dante-1.4.0-bin/* /usr/
-    rm /tmp/dante-1.4.0-bin.tar ; rm -rf /tmp/dante-1.4.0-bin
+
+  #check for correct CPU architecture - can't get the above code to work so let's hack it
+  CPU_type=`uname -m`
+  if [ "$CPU_type" = "i686" ]; then
+    cp /pia/extra_software/dante-1.4.1-bin.tar.xz /tmp/dante-1.4.1-bin.tar.xz
+
+  elif [ "$CPU_type" = "armv6l" ]; then #WATCH OUT this is armv6L
+    cp /pia/extra_software/dante-1.4.1-arm-bin.tar.xz /tmp/dante-1.4.1-bin.tar.xz
+
+  else
+    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- no precompiled package for your CPU architecture found ($CPU_type)"
+  fi
+
+  if [ -f /tmp/dante-1.4.1-bin.tar.xz ]; then
+    xz -d /tmp/dante-1.4.1-bin.tar.xz ; tar -xf /tmp/dante-1.4.1-bin.tar -C /tmp/
+    cp -r /tmp/dante-1.4.1-bin/* /usr/
+    rm /tmp/dante-1.4.1-bin.tar ; rm -rf /tmp/dante-1.4.1-bin
+  else
+    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- SOCKS5 binaries where NOT setup! This feature will not work."
+  fi
+
 else
-  #check installed version
+  #update existing dante - came after ARM release so no need to check right now
   DANTE_VERSION=`/usr/sbin/sockd -v | gawk -F" " '{print $2}'`
   if [ "$DANTE_VERSION" = "v1.4.0." ]; then
     if [ -f "/pia/extra_software/dante-1.4.1-bin.tar.xz" ]; then
