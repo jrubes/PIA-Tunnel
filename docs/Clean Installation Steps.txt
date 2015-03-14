@@ -36,12 +36,12 @@ sed '/modprobe vmhgfs/d' -i /etc/init.d/open-vm-tools
       echo "0" > /proc/sys/vm/swappiness
 
 
-	  
+
 70) vi /etc/dhcp/dhclient.conf
   on line 21 add
     supersede domain-name-servers 8.8.8.8, 208.67.222.222, 8.8.4.4, 208.67.220.220;
 
-	
+
 80) in /etc/network/interfaces add the following
 
 # The primary network interface
@@ -58,7 +58,7 @@ iface eth1 inet static
         netmask 255.255.255.0
 
 
-		
+
 
 90) /etc/dhcp/dhcpd.conf (delete all and paste below)
 # dhcpd.conf
@@ -108,7 +108,7 @@ You may also compile your own using the following steps.
 	*WARNING* pia-setup will use the repo version if "/usr/sbin/sockd" is not found. It is also possible
 	that a later software update will overwrite your custom solution. This depends on how I will implement
 	a Dante 1.4.0 to Dante 1.4.x upgrade....
-	
+
 	apt-get install build-essential
   Download latest 1.4 release from http://www.inet.no/dante/download.html
   Example commands (may not be latest): http://www.inet.no/dante/files/dante-1.4.1.tar.gz
@@ -121,8 +121,8 @@ You may also compile your own using the following steps.
 OR this is how I created the package in /pia/extra_software/
 	apt-get install build-essential
   Download latest 1.4 release from http://www.inet.no/dante/download.html
-  
-  Example commands (may not be latest): 
+
+  Example commands (may not be latest):
     cd /usr/src/
     wget http://www.inet.no/dante/files/dante-1.4.1.tar.gz
 	tar -zxf dante-1.4.1.tar.gz
@@ -139,26 +139,26 @@ OR this is how I created the package in /pia/extra_software/
 110) crontab -e
     0 6/* * * * ntpd -q > /dev/null
 
-	
-	
+
+
 120) vi /etc/inittab
 	Replace this (line 54)
 	1:2345:respawn:/sbin/getty 38400 tty1
 	with
 	1:2345:respawn:/sbin/getty --noclear 38400 tty1
 
-  
+
 130) vi /etc/sudoers
   Add this on line 21
-    www-data pia-tunnel = NOPASSWD: /pia/*,/pia/include/*,/sbin/shutdown
+    www-data ALL = NOPASSWD: /pia/*,/pia/include/*,/sbin/shutdown
 
 
-140) 
+140)
 	mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
 	git clone https://github.com/KaiserSoft/PIA-Tunnel.git /pia
 	cd /pia ; git checkout release_php-gui
 
-   
+
 150)	chmod 777 /pia/pia-setup ; /pia/pia-setup
 
 
