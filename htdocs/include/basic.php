@@ -350,7 +350,7 @@ function VM_get_status( $output = 'html'){
 
   $sysload = get_system_load();
   $ret_str .= "<tr><td>System</td><td>system load <span id=\"system_load\">{$sysload['load']}</span></td></tr>";
-  $ret_str .= "<tr><td>System</td><td>Mem <span id=\"system_mem\">{$sysload['mem']}</span>";
+  $ret_str .= "<tr><td></td><td>Mem <span id=\"system_mem\">{$sysload['mem']}</span>";
   $ret_str .= " SWAP <span id=\"system_swap\">{$sysload['swap']}</span></td></tr>";
   $ret_arr['system_load'] = $sysload['load'];
   $ret_arr['system_mem'] = $sysload['mem'];
