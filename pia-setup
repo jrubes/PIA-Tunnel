@@ -159,6 +159,7 @@ rm -f /var/www/README.txt
 rm -f /var/www/monitor-windows.zip
 cd /pia/client_scripts ; zip -r /var/www/monitor-windows.zip monitor-windows/ &> /dev/null
 cp "/pia/docs/PIA-Tunnel Documentation.pdf" /var/www/pia-tunnel_documentation.pdf &> /dev/null
+mkdir -p /var/www/docs/ ; cp -r "/pia/docs/HTML Manual/"* /var/www/docs/
 chown -R www-data.www-data /var/www
 find /var/www -type d -exec chmod 0750 {} \;
 find /var/www -type f -exec chmod 0640 {} \;
