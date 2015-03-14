@@ -422,6 +422,16 @@
     </li>
 
     <li>
+      Edit /etc/resolv and add alternative name servers
+      <pre>
+        nameserver 8.8.8.8
+        nameserver 208.67.222.222
+        nameserver 8.8.4.4
+        nameserver 208.67.220.220
+      </pre>
+    </li>
+
+    <li>
       Add the following to line 21 in /etc/sudoers
       <pre>
         www-data ALL = NOPASSWD: /pia/*,/pia/include/*,/sbin/shutdown
