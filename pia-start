@@ -117,6 +117,7 @@ if [ -f "/pia/ovpn/pia/$filename.ovpn" ] || [ -f "/pia/ovpn/frootvpn/$filename.o
 		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- VPN connection fail - please check /pia/cache/session.log for details."
 	    killall openvpn 2>/dev/null
+        mv /pia/cache/session.log /pia/cache/session.old.log
 	    /pia/pia-forward stop quite
 	    exit
 	  else
