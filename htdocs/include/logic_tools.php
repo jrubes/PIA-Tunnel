@@ -252,7 +252,9 @@ function disp_pia_update(){
  */
 function disp_pia_update_client(){
   global $_pia;
-  global $settings;
+  global $_files;
+  require_once './plugin/parsedown/Parsedown.php';
+  $Parsedown = new Parsedown();
 
   $up = $_pia->get_update_status();
   if(is_int($up) === true && $up == 0 ){
@@ -269,22 +271,15 @@ function disp_pia_update_client(){
   $disp_body .= 'Updates are downloaded from the project\'s <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
   $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
 
-/*    $disp_body .= '<br><br><form method="post" name="branch" action="/?page=tools&cid=tools&cmd=update_software_client">';
-      $disp_body .= '<span id="git_branch">Switch development branch (*<strong>super duper extra advanced option</strong>*)';
-      $disp_body .= '<br><select name="selected_branch">';
-        $disp_body .= build_git_branch_options();
-      $disp_body .= '</select>';
-      $disp_body .= ' <input type="submit" name="switch_branch" value="Switch Branch">';
-      $disp_body .= '</span>';
-    $disp_body .= '</form>';
-*/
+  $cl = $_files->readfile("/pia/Changelog.md");
+  $disp_body .=  $Parsedown->text($cl);
 
-  $disp_body .= '<div class="clear"></div>';
-  $disp_body .= '<p> </p>';
-  $disp_body .= '<a id="toggle_git_updatelog" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log('.$up.'); return false;">Show Update Log</a>';
-  $disp_body .= ' <a id="toggle_git_log" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log(50); return false;">Show Repository Log</a>';
-  $disp_body .= '<div id="uc_feedback" ><textarea id="uc_feedback_txt">'.$_pia->git_log($up).'</textarea></div>';
-  $disp_body .= '<div class="clear"></div>';
+//  $disp_body .= '<div class="clear"></div>';
+//  $disp_body .= '<p> </p>';
+//  $disp_body .= '<a id="toggle_git_updatelog" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log('.$up.'); return false;">Show Update Log</a>';
+//  $disp_body .= ' <a id="toggle_git_log" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log(50); return false;">Show Repository Log</a>';
+//  $disp_body .= '<div id="uc_feedback" ><textarea id="uc_feedback_txt">'.$_pia->git_log($up).'</textarea></div>';
+//  $disp_body .= '<div class="clear"></div>';
 
   $disp_body .= '<form class="inline" action="/?page=tools&amp;cid=tools" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';
