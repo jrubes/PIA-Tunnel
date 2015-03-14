@@ -422,6 +422,14 @@
     </li>
 
     <li>
+      Make sure that you use a valid DNS server. These settings will override the DNS server
+      sent by your router. Edit /etc/dhcp/dhclient.conf and add the following on line 21
+      <pre>
+        supersede domain-name-servers 8.8.8.8, 208.67.222.222, 8.8.4.4, 208.67.220.220;
+      </pre>
+    </li>
+
+    <li>
       Edit /etc/resolv and add alternative name servers
       <pre>
         nameserver 8.8.8.8

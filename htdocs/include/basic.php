@@ -464,11 +464,11 @@ function VM_get_status( $output = 'html'){
   if( $settings['SOCKS_EXT_ENABLED'] == 'yes' ){
     if( $_services->socks_status() === 'running' ){
       $tmpinfo = "SOCKS 5 Proxy on port {$settings['SOCKS_EXT_PORT']}";
-      $ret_str .= "<tr><td></td><td id=\"public_socks\">$tmpinfo</td></tr>";
+      $ret_str .= "<tr><td></td><td id=\"SOCKS_EXT_ENABLED\">$tmpinfo</td></tr>";
       $ret_arr['SOCKS_EXT_ENABLED'] = $tmpinfo;
     }else{
       $tmpinfo = "SOCKS 5 Proxy NOT running";
-      $ret_str .= "<tr><td></td><td id=\"public_socks\">$tmpinfo</td></tr>";
+      $ret_str .= "<tr><td></td><td id=\"SOCKS_EXT_ENABLED\">$tmpinfo</td></tr>";
       $ret_arr['SOCKS_EXT_ENABLED'] = $tmpinfo;
     }
   }
@@ -493,11 +493,11 @@ function VM_get_status( $output = 'html'){
     if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
       if( $_services->socks_status() === 'running' ){
         $tmpinfo = "SOCKS 5 Proxy on port {$settings['SOCKS_INT_PORT']}";
-        $ret_str .= "<tr><td></td><td id=\"vpn_socks\">$tmpinfo</td></tr>";
+        $ret_str .= "<tr><td></td><td id=\"SOCKS_INT_ENABLED\">$tmpinfo</td></tr>";
         $ret_arr['SOCKS_INT_ENABLED'] = $tmpinfo;
       }else{
         $tmpinfo = "SOCKS 5 Proxy NOT running";
-        $ret_str .= "<tr><td></td><td id=\"vpn_socks\">$tmpinfo</td></tr>";
+        $ret_str .= "<tr><td></td><td id=\"SOCKS_INT_ENABLED\">$tmpinfo</td></tr>";
         $ret_arr['SOCKS_INT_ENABLED'] = $tmpinfo;
       }
     }
