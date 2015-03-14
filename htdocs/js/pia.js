@@ -10,8 +10,8 @@ function OverviewObj( ){
 
 
   /* query get_status.php */
-  this.refresh_status = refresh_status;
-  function refresh_status(){
+  this.refresh_status_old = refresh_status_old;
+  function refresh_status_old(){
 
     var url = '/get_status.php';
     var pdata = ''; //post data as string
@@ -23,6 +23,39 @@ function OverviewObj( ){
       if( ele.innerHTML !== ret ){
         ele.innerHTML = '';
         ele.innerHTML = ret;
+      }
+    };
+
+    _request.post( 'status_update', url, pdata, callback);
+
+  }
+
+
+  /* query get_status.php */
+  this.refresh_status = refresh_status;
+  function refresh_status(){
+
+    var url = '/get_status.php';
+    var pdata = 'type=JSON'; //post data as string
+    var callback;
+
+    /* this will be executed after a successful http request */
+    callback = function(ret){
+      var ele;
+      var ret;
+
+      /* loop over returned values and compare to current values */
+      ret = JSON.parse(ret);
+      for(var key in ret)
+      {
+        if(ret.hasOwnProperty(key)) {
+          ele = document.getElementById(key);
+          if( ele && ele.innerHTML !== ret[key] ){
+            ele.innerHTML = '';
+            ele.innerHTML = ret[key];
+            console.log(key, ret[key]);
+          }
+        }
       }
     };
 

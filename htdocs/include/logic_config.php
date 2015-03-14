@@ -124,7 +124,7 @@ $disp_body .= '<script type="text/javascript">'
 				.'var timr1=setInterval(function(){'
 					.'var _overview = new OverviewObj();'
 					.'_overview.clean_feedback();'
-				.'},2500);'
+				.'},5500);'
 				.'</script>';
 
 

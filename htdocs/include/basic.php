@@ -349,8 +349,12 @@ function VM_get_status( $output = 'html'){
 
 
   $sysload = get_system_load();
-  $ret_str .= "<tr><td>System</td><td id=\"system_load\">$sysload</td></tr>";
-  $ret_arr['system_load'] = $sysload;
+  $ret_str .= "<tr><td>System</td><td>system load <span id=\"system_load\">{$sysload['load']}</span></td></tr>";
+  $ret_str .= "<tr><td>System</td><td>Mem <span id=\"system_mem\">{$sysload['mem']}</span>";
+  $ret_str .= " SWAP <span id=\"system_swap\">{$sysload['swap']}</span></td></tr>";
+  $ret_arr['system_load'] = $sysload['load'];
+  $ret_arr['system_mem'] = $sysload['mem'];
+  $ret_arr['system_swap'] = $sysload['swap'];
 
   $up = $_pia->get_update_status();
   if(is_int($up) === true && $up == 0 ){
@@ -362,7 +366,7 @@ function VM_get_status( $output = 'html'){
     $up_txt = $up;
   }
   $ret_str .= '<tr><td>Software</td><td id="software_update">'.$up_txt.'</td></tr>';
-  $ret_arr['software_update'] = $up;
+  $ret_arr['software_update'] = $up_txt;
 
   if( $_pia->status_pia_daemon() === 'running' ){
     $ret_str .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">running (autostart:{$settings['DAEMON_ENABLED']})</td></tr>";
@@ -392,9 +396,9 @@ function VM_get_status( $output = 'html'){
         exec('ip -4 addr show tun0 | grep inet | gawk -F" " \'{print $2}\' | gawk -F"/" \'{print $1}\'', $vpn_pub);
       }
       if( array_key_exists( '0', $vpn_pub) === true ){
-        $ret_str .= "<tr><td style=\"vertical-align: top;\">Public VPN</td><td id=\"vpn_public_ip\">IP $vpn_pub[0] ";
+        $ret_str .= "<tr><td style=\"vertical-align: top;\">Public VPN</td><td>IP <span id=\"vpn_public_ip\">$vpn_pub[0]</span> ";
         $ret_arr['vpn_public_ip'] = $vpn_pub[0];
-        $ret_str .= ($port != '') ? "Port $port" : '';
+        $ret_str .= ($port != '') ? "Port <span id=\"vpn_port\">$port</span>" : '';
         $ret_arr['vpn_port'] = ($port != '') ? "$port" : '';
         $ret_str .= '</td></tr>';
 
@@ -448,24 +452,27 @@ function VM_get_status( $output = 'html'){
   exec('/sbin/ip addr show '.$settings['IF_EXT'].' | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   $ret_str .= '<tr><td style="vertical-align: top;">Public LAN</td>';
 
-  $ret_str .= "<td id=\"public_ip\">IP $ret[0]<br>";
+  $ret_str .= "<td>IP <span id=\"public_ip\">$ret[0]</span></td></tr>";
 
   $fw_forward_state = $_pia->check_forward_state($settings['IF_EXT']);
   if( $fw_forward_state === true || $settings['FORWARD_PUBLIC_LAN'] === 'yes' )
   {
-    $ret_str .= ( $fw_forward_state === true ) ? 'VPN Gateway enabled<br>' : 'VPN Gateway disabled<br>';
+    $tmpinfo = ( $fw_forward_state === true ) ? 'VPN Gateway enabled' : 'VPN Gateway disabled';
+    $ret_str .= "<tr><td></td><td id=\"public_gw\">$tmpinfo</td></tr>";
   }
 
   if( $settings['SOCKS_EXT_ENABLED'] == 'yes' ){
     if( $_services->socks_status() === 'running' ){
-      $ret_str .= "SOCKS 5 Proxy on port {$settings['SOCKS_EXT_PORT']}";
-      $ret_arr['SOCKS_EXT_ENABLED'] = "on port {$settings['SOCKS_EXT_PORT']}";
+      $tmpinfo = "SOCKS 5 Proxy on port {$settings['SOCKS_EXT_PORT']}";
+      $ret_str .= "<tr><td></td><td id=\"public_socks\">$tmpinfo</td></tr>";
+      $ret_arr['SOCKS_EXT_ENABLED'] = $tmpinfo;
     }else{
-      $ret_str .= "SOCKS 5 Proxy NOT running";
-      $ret_arr['SOCKS_EXT_ENABLED'] = "NOT running";
+      $tmpinfo = "SOCKS 5 Proxy NOT running";
+      $ret_str .= "<tr><td></td><td id=\"public_socks\">$tmpinfo</td></tr>";
+      $ret_arr['SOCKS_EXT_ENABLED'] = $tmpinfo;
     }
   }
-  $ret_str .= '</td></tr>';
+
   $ret_arr['public_ip'] = $ret[0];
   unset($ret);
 
@@ -474,24 +481,26 @@ function VM_get_status( $output = 'html'){
   exec('/sbin/ip addr show '.$settings['IF_INT'].' | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   if(array_key_exists('0', $ret) ){
     $ret_str .= '<tr><td style="vertical-align: top;">VM LAN</td>';
-    $ret_str .= "<td id=\"private_ip\">IP $ret[0]<br>";
+    $ret_str .= "<td>IP <span id=\"private_ip\">$ret[0]</span></td></tr>";
 
     $fw_forward_state = $_pia->check_forward_state($settings['IF_INT']);
     if( $fw_forward_state === true || $settings['FORWARD_VM_LAN'] === 'yes' )
     {
-      $ret_str .= ( $fw_forward_state === true ) ? 'VPN Gateway enabled<br>' : 'VPN Gateway disabled<br>';
+      $tmpinfo = ( $fw_forward_state === true ) ? 'VPN Gateway enabled' : 'VPN Gateway disabled';
+      $ret_str .= "<tr><td></td><td id=\"vpn_gw\">$tmpinfo</td></tr>";
     }
 
-  if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
-    if( $_services->socks_status() === 'running' ){
-      $ret_str .= "SOCKS 5 Proxy on port {$settings['SOCKS_INT_PORT']}";
-      $ret_arr['SOCKS_INT_ENABLED'] = "on port {$settings['SOCKS_INT_PORT']}";
-    }else{
-      $ret_str .= "SOCKS 5 Proxy NOT running";
-      $ret_arr['SOCKS_INT_ENABLED'] = "NOT running";
+    if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
+      if( $_services->socks_status() === 'running' ){
+        $tmpinfo = "SOCKS 5 Proxy on port {$settings['SOCKS_INT_PORT']}";
+        $ret_str .= "<tr><td></td><td id=\"vpn_socks\">$tmpinfo</td></tr>";
+        $ret_arr['SOCKS_INT_ENABLED'] = $tmpinfo;
+      }else{
+        $tmpinfo = "SOCKS 5 Proxy NOT running";
+        $ret_str .= "<tr><td></td><td id=\"vpn_socks\">$tmpinfo</td></tr>";
+        $ret_arr['SOCKS_INT_ENABLED'] = $tmpinfo;
+      }
     }
-  }
-  $ret_str .= '</td></tr>';
     $ret_arr['private_ip'] = $ret[0];
   }else{
     $ret_str .= "<tr><td>Private IP</td><td id=\"private_ip\">please refresh the page</td></tr>";
@@ -517,17 +526,18 @@ function VM_get_status( $output = 'html'){
 }
 
 function get_system_load(){
-  $ret = '';
+  $ret = array();;
 
   //$cpu = get_cpuload();
   //$ret .= "CPU {$cpu['sy']}% usr,  {$cpu['sy']}% sys, {$cpu['id']}% idle\n";
   $cpu = sys_getloadavg();
-  $ret .= "load average $cpu[0], $cpu[1], $cpu[2]<br>";
+  $ret['load'] = "$cpu[0], $cpu[1], $cpu[2]";
 
   $mem = get_meminfo();
   $used = $mem['total'] - $mem['free'];
   $used_swap = $mem['swap_total'] - $mem['swap_free'];
-  $ret .= "Mem {$used}/{$mem['total']} MB &nbsp;&nbsp; Swap {$used_swap}/{$mem['swap_total']} MB";
+  $ret['mem'] = "{$used}/{$mem['total']}";
+  $ret['swap'] =  "{$used_swap}/{$mem['swap_total']}";
 
   return $ret;
 }

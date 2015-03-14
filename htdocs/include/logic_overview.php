@@ -332,7 +332,7 @@ function disp_default(){
                   .'var _overview = new OverviewObj();'
                   .'_overview.refresh_status();'
                   .'_overview.clean_feedback();'
-                  .'},2500);'
+                  .'},10000);'
 
                   .'var _overview = new OverviewObj();'
                   .'_overview.set_js_network_control();'
