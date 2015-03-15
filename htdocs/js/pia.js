@@ -53,7 +53,7 @@ function OverviewObj( ){
           if( ele && ele.innerHTML !== ret[key] ){
             ele.innerHTML = '';
             ele.innerHTML = ret[key];
-            console.log(key, ret[key]);
+            /* console.log(key, ret[key]); */
           }
         }
       }

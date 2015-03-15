@@ -138,7 +138,7 @@ class PIACommands {
 
       //cont(0) is timestamp of creation
       //cont(1) contains the value
-      $expires = strtotime('-4 hours'); //time until session expires
+      $expires = strtotime('-48 hours'); //time until session expires
       if( trim($cont[0]) < $expires ){
         $git_ret = $this->get_revlist_count();
         if( $git_ret !== false ){
