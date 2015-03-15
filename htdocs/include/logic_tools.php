@@ -131,10 +131,10 @@ function disp_diagnostics(){
 
   //offer download links to client tools
   $disp_body .= '<h2>Diagnostic Utilities</h2>';
-  $disp_body .= 'The webUI is nice when everything works but will get in the way when it does not.';
+  $disp_body .= 'The webUI is nice when everything works but will get in the way when things go wrong.';
 
   $disp_body .= '<p><a href="/tools/ping.php">Ping Utility</a></p>';
-  $disp_body .= '<p><a href="/tools/log_view.php?openvpn">LOG: openVPN</a></p>';
+  //$disp_body .= '<p><a href="/tools/log_view.php?openvpn">LOG: openVPN</a></p>';
 
   $disp_body .= '</div>';
   return $disp_body;

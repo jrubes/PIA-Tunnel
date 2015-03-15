@@ -493,7 +493,7 @@ function VM_get_status( $output = 'html'){
   }
 
   if( $output !== 'array'){
-    $table = "<table border=\"1\" id=\"vm_status\"><tbody>\n";
+    $table = "<table border=\"0\" id=\"vm_status\"><tbody>\n";
     $table .= "<tr><td style=\"width:7em\">System</td><td>system load <span id=\"system_load\">{$sysload['load']}</span></td></tr>\n";
     $table .= "<tr><td></td><td>Mem <span id=\"system_mem\">{$sysload['mem']}</span> SWAP <span id=\"system_swap\">{$sysload['swap']}</span></td></tr>\n";
     $table .= '<tr><td>Software</td><td id="software_update">'.$up_txt.'</td></tr>';
@@ -503,15 +503,13 @@ function VM_get_status( $output = 'html'){
     $table .= "<tr><td id=\"vpn_lbl\" style=\"vertical-align: top;\">{$ret_arr['vpn_lbl']}</td><td>IP <span id=\"vpn_public_ip\">{$ret_arr['vpn_public_ip']}</span> Port <span id=\"vpn_port\">{$ret_arr['vpn_port']}</span></td></tr>\n";
     $table .= "<tr><td id=\"forwarding_lbl\" style=\"vertical-align: top;\">{$ret_arr['forwarding_lbl']}</td><td id=\"forwarding_port\">{$ret_arr['forwarding_port']}</td></tr>\n";
     $table .= "<tr><td>&nbsp;</td><td></td></tr>\n";
-    $table .= "<tr><td style=\"vertical-align: top;\">Public LAN</td><td>IP <span id=\"public_ip\">{$ret_arr['public_ip']}</span></td></tr>";
+    $table .= "<tr><td style=\"vertical-align: top;\">Public LAN</td><td>IP <span id=\"public_ip\">{$ret_arr['public_ip']}</span></td></tr>\n";
     $table .= "<tr><td></td><td id=\"public_gw\">$vpn_gateway</td></tr>\n";
     $table .= "<tr><td></td><td id=\"SOCKS_EXT_ENABLED\">{$ret_arr['SOCKS_EXT_ENABLED']}</td></tr>\n";
     $table .= "<tr><td>&nbsp;</td><td></td></tr>\n";
     $table .= "<tr><td style=\"vertical-align: top;\">VM LAN</td><td>IP <span id=\"private_ip\">{$ret_arr['private_ip']}</span></td></tr>\n";
     $table .= "<tr><td></td><td id=\"vpn_gw\">{$ret_arr['vpn_gw']}</td></tr>\n";
     $table .= "<tr><td></td><td id=\"SOCKS_INT_ENABLED\">{$ret_arr['SOCKS_INT_ENABLED']}</td></tr>\n";
-    $table .= "<tr><td>&nbsp;</td><td></td></tr>\n";
-    $table .= "<tr><td>&nbsp;</td><td></td></tr>\n";
     $table .= "</tbody></table>\n";
   }
 
