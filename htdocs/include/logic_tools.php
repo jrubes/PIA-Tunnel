@@ -218,8 +218,7 @@ function disp_docu(){
 
   $disp_body .= '<h2>Support &amp; Documentation</h2>';
   $disp_body .= '<ul>';
-$disp_body .= '<li><a href="http://'.$ret_arr['lan_ip'].'/docs/index.html" target="_blank">Open Documentation from Public LAN</a></li>';
-  $disp_body .= '<li><a href="http://'.$ret_arr['vlan_ip'].'/docs/index.html" target="_blank">Open Documentation from VM LAN</a></li>';
+  $disp_body .= '<li><a href="http://./docs/index.html" target="_blank">Open New Documentation</a></li>';
   $disp_body .= '<li><a href="http://www.kaisersoft.net/r/?PIADOCU" target="_blank">Open Old Documentation</a></li>';
   $disp_body .= '<li><a href="http://www.KaiserSoft.net/r/?PIAFORUM" target="_blank">PIA-Tunnel VM Support Forum</a></li>';
   $disp_body .= '<li><a href="http://www.KaiserSoft.net/index.php?p=5&amp;lang=eng&amp;subject=PIA-Tunnel%20Help%20Request" target="_blank">Contact Support</a></li>';
@@ -272,15 +271,16 @@ function disp_pia_update_client(){
   $disp_body .= 'Updates are downloaded from the project\'s <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
   $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
 
+  $disp_body .= '<div class="box changelog">';
   $cl = $_files->readfile("/pia/Changelog.md");
   $disp_body .=  $Parsedown->text($cl);
+  $disp_body .= '</div>';
 
-//  $disp_body .= '<div class="clear"></div>';
-//  $disp_body .= '<p> </p>';
-//  $disp_body .= '<a id="toggle_git_updatelog" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log('.$up.'); return false;">Show Update Log</a>';
-//  $disp_body .= ' <a id="toggle_git_log" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log(50); return false;">Show Repository Log</a>';
-//  $disp_body .= '<div id="uc_feedback" ><textarea id="uc_feedback_txt">'.$_pia->git_log($up).'</textarea></div>';
-//  $disp_body .= '<div class="clear"></div>';
+  $disp_body .= '<div class="clear"></div>';
+  $disp_body .= '<a id="toggle_git_updatelog" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log('.$up.'); return false;">Show Update Log</a>';
+  $disp_body .= ' <a id="toggle_git_log" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log(50); return false;">Show Repository Log</a>';
+  $disp_body .= '<div id="uc_feedback" ><textarea id="uc_feedback_txt">'.$_pia->git_log($up).'</textarea></div>';
+  $disp_body .= '<div class="clear"></div>';
 
   $disp_body .= '<form class="inline" action="/?page=tools&amp;cid=tools" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';

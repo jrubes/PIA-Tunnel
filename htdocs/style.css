@@ -201,3 +201,13 @@ root {
 .update_client h2{
   width: 80%;
 }
+
+.changelog{
+  background-color: lightgray;
+  max-height:10em;
+  overflow: scroll;
+}
+
+.changelog h1,h2{
+  font-size: 1.5em;
+}
