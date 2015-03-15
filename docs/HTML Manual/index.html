@@ -8,41 +8,70 @@
 <meta name="description" content="Official documentation for the PIA-Tunnel VM">
 <meta name="robots" content="NOINDEX,NOFOLLOW">
 <meta name="dcterms.creator" content="Mirko Kaiser">
+<link rel="stylesheet" type="text/css" href="manual.css">
 </head>
 <body>
 
 <h1>PIA-Tunnel Documentation</h1>
 
-<h2>Index</h2>
-<ul>
-<li><a href="#overview">Overview</a></li>
+<p>
+  This documentation is work in progress. Some sections may not have been verified yet or are still
+  being tested.
+</p>
 
-<li>Initial Setup</li>
+<div id="main_index" class="section">
+  <h2>Index</h2>
+  <ul>
+  <li><a href="#overview">Overview</a></li>
 
-<li>PIA-Tunnel Setup Wizard</li>
+  <li><a href="#vm_setup">Virtual Machine Setup</a></li>
 
-<li>PIA-Tunnel Web-based user interface (Management Interface)</li>
+  <li><a href="#pi_setup">Raspberry Pi / stand alone setup</a></li>
 
-<li>Tools</li>
+  <li><a href="#start_vm">Starting PIA-Tunnel for the first time</a></li>
 
-<li>Settings</li>
+  <li><a href="#wizard">PIA-Tunnel Setup Wizard</a></li>
 
-<li>Configuring your Client PC/Devices to use the VPN connection</li>
+  <li><a href="#webUI">PIA-Tunnel webUI (Management Interface)</a>
+    <ul>
+      <li>Tools</li>
 
-<li>Running a Server or Torrent Client</li>
-
-<li>Starting your Torrent client with monitor.vbs</li>
-
-<li>Known Issues</li>
-
-</ul>
+      <li><a href="s_general">Settings</a></li>
+    </ul>
+  </li>
 
 
 
-<div id="overview">
+
+  <li><a href="#client_setup_overview">Configure Client PC/Devices for your VPN connection</a></li>
+
+  <li>Running a Server or Torrent Client</li>
+
+  <li>Starting your Torrent client with monitor.vbs</li>
+
+  <li>Known Issues</li>
+
+  <li>Credits</li>
+
+  </ul>
+</div>
+
+
+<div id="overview" class="section">
   <h2>Overview</h2>
   <p>
-      PIA-Tunnel VM is a Debian 7 virtual machine for VMware Workstation, Player or ESXi. It is a VPN client designed to share the VPN connection with any device on your network. The VM also supports port forwarding, SOCKS 5 proxy, failover locations, VM LAN segments and an easy to use web browser interface.
+    PIA-Tunnel is a series of scripts designed to share an openVPN connection with your network.
+    It supports port forwarding, failover locations, LAN segments and a SOCKS5 proxy.
+    The included web interface makes it easy to setup connections and get the system configured to
+    your network.<br>
+    The included shell scripts make it possible to control the system from the command line as well.
+  </p>
+  <p>
+    PIA-Tunnel started out as a virtual machine for VMware Workstation, Player and ESXi but
+    is now being used on KVM, XEN, Hyper-V and other solutions.<br>
+    PIA-Tunnel is currently being tested on a Raspberry Pi 1 Model B+, with promising results.
+    The combination turns PIA-Tunnel into a stand alone VPN router for your network.
+    Advanced setups may utilize two network adapters to completely isolate a network or system.
   </p>
 
   <h3>Features</h3>
@@ -58,11 +87,13 @@
     <li>Requires 1 CPU core, 256MB RAM and less then 2GB free drive space</li>
     <li>Supports PrivateInternetAccess.com and FrootVPN.com out of the box</li>
   </ul>
+
+    <a href="./grfx/overview.png"><img src="./grfx/overview-small.png" alt="webUI screenshot"></a>
 </div>
 
 
-<div id="fresh_setup">
-  <h2>Initial Setup</h2>
+<div id="vm_setup" class="section">
+  <h2>Virtual Machine Setup</h2>
   <ol>
     <li>Download the compressed OVF Template from <a href="http://www.kaisersoft.net/r/?PIAIMG" target="_blank">http://www.kaisersoft.net/r/?PIAIMG</a></li>
     <li>Extract the 7-Zip archive. 7-Zip is a free compression utility <a href="http://www.7-zip.org/" target="_blank">http://www.7-zip.org</a></li>
@@ -120,7 +151,7 @@
 
 
 
-<div id="start_vm">
+<div id="start_vm" class="section">
   <h2>Power on / starting PIA Tunnel VM</h2>
 
   <ol>
@@ -138,7 +169,7 @@
 </div>
 
 
-<div id="wizard">
+<div id="wizard" class="section">
 	<h2>Setup Wizard</h2>
 
 	<p>The PIA-Tunnel Setup Wizard will be executed every time the VM is reset. It ensures that the basic configuration options are set properly.</p>
@@ -164,7 +195,7 @@
 </div>
 
 
-<div id="webUI">
+<div id="webUI" class="section">
 	<h2>PIA-Tunnel WebUI - Management Interface</h2>
 
 	<p>
@@ -172,7 +203,7 @@
 	</p>
 
 
-	<div id="s_general">
+	<div id="s_general" class="sub_section">
 	<h3>Settings - General Settings</h3>
     <p>
       These are the important settings for PIA-Tunnel. Please take a moment to understand what they do.
@@ -225,7 +256,7 @@
 	</div>
 
 
-	<div id="s_daemon">
+	<div id="s_daemon" class="sub_section">
 	<h3>Settings - PIA Daemon Settings</h3>
 	<p>
       PIA Daemon is a script that may be used to keep your network connected to the VPN.<br>
@@ -247,7 +278,7 @@
 	</ul>
 	</div>
 
-	<div id="s_adv">
+	<div id="s_adv" class="sub_section">
 	<h3>Settings - Advanced Settings</h3>
 	<p>
       The advanced settings are below the General Settings. Click on Show Advanced Settings to display the options.<br>
@@ -288,7 +319,7 @@
     </ul>
 	</div>
 
-	<div id="s_dhcpd">
+	<div id="s_dhcpd" class="sub_section">
 	<h3>Settings - DHCP Server Settings</h3>
 	<p>
       This box gives you access to the configuration file of the DHCP Server running inside PIA-Tunnel.
@@ -336,7 +367,7 @@
 
 </div>
 
-<div id="client_setup_overview">
+<div id="client_setup_overview" class="section">
 	<h2>Configure Client Devices to use the VPN</h2>
 
     <p>
@@ -355,7 +386,7 @@
 </div>
 
 
-<div id="socks5_setup">
+<div id="socks5_setup" class="section">
 	<h2>SOCKS5 Proxy Setup</h2>
 
 	<p>
@@ -382,11 +413,11 @@
 </div>
 
 
-<div id="pi_setup">
-  <h2>PIA Tunnel on a Raspberry PI</h2>
+<div id="pi_setup" class="section">
+  <h2>PIA Tunnel on a Raspberry Pi</h2>
   <p>
     You can use an inexpensive <a href="http://www.raspberrypi.org/" target="_blank">Rasperry Pi</a> to setup a permanent VPN router on your network.
-    The PI is relatively inexpensive and does not use much power so it is a great candidate when you don't
+    The Pi is relatively inexpensive and does not use much power so it is a great candidate when you don't
     run a local server.<br>
     This section of the guide explains how to set up the RasbPi using only one network card.
     It is also possible to set it up with two network cards which completely isolates your

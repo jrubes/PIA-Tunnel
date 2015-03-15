@@ -218,8 +218,9 @@ function disp_docu(){
 
   $disp_body .= '<h2>Support &amp; Documentation</h2>';
   $disp_body .= '<ul>';
-  $disp_body .= '<li><a href="http://'.$ret_arr['lan_ip'].'/pia-tunnel_documentation.pdf" target="_blank">Open Documentation from Public LAN</a></li>';
-  $disp_body .= '<li><a href="http://'.$ret_arr['vlan_ip'].'/pia-tunnel_documentation.pdf" target="_blank">Open Documentation from VM LAN</a></li>';
+$disp_body .= '<li><a href="http://'.$ret_arr['lan_ip'].'/docs/index.html" target="_blank">Open Documentation from Public LAN</a></li>';
+  $disp_body .= '<li><a href="http://'.$ret_arr['vlan_ip'].'/docs/index.html" target="_blank">Open Documentation from VM LAN</a></li>';
+  $disp_body .= '<li><a href="http://www.kaisersoft.net/r/?PIADOCU" target="_blank">Open Old Documentation</a></li>';
   $disp_body .= '<li><a href="http://www.KaiserSoft.net/r/?PIAFORUM" target="_blank">PIA-Tunnel VM Support Forum</a></li>';
   $disp_body .= '<li><a href="http://www.KaiserSoft.net/index.php?p=5&amp;lang=eng&amp;subject=PIA-Tunnel%20Help%20Request" target="_blank">Contact Support</a></li>';
   $disp_body .= '</ul>';

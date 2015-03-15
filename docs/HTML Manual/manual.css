@@ -1,0 +1,43 @@
+root {
+  display: block;
+}
+
+h1{
+  font-size: 1.5em;
+}
+
+h2{
+  font-size: 1.3em;
+  text-decoration: underline;
+}
+
+h3{
+  font-size: 1.1em;
+  text-decoration: underline;
+}
+
+li{
+  margin-bottom: 0.5em;
+}
+
+img{
+  padding: 1em;
+  background-color: lightgray;
+}
+
+
+
+
+.section{
+  margin-bottom: 10em;
+}
+
+.section p{
+  margin-left: 0.5em;
+}
+
+.sub_section{
+  margin-bottom: 5em;
+}
+
+
