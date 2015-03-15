@@ -38,7 +38,8 @@ Features
 * Supports PrivateInternetAccess.com and FrootVPN.com out of the box
 
 
-SETUP
+Setup
 =====
 
-Please follow the steps in this guide: http://www.KaiserSoft.net/r/?PIADOCU
+Current but dated Documentation: http://www.KaiserSoft.net/r/?PIADOCU
+Latest Documentation (work in progress): http://www.KaiserSoft.net/pia_doc/index.html
