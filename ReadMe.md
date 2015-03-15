@@ -13,22 +13,17 @@ PIA-Tunnel is currently being tested on a Raspberry Pi 1 Model B+, with promisin
 The combination turns PIA-Tunnel into a stand alone VPN router for your network.
 Advanced setups may utilize two network adapters to completely isolate a network or system.
 
+Documentation:	http://www.KaiserSoft.net/r/?PIADOCU  
+Support:		http://www.KaiserSoft.net/r/?PIAFORUM  
 
-Documentation:	http://www.KaiserSoft.net/r/?PIADOCU
-
-Support:		http://www.KaiserSoft.net/r/?PIAFORUM
-
-Author: Mirko Kaiser, http://www.KaiserSoft.net
-
-Support development with Bitcoins !thank you!
+Author: Mirko Kaiser, http://www.KaiserSoft.net  
+Support development with Bitcoins !thank you!  
                    16moftUyJeyGSCHEtE8bPFE9Ubg4j3SdKG
 
-First created in Germany on 2013-07-20
-
+First created in Germany on 2013-07-20  
 License: New BSD License
 
-Copyright (c) 2013, Mirko Kaiser, http://www.KaiserSoft.net
-
+Copyright (c) 2013, Mirko Kaiser, http://www.KaiserSoft.net  
 All rights reserved.
 
 
