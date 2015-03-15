@@ -497,8 +497,8 @@ function VM_get_status( $output = 'html'){
     $table .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">{$ret_arr['daemon_status']}</td></tr>\n";
     $table .= "<tr><td>VPN Status</td><td id=\"vpn_status\">{$ret_arr['vpn_status']}</td></tr>\n";
     $table .= "<tr><td></td><td id=\"\"></td></tr>\n";
-    $table .= "<tr><td style=\"vertical-align: top;\">{$ret_arr['vpn_lbl']}</td><td>IP <span id=\"vpn_public_ip\">{$ret_arr['vpn_public_ip']}</span> Port <span id=\"vpn_port\">{$ret_arr['vpn_port']}</span></td></tr>\n";
-    $table .= "<tr><td style=\"vertical-align: top;\">{$ret_arr['forwarding_lbl']}</td><td>{$ret_arr['forwarding_port']}</td></tr>\n";
+    $table .= "<tr><td id=\"vpn_lbl\" style=\"vertical-align: top;\">{$ret_arr['vpn_lbl']}</td><td>IP <span id=\"vpn_public_ip\">{$ret_arr['vpn_public_ip']}</span> Port <span id=\"vpn_port\">{$ret_arr['vpn_port']}</span></td></tr>\n";
+    $table .= "<tr><td id=\"forwarding_lbl\" style=\"vertical-align: top;\">{$ret_arr['forwarding_lbl']}</td><td>{$ret_arr['forwarding_port']}</td></tr>\n";
     $table .= "<tr><td></td><td id=\"\">&nbsp;</td></tr>\n";
     $table .= "<tr><td style=\"vertical-align: top;\">Public LAN</td><td>IP <span id=\"public_ip\">{$ret_arr['public_ip']}</span></td></tr>";
     $table .= "<tr><td></td><td id=\"public_gw\">$vpn_gateway</td></tr>\n";
