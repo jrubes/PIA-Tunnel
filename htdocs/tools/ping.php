@@ -35,6 +35,8 @@ $disp_head = '<!DOCTYPE html>'
                 .'<meta name="description" content="">'
                 .'<meta name="robots" content="NOINDEX,NOFOLLOW">'
                 .'<meta name="dcterms.creator" content="Mirko Kaiser">'
+                .'<script src="../js/RequestHandler.js" type="text/javascript"></script>'."\n"
+                .'<script src="../js/ping.js" type="text/javascript"></script>'."\n"
               .'</head>';
 
 
@@ -74,13 +76,23 @@ function disp_ping_output_ui(){
 
   $ret .= '<h2>Ping Utility</h2>';
   $ret .= '<noscript><strong>The utility requires javascript. You may use the command line instead</strong></noscript>';
-  $ret .= '<p>Running ping -qn -i 0.5 -w 4 -W 0.5 -I eth0 '.$_POST['IP'].' > /pia/cache/tools_ping.txt</p>';
+  $ret .= '<p>Running ping -qn -i 0.5 -w 4 -W 0.5 '.$_POST['IP'].' > /pia/cache/tools_ping.txt</p>';
   $ret .= '<textarea id="ping_out" style="width: 80%; height: 20em;">attempting to retrieve output from /pia/cache/tools_ping.txt ....';
   $ret .= "</textarea>\n";
+  $ret .= '<input type="hidden" id="ip2ping" value="'.$_POST['IP'].'">';
+  $ret .= '<input type="hidden" id="running" value="0">';
 
   $ret .= '<script type="text/javascript">'
-          .'document.getElementById("btn_ping").disabled = false;'
-          .'document.getElementById("inp_host").focus();</script>';
+          .'document.getElementById("ping_out").focus();'
+          .'var timr1=setInterval(function(){'
+                            .'document.getElementById("ping_out").innerHTML = "ping started .....";'
+                            .'var _ping = new PingObj();'
+                            .'_ping.ping("ip2ping");clearInterval(timr1);'
+                            .'},500);'
+          .'var timr2=setInterval(function(){'
+                            .'var _ping = new PingObj();'
+                            .'_ping.read();'
+                            .'},4000);</script>';
 
   return $ret;
 }
@@ -99,7 +111,7 @@ function disp_ping_ui(){
           . 'Please keep in mind that a lot/most websites block ping requests ....</p>';
   $ret .= '<form action="/tools/ping.php" method="post">';
   $ret .= '<input type="hidden" name="cmd" value="ping_host">';
-  $ret .= 'Outgoing interface: <br>';
+  $ret .= 'Outgoing interface: ANY<br>';
   $ret .= 'Name or IP ';
   $ret .= ' <input id="inp_host" type="text" name="IP" placeholder="google.com" value=""> ';
   $ret .= ' <input id="btn_ping" type="submit" name="ping it" value="Ping Host" disabled></p>';

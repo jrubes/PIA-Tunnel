@@ -679,20 +679,6 @@ function disp_general_box(){
   $disp_body .= '<h2>General Settings</h2>'."\n";
   $disp_body .= "<table>\n";
 
-  //basic interface and network
-  $GLOB_disp_network_default_fields .= 'FORWARD_PORT_ENABLED,';
-  $sel = array(
-          'id' => 'FORWARD_PORT_ENABLED',
-          'selected' =>  $settings['FORWARD_PORT_ENABLED'],
-          'onchange' => "toggle(this, 'FORWARD_IP', 'no', 'disabled', '', '');",
-          array( 'yes', 'yes'),
-          array( 'no', 'no')
-        );
-  $disp_body .= '<tr><td>Enable Port Forwarding</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'FORWARD_IP,';
-  $disabled = ( $settings['FORWARD_PORT_ENABLED'] === 'no' ) ? ' disabled ' : '';
-  $disp_body .= '<tr><td>Forward to this IP</td><td><input type="text" '.$disabled.' id="FORWARD_IP" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'" title="Use as IP in \'DHCP Server Settings\' - \'Fixed IP\'"></td></tr>'."\n";
-
   //VM LAN segment forwarding
   $GLOB_disp_network_default_fields .= 'FORWARD_VM_LAN,';
   $sel = array(
@@ -790,7 +776,23 @@ function disp_advanced_box(){
   $disp_body .= '<h2>Advanced Settings</h2>'."\n";
   $disp_body .= "<table>\n";
 
+  //basic interface and network
+  $GLOB_disp_network_default_fields .= 'FORWARD_PORT_ENABLED,';
+  $sel = array(
+          'id' => 'FORWARD_PORT_ENABLED',
+          'selected' =>  $settings['FORWARD_PORT_ENABLED'],
+          'onchange' => "toggle(this, 'FORWARD_IP', 'no', 'disabled', '', '');",
+          array( 'yes', 'yes'),
+          array( 'no', 'no')
+        );
+  $disp_body .= '<tr><td>Enable Port Forwarding</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'FORWARD_IP,';
+  $disabled = ( $settings['FORWARD_PORT_ENABLED'] === 'no' ) ? ' disabled ' : '';
+  $disp_body .= '<tr><td>Forward to this IP</td><td><input type="text" '.$disabled.' id="FORWARD_IP" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'" title="Use as IP in \'DHCP Server Settings\' - \'Fixed IP\'"></td></tr>'."\n";
+
+
   //interface assignment
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'IF_EXT,';
   $sel = array(
           'id' => 'IF_EXT',
