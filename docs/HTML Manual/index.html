@@ -425,13 +425,19 @@
   </p>
 
   <ul>
-    <li>Start by installing Raspberrian onto your SD card</li>
-    <li>Login as root or put "sudo" in front of every command.
+    <li>Start by installing <a href="http://downloads.raspberrypi.org/raspbian_latest.torrent">Raspbian</a> onto your SD card</li>
+    <li>Login with pi:raspberry and elevate to root
       <pre>
         sudo su -
       </pre>
     </li>
-    <li>Make sure the OS is up to date</li>
+    <li>Make sure the OS is up to date
+      <pre>
+        apt-get update -y
+        apt-get upgrade -y
+      </pre>
+    </li>
+    <li>Use raspi-config to overclock your CPU to TURBO or the VPN connection will not be established! (RasbPi 1 only)</li>
     <li>Make sure you have the "en_US.UTF-8" locale installed. Use raspi-config</li>
     <li>
       run the following command to install the required software. You may receive an error message when installing the DHCP server. You may ignore  it at this point.<br>
