@@ -490,12 +490,12 @@ function VM_get_status( $output = 'html'){
   }
 
   if( $output !== 'array'){
-    $table = "<table border=\"0\" id=\"vm_status\"><tbody>\n";
+    $table = "<table border=\"1\" id=\"vm_status\"><tbody>\n";
     $table .= "<tr><td style=\"width:7em\">System</td><td>system load <span id=\"system_load\">{$sysload['load']}</span></td></tr>\n";
     $table .= "<tr><td></td><td>Mem <span id=\"system_mem\">{$sysload['mem']}</span> SWAP <span id=\"system_swap\">{$sysload['swap']}</span></td></tr>\n";
     $table .= '<tr><td>Software</td><td id="software_update">'.$up_txt.'</td></tr>';
     $table .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">{$ret_arr['daemon_status']}</td></tr>\n";
-    $table .= "<tr><td>VPN Status</td><td>{$ret_arr['vpn_status']}</td></tr>\n";
+    $table .= "<tr><td>VPN Status</td><td id=\"vpn_status\">{$ret_arr['vpn_status']}</td></tr>\n";
     $table .= "<tr><td></td><td id=\"\"></td></tr>\n";
     $table .= "<tr><td style=\"vertical-align: top;\">{$ret_arr['vpn_lbl']}</td><td>IP <span id=\"vpn_public_ip\">{$ret_arr['vpn_public_ip']}</span> Port <span id=\"vpn_port\">{$ret_arr['vpn_port']}</span></td></tr>\n";
     $table .= "<tr><td style=\"vertical-align: top;\">{$ret_arr['forwarding_lbl']}</td><td>{$ret_arr['forwarding_port']}</td></tr>\n";
