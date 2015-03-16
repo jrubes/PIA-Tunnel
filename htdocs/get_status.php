@@ -17,6 +17,10 @@ $value = ( isset($_REQUEST['value']) ) ? $_REQUEST['value'] : '';
 
 header("Content-Type:text/plain");
 switch($type){
+  case 'online':
+    /* used by scripts to determine if system is ready */
+    echo 'OK';
+    break;
   case 'JSON':
     echo json_encode(VM_get_status('array'));
     break;

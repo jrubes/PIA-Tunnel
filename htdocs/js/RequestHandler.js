@@ -43,11 +43,11 @@ function RequestHandler(){
     var _this = this;
 
     //check if there is an open request for the current class
-    //if( _this.http_request.request_group ){
-      //console.debug('aborting pending request for group: ' + request_group);
-      //_this.http_request.request_group.abort();
-    //}
-    //console.debug('creating new request for group: ' + request_group);
+    if( _this.http_request.request_group ){
+      console.debug('aborting pending request for group: ' + request_group);
+      _this.http_request.request_group.abort();
+    }
+    console.debug('creating new request for group: ' + request_group);
     _this.http_request.request_group = _request.get_http_obj();
 
     _this.http_request.request_group.onreadystatechange = function(){
@@ -56,10 +56,12 @@ function RequestHandler(){
         //execute action
         if( typeof callback === 'function' ){
           callback( _this.http_request.request_group.responseText );
+          delete _this.http_request.request_group;
         }
       }else if( _this.http_request.request_group.readyState == 4
                   && _this.http_request.request_group.status != 200 ){
-        alert('error communicating with the server. please check your network connection '._this.http_request.request_group.status);
+        // server down
+        //alert('error communicating with the server. please check your network connection ');
       }
     };
 

@@ -111,9 +111,26 @@ function OverviewObj( ){
     rem = document.getElementById('overview_net_control');
     rem.setAttribute('class', 'box overview');
     rem.setAttribute('style', 'width: 290px; text-align: center;');
+  }
 
 
+  /* checks if the system is back up and redirects to the overview page once it is */
+  this.reload_after_reboot = reload_after_reboot;
+  function reload_after_reboot(){
+    var url = '/get_status.php';
+    var pdata = 'type=online'; //post data as string
+    var callback;
 
+    /* this will be executed after a successful http request */
+    callback = function(ret){
+      console.log(ret);
+      if( ret === "OK" ){
+        clearInterval('timr_reboot');
+        location.replace("/");
+      }
+    };
+
+    _request.post( 'status_update', url, pdata, callback);
   }
 
 

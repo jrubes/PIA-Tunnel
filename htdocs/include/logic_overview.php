@@ -161,6 +161,12 @@ switch($_REQUEST['cmd']){
       }elseif( array_key_exists('vm_restart', $_POST) === true ){
         VM_restart();
         $disp_body .= "<div id=\"feedback\" class=\"feedback\">Rebooting VM....</div>\n";
+        $disp_body .= '<script type="text/javascript">'
+                        .'var timr_reboot=setInterval(function(){'
+                        .'var _overview = new OverviewObj();'
+                        .'_overview.reload_after_reboot();'
+                        .'},2500);'
+                       .'</script>';
         break;
       }
     }else{
