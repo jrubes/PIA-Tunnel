@@ -396,9 +396,9 @@ function VM_get_status( $output = 'html'){
       if( array_key_exists( '0', $vpn_pub) === true ){
         $ret_arr['vpn_lbl'] = 'Public VPN';
         $ret_arr['vpn_public_lbl1'] = 'IP';
-        $ret_arr['vpn_public_lbl2'] = 'Port';
         $ret_arr['vpn_public_ip'] = $vpn_pub[0];
         $ret_arr['vpn_port'] = ($port != '') ? "$port" : '';
+        $ret_arr['vpn_public_lbl2'] = ($port != '') ? 'Port' : '';
 
         $fw_forward_state = $_pia->check_forward_state();
         if( $fw_forward_state === true && $port != '' ){
