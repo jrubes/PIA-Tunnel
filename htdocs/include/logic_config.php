@@ -82,7 +82,7 @@ switch($_REQUEST['cmd']){
           //check if the git branch needs to be switched
           if( $settings['GIT_BRANCH'] !== $_POST['GIT_BRANCH'] ){
             $sarg = escapeshellcmd($_POST['GIT_BRANCH']); //this is not proper!
-            exec('cd /pia ; git reset --hard; git fetch ; git checkout '.$sarg.' &> /dev/null');
+            exec('cd /pia ; git reset --hard HEAD; git fetch ; git checkout '.$sarg.' &> /dev/null');
             exec('chmod ug+x /pia/pia-setup ; /pia/pia-setup &> /dev/null');
             exec('/pia/pia-update &> /dev/null');
 
