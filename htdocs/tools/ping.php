@@ -121,17 +121,23 @@ function disp_ping_ui(){
 
   $ret .= '<h2>Ping Utility</h2>';
   $ret .= '<noscript><strong>The utility requires javascript. You may use the command line instead</strong></noscript>';
-  $ret .= '<p>Try a ping by hostname first. This will check lookup and proper connection.<br>'
-          . 'Please keep in mind that a lot/most websites block ping requests ....</p>';
+  $ret .= '<p>Try a ping by hostname first. This will check domain name lookup and proper connection.<br>'
+          . 'Please keep in mind that a lot/most websites block ping requests ....<br>'
+          . '</p>';
+  $ret .= '<p>The following firewall rules apply<br>'
+          .'* outgoing eth0 ping allowed when VPN is disconnected<br>'
+          .'* outgoing eth0 not allowed when VPN is connected. use tun0 instead'
+          .'</p>';
+
   $ret .= '<form action="/tools/ping.php" method="post" onsubmit="return false;">';
   $ret .= '<input type="hidden" name="cmd" value="ping_host">';
   $ret .= 'Outgoing interface: '.build_select($sel).'<br>';
   $ret .= 'Name or IP ';
-  $ret .= ' <input id="inp_host" type="text" name="IP" placeholder="google.com" value=""> ';
-  $ret .= ' <input id="btn_ping" type="button" onclick="send_ping();" name="ping it" value="Ping Host" disabled></p>';
+  $ret .= ' <input id="inp_host" type="text" name="IP" placeholder="google.com" value="" style="width: 20em;"> ';
+  $ret .= ' <input id="btn_ping" type="button" onclick="send_ping();" name="ping it" value="Ping Host" disabled>';
   $ret .= "</form>\n";
 
-  $ret .= '<textarea id="ping_out" style="width: 600px; height: 20em;">attempting to retrieve output from /pia/cache/tools_ping.txt ....';
+  $ret .= '<textarea id="ping_out" style="width: 600px; height: 20em;">ping results are stored in /pia/cache/tools_ping.txt ....';
   $ret .= "</textarea>\n";
 
 

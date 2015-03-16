@@ -25,7 +25,7 @@ function PingObj( ){
         }
       };
 
-      _request.post( 'ping', url, pdata, callback);
+      _request.post( 'ping_read', url, pdata, callback);
   }
 
 
@@ -49,7 +49,7 @@ function PingObj( ){
         }
       };
 
-      _request.post( 'ping', url, pdata, callback);
+      _request.post( 'ping_write', url, pdata, callback);
   }
 
   }
