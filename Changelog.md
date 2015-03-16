@@ -5,6 +5,7 @@ update 2015-03-14
 * Optimized javascript on "Overview" page and slowed down page reload.
 * Added "Refresh Overview" setting to control the refreshing interval of the overview page
 * Added experimental Ping Tool to help test connection issues. Ping can be found under Tools and is one of a few more tools to come.
+* Overview page will be reloaded automatically after a reboot
 * Updated SOCKS5 software to dante 1.4.1
 * few optimizations here and there....
 * Added [Parsedown](http://parsedown.org/) to help generate these notes

@@ -105,21 +105,57 @@ function disp_ping_output_ui(){
 function disp_ping_ui(){
   $ret = '';
 
+  if( $_REQUEST['ping_if'] !== 'tun0' || $_REQUEST['ping_if'] !== 'eth0' || $_REQUEST['ping_if'] !== 'eth1' ){
+    $_REQUEST['ping_if'] = 'eth0';
+  }
+
+  //interface dropdown
+  $sel = array(
+        'id' => 'ping_if',
+        'selected' => $_REQUEST['ping_if'],
+        array( 'eth0', 'eth0'),
+        array( 'eth1', 'eth1'),
+        array( 'tun0', 'tun0')
+      );
+
+
   $ret .= '<h2>Ping Utility</h2>';
   $ret .= '<noscript><strong>The utility requires javascript. You may use the command line instead</strong></noscript>';
   $ret .= '<p>Try a ping by hostname first. This will check lookup and proper connection.<br>'
           . 'Please keep in mind that a lot/most websites block ping requests ....</p>';
-  $ret .= '<form action="/tools/ping.php" method="post">';
+  $ret .= '<form action="/tools/ping.php" method="post" onsubmit="return false;">';
   $ret .= '<input type="hidden" name="cmd" value="ping_host">';
-  $ret .= 'Outgoing interface: ANY<br>';
+  $ret .= 'Outgoing interface: '.build_select($sel).'<br>';
   $ret .= 'Name or IP ';
   $ret .= ' <input id="inp_host" type="text" name="IP" placeholder="google.com" value=""> ';
-  $ret .= ' <input id="btn_ping" type="submit" name="ping it" value="Ping Host" disabled></p>';
+  $ret .= ' <input id="btn_ping" type="button" onclick="send_ping();" name="ping it" value="Ping Host" disabled></p>';
   $ret .= "</form>\n";
+
+  $ret .= '<textarea id="ping_out" style="width: 600px; height: 20em;">attempting to retrieve output from /pia/cache/tools_ping.txt ....';
+  $ret .= "</textarea>\n";
+
+
+
+
 
   $ret .= '<script type="text/javascript">'
           .'document.getElementById("btn_ping").disabled = false;'
-          .'document.getElementById("inp_host").focus();</script>';
+          .'document.getElementById("inp_host").focus();'
+          .'var timr2;
+  function send_ping(){
+    document.getElementById("btn_ping").disabled = true;
+    var timr1=setTimeout(function(){
+      document.getElementById("ping_out").innerHTML = "ping started .....";
+      var _ping = new PingObj();
+      _ping.ping("inp_host");
+      },500);
+
+    timr2=setInterval(function(){
+      var _ping = new PingObj();
+       _ping.read();
+       },4000);
+
+  }</script>';
 
   return $ret;
 }

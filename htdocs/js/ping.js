@@ -19,6 +19,7 @@ function PingObj( ){
         if( ele.innerHTML !== ret ){
           ele.innerHTML = '';
           ele.innerHTML = ret;
+          document.getElementById("btn_ping").disabled = false;
           clearInterval(timr2);
           console.log("ended timr2");
         }
@@ -33,7 +34,9 @@ function PingObj( ){
   function ping( host_ele ){
       var url = './ping_worker.php';
       var host = document.getElementById(host_ele).value;
-      var pdata = 'cmd=ping&IP=' + host; //post data as string
+      var se = document.getElementById('ping_if');
+      var intif = se.options[se.selectedIndex].value;
+      var pdata = 'cmd=ping&IP=' + host + '&IF=' + intif; //post data as string
       var callback;
 
 
