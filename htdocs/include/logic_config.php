@@ -756,6 +756,18 @@ function disp_general_box(){
   $GLOB_disp_network_default_fields .= 'WEB_UI_COOKIE_LIFETIME,';
   $disp_body .= '<tr><td>Remember Me for</td><td><input type="text" class="short" name="WEB_UI_COOKIE_LIFETIME" value="'.htmlspecialchars($settings['WEB_UI_COOKIE_LIFETIME']).'"> days</td></tr>'."\n";
 
+  $GLOB_disp_network_default_fields .= 'WEB_UI_REFRESH_TIME,';
+  $sel = array(
+            'id' => 'WEB_UI_REFRESH_TIME',
+            'selected' =>  $settings['WEB_UI_REFRESH_TIME'],
+            array( '5000', '5 seconds'),
+            array( '10000', '10 seconds'),
+            array( '15000', '15 seconds'),
+            array( '30000', '30 seconds'),
+            array( '60000', '60 seconds')
+          );
+  $disp_body .= '<tr><td>Refresh Overview every </td><td>'.build_select($sel).'</td></tr>'."\n";
+
 
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';

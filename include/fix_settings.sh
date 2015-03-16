@@ -232,3 +232,9 @@ if [ $ret = 0 ]; then
   git submodule update htdocs/plugin/phpdhcpd
   echo 'GIT_SUB_PDHCPD="ran setup"' >> '/pia/settings.conf'
 fi
+
+# webUI Overview refresh interval
+ret=`grep -c "WEB_UI_REFRESH_TIME" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'WEB_UI_REFRESH_TIME="15000"' >> '/pia/settings.conf'
+fi
