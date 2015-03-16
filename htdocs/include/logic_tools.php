@@ -64,8 +64,15 @@ switch($_REQUEST['cmd']){
         exec("sudo /pia/reset-pia", $result);
         if( array_key_exists('0', $result) === true ){
           $_SESSION = array(); //clear all session vars
-          $disp_body .= "<div id=\"feedback\" class=\"feedback\">Full system reset has been executed - system will reboot now.</div>\n";
+          $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.<br>Please double check the IP as it tends to change after a reset.</div>\n";
+          $disp_body .= '<script type="text/javascript">'
+                          .'var timr_reboot=setInterval(function(){'
+                          .'var _overview = new OverviewObj();'
+                          .'_overview.reload_after_reboot();'
+                          .'},2500);'
+                         .'</script>';
           VM_restart();
+          break;
         }
       }else{
         $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
@@ -93,7 +100,7 @@ $disp_body .= '<script type="text/javascript">'
 				.'var timr1=setInterval(function(){'
 					.'var _overview = new OverviewObj();'
 					.'_overview.clean_feedback();'
-				.'},2500);'
+				.'},4000);'
 				.'</script>';
 
 

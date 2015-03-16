@@ -32,7 +32,13 @@ switch($_REQUEST['cmd']){
       exec("sudo /pia/reset-pia", $result);
       if( array_key_exists('0', $result) === true ){
         $_SESSION = array(); //clear all session vars
-        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Full system reset has been executed - system will reboot now.<br>Please wait about a minute before you reload the page.</div>\n";
+        $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.<br>Please double check the IP as it tends to change after a reset.</div>\n";
+        $disp_body .= '<script type="text/javascript">'
+                        .'var timr_reboot=setInterval(function(){'
+                        .'var _overview = new OverviewObj();'
+                        .'_overview.reload_after_reboot();'
+                        .'},4000);'
+                       .'</script>';
         $_settings->save_settings('HAS_BEEN_RESET', "yes");
         VM_restart();
       }else{
