@@ -214,7 +214,7 @@ function socks_process_template(){
   $templ = $_files->readfile('/pia/include/sockd.conf');
   $client_templ = "client pass {\n"
                 ."  from: INTERNAL_NETWORK_HERE\n"
-                ."  log: connect disconnect error\n"
+                ."  log: #error connect disconnect\n"
                 ."}\n";
 
   $clients = ''; //contains assembled network declaration
