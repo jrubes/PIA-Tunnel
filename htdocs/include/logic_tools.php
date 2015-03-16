@@ -133,7 +133,7 @@ function disp_diagnostics(){
   $disp_body .= '<h2>Diagnostic Utilities</h2>';
   $disp_body .= 'The webUI is nice when everything works but will get in the way when things go wrong.';
 
-  $disp_body .= '<p><a href="/tools/ping.php">Ping Utility</a></p>';
+  $disp_body .= '<p><a href="/?page=ping">Ping Utility</a></p>';
   //$disp_body .= '<p><a href="/tools/log_view.php?openvpn">LOG: openVPN</a></p>';
 
   $disp_body .= '</div>';
@@ -268,18 +268,18 @@ function disp_pia_update_client(){
 
   $disp_body = '<div class="box update_client">';
   $disp_body .= '<h2>Online Update Client</h2>';
-  $disp_body .= 'Updates are downloaded from the project\'s <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
+  $disp_body .= 'Updates are downloaded from the <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
   $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
 
   $disp_body .= '<div class="box changelog">';
-  $cl = $_files->readfile("/pia/Changelog.md");
+  $cl = $_files->readfile("/var/www/pia_latest_changes.md");
   $disp_body .=  $Parsedown->text($cl);
   $disp_body .= '</div>';
 
   $disp_body .= '<div class="clear"></div>';
-  $disp_body .= '<a id="toggle_git_updatelog" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log('.$up.'); return false;">Show Update Log</a>';
-  $disp_body .= ' <a id="toggle_git_log" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log(50); return false;">Show Repository Log</a>';
-  $disp_body .= '<div id="uc_feedback" ><textarea id="uc_feedback_txt">'.$_pia->git_log($up).'</textarea></div>';
+  //$disp_body .= '<a id="toggle_git_updatelog" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log('.$up.'); return false;">Show Update Log</a>';
+  //$disp_body .= ' <a id="toggle_git_log" class="button" href="#" onclick="var _update = new UpdateClient(); _update.get_git_log(50); return false;">Show Repository Log</a>';
+  $disp_body .= '<div class="hidden" id="uc_feedback" ><textarea id="uc_feedback_txt">'.$_pia->git_log($up).'</textarea></div>';
   $disp_body .= '<div class="clear"></div>';
 
   $disp_body .= '<form class="inline" action="/?page=tools&amp;cid=tools" method="post">';

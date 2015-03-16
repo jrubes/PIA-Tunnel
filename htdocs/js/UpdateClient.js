@@ -37,7 +37,7 @@ function UpdateClient( ){
     var ele = document.getElementById('pia-update');
     if( ele ){
       ele.type = 'button';
-      ele.setAttribute('onclick', "var _update = new UpdateClient(); _update.start_update(); return false;");
+      ele.setAttribute('onclick', "unhide('uc_feedback'); var _update = new UpdateClient(); _update.start_update(); return false;");
     }
   }
 

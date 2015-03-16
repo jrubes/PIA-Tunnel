@@ -391,7 +391,7 @@ function VM_get_status( $output = 'html'){
       if( VPN_provider_connected() === 'pia' ){
         exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
       }else{
-        exec('ip -4 addr show tun0 | grep inet | gawk -F" " \'{print $2}\' | gawk -F"/" \'{print $1}\'', $vpn_pub);
+        exec('/sbin/ip -4 addr show tun0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $vpn_pub);
       }
       if( array_key_exists( '0', $vpn_pub) === true ){
         $ret_arr['vpn_lbl'] = 'Public VPN';
@@ -490,12 +490,6 @@ function VM_get_status( $output = 'html'){
   }
   unset($ret);
 
-  exec('/sbin/ip addr show '.$settings['IF_TUNNEL'].' 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  if( array_key_exists( '0', $ret) !== true ){
-    $ret_arr['vpn_port'] = '';
-    $ret_arr['vpn_ip'] = '';
-    $ret_arr['vpn_public_ip'] = '';
-  }
 
   if( $output !== 'array'){
     $table = "<table border=\"0\" id=\"vm_status\"><tbody>\n";
@@ -505,7 +499,7 @@ function VM_get_status( $output = 'html'){
     $table .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">{$ret_arr['daemon_status']}</td></tr>\n";
     $table .= "<tr><td>VPN Status</td><td id=\"vpn_status\">{$ret_arr['vpn_status']}</td></tr>\n";
     $table .= "<tr><td>&nbsp;</td><td></td></tr>\n";
-    $table .= "<tr><td id=\"vpn_lbl\" style=\"vertical-align: top;\">{$ret_arr['vpn_lbl']}</td><td><span id=\"vpn_public_lbl1\"></span> <span id=\"vpn_public_ip\">{$ret_arr['vpn_public_ip']}</span> <span id=\"vpn_public_lbl2\"></span> <span id=\"vpn_port\">{$ret_arr['vpn_port']}</span></td></tr>\n";
+    $table .= "<tr><td id=\"vpn_lbl\" style=\"vertical-align: top;\">{$ret_arr['vpn_lbl']}</td><td><span id=\"vpn_public_lbl1\">{$ret_arr['vpn_public_lbl1']}</span> <span id=\"vpn_public_ip\">{$ret_arr['vpn_public_ip']}</span> <span id=\"vpn_public_lbl2\">{$ret_arr['vpn_public_lbl2']}</span> <span id=\"vpn_port\">{$ret_arr['vpn_port']}</span></td></tr>\n";
     $table .= "<tr><td id=\"forwarding_lbl\" style=\"vertical-align: top;\">{$ret_arr['forwarding_lbl']}</td><td id=\"forwarding_port\">{$ret_arr['forwarding_port']}</td></tr>\n";
     $table .= "<tr><td>&nbsp;</td><td></td></tr>\n";
     $table .= "<tr><td style=\"vertical-align: top;\">Public LAN</td><td>IP <span id=\"public_ip\">{$ret_arr['public_ip']}</span></td></tr>\n";

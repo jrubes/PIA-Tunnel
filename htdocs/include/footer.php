@@ -10,10 +10,7 @@ $disp_footer = '';
 $disp_footer .= "<div class=\"clear\"></div>\n";
 
 $disp_footer .= '<p style="text-align: center">';
-//$disp_footer .= '<a href="http://www.KaiserSoft.net/r/?PIAFORUM" target="_blank">PIA-Tunnel Support Forum</a><br>';
-$disp_footer .= 'The latest update implemented a lot of changes. Please report any issues at the ';
-$disp_footer .= '<a href="http://www.KaiserSoft.net/r/?PIAFORUM" target="_blank">anonymous PIA-Tunnel forum</a><br>';
-$disp_footer .= 'Bitcoin donations accepted at <a href="bitcoin:1NLojvfK5a1c3S5YUiyEZytfMnQkSVNNZv?label=PIA-Tunnel%20Donation">1NLojvfK5a1c3S5YUiyEZytfMnQkSVNNZv</a></p>';
+$disp_footer .= 'Support this project with a Bitcoin donation to <a href="bitcoin:1CiSA5KgjdPpfnsXuYYoeisExqrJdrKX89?label=PIA-Tunnel%20Donation">1CiSA5KgjdPpfnsXuYYoeisExqrJdrKX89</a></p>';
 $disp_footer .= '<script type="text/javascript">
 /* sets or removes an attribute based on an elements source value
  - think toggeling an input box with "on" or "off" select dropdown

@@ -203,8 +203,9 @@ root {
 }
 
 .changelog{
+  font-size: 1em;
   background-color: lightgray;
-  max-height:10em;
+  max-height:15em;
   overflow: scroll;
 }
 

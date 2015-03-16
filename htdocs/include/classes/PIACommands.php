@@ -115,6 +115,7 @@ class PIACommands {
    * @return string number as string containing commit number or a status string
    */
   function get_update_status($force_update=false){
+    static $running = false; //set to true will shell script is running
     $cache_file = '/pia/cache/webui-update_status.txt';
 
     if( $force_update === true ){
@@ -140,23 +141,22 @@ class PIACommands {
       //cont(1) contains the value
       $expires = strtotime('-48 hours'); //time until session expires
       if( trim($cont[0]) < $expires ){
-        $git_ret = $this->get_revlist_count();
-        if( $git_ret !== false ){
-          $txt = strtotime('now').'|'.$git_ret;
-          $this->_files->writefile($cache_file, $txt);
-          return (int)$git_ret;
+        unlink($cache_file);
+        if( $running === false ){
+          $running = true;
+          $this->get_revlist_count();
         }
+        return 'checking ...';
 
       }else{
         //return info from cache file
+        $running = false;
         return (int)trim($cont[1]);
       }
 
     }else{
-      //file does not exist. create dummy file to show page as quickly as possible
-      // the next javascript status update will run the actuall check in the background
-      $txt = '0|0';
-      $this->_files->writefile($cache_file, $txt);
+      $running = true;
+      $this->get_revlist_count();
       return 'checking ...';
     }
   }
@@ -168,14 +168,10 @@ class PIACommands {
    */
   private function get_revlist_count(){
     global $settings;
-    $ret = array();
-    exec('cd /pia ; git fetch origin &> /dev/null ; git rev-list HEAD... origin/'.$settings['GIT_BRANCH'].' --count 2> /dev/null', $ret);
-    if( array_key_exists(0, $ret) === true ){
-      return (int)$ret[0];
-    }else{
-      return false;
-    }
+    $sh = escapeshellarg($settings['GIT_BRANCH']);
+    exec("bash -c \" /pia/include/log_fetch.sh $sh &>>/dev/null &\" &>/dev/null &");
   }
+
 
   /**
    * checks git log and returns information about last $count commits

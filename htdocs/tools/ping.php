@@ -9,93 +9,10 @@
 /* @var $_services SystemServices */
 /* @var $_auth AuthenticateUser */
 /* @var $_token token */
+if( $UNLOCKED !== 'byPIA' ){ die('invalid'); }
+$meta['javascript'][] = './js/ping.js';
+$disp_body .= disp_ping_ui();
 
-$inc_dir = '../include/';
-require_once $inc_dir.'basic.php';
-
-
-/*
- * translates the login form into values used by authentication function
- */
-$expected = array( 'username' => $settings['WEB_UI_USER'], 'password' => $settings['WEB_UI_PASSWORD']);
-$supplied = (isset($_POST['username']) && isset($_POST['username']) )
-                ? array( 'username' => $_POST['username'], 'password' => $_POST['password'])
-                : array( 'username' => '', 'password' => '');
-$_auth->authenticate( $expected, $supplied );
-
-
-/* common header for output */
-$disp_head = '<!DOCTYPE html>'
-              .'<html>'
-              .'<head>'
-                .'<meta charset="UTF-8">'
-                .'<title>PIA-Tunnel Management Interface</title>'
-                .'<meta name="author" content="Mirko Kaiser">'
-                .'<meta name="keywords" content="">'
-                .'<meta name="description" content="">'
-                .'<meta name="robots" content="NOINDEX,NOFOLLOW">'
-                .'<meta name="dcterms.creator" content="Mirko Kaiser">'
-                .'<script src="../js/RequestHandler.js" type="text/javascript"></script>'."\n"
-                .'<script src="../js/ping.js" type="text/javascript"></script>'."\n"
-              .'</head>';
-
-
-
-
-if( !isset($_POST['IP']) ){
-  $disp_body .= disp_ping_ui();
-
-  echo $disp_head."\n".$disp_body."\n</body></html>";
-
-}else{
-  header("Content-Type:text/html");
-  disp_ping_output_ui();
-  $disp_body .= disp_ping_output_ui();
-
-  echo $disp_head."\n".$disp_body."\n</body></html>";
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * generates HTML form used to display output from "ping"
- * @return string
- */
-function disp_ping_output_ui(){
-  $ret = '';
-
-  $ret .= '<h2>Ping Utility</h2>';
-  $ret .= '<noscript><strong>The utility requires javascript. You may use the command line instead</strong></noscript>';
-  $ret .= '<p>Running ping -qn -i 0.5 -w 4 -W 0.5 '.$_POST['IP'].' > /pia/cache/tools_ping.txt</p>';
-  $ret .= '<textarea id="ping_out" style="width: 80%; height: 20em;">attempting to retrieve output from /pia/cache/tools_ping.txt ....';
-  $ret .= "</textarea>\n";
-  $ret .= '<input type="hidden" id="ip2ping" value="'.$_POST['IP'].'">';
-  $ret .= '<input type="hidden" id="running" value="0">';
-
-  $ret .= '<script type="text/javascript">'
-          .'document.getElementById("ping_out").focus();'
-          .'var timr1=setInterval(function(){'
-                            .'document.getElementById("ping_out").innerHTML = "ping started .....";'
-                            .'var _ping = new PingObj();'
-                            .'_ping.ping("ip2ping");clearInterval(timr1);'
-                            .'},500);'
-          .'var timr2=setInterval(function(){'
-                            .'var _ping = new PingObj();'
-                            .'_ping.read();'
-                            .'},4000);</script>';
-
-  return $ret;
-}
 
 
 
@@ -121,23 +38,22 @@ function disp_ping_ui(){
 
   $ret .= '<h2>Ping Utility</h2>';
   $ret .= '<noscript><strong>The utility requires javascript. You may use the command line instead</strong></noscript>';
-  $ret .= '<p>Try a ping by hostname first. This will check domain name lookup and proper connection.<br>'
-          . 'Please keep in mind that a lot/most websites block ping requests ....<br>'
-          . '</p>';
-  $ret .= '<p>The following firewall rules apply<br>'
-          .'* outgoing eth0 ping allowed when VPN is disconnected<br>'
-          .'* outgoing eth0 not allowed when VPN is connected. use tun0 instead'
+  $ret .= '<p>The Ping Utility uses the same ping commands as the PIA-Tunnel scripts.<br>'
+          .'Try pining a hostname (google.com) to see if name resolution works or '
+          . 'your computers/router by IP if everything fails.....'
+          .'</p>';
+  $ret .= '<p>The following firewall rule applies<br>'
+          .'* outgoing eth0 not allowed when the VPN is connected. connections to the Internet are '
+          . ' only allowed through tun0'
           .'</p>';
 
-  $ret .= '<form action="/tools/ping.php" method="post" onsubmit="return false;">';
   $ret .= '<input type="hidden" name="cmd" value="ping_host">';
   $ret .= 'Outgoing interface: '.build_select($sel).'<br>';
   $ret .= 'Name or IP ';
   $ret .= ' <input id="inp_host" type="text" name="IP" placeholder="google.com" value="" style="width: 20em;"> ';
-  $ret .= ' <input id="btn_ping" type="button" onclick="send_ping();" name="ping it" value="Ping Host" disabled>';
-  $ret .= "</form>\n";
+  $ret .= ' <input id="btn_ping" type="button" href="#" onclick="send_ping();" name="ping it" value="Ping Host" disabled>';
 
-  $ret .= '<textarea id="ping_out" style="width: 600px; height: 20em;">ping results are stored in /pia/cache/tools_ping.txt ....';
+  $ret .= '<textarea id="ping_out" style="width: 625px; height: 20em;">ping results are stored in /pia/cache/tools_ping.txt ....';
   $ret .= "</textarea>\n";
 
 
@@ -151,7 +67,7 @@ function disp_ping_ui(){
   function send_ping(){
     document.getElementById("btn_ping").disabled = true;
     var timr1=setTimeout(function(){
-      document.getElementById("ping_out").innerHTML = "ping started .....";
+      document.getElementById("ping_out").innerHTML = "running .....";
       var _ping = new PingObj();
       _ping.ping("inp_host");
       },500);
@@ -159,7 +75,7 @@ function disp_ping_ui(){
     timr2=setInterval(function(){
       var _ping = new PingObj();
        _ping.read();
-       },4000);
+       },2500);
 
   }</script>';
 

@@ -8,7 +8,7 @@ function PingObj( ){
   /* query get_status.php */
   this.read = read;
   function read( ){
-      var url = './ping_worker.php';
+      var url = '/tools/ping_worker.php';
       var pdata = 'cmd=read'; //post data as string
       var callback;
 
@@ -19,9 +19,12 @@ function PingObj( ){
         if( ele.innerHTML !== ret ){
           ele.innerHTML = '';
           ele.innerHTML = ret;
-          document.getElementById("btn_ping").disabled = false;
-          clearInterval(timr2);
-          console.log("ended timr2");
+
+          if( ret.search('PINGDONE') !== -1 ){
+            clearInterval(timr2);
+            document.getElementById("btn_ping").disabled = false;
+            console.log("ended timr2");
+          }
         }
       };
 
@@ -32,7 +35,7 @@ function PingObj( ){
   /* query get_status.php */
   this.ping = ping;
   function ping( host_ele ){
-      var url = './ping_worker.php';
+      var url = '/tools/ping_worker.php';
       var host = document.getElementById(host_ele).value;
       var se = document.getElementById('ping_if');
       var intif = se.options[se.selectedIndex].value;

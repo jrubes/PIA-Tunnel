@@ -24,14 +24,19 @@ if( $plen > 1 && $plen < 20 && isset($_REQUEST['page']) ){
     case 'tools':
       require_once $inc_dir.'logic_tools.php';
       break;
+    case 'setup-admin_account':
+      require_once $inc_dir.'logic_admin_account.php';
+      break;
     case 'logout':
       require_once $inc_dir.'logic_logout.php';
       break;
     case 'setup-wizard':
       require_once $inc_dir.'logic_wizard.php';
       break;
-    case 'setup-admin_account':
-      require_once $inc_dir.'logic_admin_account.php';
+    case 'ping':
+      $UNLOCKED='byPIA';
+      require_once '/var/www/tools/ping.php';
+      unset($UNLOCKED);
       break;
     default:
       require_once $inc_dir.'logic_overview.php';

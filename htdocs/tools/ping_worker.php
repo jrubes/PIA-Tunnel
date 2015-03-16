@@ -28,8 +28,8 @@ switch($_POST['cmd'])
   case 'ping':
     $host = escapeshellarg($_POST['IP']);
     $intf = escapeshellarg($_POST['IF']);
-    echo "pinged $host over $intf\n";
-    exec('/pia/include/ping.sh '.$host.' '.$intf.' &>1 &');
+    echo "ping $host over $intf\n";
+    exec("bash -c \"/pia/include/ping.sh $host $intf &> /dev/null &\" &>/dev/null &");
     break;
 
   case 'read':

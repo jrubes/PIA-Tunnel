@@ -79,7 +79,18 @@ function toggle_hide( ele_id , event_ele_id, switch_value ){
             }
         }
     }
-}';
+};
+
+/* quick hack ... wil only unhide an element */
+function unhide( ele_id ){
+    var ele = document.getElementById( ele_id );
+
+    if( ele ){
+        if( ele.getAttribute("class") == "hidden" ){
+            ele.removeAttribute("class");
+        }
+    }
+};';
 $disp_header .= '</script>';
 
 
