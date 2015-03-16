@@ -5,7 +5,7 @@ This is a cut and paste file so getting everything working should only take a fe
   * 2GB VM disk
     * 100MB for SWAP, rest for /
   * 256MB RAM for VM - 92MB if you don't need socks proxy (not recommended)
-  * Set to en_US.UTF-8 locale or change with 'dpkg-reconfigure locales' later on
+  * Set to en_US.UTF-8 locale
   * make sure you set the hostname to   pia-tunnel   before you start with this guide
 
 20) For Debian without SSH Server
@@ -17,7 +17,8 @@ This is a cut and paste file so getting everything working should only take a fe
 
 
 
-50) apt-get install -y psmisc openvpn dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt sudo ca-certificates
+50) 
+apt-get install -y psmisc openvpn dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt sudo ca-certificates
 update-rc.d  ntp remove
 update-rc.d  mpt-statusd remove
 update-rc.d lighttpd enable
@@ -26,6 +27,8 @@ lighttpd-enable-mod fastcgi fastcgi-php
 addgroup vpnvm
 usermod -G vpnvm www-data
 usermod -G vpnvm root
+
+51)
 sed '/modprobe vmsync/d' -i /etc/rc*.d/S01open-vm-tools
 sed '/modprobe vmhgfs/d' -i /etc/rc*.d/S01open-vm-tools
 sed '/modprobe vmsync/d' -i /etc/init.d/open-vm-tools
@@ -154,9 +157,9 @@ OR this is how I created the package in /pia/extra_software/
 
 
 140)
-	mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
-	git clone https://github.com/KaiserSoft/PIA-Tunnel.git /pia
-	cd /pia ; git checkout release_php-gui
+mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
+git clone https://github.com/KaiserSoft/PIA-Tunnel.git /pia
+cd /pia ; git checkout release_php-gui
 
 
 150)	chmod 777 /pia/pia-setup ; /pia/pia-setup
