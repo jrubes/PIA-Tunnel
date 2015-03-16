@@ -233,6 +233,16 @@ if [ $ret = 0 ]; then
   echo 'GIT_SUB_PDHCPD="ran setup"' >> '/pia/settings.conf'
 fi
 
+# initial setup of Parsedown
+ret=`grep -c "GIT_SUB_PARSEDOWN" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  cd /pia/
+  git submodule init htdocs/plugin/parsedown
+  git submodule update htdocs/plugin/parsedown
+  echo 'GIT_SUB_PARSEDOWN="ran setup"' >> '/pia/settings.conf'
+fi
+
+
 # webUI Overview refresh interval
 ret=`grep -c "WEB_UI_REFRESH_TIME" /pia/settings.conf`
 if [ $ret = 0 ]; then

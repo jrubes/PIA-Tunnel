@@ -1,3 +1,6 @@
 [submodule "htdocs/plugin/phpdhcpd"]
 	path = htdocs/plugin/phpdhcpd
 	url = https://github.com/KaiserSoft/phpdhcpd
+[submodule "htdocs/plugin/parsedown"]
+	path = htdocs/plugin/parsedown
+	url = https://github.com/KaiserSoft/parsedown

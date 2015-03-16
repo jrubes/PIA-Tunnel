@@ -27,6 +27,18 @@ if [ "$?" -ne "0" ]; then
   exit 1
 fi
 
+git submodule init htdocs/plugin/parsedown 2>&1
+if [ "$?" -ne "0" ]; then
+  # error updating repo, abort
+  exit 1
+fi
+
+git submodule update htdocs/plugin/parsedown 2>&1
+if [ "$?" -ne "0" ]; then
+  # error updating repo, abort
+  exit 1
+fi
+
 
 #run pia-setup to fix permissions from git pull
 echo
