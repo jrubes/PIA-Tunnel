@@ -383,6 +383,9 @@ function VM_get_status( $output = 'html'){
       $_SESSION['connecting2'] = '';
 
       $ret_arr['forwarding_lbl'] = 'Forwarding';
+      $ret_arr['vpn_public_lbl1'] = '';
+      $ret_arr['vpn_public_lbl2'] = '';
+
       $port = VPN_get_port();
       $vpn_pub = array();
       if( VPN_provider_connected() === 'pia' ){
@@ -392,6 +395,8 @@ function VM_get_status( $output = 'html'){
       }
       if( array_key_exists( '0', $vpn_pub) === true ){
         $ret_arr['vpn_lbl'] = 'Public VPN';
+        $ret_arr['vpn_public_lbl1'] = 'IP';
+        $ret_arr['vpn_public_lbl2'] = 'Port';
         $ret_arr['vpn_public_ip'] = $vpn_pub[0];
         $ret_arr['vpn_port'] = ($port != '') ? "$port" : '';
 
@@ -500,7 +505,7 @@ function VM_get_status( $output = 'html'){
     $table .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">{$ret_arr['daemon_status']}</td></tr>\n";
     $table .= "<tr><td>VPN Status</td><td id=\"vpn_status\">{$ret_arr['vpn_status']}</td></tr>\n";
     $table .= "<tr><td>&nbsp;</td><td></td></tr>\n";
-    $table .= "<tr><td id=\"vpn_lbl\" style=\"vertical-align: top;\">{$ret_arr['vpn_lbl']}</td><td>IP <span id=\"vpn_public_ip\">{$ret_arr['vpn_public_ip']}</span> Port <span id=\"vpn_port\">{$ret_arr['vpn_port']}</span></td></tr>\n";
+    $table .= "<tr><td id=\"vpn_lbl\" style=\"vertical-align: top;\">{$ret_arr['vpn_lbl']}</td><td><span id=\"vpn_public_lbl1\"></span> <span id=\"vpn_public_ip\">{$ret_arr['vpn_public_ip']}</span> <span id=\"vpn_public_lbl2\"></span> <span id=\"vpn_port\">{$ret_arr['vpn_port']}</span></td></tr>\n";
     $table .= "<tr><td id=\"forwarding_lbl\" style=\"vertical-align: top;\">{$ret_arr['forwarding_lbl']}</td><td id=\"forwarding_port\">{$ret_arr['forwarding_port']}</td></tr>\n";
     $table .= "<tr><td>&nbsp;</td><td></td></tr>\n";
     $table .= "<tr><td style=\"vertical-align: top;\">Public LAN</td><td>IP <span id=\"public_ip\">{$ret_arr['public_ip']}</span></td></tr>\n";
