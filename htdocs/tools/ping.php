@@ -1,7 +1,6 @@
 <?php
 /*
- * ping script - requires authentication from the webUI to prevent third party scripts
- * from using this tool without authenticating first.
+ * ping script
  */
 /* @var $_settings PIASettings */
 /* @var $_pia PIACommands */
@@ -10,7 +9,7 @@
 /* @var $_auth AuthenticateUser */
 /* @var $_token token */
 if( $UNLOCKED !== 'byPIA' ){ die('invalid'); }
-$meta['javascript'][] = './js/ping.js';
+$meta['javascript'][] = '/js/ping.js';
 $disp_body .= disp_ping_ui();
 
 

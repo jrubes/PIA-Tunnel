@@ -32,6 +32,16 @@
 
   <li><a href="#wizard">PIA-Tunnel Setup Wizard</a></li>
 
+  <li><a href="#socks5_setup">SOCKS5 Proxy Server Setup</a></li>
+
+  <li>
+    <a href="#defaultgw_setup">Default Gateway Setup</a>
+    <ul>
+      <li><a href="#defaultgw_single">Basic - One Network Interface</a></li>
+      <li><a href="#defaultgw_dual">Advanced - Dual Network Interface</a></li>
+    </ul>
+  </li>
+
   <li><a href="#webUI">PIA-Tunnel webUI (Management Interface)</a>
     <ul>
       <li>Tools</li>
@@ -39,6 +49,7 @@
       <li><a href="#s_general">Settings</a></li>
     </ul>
   </li>
+
 
 
 
@@ -58,7 +69,7 @@
 
 
 <div id="overview" class="section">
-  <h2>Overview</h2>
+  <h2>Overview</h2> <a href="#main_index">Back To Top</a>
   <p>
     PIA-Tunnel is a series of scripts designed to share an openVPN connection with your network.
     It supports port forwarding, failover locations, LAN segments and a SOCKS5 proxy.
@@ -76,9 +87,9 @@
 
   <h3>Features</h3>
   <ul>
-    <li>Open by design! PIA-Tunnel is script based, so no binaries
-        with hidden features and you may roll your own VM by
-        following the steps in 'Clean Installation Steps.txt'</li>
+    <li>Open by design! PIA-Tunnel is script based and you may roll your own installation
+        by following the steps in 'Clean Installation Steps.txt'
+    </li>
     <li>Complete network isolation with VM LAN segment (leak protection)</li>
     <li>Simple Web-interface and/or command line support</li>
     <li>SOCKS 5 proxy for LAN or VM LAN segment. proxifier.com compatible</li>
@@ -93,7 +104,7 @@
 
 
 <div id="vm_setup" class="section">
-  <h2>Virtual Machine Setup</h2>
+  <h2>Virtual Machine Setup</h2> <a href="#main_index">Back To Top</a>
   <ol>
     <li>Download the compressed OVF Template from <a href="http://www.kaisersoft.net/r/?PIAIMG" target="_blank">http://www.kaisersoft.net/r/?PIAIMG</a></li>
     <li>Extract the 7-Zip archive. 7-Zip is a free compression utility <a href="http://www.7-zip.org/" target="_blank">http://www.7-zip.org</a></li>
@@ -152,7 +163,7 @@
 
 
 <div id="start_vm" class="section">
-  <h2>Power on / starting PIA Tunnel VM</h2>
+  <h2>Power on / starting PIA Tunnel VM</h2> <a href="#main_index">Back To Top</a>
 
   <ol>
     <li>Verify that the machine has one CPU and at least 256MB of RAM.</li>
@@ -170,7 +181,7 @@
 
 
 <div id="wizard" class="section">
-	<h2>Setup Wizard</h2>
+	<h2>Setup Wizard</h2> <a href="#main_index">Back To Top</a>
 
 	<p>The PIA-Tunnel Setup Wizard will be executed every time the VM is reset. It ensures that the basic configuration options are set properly.</p>
 
@@ -196,7 +207,7 @@
 
 
 <div id="webUI" class="section">
-	<h2>PIA-Tunnel WebUI - Management Interface</h2>
+	<h2>PIA-Tunnel WebUI - Management Interface</h2> <a href="#main_index">Back To Top</a>
 
 	<p>
 		The WebUI should work with any basic HTML5 browser, even with javascript disabled.  Enabling javascript will activate the advanced UI which will reconfigure some UI elements, enable automatic Network Status updates and make the Settings page easier to use.
@@ -204,22 +215,12 @@
 
 
 	<div id="s_general" class="sub_section">
-	<h3>Settings - General Settings</h3>
+	<h3>Settings - General Settings</h3> <a href="#main_index">Back To Top</a>
     <p>
       These are the important settings for PIA-Tunnel. Please take a moment to understand what they do.
     </p>
 
 	<ul>
-      <li>
-        <strong>Enable Port Forwarding</strong> : &lt;yes/no&gt; (default: no)<br>
-        This option enables port forwarding to a computer connected to PIA-Tunnel. Only set this to yes if you intend to run a server or torrent client. Please see Running a Server or Torrent Client for details
-      </li>
-
-      <li>
-        <strong>Forward IP</strong>: &lt;some IP&gt; (default: 192.168.10.100)<br>
-        This is the target IP of the open port. The option is only available when Enable Port Forwarding is set to yes.
-      </li>
-
       <li>
         <strong>VPN Gateway for VM LAN</strong>:  &lt;yes/no;&gt; (default: yes)<br>
         Setting this option to yes will share the VPN connection with any computer on your private VM LAN Segment. The LAN segment is called VPN Bridge in the setup portion of this guide.
@@ -257,7 +258,7 @@
 
 
 	<div id="s_daemon" class="sub_section">
-	<h3>Settings - PIA Daemon Settings</h3>
+	<h3>Settings - PIA Daemon Settings</h3> <a href="#main_index">Back To Top</a>
 	<p>
       PIA Daemon is a script that may be used to keep your network connected to the VPN.<br>
       It will test the VPN connection every few minutes, stop all VPN forwarding on error and attempt to reconnect when the connection is down.
@@ -279,13 +280,22 @@
 	</div>
 
 	<div id="s_adv" class="sub_section">
-	<h3>Settings - Advanced Settings</h3>
+	<h3>Settings - Advanced Settings</h3> <a href="#main_index">Back To Top</a>
 	<p>
       The advanced settings are below the General Settings. Click on Show Advanced Settings to display the options.<br>
       <strong>WARNING</strong>: You can really mess things up in here and may even compromise your security by changing the wrong option.
 	</p>
 
 	<ul>
+      <li>
+        <strong>Enable Port Forwarding</strong> : &lt;yes/no&gt; (default: no)<br>
+        This option enables port forwarding to a computer connected to PIA-Tunnel. Only set this to yes if you intend to run a server or torrent client. Please see Running a Server or Torrent Client for details
+      </li>
+
+      <li>
+        <strong>Forward IP</strong>: &lt;some IP&gt; (default: 192.168.10.100)<br>
+        This is the target IP of the open port. The option is only available when Enable Port Forwarding is set to yes.
+      </li>
       <li><strong>Public LAN interface</strong>: &lt;eth0/eth1/tun0&gt; (default: eth0)<br>
           Specifies which interface is connected to your public LAN.
           WARNING: Dont change this!
@@ -320,7 +330,7 @@
 	</div>
 
 	<div id="s_dhcpd" class="sub_section">
-	<h3>Settings - DHCP Server Settings</h3>
+	<h3>Settings - DHCP Server Settings</h3> <a href="#main_index">Back To Top</a>
 	<p>
       This box gives you access to the configuration file of the DHCP Server running inside PIA-Tunnel.
       The current UI supports up to two subnets.<br>
@@ -368,7 +378,7 @@
 </div>
 
 <div id="client_setup_overview" class="section">
-	<h2>Configure Client Devices to use the VPN</h2>
+	<h2>Configure Client Devices to use the VPN</h2> <a href="#main_index">Back To Top</a>
 
     <p>
       PIA-Tunnel may share your VPN connection as a SOCKS5 proxy server or as a default gateway for your nework.
@@ -387,10 +397,13 @@
 
 
 <div id="socks5_setup" class="section">
-	<h2>SOCKS5 Proxy Setup</h2>
+	<h2>SOCKS5 Proxy Setup</h2> <a href="#main_index">Back To Top</a>
 
 	<p>
-      Using the SOCKS5 proxy is a great way to get around country blocks without major changes. Simply change your browser settings and your are done.<br>
+      Using the SOCKS5 proxy is a great way to get around country blocks without major changes.
+      Simply change your browser settings and your are done.<br>
+      This option may also be used on a device that is already setup
+      as a default gateway for your network.
 	</p>
 
 	<ul>
@@ -413,8 +426,143 @@
 </div>
 
 
+<div id="defaultgw_setup" class="section">
+	<h2>Default Gateway Setup</h2> <a href="#main_index">Back To Top</a>
+
+	<p>
+      PIA-Tunnel is primarily designed to act as a default gateway for one or
+      more client devices on your network.
+      Unlike the SOCKS5 proxy, which needs to be configured per program.
+      The default gateway is an operating system setting that is configured once.
+      It forces your programs to send all traffic through the default gateway, the VPN tunnel.
+    </p>
+    <p>
+      The basic configuration makes use of one network adapter to connect
+      to the VPN and share the connection with your network.<br>
+      While a more advanced setup may utilize two network adapters to physically isolate
+      your network from the Internet side.
+    </p>
+
+
+    <div id="defaultgw_single" class="sub_section">
+      <h2>Basic - One Network Interface</h2> <a href="#main_index">Back To Top</a>
+
+      <p>
+        The basic setup will use one network card to connect to the VPN and share the connection
+        with your network.
+      </p>
+
+      <ul>
+        <li>
+          Begin by configuring a static IP for your network interface. This will be the IP
+          your clients use as the default gateway setting.
+          <ul>
+            <li>Settings =&gt; General Settings
+              <ul>
+                <li>Set "VPN Gateway for public LAN" to "yes"</li>
+              </ul>
+            </li>
+            <li>Settings =&gt; Advanced Settings
+              <ul>
+                <li>
+                  Disable DHCP Server by setting "Subnet 1" and "Subnet 2" to disable<br>
+                  You may also use the build on DHCP Server if you disable the DHCP Server
+                  running on your router. There must only be one DHCP Server on a basic network!
+                </li>
+                <li>Set "Enable Port Forwarding" to "no" for now. You may enable this later
+                <li>
+                  Set "eth0 use DHCP" to "no" and fill out the IP, Subnet and Gateway field.<br>
+                  Here, gateway is the IP of your router/modem
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+
+        <li>
+          Go back to the Overview page and click on the reboot button. Wait a bit and then
+          use the IP you just entered to reopen the webUI
+        </li>
+
+        <li>
+          Connect to your VPN and wait until the overview page says "VPN Gateway enabled"
+        </li>
+
+        <li>
+          Time to configure your client devices and add the "Public LAN" IP as a default gateway.<br>
+        </li>
+
+        <li>
+          <a href="http://www.network-technologies.org/Projects/user_agent-ip_address.php" target="_blank">Verify that your clients are using the VPN</a> by checking your Internet IP.
+          It should be the same as the Public VPN IP listed on the overview page.
+       </li>
+      </ul>
+    </div>
+
+
+    <div id="defaultgw_dual" class="sub_section">
+      <h2>Advanced - Two Network Interfaces</h2> <a href="#main_index">Back To Top</a>
+
+      <p>
+        Advanced setup - or the "this is what PIA-Tunnel was designed for" setup.<br>
+        The Guide is currently written with PIA-Tunnel running on a Raspberry Pi. Everything
+        here should be true for any Debian 7 setup running the PIA-Tunnel scripts.
+      </p>
+
+      <p>
+        This setup separates your network from the Internet by physically separating the two.
+        One network interface is connected to the Internet while the other connects to your LAN. There
+        are no other interconnects between the network so all traffic must flow through
+        the PIA-Tunnel gateway, the VPN connection.
+      </p>
+
+      <p>
+        This can either be achieved by using PIA-Tunnel as a virtual machine, with on card connected
+        to your LAN and another to a private VM LAN. Any virtual machines that are only connected to
+        this VM LAN will be completely isolated from any other network.<br>
+        This section of the guide will focus on a typical home setup. Your computer connects
+        to the Internet via a router or modem.<br>
+        <strong>WARNING</strong>WLAN connections that are offered by that router will
+        be connected to the public network! VPN access is possible but these connections are not isolated.
+      </p>
+
+      <p>
+        <img src="./grfx/default_home_network.png" alt="typical home network map"><br>
+        The image above is an example of a typical home setup with one or
+        more PCs hardwired to the router while laptops and tablets use the WLAN.
+      </p>
+      <p>
+        PIA-Tunnel running on a Raspberry Pi would create a second network behind the router.
+        One network connects to the first network card, the other to the second network card. Complete isolation.<br>
+        You could turn WLAN off at your Internet router and replace the network switch inside
+        the isolated network with an access point/switch combo.
+        Many things are possible with networking ... .
+        <img src="./grfx/default_home_pia_standalone.png" alt="typical home network map"><br>
+      </p>
+
+      <div class="sub_section">
+        <h3>Let's get started....</h3>
+        <p>First get the IP of your router</p>
+        <ul>
+          <li>First get the IP of your router</li>
+          <li>Make sure your have two network adapters connected, then start the device
+            running PIA-Tunnel .... Virtual Machine, Raspberry Pi, ....</li>
+          <li>Open the webUI make sure that the "Overview" page shows a "Public LAN	IP" and a "VM LAN IP"</li>
+          <li>Open Settings and click on Advanced towards the bottom of the page</li>
+          <li>
+            The public LAN IP may be assigned by your router or be static. I recommend a static IP for all
+            devices that offer a service on your network.
+          </li>
+          <li>time for a brake.....</li>
+        </ul>
+      </div>
+    </div>
+</div>
+
+
+
 <div id="pi_setup" class="section">
-  <h2>PIA Tunnel on a Raspberry Pi</h2>
+  <h2>PIA Tunnel on a Raspberry Pi</h2> <a href="#main_index">Back To Top</a>
   <p>
     You may use an inexpensive <a href="http://www.raspberrypi.org/" target="_blank">Rasperry Pi</a> to setup a permanent VPN router on your network.
     The Pi is relatively inexpensive and does not use much power so it is a great candidate when you don't
@@ -422,6 +570,14 @@
     This section of the guide explains how to set up the RasbPi using only one network card.
     It is also possible to set it up with two network cards which completely isolates your
     LAN from the non-VPN tunneled Internet.
+  </p>
+
+  <p>
+    2015-03-17 - Current test results with a Raspberry Pi 1 B+<br>
+    * works well when setup as a default gateway.
+    tested with 1,1MB/s transfer speed through VPN tunnel<br>
+    * SOCKS5 adds a lot of CPU load on top of handling the encrypted VPN tunnel.
+      works good with small loads such as browsing and watch a HQ Twitch stream or two.<br>
   </p>
 
   <ul>
@@ -489,6 +645,13 @@
         mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
         git clone https://github.com/KaiserSoft/PIA-Tunnel.git /pia
         cd /pia ; git checkout release_php-gui
+      </pre>
+    </li>
+
+    <li>
+      The next commands will execute the PIA-Tunnel setup script.
+      Please report any error messages you encounter.
+      <pre>
         chmod 777 /pia/pia-setup ; /pia/pia-setup
       </pre>
     </li>

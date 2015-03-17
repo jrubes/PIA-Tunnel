@@ -38,6 +38,11 @@ if( $plen > 1 && $plen < 20 && isset($_REQUEST['page']) ){
       require_once '/var/www/tools/ping.php';
       unset($UNLOCKED);
       break;
+    case 'tc':
+      $UNLOCKED='byPIA';
+      require_once '/var/www/tools/tc.php';
+      unset($UNLOCKED);
+      break;
     default:
       require_once $inc_dir.'logic_overview.php';
   }
