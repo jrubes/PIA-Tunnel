@@ -158,12 +158,25 @@
     </ol>
   </li>
   </ol>
+
+  <p>
+    <strong>WARNING:</strong> Do not connect both interfaces to the same network. It will create
+    routing conflicts and the VPN will fail to connect.<br>
+    Remove the second network card if you don't intend use network isolation. You may always add
+    the interface later.
+  </p>
 </div>
 
 
 
 <div id="start_vm" class="section">
   <h2>Power on / starting PIA Tunnel VM</h2> <a href="#main_index">Back To Top</a>
+  <p>
+    <strong>WARNING:</strong> Do not connect both interfaces to the same network. It will create
+    routing conflicts and the VPN will fail to connect.<br>
+    Remove the second network card if you don't intend use network isolation. You may always add
+    the interface later.
+  </p>
 
   <ol>
     <li>Verify that the machine has one CPU and at least 256MB of RAM.</li>
@@ -379,6 +392,12 @@
 
 <div id="client_setup_overview" class="section">
 	<h2>Configure Client Devices to use the VPN</h2> <a href="#main_index">Back To Top</a>
+    <p>
+      <strong>WARNING:</strong> Do not connect both interfaces to the same network. It will create
+      routing conflicts and the VPN will fail to connect.<br>
+      Remove the second network card if you don't intend use network isolation. You may always add
+      the interface later.
+    </p>
 
     <p>
       PIA-Tunnel may share your VPN connection as a SOCKS5 proxy server or as a default gateway for your nework.
@@ -446,6 +465,12 @@
 
     <div id="defaultgw_single" class="sub_section">
       <h2>Basic - One Network Interface</h2> <a href="#main_index">Back To Top</a>
+      <p>
+        <strong>WARNING:</strong> Do not connect both interfaces to the same network. It will create
+        routing conflicts and the VPN will fail to connect.<br>
+        Remove the second network card if you don't intend use network isolation. You may always add
+        the interface later.
+      </p>
 
       <p>
         The basic setup will use one network card to connect to the VPN and share the connection
@@ -506,7 +531,7 @@
       <p>
         Advanced setup - or the "this is what PIA-Tunnel was designed for" setup.<br>
         The Guide is currently written with PIA-Tunnel running on a Raspberry Pi. Everything
-        here should be true for any Debian 7 setup running the PIA-Tunnel scripts.
+        here should be true for any Debian 7 setup running the PIA-Tunnel scripts.<br>
       </p>
 
       <p>
@@ -522,7 +547,7 @@
         this VM LAN will be completely isolated from any other network.<br>
         This section of the guide will focus on a typical home setup. Your computer connects
         to the Internet via a router or modem.<br>
-        <strong>WARNING</strong>WLAN connections that are offered by that router will
+        <strong>WARNING</strong> WLAN connections offered by that router will
         be connected to the public network! VPN access is possible but these connections are not isolated.
       </p>
 
@@ -570,6 +595,13 @@
     This section of the guide explains how to set up the RasbPi using only one network card.
     It is also possible to set it up with two network cards which completely isolates your
     LAN from the non-VPN tunneled Internet.
+  </p>
+
+  <p>
+    <strong>WARNING:</strong> Do not connect both interfaces to the same network. It will create
+    routing conflicts and the VPN will fail to connect.<br>
+    Remove the second network card if you don't intend use network isolation. You may always add
+    the interface later.
   </p>
 
   <p>

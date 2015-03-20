@@ -156,11 +156,11 @@ switch($_REQUEST['cmd']){
     if( $_token->pval($_POST['token'], 'handle user request - shutdown or reboot the OS') === true ){
       if( array_key_exists('vm_shutdown', $_POST) === true ){
         VM_shutdown();
-        $disp_body .= "<div id=\"feedback\" class=\"feedback\">VM is shutting down....</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Shutting down ....</div>\n";
         break;
       }elseif( array_key_exists('vm_restart', $_POST) === true ){
         VM_restart();
-        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Rebooting VM....</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">Rebooting ....</div>\n";
         $disp_body .= '<script type="text/javascript">'
                         .'var timr_reboot=setInterval(function(){'
                         .'var _overview = new OverviewObj();'

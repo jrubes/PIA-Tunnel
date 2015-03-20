@@ -803,74 +803,6 @@ function disp_advanced_box(){
   $disp_body .= '<tr><td>Forward to this IP</td><td><input type="text" '.$disabled.' id="FORWARD_IP" name="FORWARD_IP" value="'.htmlspecialchars($settings['FORWARD_IP']).'" title="Use as IP in \'DHCP Server Settings\' - \'Fixed IP\'"></td></tr>'."\n";
 
 
-  //interface assignment
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_EXT,';
-  $sel = array(
-          'id' => 'IF_EXT',
-          'selected' =>  $settings['IF_EXT'],
-          array( 'eth0', 'eth0'),
-          array( 'eth1', 'eth1'),
-          array( 'tun0', 'tun0')
-        );
-  $disp_body .= '<tr><td>Public LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_INT,';
-  $sel = array(
-          'id' => 'IF_INT',
-          'selected' =>  $settings['IF_INT'],
-          array( 'eth0', 'eth0'),
-          array( 'eth1', 'eth1'),
-          array( 'tun0', 'tun0')
-        );
-  $disp_body .= '<tr><td>VM LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_TUNNEL,';
-  $sel = array(
-          'id' => 'IF_TUNNEL',
-          'selected' =>  $settings['IF_TUNNEL'],
-          array( 'eth0', 'eth0'),
-          array( 'eth1', 'eth1'),
-          array( 'tun0', 'tun0')
-        );
-  $disp_body .= '<tr><td>VPN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
-
-  //eth0
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $disabled = ($settings['IF_ETH0_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
-  $GLOB_disp_network_default_fields .= 'IF_ETH0_DHCP,';
-  $sel = array(
-          'id' => 'IF_ETH0_DHCP',
-          'selected' => $settings['IF_ETH0_DHCP'],
-          'onchange' => "toggle(this, 'IF_ETH0_IP,IF_ETH0_SUB,IF_ETH0_GW', 'yes', 'disabled', '', '');",
-          array( 'yes', 'yes'),
-          array( 'no', 'no')
-        );
-  $disp_body .= '<tr><td>eth0 use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH0_IP,';
-  $disp_body .= '<tr><td>eth0 IP</td><td><input '.$disabled.' type="text" id="IF_ETH0_IP" name="IF_ETH0_IP" value="'.$settings['IF_ETH0_IP'].'"></td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH0_SUB,';
-  $disp_body .= '<tr><td>eth0 Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH0_SUB" name="IF_ETH0_SUB" value="'.$settings['IF_ETH0_SUB'].'"></td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH0_GW,';
-  $disp_body .= '<tr><td>eth0 Gateway</td><td><input '.$disabled.' type="text" id="IF_ETH0_GW" name="IF_ETH0_GW" value="'.$settings['IF_ETH0_GW'].'"></td></tr>'."\n";
-
-  //eth1
-  $disabled = ($settings['IF_ETH1_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH1_DHCP,';
-  $sel = array(
-          'id' => 'IF_ETH1_DHCP',
-          'selected' => $settings['IF_ETH1_DHCP'],
-          'onchange' => "toggle(this, 'IF_ETH1_IP,IF_ETH1_SUB,IF_ETH1_GW', 'yes', 'disabled', '', '');",
-          array( 'yes', 'yes'),
-          array( 'no', 'no')
-        );
-  $disp_body .= '<tr><td>eth1 use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH1_IP,';
-  $disp_body .= '<tr><td>eth1 IP</td><td><input '.$disabled.' type="text" id="IF_ETH1_IP" name="IF_ETH1_IP" value="'.$settings['IF_ETH1_IP'].'"></td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH1_SUB,';
-  $disp_body .= '<tr><td>eth1 Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH1_SUB" name="IF_ETH1_SUB" value="'.$settings['IF_ETH1_SUB'].'"></td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH1_GW,';
-  $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" id="IF_ETH1_GW" name="IF_ETH1_GW" value="'.$settings['IF_ETH1_GW'].'"></td></tr>'."\n";
-
   //DNS
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'NAMESERVERS,';
@@ -944,6 +876,92 @@ function disp_advanced_box(){
   return $disp_body;
 }
 
+
+function disp_interface(){
+  global $_settings;
+  $settings = $_settings->get_settings();
+  $disp_body = '';
+  $fields = ''; //comma separate list of settings offered here
+
+  $disp_body .= '<div class="box options">';
+  $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
+  $disp_body .= '<input type="hidden" name="store" value="if_settings">';
+  $disp_body .= '<h2>Interface Settings</h2>'."\n";
+  $disp_body .= '<p>IPs for eth0 and eth1 can NOT be in the same range!</p>'."\n";
+  $disp_body .= "<table>\n";
+
+  //interface assignment
+  $GLOB_disp_network_default_fields .= 'IF_EXT,';
+  $sel = array(
+          'id' => 'IF_EXT',
+          'selected' =>  $settings['IF_EXT'],
+          array( 'eth0', 'eth0'),
+          array( 'eth1', 'eth1'),
+          array( 'tun0', 'tun0')
+        );
+  $disp_body .= '<tr><td>Public LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'IF_INT,';
+  $sel = array(
+          'id' => 'IF_INT',
+          'selected' =>  $settings['IF_INT'],
+          array( 'eth0', 'eth0'),
+          array( 'eth1', 'eth1'),
+          array( 'tun0', 'tun0')
+        );
+  $disp_body .= '<tr><td>VM LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'IF_TUNNEL,';
+  $sel = array(
+          'id' => 'IF_TUNNEL',
+          'selected' =>  $settings['IF_TUNNEL'],
+          array( 'eth0', 'eth0'),
+          array( 'eth1', 'eth1'),
+          array( 'tun0', 'tun0')
+        );
+  $disp_body .= '<tr><td>VPN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+
+
+    //eth0
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $disabled = ($settings['IF_ETH0_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
+  $GLOB_disp_network_default_fields .= 'IF_ETH0_DHCP,';
+  $sel = array(
+          'id' => 'IF_ETH0_DHCP',
+          'selected' => $settings['IF_ETH0_DHCP'],
+          'onchange' => "toggle(this, 'IF_ETH0_IP,IF_ETH0_SUB,IF_ETH0_GW', 'yes', 'disabled', '', '');",
+          array( 'yes', 'yes'),
+          array( 'no', 'no')
+        );
+  $disp_body .= '<tr><td>eth0 use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'IF_ETH0_IP,';
+  $disp_body .= '<tr><td>eth0 IP</td><td><input '.$disabled.' type="text" id="IF_ETH0_IP" name="IF_ETH0_IP" value="'.$settings['IF_ETH0_IP'].'"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'IF_ETH0_SUB,';
+  $disp_body .= '<tr><td>eth0 Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH0_SUB" name="IF_ETH0_SUB" value="'.$settings['IF_ETH0_SUB'].'"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'IF_ETH0_GW,';
+  $disp_body .= '<tr><td>eth0 Gateway</td><td><input '.$disabled.' type="text" id="IF_ETH0_GW" name="IF_ETH0_GW" value="'.$settings['IF_ETH0_GW'].'"></td></tr>'."\n";
+
+  //eth1
+  $disabled = ($settings['IF_ETH1_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'IF_ETH1_DHCP,';
+  $sel = array(
+          'id' => 'IF_ETH1_DHCP',
+          'selected' => $settings['IF_ETH1_DHCP'],
+          'onchange' => "toggle(this, 'IF_ETH1_IP,IF_ETH1_SUB,IF_ETH1_GW', 'yes', 'disabled', '', '');",
+          array( 'yes', 'yes'),
+          array( 'no', 'no')
+        );
+  $disp_body .= '<tr><td>eth1 use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'IF_ETH1_IP,';
+  $disp_body .= '<tr><td>eth1 IP</td><td><input '.$disabled.' type="text" id="IF_ETH1_IP" name="IF_ETH1_IP" value="'.$settings['IF_ETH1_IP'].'"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'IF_ETH1_SUB,';
+  $disp_body .= '<tr><td>eth1 Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH1_SUB" name="IF_ETH1_SUB" value="'.$settings['IF_ETH1_SUB'].'"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'IF_ETH1_GW,';
+  $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" id="IF_ETH1_GW" name="IF_ETH1_GW" value="'.$settings['IF_ETH1_GW'].'"></td></tr>'."\n";
+
+  $disp_body .= '</table></div>';
+
+  return $disp_body;
+}
 
 /**
  * generates HTML form element for encryption settings
@@ -1024,6 +1042,7 @@ function disp_network_default(){
   $disp_body .= disp_general_box();
   $disp_body .= disp_pia_daemon_box_new();
   $disp_body .= '<div class="clear"></div>';
+  $disp_body .= disp_interface();
   $disp_body .= disp_socks_box_new();
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<p class="hidden" id="advanced_button"><a id="toggle_advanced_settings_toggle" class="button" href="" onclick="toggle_hide(\'toggle_advanced_settings\', \'toggle_advanced_settings_toggle\', \'Show Advanced Settings,Hide Advanced Settings\'); return false;">Show Advanced Settings</a></p>';
