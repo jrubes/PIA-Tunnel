@@ -879,6 +879,7 @@ function disp_advanced_box(){
 
 function disp_interface(){
   global $_settings;
+  global $GLOB_disp_network_default_fields;
   $settings = $_settings->get_settings();
   $disp_body = '';
   $fields = ''; //comma separate list of settings offered here
@@ -958,7 +959,10 @@ function disp_interface(){
   $GLOB_disp_network_default_fields .= 'IF_ETH1_GW,';
   $disp_body .= '<tr><td>eth1 Gateway</td><td><input '.$disabled.' type="text" id="IF_ETH1_GW" name="IF_ETH1_GW" value="'.$settings['IF_ETH1_GW'].'"></td></tr>'."\n";
 
-  $disp_body .= '</table></div>';
+  $disp_body .= '</table>';
+  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Network Restart">';
+  $disp_body .= '</div>';
 
   return $disp_body;
 }
