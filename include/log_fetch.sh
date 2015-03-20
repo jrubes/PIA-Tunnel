@@ -1,9 +1,12 @@
 # fetch the latest git log for the webui
 
-rm -f /pia/cache/webui-update_status_out.txt
 val=`cd /pia ; git fetch origin &> /dev/null ; git rev-list HEAD... origin/"$1" --count 2>/dev/null`
 
-if [ "$val" = "0" ] || [ "$val" = "1" ]; then
+if [ "$val" = "0" ]; then
+  dt=`date +%s`
+  echo "$dt|$val" > /pia/cache/webui-update_status.txt
+
+elif [ "$val" -gt "0" ]; then
   dt=`date +%s`
   echo "$dt|$val" > /pia/cache/webui-update_status.txt
 

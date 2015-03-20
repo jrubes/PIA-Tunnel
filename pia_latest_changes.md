@@ -1,3 +1,20 @@
+update 2015-03-20
+=================
+* The old SOCKS5 server configuration was verbose for testing. This is not required anymore and
+  has been changed with last release. Please disable the SOCKS5 server on at least one interface
+  to generate a new configuration file.  
+  The current log file could be quite large. You may login as root and execute the following command to clear it.   
+  echo "" >  /var/log/sockd.log
+* Do not connect both network interfaces to the same network or use IPs in the same range!
+  I have been working on the documentation and noticed that the VPN may not connect
+  when both adapters are connected to the same network. In my case eth0 was set to 192.168.1.240
+  and eth1 to 192.168.1.25 with a subnet of 255.255.255.0   
+  Changing eth1 to 192.168.2.25 and disconnecting the network cable appears to have fixed it.
+* retrieving this list before an update should work now ....
+* few updates to the new manual
+  
+  
+  
 update 2015-03-16
 ======================
 * added release notes to the update client - this box.  
