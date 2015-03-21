@@ -85,7 +85,7 @@ if [ ! -f "/usr/sbin/socks" ]; then
   fi
 
   if [ -f /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz ]; then
-    xz -d /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz ; tar -xf /tmp/3proxy/3proxy-0.7.1.2-socks-bin.tar -C /tmp/3proxy/
+    xz -d /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz ; tar -xf /tmp/3proxy/3proxy-0.7.1.2-socks.tar -C /tmp/3proxy/
     cp -r /tmp/3proxy/socks /usr/sbin
     rm -rf /tmp/3proxy
   else
