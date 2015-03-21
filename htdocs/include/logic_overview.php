@@ -100,7 +100,7 @@ switch($_REQUEST['cmd']){
             $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS5 Proxy in 'running'. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
           }
 
-        }elseif( $_services->socks_status() === 'not running'){
+        }elseif( $_services->socks_status() === 'not running' && $_pia->is_vpn_up() === true ){
 
           if( $_services->socks_start() === true )
           {
@@ -114,7 +114,11 @@ switch($_REQUEST['cmd']){
           }
 
         }else{
-          $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS5 Proxy. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
+          if( $_services->socks_status() === 'not running' && $_pia->is_vpn_up() !== true ){
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS server can only be started after a VPN connection has been established.</div>\n";
+          }else{
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS5 Proxy. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
+          }
         }
 
 
