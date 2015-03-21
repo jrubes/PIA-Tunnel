@@ -159,7 +159,7 @@ function VPN_generate_dhcpd_conf(){
 function VPN_generate_socks_conf(){
   $template = socks_process_template();
   $save = escapeshellarg($template);
-  exec("sudo /pia/include/socks-reconfigure.sh $save"); //write new dhcpd.conf
+  exec("sudo /pia/include/sockd-dante-reconfigure.sh $save"); //write new dhcpd.conf
 }
 
 /**
