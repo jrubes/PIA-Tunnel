@@ -176,7 +176,7 @@ function socks_start(){
     {
       switch ($settings['SOCKS_SERVER_TYPE']){
         case 'dante':
-          exec('bash -c "sudo \"/pia/include/sockd-dante-start.sh\" "');
+          exec("bash -c \"sudo /pia/include/sockd-dante-start.sh &> /dev/null &\" &>/dev/null &");
           break;
         case '3proxy':
           exec("bash -c \"sudo /pia/include/sockd-3proxy-start.sh &> /dev/null &\" &>/dev/null &");
