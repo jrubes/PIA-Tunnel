@@ -73,18 +73,18 @@ if [ ! -f "/usr/sbin/socks" ]; then
   CPU_type=`uname -m`
   if [ "$CPU_type" = "i686" ]; then
     mkdir -p /tmp/3proxy/
-    cp /pia/extra_software/3proxy-0.7.1.2-socks-i686.tar.xz /tmp/3proxy-0.7.1.2-socks.tar.xz
+    cp /pia/extra_software/3proxy-0.7.1.2-socks-i686.tar.xz /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz
 
   elif [ "$CPU_type" = "armv6l" ]; then #WATCH OUT this is armv6L
     mkdir -p /tmp/3proxy/
-    cp /pia/extra_software/3proxy-0.7.1.2-socks-arm.tar.xz /tmp/3proxy-0.7.1.2-socks.tar.xz
+    cp /pia/extra_software/3proxy-0.7.1.2-socks-arm.tar.xz /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz
 
   else
     echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
       "- no precompiled package for your CPU architecture found ($CPU_type)"
   fi
 
-  if [ -f /tmp/3proxy-0.7.1.2-socks.tar.xz ]; then
+  if [ -f /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz ]; then
     xz -d /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz ; tar -xf /tmp/3proxy/3proxy-0.7.1.2-socks-bin.tar -C /tmp/3proxy/
     cp -r /tmp/3proxy/socks /usr/sbin
     rm -rf /tmp/3proxy
