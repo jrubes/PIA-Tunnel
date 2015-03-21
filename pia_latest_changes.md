@@ -10,7 +10,7 @@ update 2015-03-20
   when both adapters are connected to the same network. In my case eth0 was set to 192.168.1.240
   and eth1 to 192.168.1.25 with a subnet of 255.255.255.0   
   Changing eth1 to 192.168.2.25 and disconnecting the network cable appears to have fixed it.
-* retrieving this list before an update should work now ....
+* retrieving this list before an update should work now ,,,
 * few updates to the new manual
   
   

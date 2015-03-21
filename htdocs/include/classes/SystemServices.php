@@ -7,6 +7,9 @@
 class SystemServices {
 
 
+
+
+
 /**
  * method to execute pia-forward start/stop - control the firewall
  * @param string $command "start" or "stop"
@@ -128,6 +131,33 @@ function dhcpd_stop(){
   }
 
 }
+
+
+/**
+ * will enable or disable the dhcpd based on the current enable / disable settings
+ * for subnet 1 and 2
+ */
+ function dhcpd_service_control(){
+    if( $settings['DHCPD_ENABLED1'] === 'no' && $settings['DHCPD_ENABLED2'] === 'no' ){
+      $this->dhcpd_service_disable();
+    }else{
+      $this->dhcpd_service_enable();
+    }
+ }
+ 
+ /**
+ * disables the service from starting
+ */
+ function dhcpd_service_disable(){
+    if( $settings['DHCPD_ENABLED1'] === 'no' && $settings['DHCPD_ENABLED2'] === 'no' ){
+      $this->dhcpd_service_disable();
+    }else{
+      $this->dhcpd_service_enable();
+    }
+ }
+
+
+
 
 /**
  * stop dante (SOCKS 5) and verify status with service status

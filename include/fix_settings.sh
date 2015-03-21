@@ -248,3 +248,10 @@ ret=`grep -c "WEB_UI_REFRESH_TIME" /pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_REFRESH_TIME="15000"' >> '/pia/settings.conf'
 fi
+
+
+# SOCKS5 software selection
+ret=`grep -c "SOCKS_SERVER_TYPE" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'SOCKS_SERVER_TYPE="3proxy"' >> '/pia/settings.conf'
+fi

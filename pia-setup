@@ -66,6 +66,34 @@ else
 fi
 
 
+#install 3proxy SOCKS5
+if [ ! -f "/usr/sbin/socks" ]; then
+
+  #check for correct CPU architecture - can't get the above code to work so let's hack it
+  CPU_type=`uname -m`
+  if [ "$CPU_type" = "i686" ]; then
+    mkdir -p /tmp/3proxy/
+    cp /pia/extra_software/3proxy-0.7.1.2-socks-i686.tar.xz /tmp/3proxy-0.7.1.2-socks.tar.xz
+
+  elif [ "$CPU_type" = "armv6l" ]; then #WATCH OUT this is armv6L
+    mkdir -p /tmp/3proxy/
+    cp /pia/extra_software/3proxy-0.7.1.2-socks-arm.tar.xz /tmp/3proxy-0.7.1.2-socks.tar.xz
+
+  else
+    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- no precompiled package for your CPU architecture found ($CPU_type)"
+  fi
+
+  if [ -f /tmp/3proxy-0.7.1.2-socks.tar.xz ]; then
+    xz -d /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz ; tar -xf /tmp/3proxy/3proxy-0.7.1.2-socks-bin.tar -C /tmp/3proxy/
+    cp -r /tmp/3proxy/socks /usr/sbin
+    rm -rf /tmp/3proxy
+  else
+    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- SOCKS5 binaries where NOT setup! This feature will not work."
+  fi
+fi
+
 
 #remove /bin/bash from sudoers
 pos=`grep -n '/bin/bash,/sbin/shutdown' /etc/sudoers | gawk -F":" '{print $1}'`
@@ -134,10 +162,11 @@ do
 done
 
 #handle files in include, these don't get /bin/ links
-FILES="fw-forward.sh fw-no-forward.sh functions.sh build_ping_list.sh fix_settings.sh network-interfaces.sh"
+FILES="fw-forward.sh fw-no-forward.sh build_ping_list.sh fix_settings.sh network-interfaces.sh"
 FILES="$FILES network-restart.sh autostart autostart.sh dhcpd-reconfigure.sh dhcpd-start.sh log_fetch.sh"
 FILES="$FILES dhcpd-stop.sh dhcpd-status.sh update_root.sh fw_get_forward_state.sh autostart_rebuild.sh"
 FILES="$FILES ovpn_kill.sh socks-start.sh socks-status.sh socks-stop.sh socks-reconfigure.sh ping.sh"
+FILES="dhcpd-service.sh functions.sh"
 for f in $FILES
 do
 	chmod ug+x "/pia/include/$f"
