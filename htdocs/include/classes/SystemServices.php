@@ -138,13 +138,15 @@ function dhcpd_stop(){
  * for subnet 1 and 2
  */
  function dhcpd_service_control(){
+   global $settings;
+
     if( $settings['DHCPD_ENABLED1'] === 'no' && $settings['DHCPD_ENABLED2'] === 'no' ){
-      $this->dhcpd_service_disable();
+      //$this->dhcpd_service_disable();
     }else{
-      $this->dhcpd_service_enable();
+      //$this->dhcpd_service_enable();
     }
  }
- 
+
  /**
  * disables the service from starting
  */
@@ -164,6 +166,7 @@ function dhcpd_stop(){
  * @return bool,array true on success or [0])false, [1]=error message
  */
 function socks_start(){
+  global $settings;
 
   //try to start the process 10 times before giving up
   for( $protect = 0 ; $protect < 10 ; ++$protect ){
@@ -171,7 +174,15 @@ function socks_start(){
 
     if( $stat === 'not running' )
     {
-      exec('sudo "/pia/include/socks-start.sh"');
+      switch ($settings['SOCKS_SERVER_TYPE']){
+        case 'dante':
+          exec('bash -c "sudo \"/pia/include/sockd-dante-start.sh\" "');
+          break;
+        case '3proxy':
+          exec("bash -c \"sudo /pia/include/sockd-3proxy-start.sh &> /dev/null &\" &>/dev/null &");
+
+      }
+
       usleep(50000);
 
     }elseif( $stat === 'running' ){
@@ -191,6 +202,7 @@ function socks_start(){
  * @return bool,array true on success or [0])false, [1]=error message
  */
 function socks_stop(){
+  global $settings;
 
   //try to kill the process 10 times before giving up
   for( $protect = 0 ; $protect < 10 ; ++$protect ){
@@ -198,7 +210,14 @@ function socks_stop(){
 
     if( $stat === 'running' )
     {
-      exec('sudo "/pia/include/socks-stop.sh"');
+     switch ($settings['SOCKS_SERVER_TYPE']){
+        case 'dante':
+          exec('sudo "/pia/include/sockd-dante-stop.sh"');
+          break;
+        case '3proxy':
+          exec('sudo "/pia/include/sockd-3proxy-stop.sh"');
+
+      }
       usleep(50000);
 
     }elseif( $stat === 'not running' ){
@@ -223,11 +242,20 @@ function socks_stop(){
  */
 function socks_status( $use_cache = true ){
   static $cached = ''; //short time cache for multiple calls to this method
+  global $settings;
 
   if( $use_cache === false || $cached === '' )
   {
     $ret = array();
-    exec('sudo "/pia/include/socks-status.sh"', $ret );
+    switch ($settings['SOCKS_SERVER_TYPE']){
+      case 'dante':
+        exec('sudo "/pia/include/sockd-dante-status.sh"', $ret );
+        break;
+      case '3proxy':
+        exec('sudo "/pia/include/sockd-3proxy-status.sh"', $ret );
+
+    }
+
 
     switch( $ret[0] )
     {

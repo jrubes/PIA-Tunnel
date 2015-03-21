@@ -6,14 +6,14 @@ source '/pia/settings.conf'
 
 
 # make sure sockd is not currently running
-socks_stat=`/pia/include/socks-status.sh`
+socks_stat=`/pia/include/sockd-dante-status.sh`
 if [ "${socks_stat}" = 'running' ]; then
   LOOP_PROTECT=0
   while true; do
 
-    socks_stat=`/pia/include/socks-status.sh`
+    socks_stat=`/pia/include/sockd-dante-status.sh`
     if [ "${socks_stat}" = 'running' ]; then
-      /pia/include/socks-stop.sh
+      /pia/include/sockd-dante-stop.sh
 
     elif [ "${socks_stat}" = 'not running' ]; then
       break
@@ -43,7 +43,7 @@ fi
 LOOP_PROTECT=0
 while true; do
 
-  socks_stat=`/pia/include/socks-status.sh`
+  socks_stat=`/pia/include/sockd-dante-status.sh`
   if [ "${socks_stat}" = 'running' ]; then
     echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
         "- Dante SOCKS 5 Proxy Server has been started."

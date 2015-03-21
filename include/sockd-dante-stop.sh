@@ -5,7 +5,7 @@ export LANG
 source '/pia/settings.conf'
 
 # make sure sockd is not currently running
-socks_stat=`/pia/include/socks-status.sh`
+socks_stat=`/pia/include/sockd-dante-status.sh`
 if [ "${socks_stat}" = 'not running' ]; then
 
   exit
@@ -14,7 +14,7 @@ elif [ "${socks_stat}" = 'running' ]; then
 
   LOOP_PROTECT=0
   while true; do
-     socks_stat=`/pia/include/socks-status.sh`
+     socks_stat=`/pia/include/sockd-dante-status.sh`
     if [ "${socks_stat}" = 'running' ]; then
       killall sockd &> /dev/null
 
@@ -35,5 +35,5 @@ elif [ "${socks_stat}" = 'running' ]; then
   done
 
 else
-  echo -e "[\e[1;33mwarn\e[0m] Unkown return from socks-status.sh. received: ${socks_stat}"
+  echo -e "[\e[1;33mwarn\e[0m] Unkown return from sockd-dante-status.sh. received: ${socks_stat}"
 fi

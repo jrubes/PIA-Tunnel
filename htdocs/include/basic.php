@@ -456,9 +456,9 @@ function VM_get_status( $output = 'html'){
 
   if( $settings['SOCKS_EXT_ENABLED'] == 'yes' ){
     if( $_services->socks_status() === 'running' ){
-      $ret_arr['SOCKS_EXT_ENABLED'] = "SOCKS 5 Proxy on port {$settings['SOCKS_EXT_PORT']}";
+      $ret_arr['SOCKS_EXT_ENABLED'] = "SOCKS5 Proxy on port {$settings['SOCKS_EXT_PORT']}";
     }else{
-      $ret_arr['SOCKS_EXT_ENABLED'] = "SOCKS 5 Proxy NOT running";
+      $ret_arr['SOCKS_EXT_ENABLED'] = "SOCKS5 Proxy NOT running";
     }
   }
 
@@ -479,13 +479,16 @@ function VM_get_status( $output = 'html'){
 
     if( $settings['SOCKS_INT_ENABLED'] == 'yes' ){
       if( $_services->socks_status() === 'running' ){
-        $ret_arr['SOCKS_INT_ENABLED'] = "SOCKS 5 Proxy on port {$settings['SOCKS_INT_PORT']}";
+        $ret_arr['SOCKS_INT_ENABLED'] = "SOCKS5 Proxy on port {$settings['SOCKS_INT_PORT']}";
       }else{
-        $ret_arr['SOCKS_INT_ENABLED'] = "SOCKS 5 Proxy NOT running";
+        $ret_arr['SOCKS_INT_ENABLED'] = "SOCKS5 Proxy NOT running";
       }
+    }else{
+      $ret_arr['SOCKS_INT_ENABLED'] = '';
     }
     $ret_arr['private_ip'] = $ret[0];
   }else{
+    $ret_arr['SOCKS_INT_ENABLED'] = '';
     $ret_arr['private_ip'] = 'interface missing';
   }
   unset($ret);

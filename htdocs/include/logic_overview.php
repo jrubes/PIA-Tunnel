@@ -91,36 +91,36 @@ switch($_REQUEST['cmd']){
 
           if( $_services->socks_start() === true )
           {
-            $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been restarted</div>\n";
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS5 Proxy has been restarted</div>\n";
 
             $_services->firewall_fw('stop');
             $_services->firewall_fw('start');
             $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
           }else{
-            $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS 5 Proxy in 'running'. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS5 Proxy in 'running'. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
           }
 
         }elseif( $_services->socks_status() === 'not running'){
 
           if( $_services->socks_start() === true )
           {
-            $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been started</div>\n";
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS5 Proxy has been started</div>\n";
 
             $_services->firewall_fw('stop');
             $_services->firewall_fw('start');
             $disp_body .= "<div id=\"feedback\" class=\"feedback\">Firewall has been restarted</div>\n";
           }else{
-            $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS 5 Proxy in 'not running'. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS5 Proxy in 'not running'. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
           }
 
         }else{
-          $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS 5 Proxy. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to (re)start SOCKS5 Proxy. Please send the following to the devloper: return of socks-status.sh: ".$_services->socks_status()."</div>\n";
         }
 
 
       }elseif( array_key_exists('socks_stop', $_POST) === true ){
         $_services->socks_stop();
-        $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS 5 Proxy has been stopped</div>\n";
+        $disp_body .= "<div id=\"feedback\" class=\"feedback\">SOCKS5 Proxy has been stopped</div>\n";
 
         $_services->firewall_fw('stop');
         $_services->firewall_fw('start');
@@ -263,7 +263,7 @@ function disp_default(){
     $disp_body .= '<table class="control_box">';
     $disp_body .= '<tr>';
     $disp_body .= '<td id="ele_socks_lbl">';
-    $disp_body .=   "SOCKS 5 Proxy\n";
+    $disp_body .=   "SOCKS5 Proxy\n";
     $disp_body .= '</td>';
     $disp_body .= '</td>';
     $disp_body .= '<td>';
