@@ -1,3 +1,9 @@
+update 2015-03-21
+=================
+* added an alternative SOCKS5 server package "3proxy" for i686 and arm6l. Looks like this one handles load a bit better.
+  Please report any issues or if it improves performance.    
+  Ensure the proxy server is not running then switch the software under "Settings" => "SOCKS 5 Proxy Server".
+
 update 2015-03-20
 =================
 * The old SOCKS5 server configuration was verbose for testing. This is not required anymore and
