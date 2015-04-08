@@ -389,7 +389,7 @@ function VM_get_status( $output = 'html'){
       $port = VPN_get_port();
       $vpn_pub = array();
       if( VPN_provider_connected() === 'pia' ){
-        exec('grep "UDPv4 link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
+        exec('grep "TCPv4_CLIENT link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
       }else{
         exec('/sbin/ip -4 addr show tun0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $vpn_pub);
       }
@@ -680,7 +680,7 @@ function VPN_sessionlog_status(){
     }elseif( strpos($content, 'process exiting') !== false ){
       return array('disconnected');
 
-    }elseif( strpos($content, 'UDPv4 link remote: [AF_INET]') !== false
+    }elseif( strpos($content, 'TCPv4_CLIENT link remote: [AF_INET]') !== false
             || strpos($content, 'connecting to') !== false ){ //needs to be after error checks!
       return array('connecting');
 
