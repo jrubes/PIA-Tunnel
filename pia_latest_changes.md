@@ -1,6 +1,7 @@
 update 2015-04-08
 =================
-* sry for the delay. This updates the connection files to match PIA's latest changes. VPN should work once again.
+* sry for the delay. This updates the connection files to match PIA's latest changes. VPN should work once again.    
+  Please logout of the webUI to update your list of available VPN locations.
 
 update 2015-04-04
 =================

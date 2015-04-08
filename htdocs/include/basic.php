@@ -219,7 +219,7 @@ function VPN_get_connections( $name, $build_options=array()){
  * @param string $conn_name name OVPN file without .ovpn
  */
 function supports_forwarding( $conn_name ){
-  $locations = array( 'CA North York', 'CA Toronto', 'Switzerland', 'Sweden', 'Romania', 'Germany', 'France', 'Netherlands' );
+  $locations = array( 'CA North York', 'CA Toronto', 'Switzerland', 'Sweden', 'Romania', 'Germany', 'France', 'Netherlands', 'Russia', 'Hong Kong', 'Isreal' );
   $lc = strtolower($conn_name);
 
   foreach( $locations as $l ){
