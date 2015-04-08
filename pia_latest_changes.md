@@ -2,6 +2,9 @@ update 2015-04-08
 =================
 * sry for the delay. This updates the connection files to match PIA's latest changes. VPN should work once again.    
   Please logout of the webUI to update your list of available VPN locations.
+* Looks like the free ride provided by FrootVPN has come to an end. Support for FrootVPN will be removed unless 
+  YOU let me know that you are using it and that it still works.   
+  I don't have a paid account with them and they don't respond to inquiries ....
 
 update 2015-04-04
 =================
