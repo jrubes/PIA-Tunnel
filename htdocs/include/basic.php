@@ -9,7 +9,7 @@
 date_default_timezone_set('Europe/Berlin');
 define('APC_CACHE_PREFIX', 'piatunnel_');
 if( session_id () == '' ) session_start ();
-unset($_SESSION['settings.conf']); //DEV ONLY - remove!
+//unset($_SESSION['settings.conf']); //DEV ONLY - remove!
 if( !array_key_exists('page', $_REQUEST) ){ $_REQUEST['page'] = ''; }
 if( !array_key_exists('cmd', $_REQUEST) ){ $_REQUEST['cmd'] = ''; }
 if( !array_key_exists('cid', $_GET) ){ $_GET['cid'] = ''; }
