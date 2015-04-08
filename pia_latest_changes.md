@@ -1,3 +1,12 @@
+update 2015-04-08
+=================
+* sry for the delay. This updates the connection files to match PIA's latest changes. VPN should work once again.
+
+update 2015-04-04
+=================
+* their appears to be an issue with keeping a VPN connection up when there is more then a few KB of load on the
+  tunnel. I suspect the issue is related to the latest openSSL bugs and the resulting patches. I will investigate ASAP.
+
 update 2015-03-21
 =================
 * added an alternative SOCKS5 server package "3proxy" for i686 and arm6l. Looks like this one handles load a bit better.
