@@ -1,3 +1,10 @@
+update 2015-04-28
+=================
+* I have received reports that a recent update degraded VPN performance for high speed connections (+1MB/s). The issue appears to be caused by a switch from a UDP to a TCP based VPN connections.      
+I will implement an option to select which protocol to use ASAP. 
+
+
+
 update 2015-04-08
 =================
 * sry for the delay. This updates the connection files to match PIA's latest changes. VPN should work once again.    
