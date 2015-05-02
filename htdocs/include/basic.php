@@ -349,7 +349,6 @@ function VPN_get_providers( ){
     while (false !== ($file = readdir($handle))) {
       if( $file !== '.' && $file !== '..' && is_dir($dir."/".$file) === true )
       {
-        //$provider_txt = $_files->readfile($dir."/".$file."/provider.txt");
         $ret[] = array( $file => $file );
       }
     }
