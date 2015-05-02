@@ -255,3 +255,8 @@ ret=`grep -c "SOCKS_SERVER_TYPE" /pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'SOCKS_SERVER_TYPE="3proxy"' >> '/pia/settings.conf'
 fi
+
+
+if [ ! ${VPN_PROVIDERS[0]+abc} ]; then
+  echo 'VPN_PROVIDERS[0]="PIAtcp"' >> '/pia/settings.conf'
+fi

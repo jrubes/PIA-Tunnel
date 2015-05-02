@@ -310,11 +310,13 @@ function VPN_is_provider_active( $provider ){
  * @return boolean true on success or false on failure - dir does not exist
  */
 function VPN_ovpn_to_session(){
-  $providers = array( 'pia', 'frootvpn'); //possible providers
+  global $_settings;
+  $providers = $_settings->get_settings_array('VPN_PROVIDERS'); //possible providers
+
   $_SESSION['ovpn'] = array();
 
-  foreach( $providers as $p ){
-    if( VPN_is_provider_active( $p) && is_dir('/pia/ovpn/'.$p) ){
+  foreach( $providers as $set ){
+    if( is_dir('/pia/ovpn/'.$set[1]) ){
       global $_files;
 
       $tmp = array('ovpn');
@@ -322,16 +324,40 @@ function VPN_ovpn_to_session(){
       $_files->set_ls_filter_mode('include');
 
       //strip .ovpn before storing in session
-      $ls = $_files->ls('/pia/ovpn/'.$p);
+      $ls = $_files->ls('/pia/ovpn/'.$set[1]);
       foreach( $ls as $val ){
          //$_SESSION['ovpn'][] = "$p/".substr($val, 0, (mb_strlen($val)-5) );
-         $_SESSION['ovpn'][] = substr($val, 0, (mb_strlen($val)-5) );
+         $_SESSION['ovpn'][] = $set[1].'/'.substr($val, 0, (mb_strlen($val)-5) );
       }
     }
   }
 
   if( count($_SESSION['ovpn']) > 0 ){ return true; }else{ return false; }
 }
+
+
+/**
+ * returns list of VPN providers as an array
+ */
+function VPN_get_providers( ){
+  $ret = array();
+  $dir = "/pia/ovpn";
+  $handle = opendir($dir);
+  if($handle)
+  {
+    /* This is the correct way to loop over the directory. */
+    while (false !== ($file = readdir($handle))) {
+      if( $file !== '.' && $file !== '..' && is_dir($dir."/".$file) === true )
+      {
+        //$provider_txt = $_files->readfile($dir."/".$file."/provider.txt");
+        $ret[] = array( $file => $file );
+      }
+    }
+  }
+
+  return $ret;
+}
+
 
 /**
    * method to display the current network info for all interfaces to the user and console
@@ -386,24 +412,20 @@ function VM_get_status( $output = 'html'){
       $ret_arr['vpn_public_lbl1'] = '';
       $ret_arr['vpn_public_lbl2'] = '';
 
-      $port = VPN_get_port();
-      $vpn_pub = array();
-      if( VPN_provider_connected() === 'pia' ){
-        exec('grep "TCPv4_CLIENT link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $vpn_pub);
-      }else{
-        exec('/sbin/ip -4 addr show tun0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $vpn_pub);
-      }
-      if( array_key_exists( '0', $vpn_pub) === true ){
+      $vpn_port = VPN_get_port();
+      $vpn_ip = VPN_get_IP();
+
+      if( $vpn_ip !== false ){
         $ret_arr['vpn_lbl'] = 'Public VPN';
         $ret_arr['vpn_public_lbl1'] = 'IP';
-        $ret_arr['vpn_public_ip'] = $vpn_pub[0];
-        $ret_arr['vpn_port'] = ($port != '') ? "$port" : '';
-        $ret_arr['vpn_public_lbl2'] = ($port != '') ? 'Port' : '';
+        $ret_arr['vpn_public_ip'] = $vpn_ip;
+        $ret_arr['vpn_port'] = ($vpn_port != '') ? "$vpn_port" : '';
+        $ret_arr['vpn_public_lbl2'] = ($vpn_port != '') ? 'Port' : '';
 
         $fw_forward_state = $_pia->check_forward_state();
-        if( $fw_forward_state === true && $port != '' ){
+        if( $fw_forward_state === true && $vpn_port != '' ){
           if( $settings['FORWARD_PORT_ENABLED'] == 'yes' ){
-            $ret_arr['forwarding_port'] = "$vpn_pub[0]:$port &lt;=&gt; $settings[FORWARD_IP]";
+            $ret_arr['forwarding_port'] = "$vpn_ip:$vpn_port &lt;=&gt; $settings[FORWARD_IP]";
           }else{
             $ret_arr['forwarding_lbl'] = '';
             $ret_arr['forwarding_port'] = '';
@@ -690,6 +712,25 @@ function VPN_sessionlog_status(){
   }
 
 }
+
+/**
+ * returns IP of VPN. Checks session.log to get external IP for
+ */
+function VPN_get_IP(){
+  $cmdret = array();
+  exec('grep "link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $cmdret);
+  if(array_key_exists(0, $cmdret) === true && $cmdret[0] != '' ){
+    return $cmdret[0];
+  }
+
+  exec('/sbin/ip -4 addr show tun0 | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $cmdret);
+  if(array_key_exists(0, $cmdret) === true && $cmdret[0] != '' ){
+    return $cmdret[0];
+  }
+
+  return FALSE;
+}
+
 
  /**
   * having trouble reading status.txt right after connection so I am doing it myself ... grr
