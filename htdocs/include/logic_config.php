@@ -354,18 +354,18 @@ function disp_vpn_default(){
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form></div>";
 
-  $user = VPN_get_user('frootvpn');
-  $disp_body .= '<div class="box vpn"><h2>FrootVPN.com</h2>';
-  $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
-  $disp_body .= '<table><tr>';
-  $disp_body .= '<td>Username</td><td><input type="text" name="username" value="'.htmlentities($user['username']).'"></td>';
-  $disp_body .= '</tr><tr>';
-  $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
-  $disp_body .= '</tr></table>';
-  $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= '<input type="hidden" name="vpn_provider" value="frootvpn">';
-  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
-  $disp_body .= "</form></div>";
+//  $user = VPN_get_user('frootvpn');
+//  $disp_body .= '<div class="box vpn"><h2>FrootVPN.com</h2>';
+//  $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
+//  $disp_body .= '<table><tr>';
+//  $disp_body .= '<td>Username</td><td><input type="text" name="username" value="'.htmlentities($user['username']).'"></td>';
+//  $disp_body .= '</tr><tr>';
+//  $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
+//  $disp_body .= '</tr></table>';
+//  $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
+//  $disp_body .= '<input type="hidden" name="vpn_provider" value="frootvpn">';
+//  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
+//  $disp_body .= "</form></div>";
 
   return $disp_body;
 }
@@ -570,6 +570,63 @@ function disp_dhcpd_box($tokens){
   return $disp_body;
 }
 
+
+function disp_provider_box(){
+  global $_settings;
+  global $GLOB_disp_network_default_fields;
+
+  $settings = $_settings->get_settings();
+  $disp_body = '';
+
+  $disp_body .= '<div class="box options">';
+  $disp_body .= '<h2>VPN Provider Settings</h2>'."\n";
+  $disp_body .= "<table>\n";
+
+  $GLOB_disp_network_default_fields .= 'VPN_PROVIDERS,';
+  $avpn_providers = VPN_get_providers(); //get list of all possible providers as an array
+
+  foreach( $avpn_providers as $p ){
+    $sel = array(
+              'id' => $use,
+              'selected' =>  $fw_ssh,
+              array( 'FIREWALL_IF_WEB[0]', 'eth0'),
+              array( 'FIREWALL_IF_WEB[1]', 'eth1')
+            );
+    $disp_body .= '<tr><td>Allow web-UI access on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
+  }
+  $sel = array(
+            'id' => $use,
+            'selected' =>  $fw_ssh,
+            array( 'FIREWALL_IF_WEB[0]', 'eth0'),
+            array( 'FIREWALL_IF_WEB[1]', 'eth1')
+          );
+  $disp_body .= '<tr><td>Allow web-UI access on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
+
+  //Failover connection selection - fix hard coded loop later
+  $fovers = 0;
+  $GLOB_disp_network_default_fields .= 'MYVPN,';
+  for( $x = 0 ; $x < 30 ; ++$x ){
+    if( array_key_exists('MYVPN['.$x.']', $settings) === true ){
+
+      $ovpn = VPN_get_connections('MYVPN['.$x.']', array( 'selected' => $settings['MYVPN['.$x.']'], array( '', ' ')) ); //empty array creates a space between the default selection
+      $disp_body .= '<tr><td>Failover '.$x.'</td><td>'.$ovpn.'</td></tr>'."\n";
+      ++$fovers;
+    }
+  }
+
+
+  $ovpn = VPN_get_connections('MYVPN['.$fovers.']', array('initial' => 'empty'));
+  $disp_body .= '<tr><td>Add Failover</td><td>'.$ovpn.'</td></tr>'."\n";
+
+
+  $disp_body .= "</table>\n";
+  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= '</div>';
+
+  return $disp_body;
+}
+
+
 function disp_pia_daemon_box_new(){
   global $_settings;
   global $GLOB_disp_network_default_fields;
@@ -681,6 +738,9 @@ function disp_general_box(){
   $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>General Settings</h2>'."\n";
   $disp_body .= "<table>\n";
+
+  $disp_body .= build_providers();
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
   //VM LAN segment forwarding
   $GLOB_disp_network_default_fields .= 'FORWARD_VM_LAN,';
@@ -1048,6 +1108,7 @@ function disp_network_default(){
 
   $disp_body .= disp_general_box();
   $disp_body .= disp_pia_daemon_box_new();
+  //$disp_body .= disp_provider_box();
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= disp_interface();
   $disp_body .= disp_socks_box_new();
@@ -1074,4 +1135,28 @@ function disp_network_default(){
 
   return $disp_body;
 }
+
+
+
+function build_providers(){
+  global $_settings;
+  global $GLOB_disp_network_default_fields;
+  $GLOB_disp_network_default_fields = '';
+
+  $GLOB_disp_network_default_fields .= 'VPN_PROVIDERS,';
+  $sel_providers = VPN_get_providers(); //get list of all possible providers as an array
+
+  $set_selp = $_settings->get_settings_array('VPN_PROVIDERS');
+  $sel_providers['id'] = 'VPN_PROVIDERS';
+  $sel_providers['selected'] = $set_selp;
+
+  return '<tr><td>VPN Providers</td><td>'.nl2br(build_checkbox($sel_providers)).'</td></tr>'."\n";
+}
+
+
+
+
+
+
+
 ?>

@@ -13,3 +13,11 @@
 sed -i 's/auth-user-pass/auth-user-pass \/pia\/login-pia.conf /g' /pia/ovpn/pia/*.ovpn
 
 echo "Files have been updated"
+
+
+
+sed -i 's/pia\/ovpn\/pia\//pia\/ovpn\/PIAtcp\//g' /pia/ovpn/PIAtcp/*.ovpn
+
+sed -i 's/pia\/ovpn\/pia\//pia\/ovpn\/PIAudp\//g' /pia/ovpn/PIAudp/*.ovpn
+sed -i 's/proto tcp/proto udp/g' /pia/ovpn/PIAudp/*.ovpn
+sed -i 's/443/1194/g' /pia/ovpn/PIAudp/*.ovpn
