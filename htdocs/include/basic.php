@@ -349,7 +349,7 @@ function VPN_get_providers( ){
     while (false !== ($file = readdir($handle))) {
       if( $file !== '.' && $file !== '..' && is_dir($dir."/".$file) === true )
       {
-        $ret[] = array( $file => $file );
+        $ret[] = array( $file , $file ); //comma is correct ... I think ... some part of the code should  expect it
       }
     }
   }

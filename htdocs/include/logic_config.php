@@ -571,62 +571,6 @@ function disp_dhcpd_box($tokens){
 }
 
 
-function disp_provider_box(){
-  global $_settings;
-  global $GLOB_disp_network_default_fields;
-
-  $settings = $_settings->get_settings();
-  $disp_body = '';
-
-  $disp_body .= '<div class="box options">';
-  $disp_body .= '<h2>VPN Provider Settings</h2>'."\n";
-  $disp_body .= "<table>\n";
-
-  $GLOB_disp_network_default_fields .= 'VPN_PROVIDERS,';
-  $avpn_providers = VPN_get_providers(); //get list of all possible providers as an array
-
-  foreach( $avpn_providers as $p ){
-    $sel = array(
-              'id' => $use,
-              'selected' =>  $fw_ssh,
-              array( 'FIREWALL_IF_WEB[0]', 'eth0'),
-              array( 'FIREWALL_IF_WEB[1]', 'eth1')
-            );
-    $disp_body .= '<tr><td>Allow web-UI access on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
-  }
-  $sel = array(
-            'id' => $use,
-            'selected' =>  $fw_ssh,
-            array( 'FIREWALL_IF_WEB[0]', 'eth0'),
-            array( 'FIREWALL_IF_WEB[1]', 'eth1')
-          );
-  $disp_body .= '<tr><td>Allow web-UI access on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
-
-  //Failover connection selection - fix hard coded loop later
-  $fovers = 0;
-  $GLOB_disp_network_default_fields .= 'MYVPN,';
-  for( $x = 0 ; $x < 30 ; ++$x ){
-    if( array_key_exists('MYVPN['.$x.']', $settings) === true ){
-
-      $ovpn = VPN_get_connections('MYVPN['.$x.']', array( 'selected' => $settings['MYVPN['.$x.']'], array( '', ' ')) ); //empty array creates a space between the default selection
-      $disp_body .= '<tr><td>Failover '.$x.'</td><td>'.$ovpn.'</td></tr>'."\n";
-      ++$fovers;
-    }
-  }
-
-
-  $ovpn = VPN_get_connections('MYVPN['.$fovers.']', array('initial' => 'empty'));
-  $disp_body .= '<tr><td>Add Failover</td><td>'.$ovpn.'</td></tr>'."\n";
-
-
-  $disp_body .= "</table>\n";
-  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= '</div>';
-
-  return $disp_body;
-}
-
-
 function disp_pia_daemon_box_new(){
   global $_settings;
   global $GLOB_disp_network_default_fields;
@@ -1108,7 +1052,6 @@ function disp_network_default(){
 
   $disp_body .= disp_general_box();
   $disp_body .= disp_pia_daemon_box_new();
-  //$disp_body .= disp_provider_box();
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= disp_interface();
   $disp_body .= disp_socks_box_new();
@@ -1141,14 +1084,16 @@ function disp_network_default(){
 function build_providers(){
   global $_settings;
   global $GLOB_disp_network_default_fields;
-  $GLOB_disp_network_default_fields = '';
+  $sel_head = array();
 
   $GLOB_disp_network_default_fields .= 'VPN_PROVIDERS,';
-  $sel_providers = VPN_get_providers(); //get list of all possible providers as an array
 
   $set_selp = $_settings->get_settings_array('VPN_PROVIDERS');
-  $sel_providers['id'] = 'VPN_PROVIDERS';
-  $sel_providers['selected'] = $set_selp;
+  $sel_head['id'] = 'VPN_PROVIDERS';
+  $sel_head['selected'] = $set_selp;
+  $sel_head['selected'] = array( 'PIAtcp', 'PIAtcp');
+  $provs = VPN_get_providers(); //get list of all possible providers as an array
+  $sel_providers = array_merge($sel_head, $provs);
 
   return '<tr><td>VPN Providers</td><td>'.nl2br(build_checkbox($sel_providers)).'</td></tr>'."\n";
 }
