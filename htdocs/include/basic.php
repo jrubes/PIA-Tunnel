@@ -1081,23 +1081,22 @@ function update_user_settings(){
 
   $ret = '';
   if( !array_key_exists('vpn_provider', $_POST) ){throw new Exception('FATAL ERROR: vpn_provider not set'); }
+  if( !preg_match("/^[a-zA-Z]{3,10}+\z/", $_POST['vpn_provider'] ) ){throw new Exception('FATAL ERROR: invalid vpn_provider by user'); }
 
-  switch( $_POST['vpn_provider'] ){
-    case 'pia':
-      $login_file = '/pia/login-pia.conf';
-      $session = 'login-pia.conf';
-      $username = ( array_key_exists('username', $_POST) ) ? $_POST['username'] : '';
-      $password = ( array_key_exists('password', $_POST) ) ? $_POST['password'] : '';
-      break;
-    case 'frootvpn':
-      $login_file = '/pia/login-frootvpn.conf';
-      $session = 'login-frootvpn.conf';
-      $username = ( array_key_exists('username', $_POST) ) ? $_POST['username'] : '';
-      $password = ( array_key_exists('password', $_POST) ) ? $_POST['password'] : '';
-      break;
-    default:
-      throw new Exception('FATAL ERROR: unkown VPN provider.');
-  }
+  $ovpns = get_ovpn_list($_POST['vpn_provider']);
+  if( !array_key_exists(0, $ovpns) ){ return FALSE; }
+
+  //pick first one of the ovpn files to get "auth-user-pass" setting
+  $inj = escapeshellarg('/pia/ovpn/'.$ovpns[0].'.ovpn');
+  $cmdret = array();
+  exec('grep "auth-user-pass" '.$inj.' | gawk -F" " \'{print $2}\' ', $cmdret);
+  $login_file = $cmdret[0];
+  if( !preg_match("/^\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $login_file ) ){throw new Exception('FATAL ERROR: invalid login file name retrieved'); }
+
+  $tmp = explode('/', $login_file); $session = $tmp[1]; //session requires no path
+  $username = ( array_key_exists('username', $_POST) ) ? $_POST['username'] : '';
+  $password = ( array_key_exists('password', $_POST) ) ? $_POST['password'] : '';
+
 
   //can not empty values right now ... but there is a reset command
   if( $username != '' ){

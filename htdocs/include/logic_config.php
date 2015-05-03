@@ -335,16 +335,11 @@ function dhcpd_process_template(){
  * @return string string with HTML for body of this page
  */
 function disp_vpn_login(){
-  global $_settings;
-
-
   $grouped_providers = group_enabled_providers();
-  //die('fail');
 
-  foreach( $grouped_providers as $group){
-    $forms .= generate_provider_group_form($group);
+  foreach( $grouped_providers as $gname => $group){
+    $forms .= generate_provider_group_form( $gname, $group);
   }
-
 
   return $forms;
 }
@@ -354,9 +349,14 @@ function disp_vpn_login(){
  * loops over provider group array to build username and password form
  * @param type $provider_group
  */
-function generate_provider_group_form( &$provider_group ){
+function generate_provider_group_form( &$group_name, &$provider_group ){
+  global $_token;
   $disp_body = '';
   $plist = '';
+
+  $pass = array('update VPN username and password');
+  $tokens = $_token->pgen($pass);
+
 
   foreach( $provider_group as $p ){ $plist .= ($plist === '') ? $p : ", $p"; }
 
@@ -368,8 +368,8 @@ function generate_provider_group_form( &$provider_group ){
   $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
   $disp_body .= '</tr></table>';
   $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= '<input type="hidden" name="vpn_provider" value="'.htmlentities($gname).'">';
-  //$disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
+  $disp_body .= '<input type="hidden" name="vpn_provider" value="'.htmlentities($p).'">'; //login config files are shared so $p can be any group member
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form></div>";
 
   return $disp_body;
@@ -394,7 +394,8 @@ function group_enabled_providers(){
     if( !array_key_exists(0, $ovpns) ){ return FALSE; }
 
     //pick first one of the ovpn files to get "auth-user-pass" setting
-    exec('grep "auth-user-pass" "/pia/ovpn/'.$ovpns[0].'.ovpn" | gawk -F" " \'{print $2}\' ', $cmdret);
+    $inj = escapeshellarg('/pia/ovpn/'.$ovpns[0].'.ovpn');
+    exec('grep "auth-user-pass" '.$inj.' | gawk -F" " \'{print $2}\' ', $cmdret);
     $providers[$cmdret[0]][] = $ep[1];
   }
 
