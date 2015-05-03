@@ -19,7 +19,8 @@ if(array_key_exists('ovpn', $_SESSION) !== true ){
 //act on $CMD variable
 switch($_REQUEST['cmd']){
   case 'vpn':
-    $disp_body .= disp_vpn_default();
+    //$disp_body .= disp_vpn_default();
+    $disp_body .= disp_vpn_login();
     break;
   case 'vpn_store';
     if( $_token->pval($_POST['token'], 'update VPN username and password') === true ){
@@ -328,6 +329,81 @@ function dhcpd_process_template(){
 
 }
 
+
+/**
+ * generates an HTML overview to enter the VPN username and password.
+ * @return string string with HTML for body of this page
+ */
+function disp_vpn_login(){
+  global $_settings;
+
+
+  $grouped_providers = group_enabled_providers();
+  //die('fail');
+
+  foreach( $grouped_providers as $group){
+    $forms .= generate_provider_group_form($group);
+  }
+
+
+  return $forms;
+}
+
+
+/**
+ * loops over provider group array to build username and password form
+ * @param type $provider_group
+ */
+function generate_provider_group_form( &$provider_group ){
+  $disp_body = '';
+  $plist = '';
+
+  foreach( $provider_group as $p ){ $plist .= ($plist === '') ? $p : ", $p"; }
+
+  $disp_body .= '<div class="box vpn"><h2>Credentials for '.htmlentities($plist).'</h2>';
+  $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
+  $disp_body .= '<table><tr>';
+  $disp_body .= '<td>Username</td><td><input type="text" name="username" value=""></td>';
+  $disp_body .= '</tr><tr>';
+  $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
+  $disp_body .= '</tr></table>';
+  $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= '<input type="hidden" name="vpn_provider" value="'.htmlentities($gname).'">';
+  //$disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
+  $disp_body .= "</form></div>";
+
+  return $disp_body;
+}
+
+
+
+/**
+ * support function for disp_vpn_login()
+ * it groups the list of enabled VPN providers by the "auth-user-pass" setting
+ * @return array multidimensional array, first key defines group, second key is for group members
+ */
+function group_enabled_providers(){
+  global $_settings;
+  $providers = array(); //this is returned
+
+  $enabled = $_settings->get_settings_array('VPN_PROVIDERS');
+
+  foreach( $enabled as $ep ){
+    $cmdret = array();
+    $ovpns = get_ovpn_list($ep[1]);
+    if( !array_key_exists(0, $ovpns) ){ return FALSE; }
+
+    //pick first one of the ovpn files to get "auth-user-pass" setting
+    exec('grep "auth-user-pass" "/pia/ovpn/'.$ovpns[0].'.ovpn" | gawk -F" " \'{print $2}\' ', $cmdret);
+    $providers[$cmdret[0]][] = $ep[1];
+  }
+
+  //var_dump($providers);die('end');
+  return $providers;
+}
+
+
+
 /**
  * returns the default UI for this option
  * @return string string with HTML for body of this page
@@ -354,18 +430,18 @@ function disp_vpn_default(){
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form></div>";
 
-//  $user = VPN_get_user('frootvpn');
-//  $disp_body .= '<div class="box vpn"><h2>FrootVPN.com</h2>';
-//  $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
-//  $disp_body .= '<table><tr>';
-//  $disp_body .= '<td>Username</td><td><input type="text" name="username" value="'.htmlentities($user['username']).'"></td>';
-//  $disp_body .= '</tr><tr>';
-//  $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
-//  $disp_body .= '</tr></table>';
-//  $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
-//  $disp_body .= '<input type="hidden" name="vpn_provider" value="frootvpn">';
-//  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
-//  $disp_body .= "</form></div>";
+  $user = VPN_get_user('frootvpn');
+  $disp_body .= '<div class="box vpn"><h2>FrootVPN.com</h2>';
+  $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
+  $disp_body .= '<table><tr>';
+  $disp_body .= '<td>Username</td><td><input type="text" name="username" value="'.htmlentities($user['username']).'"></td>';
+  $disp_body .= '</tr><tr>';
+  $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
+  $disp_body .= '</tr></table>';
+  $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= '<input type="hidden" name="vpn_provider" value="frootvpn">';
+  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
+  $disp_body .= "</form></div>";
 
   return $disp_body;
 }
@@ -1091,7 +1167,6 @@ function build_providers(){
   $set_selp = $_settings->get_settings_array('VPN_PROVIDERS');
   $sel_head['id'] = 'VPN_PROVIDERS';
   $sel_head['selected'] = $set_selp;
-  $sel_head['selected'] = array( 'PIAtcp', 'PIAtcp');
   $provs = VPN_get_providers(); //get list of all possible providers as an array
   $sel_providers = array_merge($sel_head, $provs);
 

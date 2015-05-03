@@ -311,28 +311,41 @@ function VPN_is_provider_active( $provider ){
  */
 function VPN_ovpn_to_session(){
   global $_settings;
-  $providers = $_settings->get_settings_array('VPN_PROVIDERS'); //possible providers
-
   $_SESSION['ovpn'] = array();
+  $providers = $_settings->get_settings_array('VPN_PROVIDERS'); //possible providers
 
   foreach( $providers as $set ){
     if( is_dir('/pia/ovpn/'.$set[1]) ){
-      global $_files;
 
-      $tmp = array('ovpn');
-      $_files->set_ls_filter($tmp, 2);
-      $_files->set_ls_filter_mode('include');
-
-      //strip .ovpn before storing in session
-      $ls = $_files->ls('/pia/ovpn/'.$set[1]);
-      foreach( $ls as $val ){
-         //$_SESSION['ovpn'][] = "$p/".substr($val, 0, (mb_strlen($val)-5) );
-         $_SESSION['ovpn'][] = $set[1].'/'.substr($val, 0, (mb_strlen($val)-5) );
+      $ovpn_list = get_ovpn_list($set[1]);
+      foreach( $ovpn_list as $ovpn ){
+        $_SESSION['ovpn'][] = $ovpn;
       }
     }
   }
 
   if( count($_SESSION['ovpn']) > 0 ){ return true; }else{ return false; }
+}
+
+
+/**
+ * retrieves list of ovpn files from directory
+ */
+function get_ovpn_list($provider_dir){
+  global $_files;
+  $ret = array();
+
+  $tmp = array('ovpn');
+  $_files->set_ls_filter($tmp, 2);
+  $_files->set_ls_filter_mode('include');
+
+  //strip .ovpn before storing in session
+  $ls = $_files->ls('/pia/ovpn/'.$provider_dir);
+  foreach( $ls as $val ){
+    $ret[] = $provider_dir.'/'.substr($val, 0, (mb_strlen($val)-5) );
+  }
+
+  return $ret;
 }
 
 
