@@ -1098,7 +1098,7 @@ function update_user_settings(){
   $password = ( array_key_exists('password', $_POST) ) ? $_POST['password'] : '';
 
 
-  //can not empty values right now ... but there is a reset command
+  //can not handle empty values right now ... but there is a reset command
   if( $username != '' ){
     if( file_exists($login_file) ){
       $c = $_files->readfile($login_file);
