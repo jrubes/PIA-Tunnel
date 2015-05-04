@@ -681,7 +681,7 @@ function VPN_sessionlog_status(){
     }else{
       $lines = explode("\n", $content);
       if( substr($lines[0], 0, 13) === 'connecting to' ){
-        $location = substr($lines[0], strpos($content, 'connecting to')+13 ); //+13 to remove 'connecting to'
+        $location = substr($lines[0], strpos($content, 'connecting to')+14 ); //+13 to remove 'connecting to'
         $_SESSION['connecting2'] = $location;
         return array('connecting');
       }
@@ -691,7 +691,7 @@ function VPN_sessionlog_status(){
     if(array_key_exists('connecting2', $_SESSION) !== true && strpos($content, 'connecting to') !== false ){
       //get name of current connection for status overview
       $lines = explode("\n", $content);
-      $location = substr($lines[0], strpos($content, 'connecting to')+13 ); //+13 to remove 'connecting to'
+      $location = substr($lines[0], strpos($content, 'connecting to')+14); //+13 to remove 'connecting to'
       $_SESSION['connecting2'] = $location;
     }else{
       //recover from previous error
@@ -700,7 +700,7 @@ function VPN_sessionlog_status(){
               && strpos($content, 'connecting to') !== false
         ){
         $lines = explode("\n", $content);
-        $location = substr($lines[0], strpos($content, 'connecting to')+13 ); //+13 to remove 'connecting to'
+        $location = substr($lines[0], strpos($content, 'connecting to')+14 ); //+13 to remove 'connecting to'
         $_SESSION['connecting2'] = $location;
       }
     }
@@ -777,7 +777,7 @@ function VPN_get_IP(){
 
   if( supports_forwarding(trim($_SESSION['connecting2'])) === false ){return false; }
 
-
+  
   //check if the port cache should be considered old
   $session_settings_timeout = strtotime('-5 minutes'); //time until session expires
   if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
@@ -845,38 +845,40 @@ function VPN_get_IP(){
   return $_SESSION['PIA_port'];
  }
 
- /**
-  * get forwarded port from PIA
-  * @global object $_files
-  * @return int,boolean integer with port number or boolean false on failure
-  */
- function get_port(){
-   global $_files;
+/**
+ * get forwarded port from PIA
+ * @global object $_files
+ * @return int,boolean integer with port number or boolean false on failure
+ */
+function get_port(){
+  global $_files;
+  if( $_SESSION['connecting2'] == '' ){ return ''; }
+
+  //get provider from connectin2
+  $provider = explode('/', $_SESSION['connecting2']);
+  $filename = VPN_get_loginfile($provider[0]);
+  if( !preg_match("/^\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $filename ) ){throw new Exception('FATAL ERROR: invalid login file name - '.$filename); }
+
+
   //get username and password from file or SESSION
-  if( array_key_exists('login-pia.conf', $_SESSION) !== true ){
-   if( load_login() === false ){
-     return false;
-   }
+  if( array_key_exists($filename, $_SESSION) !== true ){
+    if( load_login($filename) === false ){ return false; }
   }
 
   //get the client ID
   if( array_key_exists('client_id', $_SESSION) !== true ){
     $c = $_files->readfile('/pia/client_id');
     if( $c !== false ){
-      if( mb_strlen($c) < 1 ){
-        return false;
-      }
+      if( mb_strlen($c) < 1 ){ return false; }
       $_SESSION['client_id'] = $c; //store for later
+
     }else{
       return false;
     }
   }
 
-  // create a new cURL resource
-  $ch = curl_init();
-
-  $PIA_UN = urlencode($_SESSION['login-pia.conf']['username']);
-  $PIA_PW = urlencode($_SESSION['login-pia.conf']['password']);
+  $PIA_UN = urlencode($_SESSION[$filename]['username']);
+  $PIA_PW = urlencode($_SESSION[$filename]['password']);
   $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
   $ret = array();
   exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
@@ -887,9 +889,12 @@ function VPN_get_IP(){
     $TUN_IP = $ret[0];
   }
 
+  //combine vars to submit as avPOST request
   $post_vars = "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP";
 
-  // set URL and other appropriate options
+
+  // setup cURL resource
+  $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, 'https://www.privateinternetaccess.com/vpninfo/port_forward_assignment');
   curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
   curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -925,12 +930,10 @@ function VPN_get_IP(){
 
   // grab URL and pass it to the browser
   $return = json_decode(curl_exec($ch), true);
-
-  // close cURL resource, and free up system resources
   curl_close($ch);
 
   return $return;
- }
+}
 
 
 /**
@@ -943,7 +946,7 @@ function eol($string) {
 }
 
 /**
- * this function loads the loginf file into session and return it
+ * this function loads the loginf file into session and returns it
  * ['username']
  * ['password']
  * @global object $_files
@@ -1090,7 +1093,7 @@ function build_checkbox( &$content, $double=false ){
  * @throws Exception
  */
 function VPN_get_loginfile($VPN_provider){
-  if( !preg_match("/^[a-zA-Z]{3,10}+\z/", $VPN_provider ) ){throw new Exception('FATAL ERROR: invalid vpn_provider by user'); }
+  if( !preg_match("/^[a-zA-Z]{3,10}+\z/", $VPN_provider ) ){ throw new Exception('FATAL ERROR: invalid vpn_provider by user.'); }
 
   $ovpns = get_ovpn_list($VPN_provider);
   if( !array_key_exists(0, $ovpns) ){ return FALSE; }

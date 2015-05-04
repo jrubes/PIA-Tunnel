@@ -15,7 +15,7 @@ SLEEP_PING_RETEST=4
 gen_ip_list
 
 # remove old status.txt
-rm -r '/pia/cache/status.txt' 2>/dev/null
+rm -f '/pia/cache/status.txt' 2>/dev/null
 
 
 
@@ -85,7 +85,8 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
           "- terminating...."
       # remove old status.txt
-      rm -r '/pia/cache/status.txt' 2>/dev/null
+      rm -f '/pia/cache/status.txt' 2>/dev/null
+      rm -f '/pia/cache/php_pia-start.log' 2>/dev/null
       exit 1
     fi
 
@@ -127,6 +128,7 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 			"- VPN connection fail - please check /pia/cache/session.log for details."
 	    killall openvpn 2>/dev/null
         mv /pia/cache/session.log /pia/cache/session.old.log
+        mv '/pia/cache/php_pia-start.log' '/pia/cache/php_pia-start.lastfail.log' 2>/dev/null
 	    /pia/pia-forward stop quite
 	    exit
 	  else
