@@ -30,7 +30,8 @@ switch($_REQUEST['cmd']){
       $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
     }
     //show inout forms again
-    $disp_body .= disp_vpn_default();
+    //$disp_body .= disp_vpn_default();
+    $disp_body .= disp_vpn_login();
     break;
 
   case 'network':
@@ -336,6 +337,7 @@ function dhcpd_process_template(){
  */
 function disp_vpn_login(){
   $grouped_providers = group_enabled_providers();
+  $forms = '';
 
   foreach( $grouped_providers as $gname => $group){
     $forms .= generate_provider_group_form( $gname, $group);
@@ -360,15 +362,19 @@ function generate_provider_group_form( &$group_name, &$provider_group ){
 
   foreach( $provider_group as $p ){ $plist .= ($plist === '') ? $p : ", $p"; }
 
+  //login config files are shared so $p can be any group member
+  $vpn_user = VPN_get_user($p);
+  $vpn_provider = htmlentities($p);
+
   $disp_body .= '<div class="box vpn"><h2>Credentials for '.htmlentities($plist).'</h2>';
   $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
   $disp_body .= '<table><tr>';
-  $disp_body .= '<td>Username</td><td><input type="text" name="username" value=""></td>';
+  $disp_body .= '<td>Username</td><td><input type="text" name="username" value="'.htmlentities($vpn_user['username']).'"></td>';
   $disp_body .= '</tr><tr>';
   $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
   $disp_body .= '</tr></table>';
   $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= '<input type="hidden" name="vpn_provider" value="'.htmlentities($p).'">'; //login config files are shared so $p can be any group member
+  $disp_body .= '<input type="hidden" name="vpn_provider" value="'.$vpn_provider.'">';
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= "</form></div>";
 
@@ -410,41 +416,7 @@ function group_enabled_providers(){
  * @return string string with HTML for body of this page
  */
 function disp_vpn_default(){
-  global $_token;
-
-
-  $pass = array('update VPN username and password');
-  $tokens = $_token->pgen($pass);
-
-  $disp_body = '<div class="box vpn">Please logoff after you enter the username and password for a VPN provider for the first time. The providers VPN connections will not work until you logff.</div>';
-  /* show Username and Password fields - expand this for more VPN providers */
-  $user = VPN_get_user('pia');
-  $disp_body .= '<div class="box vpn"><h2>PrivateInternetAccess.com</h2>';
-  $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
-  $disp_body .= '<table><tr>';
-  $disp_body .= '<td>Username</td><td><input type="text" name="username" value="'.htmlentities($user['username']).'"></td>';
-  $disp_body .= '</tr><tr>';
-  $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
-  $disp_body .= '</tr></table>';
-  $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= '<input type="hidden" name="vpn_provider" value="pia">';
-  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
-  $disp_body .= "</form></div>";
-
-  $user = VPN_get_user('frootvpn');
-  $disp_body .= '<div class="box vpn"><h2>FrootVPN.com</h2>';
-  $disp_body .= '<form action="/?page=config&amp;cmd=vpn_store&amp;cid=cvpn" method="post">';
-  $disp_body .= '<table><tr>';
-  $disp_body .= '<td>Username</td><td><input type="text" name="username" value="'.htmlentities($user['username']).'"></td>';
-  $disp_body .= '</tr><tr>';
-  $disp_body .= '<td>Password</td><td><input type="password" name="password" class="long" value="" placeholder="************"></td>';
-  $disp_body .= '</tr></table>';
-  $disp_body .= '<input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= '<input type="hidden" name="vpn_provider" value="frootvpn">';
-  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
-  $disp_body .= "</form></div>";
-
-  return $disp_body;
+  die('old function - disp_vpn_default()');
 }
 
 /**

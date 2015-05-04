@@ -266,34 +266,21 @@ function get_port_forward_locations( &$conn_name ){
  * @return array,bool array with ['name'], ['password'] OR FALSE on failure
  */
 function VPN_get_user( $provider ){
+
+  $filename = VPN_get_loginfile($provider);
+  if( !preg_match("/^\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $filename ) ){throw new Exception('FATAL ERROR: invalid login file name - '.$filename); }
+
   //get username and password from file or SESSION
-  switch( $provider ){
-    case 'pia':
-      if( array_key_exists('login-pia.conf', $_SESSION) !== true ){
-        $ret = load_login($provider);
-        if( $ret !== false ){
-          $_SESSION['login-pia.conf'] = $ret;
-          return $ret;
-        }else{
-          return false;
-        }
-      }
-      return $_SESSION['login-pia.conf'];
-
-    case 'frootvpn':
-      if( array_key_exists('login-frootvpn.conf', $_SESSION) !== true ){
-        $ret = load_login($provider);
-        if( $ret !== false ){
-          $_SESSION['login-frootvpn.conf'] = $ret;
-          return $ret;
-        }else{
-          return false;
-        }
-      }
-      return $_SESSION['login-frootvpn.conf'];
-
+  if( array_key_exists($filename, $_SESSION) !== true ){
+    $ret = load_login($filename);
+    if( $ret !== false ){
+      $_SESSION[$filename] = $ret;
+      return $ret;
+    }else{
+      return false;
+    }
   }
-  return false;
+  return $_SESSION[$filename];
 }
 
 /**
@@ -956,25 +943,23 @@ function eol($string) {
 }
 
 /**
- * this function loads login-pia.conf into an array, stores it in session and return it
+ * this function loads the loginf file into session and return it
  * ['username']
  * ['password']
  * @global object $_files
  * @return array,boolean or false on failure
  */
-function load_login( $provider ){
+function load_login( $filename ){
   global $_files;
 
-  $fname = ($provider === 'frootvpn') ? 'login-frootvpn.conf' : 'login-pia.conf';
-
-  if( array_key_exists( $fname, $_SESSION) === true
-          && $_SESSION[$fname]['username'] != 'your PIA account name on this line'
-          && $_SESSION[$fname]['username'] != 'your FrootVPN account name on this line' )
+  if( array_key_exists( $filename, $_SESSION) === true
+          && $_SESSION[$filename]['username'] != 'your PIA account name on this line'
+          && $_SESSION[$filename]['username'] != 'your FrootVPN account name on this line' )
   {
-    return $_SESSION[$fname];
+    return $_SESSION[$filename];
 
   }else{
-    $c = $_files->readfile('/pia/'.$fname);
+    $c = $_files->readfile($filename);
     if( $c !== false ){
       $c = explode( "\n", eol($c));
       $un = ( mb_strlen($c[0]) > 0 ) ? $c[0] : '';
@@ -982,8 +967,8 @@ function load_login( $provider ){
       if( $un == '' || $pw == '' ){
         return false;
       }
-      $_SESSION[$fname] = array( 'username' => $un , 'password' => $pw); //store for later
-      return $_SESSION[$fname];
+      $_SESSION[$filename] = array( 'username' => $un , 'password' => $pw); //store for later
+      return $_SESSION[$filename];
     }else{
       return false;
     }
@@ -1097,6 +1082,30 @@ function build_checkbox( &$content, $double=false ){
   return $sel.$opts;
 }
 
+
+/**
+ * retrieves the name of the login file from one of the providers .ovpn files
+ * @param type $VPN_provider
+ * @return boolean|array
+ * @throws Exception
+ */
+function VPN_get_loginfile($VPN_provider){
+  if( !preg_match("/^[a-zA-Z]{3,10}+\z/", $VPN_provider ) ){throw new Exception('FATAL ERROR: invalid vpn_provider by user'); }
+
+  $ovpns = get_ovpn_list($VPN_provider);
+  if( !array_key_exists(0, $ovpns) ){ return FALSE; }
+
+  //pick first one of the ovpn files to get "auth-user-pass" setting
+  $inj = escapeshellarg('/pia/ovpn/'.$ovpns[0].'.ovpn');
+  $cmdret = array();
+  exec('grep "auth-user-pass" '.$inj.' | gawk -F" " \'{print $2}\' ', $cmdret);
+  $login_file = $cmdret[0];
+  if( !preg_match("/^\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $login_file ) ){throw new Exception('FATAL ERROR: invalid login file name retrieved'); }
+
+  return $login_file;
+}
+
+
 /**
  * method to update username and password passed via POST
  * @global object $_files
@@ -1107,21 +1116,14 @@ function update_user_settings(){
   $ret = '';
 
   if( !array_key_exists('vpn_provider', $_POST) ){throw new Exception('FATAL ERROR: vpn_provider not set'); }
-  if( !preg_match("/^[a-zA-Z]{3,10}+\z/", $_POST['vpn_provider'] ) ){throw new Exception('FATAL ERROR: invalid vpn_provider by user'); }
 
-  $ovpns = get_ovpn_list($_POST['vpn_provider']);
-  if( !array_key_exists(0, $ovpns) ){ return FALSE; }
-
-  //pick first one of the ovpn files to get "auth-user-pass" setting
-  $inj = escapeshellarg('/pia/ovpn/'.$ovpns[0].'.ovpn');
-  $cmdret = array();
-  exec('grep "auth-user-pass" '.$inj.' | gawk -F" " \'{print $2}\' ', $cmdret);
-  $login_file = $cmdret[0];
-  if( !preg_match("/^\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $login_file ) ){throw new Exception('FATAL ERROR: invalid login file name retrieved'); }
+  //get name of login file
+  $login_file = VPN_get_loginfile($_POST['vpn_provider']);
 
   $tmp = explode('/', $login_file); $session = $tmp[1]; //session requires no path
   $username = ( array_key_exists('username', $_POST) ) ? $_POST['username'] : '';
   $password = ( array_key_exists('password', $_POST) ) ? $_POST['password'] : '';
+
 
 
   //can not handle empty values right now ... but there is a reset command
@@ -1134,6 +1136,7 @@ function update_user_settings(){
         $_files->writefile($login_file, $content); //back to login-pia.conf
         $ret .= "<div id=\"feedback\" class=\"feedback\">Username updated</div>\n";
         unset($_SESSION[$session]);
+        unset($_SESSION[$login_file]);
       }
     }
   }
@@ -1146,6 +1149,7 @@ function update_user_settings(){
         $_files->writefile($login_file, $content); //back to login-pia.conf
         $ret .= "<div id=\"feedback\" class=\"feedback\">Password updated</div>\n";
         unset($_SESSION[$session]);
+        unset($_SESSION[$login_file]);
       }
     }
   }

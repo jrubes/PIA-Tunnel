@@ -13,9 +13,9 @@ $inc_dir = './include/';
 require_once $inc_dir.'basic.php';
 
 //force setup wizard if PIA username is set to default
-if( !VPN_is_provider_active('pia') && !VPN_is_provider_active('frootvpn') ){
-  $_REQUEST['page'] = 'setup-wizard';
-}
+//if( !VPN_is_provider_active('pia') && !VPN_is_provider_active('frootvpn') ){
+//  $_REQUEST['page'] = 'setup-wizard';
+//}
 unset($login_dta);
 
 //user account control was added later so keep the following code for the next few releases
