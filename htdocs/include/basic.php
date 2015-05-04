@@ -213,13 +213,16 @@ function VPN_get_connections( $name, $build_options=array()){
   return $assembled;
 }
 
+
+
 /**
  * check if the connection supports port forwarding
  * this is hardcoded information
  * @param string $conn_name name OVPN file without .ovpn
  */
 function supports_forwarding( $conn_name ){
-  $locations = array( 'CA North York', 'CA Toronto', 'Switzerland', 'Sweden', 'Romania', 'Germany', 'France', 'Netherlands', 'Russia', 'Hong Kong', 'Israel' );
+  $locations = get_port_forward_locations($conn_name);
+  if( $locations === false ){ return false; }
   $lc = strtolower($conn_name);
 
   foreach( $locations as $l ){
@@ -228,6 +231,32 @@ function supports_forwarding( $conn_name ){
     }
   }
   return false;
+}
+
+
+/**
+ * retrieve forward locations from port_forward.txt within ovpn directory
+ * @param string &$conn_name connection name as stored in session
+ * @return bool/array array containing one name per line or FALSE
+ */
+function get_port_forward_locations( &$conn_name ){
+  global $_files;
+  $ret = array();
+  $conn_parts = explode('/', $conn_name); //is "PIAudp/Germany", need "PIAudp"
+  if( $conn_parts[0] == '' ){ return false; }
+
+  $content = $_files->readfile('/pia/ovpn/'.$conn_parts[0].'/port_forward.txt');
+  if( $content === false ){ return false; }
+
+  //build array to be returned and remove first line
+  $locations = explode( "\n", eol($content));
+
+  $cnt = count($locations);
+  for( $x=1; $x < $cnt ; ++$x ){ //start at 1 to skip first line
+    $ret[] = $conn_parts[0].'/'.$locations[$x];
+  }
+
+  return $ret;
 }
 
 
@@ -1074,12 +1103,12 @@ function build_checkbox( &$content, $double=false ){
 /**
  * method to update username and password passed via POST
  * @global object $_files
- * @return string string with HTML success message or empty when there was no update
+ * @return string HTML success message or empty when there was no update
  */
 function update_user_settings(){
   global $_files;
-
   $ret = '';
+
   if( !array_key_exists('vpn_provider', $_POST) ){throw new Exception('FATAL ERROR: vpn_provider not set'); }
   if( !preg_match("/^[a-zA-Z]{3,10}+\z/", $_POST['vpn_provider'] ) ){throw new Exception('FATAL ERROR: invalid vpn_provider by user'); }
 
