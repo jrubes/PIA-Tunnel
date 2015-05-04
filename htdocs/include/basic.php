@@ -222,8 +222,9 @@ function VPN_get_connections( $name, $build_options=array()){
  */
 function supports_forwarding( $conn_name ){
   $locations = get_port_forward_locations($conn_name);
+
   if( $locations === false ){ return false; }
-  $lc = strtolower($conn_name);
+  $lc = strtolower(trim($conn_name));
 
   foreach( $locations as $l ){
     if( strtolower($l) == $lc ){
@@ -787,78 +788,74 @@ function VPN_get_IP(){
     return 'not connected yet';
   }
 
-  //currently PIA is only provider supporting port forwarding
-  if( VPN_provider_connected() !== 'pia' ){
-    return false;
+  if( supports_forwarding(trim($_SESSION['connecting2'])) === false ){return false; }
+
+
+  //check if the port cache should be considered old
+  $session_settings_timeout = strtotime('-5 minutes'); //time until session expires
+  if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
+    //validate time
+    if( $_SESSION['PIA_port_timestamp'] < $session_settings_timeout ){
+     if( array_key_exists('PIA_port', $_SESSION) === true ){
+       unset($_SESSION['PIA_port']); //time expired
+     }
+    }
+  }else{
+    //does not exist so destroy PIA_port just to be save
+    if( array_key_exists('PIA_port', $_SESSION) === true ){
+      unset($_SESSION['PIA_port']);
+    }
   }
 
-  //unset($_SESSION['PIA_port_timestamp']);
 
-   //check if the port cache should be considered old
-   $session_settings_timeout = strtotime('-5 minutes'); //time until session expires
-   if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
-     //validate time
-     if( $_SESSION['PIA_port_timestamp'] < $session_settings_timeout ){
-      if( array_key_exists('PIA_port', $_SESSION) === true ){
-        unset($_SESSION['PIA_port']); //time expired
-      }
-     }
-   }else{
-     //does not exist so destroy PIA_port just to be save
-     if( array_key_exists('PIA_port', $_SESSION) === true ){
-       unset($_SESSION['PIA_port']);
-     }
-   }
+  //get fresh port info
+  if( array_key_exists('PIA_port', $_SESSION) !== true )
+  {
+    //read from cache file or get fresh info
+    if( file_exists($cache_file) === true ){
+      $cont = explode('|', $_files->readfile($cache_file));
 
-
-   //get fresh port info
-   if( array_key_exists('PIA_port', $_SESSION) !== true )
-   {
-      //read from cache file or get fresh info
-      if( file_exists($cache_file) === true ){
-        $cont = explode('|', $_files->readfile($cache_file));
-
-        //cont(0) is timestamp of creation
-        //cont(1) contains the port number
-        $expires = strtotime('-96 hours'); //time until session expires
-        if( trim($cont[0]) < $expires ){
-          $pia_ret = get_port();
-          if( $pia_ret !== false && array_key_exists('port', $pia_ret) ){
-            settype($pia_ret['port'], 'integer');
-          }
-
-        }else{
-          $pia_ret['port'] = (int)trim($cont[1]);
-        }
-      }else{
+      //cont(0) is timestamp of creation
+      //cont(1) contains the port number
+      $expires = strtotime('-96 hours'); //time until session expires
+      if( trim($cont[0]) < $expires ){
         $pia_ret = get_port();
         if( $pia_ret !== false && array_key_exists('port', $pia_ret) ){
           settype($pia_ret['port'], 'integer');
         }
-      }
 
-      if( is_int($pia_ret['port']) === true && $pia_ret['port'] > 0 && $pia_ret['port'] < 65536 ){
-        $_SESSION['PIA_port'] = $pia_ret['port']; //needs to be refreshed later on
-        $_SESSION['PIA_port_timestamp'] = strtotime('now');
-
-        //update cache
-        $txt = strtotime('now').'|'.$pia_ret['port'];
-        $_files->writefile($cache_file, $txt);
-      }elseif( is_array($pia_ret) === false && $pia_ret === false ){
-        if( supports_forwarding($_SESSION['connecting2']) === true ){
-          //unable to get port info - PIA may be down
-          $_SESSION['PIA_port'] = "ERROR: getting port info. is the website up?";
-          $_SESSION['PIA_port_timestamp'] = strtotime('now');
-        }else{
-          $_SESSION['PIA_port'] = "";
-          $_SESSION['PIA_port_timestamp'] = strtotime('now');
-        }
       }else{
-        return false;
+        $pia_ret['port'] = (int)trim($cont[1]);
       }
-   }
+    }else{
+      $pia_ret = get_port();
+      if( $pia_ret !== false && array_key_exists('port', $pia_ret) ){
+        settype($pia_ret['port'], 'integer');
+      }
+    }
 
-   return $_SESSION['PIA_port'];
+    if( is_int($pia_ret['port']) === true && $pia_ret['port'] > 0 && $pia_ret['port'] < 65536 ){
+      $_SESSION['PIA_port'] = $pia_ret['port']; //needs to be refreshed later on
+      $_SESSION['PIA_port_timestamp'] = strtotime('now');
+
+      //update cache
+      $txt = strtotime('now').'|'.$pia_ret['port'];
+      $_files->writefile($cache_file, $txt);
+    }elseif( is_array($pia_ret) === false && $pia_ret === false ){
+      if( supports_forwarding($_SESSION['connecting2']) === true ){
+        //unable to get port info - PIA may be down
+        $_SESSION['PIA_port'] = "ERROR: getting port info. is the website up?";
+        $_SESSION['PIA_port_timestamp'] = strtotime('now');
+      }else{
+        $_SESSION['PIA_port'] = "";
+        $_SESSION['PIA_port_timestamp'] = strtotime('now');
+      }
+    }else{
+      return false;
+    }
+  }
+
+  return $_SESSION['PIA_port'];
  }
 
  /**

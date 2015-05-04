@@ -348,14 +348,21 @@ function switch_vpn() {
 		killall openvpn &> /dev/null
         echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $CONN" > /pia/cache/session.log
 
-        #this is a hack until I come up with a good way to providers dynamically
-        if [ -f "/pia/ovpn/pia/$CONN.ovpn" ]; then
-          echo "pia" > /pia/cache/provider.txt
-          openvpn "/pia/ovpn/pia/$CONN.ovpn" &>> /pia/cache/session.log &
+        #get the provider / directory name
+        VPNprovider=`echo "$CONN" | gawk -F"/" '{print $1}'`
+
+        #start openVPN session
+        if [ -f "/pia/ovpn/$CONN.ovpn" ]; then
+          echo "$VPNprovider" > /pia/cache/provider.txt
+          openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/cache/session.log &
         else
-          echo "frootvpn" > /pia/cache/provider.txt
-          openvpn "/pia/ovpn/frootvpn/$CONN.ovpn" &>> /pia/cache/session.log &
+          echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+              "- specified file not found in switch_vpn() - /pia/ovpn/$CONN.ovpn"
+          echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+              "- terminating...."
+          exit 1
         fi
+
 
 		#wait until connection has been established
 		LOOP_PROTECT=0
