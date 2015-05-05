@@ -26,9 +26,8 @@ PING_IP_LIST[3]="208.67.220.220"
 # checks if at least one of the login files has been filled
 function check_default_username(){
 	#check if login files exist
-    FCOUNT=`ls -1 /pia/login-* | wc -l`
+    FCOUNT=`ls -1 /pia/login-*.conf 2>/dev/null | wc -l`
 
-	#if [ "$PIA_UN1" = "your PIA account name on this line" ] && [ "$PIA_UN2" = "your FrootVPN account name on this line" ]; then
     if [ "$FCOUNT" -lt 1 ]; then
         # FATAL ERROR: make sure to always print IP info
         INT_IP=`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
@@ -402,9 +401,7 @@ function get_provider(){
   if [ -f "/pia/cache/provider.txt" ];then
     RET_PROVIDER_NAME=`cat /pia/cache/provider.txt`
   else
-    echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-				"- /pia/cache/provider.txt does not exist."
-    exit 1;
+    RET_PROVIDER_NAME=""
   fi
 }
 

@@ -4,20 +4,6 @@
 LANG=en_US.UTF-8
 export LANG
 
-#config file has been added after the first release so this condition needs to stay here for a while
-if [ ! -f "/pia/settings.conf" ]; then
-	echo '#!/bin/bash' > '/pia/settings.conf'
-	echo 'LANG=en_US.UTF-8' >> '/pia/settings.conf'
-	echo 'export LANG' >> '/pia/settings.conf'
-	echo '' >> '/pia/settings.conf'
-	echo '# name of your external interface. this connects to the Internet/Router' >> '/pia/settings.conf'
-	echo 'IF_EXT="eth0"' >> '/pia/settings.conf'
-	echo '# name of your internal interface. this if for the private VM network' >> '/pia/settings.conf'
-	echo 'IF_INT="eth1"' >> '/pia/settings.conf'
-	echo '# name of your VPN interface' >> '/pia/settings.conf'
-	echo 'IF_TUNNEL="tun0"' >> '/pia/settings.conf'
-	echo '' >> '/pia/settings.conf'
-fi
 source '/pia/settings.conf'
 source '/pia/include/functions.sh'
 
@@ -50,7 +36,13 @@ if [ "$RET_PING_HOST" = "OK" ]; then
   fi
 
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/pia/cache/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
-  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`cat "/pia/cache/status.txt" | grep "INTIP" | gawk -F":" '{print $2}'`
+
+  PLANIP=`cat "/pia/cache/status.txt" | grep 	"INTIP" | gawk -F":" '{print $2}'`
+  if [ "$PLANIP" != "" ] ; then
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: $PLANIP"
+  fi
+
+
 else
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is DOWN!"
   if [ ! -f '/pia/cache/status.txt' ]; then
@@ -58,7 +50,10 @@ else
     echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
   else
     echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/pia/cache/status.txt" | grep "INTERNETIP" | gawk -F":" '{print $2}'`
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`cat "/pia/cache/status.txt" | grep 	"INTIP" | gawk -F":" '{print $2}'`
+
+    PLANIP=`cat "/pia/cache/status.txt" | grep 	"INTIP" | gawk -F":" '{print $2}'`
+    if [ "$PLANIP" != "" ] ; then
+      echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: $PLANIP"
+    fi
   fi
 fi
-
