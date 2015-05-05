@@ -54,4 +54,8 @@ cd /pia ; git reset --hard HEAD &> /dev/null
 #Now run setup to get settings back and apply permissions
 chmod ugo+x /pia/pia-setup
 /pia/pia-setup
+
+#force wizard to start
+sed -i 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /pia/settings.conf
+
 echo "Done, reboot or shutdown now!"

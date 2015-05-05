@@ -262,3 +262,10 @@ if [ ! ${VPN_PROVIDERS[0]+abc} ]; then
   echo 'VPN_PROVIDERS[0]="PIAtcp"' >> '/pia/settings.conf'
   echo 'VPN_PROVIDERS[0]="FrootVPN"' >> '/pia/settings.conf'
 fi
+
+
+# add setup wizard value to settings - default to yes since a full reset will set it to no
+ret=`grep -c "SETUP_WIZARD_COMPLETED" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'SETUP_WIZARD_COMPLETED="yes"' >> '/pia/settings.conf'
+fi
