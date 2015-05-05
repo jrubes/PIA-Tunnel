@@ -305,6 +305,7 @@ function VPN_provider_connected(){
  */
 function VPN_is_provider_active( $provider ){
   $users = VPN_get_user($provider);
+  
   if( $users !== false ){
     if( $provider === 'pia' ){
       if( count($_SESSION['login-pia.conf']) === 2
@@ -777,7 +778,7 @@ function VPN_get_IP(){
 
   if( supports_forwarding(trim($_SESSION['connecting2'])) === false ){return false; }
 
-  
+
   //check if the port cache should be considered old
   $session_settings_timeout = strtotime('-5 minutes'); //time until session expires
   if( array_key_exists('PIA_port_timestamp', $_SESSION) === true ){
@@ -1128,6 +1129,13 @@ function update_user_settings(){
   $password = ( array_key_exists('password', $_POST) ) ? $_POST['password'] : '';
 
 
+  //create an empty file and set permissions
+  if( !file_exists($login_file) ){
+    file_put_contents($login_file, ' ');
+    chmod($login_file, 0660); //r+w for owner and group
+    @chown($login_file, 'root'); //this line should not work due to security restrictions
+    chgrp($login_file, 'vpnvm');
+  }
 
   //can not handle empty values right now ... but there is a reset command
   if( $username != '' ){

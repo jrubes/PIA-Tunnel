@@ -109,8 +109,8 @@ function disp_wizard_default(){
   $disp_body .= "<table>\n";
   $disp_body .= '<tr><td>VPN Provider</td><td>';
     $disp_body .= '<select name="vpn_provider">';
-    $disp_body .= '<option value="pia">PrivateInternetAccess.com</option>';
-    $disp_body .= '<option value="frootvpn">FrootVPN.com</option>';
+    $disp_body .= '<option value="PIAtcp">PrivateInternetAccess.com</option>';
+    $disp_body .= '<option value="FrootVPN">FrootVPN.com</option>';
     $disp_body .= '</select>';
   $disp_body .= '</td>';
   $disp_body .= '<tr><td>VPN Account Username</td><td><input type="text" style="width: 15em" name="username" value="" placeholder="Your Account Username" required></td>';

@@ -257,6 +257,8 @@ if [ $ret = 0 ]; then
 fi
 
 
+# new setting to enable or disable VPN providers
 if [ ! ${VPN_PROVIDERS[0]+abc} ]; then
   echo 'VPN_PROVIDERS[0]="PIAtcp"' >> '/pia/settings.conf'
+  echo 'VPN_PROVIDERS[0]="FrootVPN"' >> '/pia/settings.conf'
 fi
