@@ -105,19 +105,6 @@ if [ ! -z "$pos" ]; then
   fi
 fi
 
-#create new login files if none exist
-if [ ! -f '/pia/login-pia.conf' ]; then
-	echo "your PIA account name on this line" > '/pia/login-pia.conf'
-	echo "your PIA account password on this line" >> '/pia/login-pia.conf'
-    chown -R root.vpnvm /pia/login-pia.conf
-    chmod 0660 /pia/login-pia.conf
-fi
-if [ ! -f '/pia/login-frootvpn.conf' ]; then
-    echo "your FrootVPN account name on this line" > /pia/login-frootvpn.conf
-    echo "your FrootVPN account password on this line" >> /pia/login-frootvpn.conf
-    chown -R root.vpnvm /pia/login-frootvpn.conf
-    chmod 0660 /pia/login-frootvpn.conf
-fi
 
 #create a fresh settings file
 if [ ! -f "/pia/settings.conf" ]; then

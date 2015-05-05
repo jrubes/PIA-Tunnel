@@ -25,17 +25,11 @@ PING_IP_LIST[3]="208.67.220.220"
 
 # checks if at least one of the login files has been filled
 function check_default_username(){
-	#check the for default value
-    if [ -f "/pia/login-pia.conf" ]; then
-      PIA_UN1=`sed -n '1p' /pia/login-pia.conf`
-    fi
+	#check if login files exist
+    FCOUNT=`ls -1 /pia/login-* | wc -l`
 
-    if [ -f "/pia/login-frootvpn.conf" ]; then
-      PIA_UN2=`sed -n '1p' /pia/login-frootvpn.conf`
-    fi
-
-	if [ "$PIA_UN1" = "your PIA account name on this line" ] && [ "$PIA_UN2" = "your FrootVPN account name on this line" ]; then
-
+	#if [ "$PIA_UN1" = "your PIA account name on this line" ] && [ "$PIA_UN2" = "your FrootVPN account name on this line" ]; then
+    if [ "$FCOUNT" -lt 1 ]; then
         # FATAL ERROR: make sure to always print IP info
         INT_IP=`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
         EXT_IP=`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
@@ -45,17 +39,17 @@ function check_default_username(){
         echo
 		echo
 		echo "No VPN account info found! Please use the WebUI to configure "
-        echo "your account or add the information manually to the following files."
+        echo "your account or add the information manually to one of the following files."
         echo
 		echo -e "\t/pia/login-pia.conf"
-		echo -e "\t/pia/login-frootvpn.conf"
+		echo -e "\t/pia/login-FrootVPN.conf"
         echo
 		echo "Try"
 		echo -e "\tvi /pia/login-pia.conf"
-		echo -e "\tvi /pia/login-frootvpn.conf"
+		echo -e "\tvi /pia/login-FrootVPN.conf"
 		echo "or"
 		echo -e "\tnano /pia/login-pia.conf"
-		echo -e "\tnano /pia/login-frootvpn.conf"
+		echo -e "\tnano /pia/login-FrootVPN.conf"
 		echo
 		exit
 	fi
