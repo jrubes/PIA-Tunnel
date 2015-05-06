@@ -13,7 +13,7 @@ function get_forward_port() {
 
   #this only works with pia
   get_provider
-  if [ "$RET_PROVIDER_NAME" = "pia" ]; then
+  if [ "$RET_PROVIDER_NAME" = "PIAtcp" ] || [ "$RET_PROVIDER_NAME" = "PIAudp" ]; then
 
     #check if the client ID has been generated and get it
     if [ ! -f "/pia/client_id" ]; then

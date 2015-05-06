@@ -396,7 +396,8 @@ function switch_vpn() {
 
 
 # retrieve provider from cache file
-# "returns" RET_PROVIDER_NAME with the provider string "pia", "frootvpn"
+# "returns" RET_PROVIDER_NAME with the provider string "PICtcp", "PIAudp" ...
+#   it is the name of the directory inside /pia/ovpn/
 function get_provider(){
   if [ -f "/pia/cache/provider.txt" ];then
     RET_PROVIDER_NAME=`cat /pia/cache/provider.txt`
@@ -413,7 +414,7 @@ function get_forward_port() {
 
   #this only works with pia
   get_provider
-  if [ "$RET_PROVIDER_NAME" = "pia" ]; then
+  if [ "$RET_PROVIDER_NAME" = "PIAtcp" ] || [ "$RET_PROVIDER_NAME" = "PIAudp" ]; then
 
     #check if the client ID has been generated and get it
     if [ ! -f "/pia/client_id" ]; then
@@ -581,7 +582,7 @@ function maintain_status_cache() {
 
   #this only works with pia
   get_provider
-  if [ "$RET_PROVIDER_NAME" = "pia" ]; then
+  if [ "$RET_PROVIDER_NAME" = "PIAtcp" ] || [ "$RET_PROVIDER_NAME" = "PIAudp" ]; then
 
     #get PIA username and password from /pia/login-pia.conf
     PIA_UN=`sed -n '1p' /pia/login-pia.conf`
