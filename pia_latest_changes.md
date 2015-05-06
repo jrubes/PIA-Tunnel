@@ -1,3 +1,15 @@
+update 2015-05-06
+=================
+* **WARNING** major changes! Don't update yet unless you want to use the latest and greates features. PLEASE REPORT ANY ISSUES!!!!
+* removed most of the code that binds PIA-Tunnel to PrivateInternetAccess.com.      
+  It should be possible to use this VM with most VPN providers soon.
+* PrivateInternetAccess.com: added openVPN files for TCP and UDP connections.     
+  UDP may be enabled in "General Settings" => "VPN Provider"
+* ALL connections are now prefixed with a custom provider prefix. "PIAtcp/France" will create a TCP VPN tunnel to France and "PIAudp/France" will do the same using the UDP protocol.
+* this update breaks your current PIA-Daemon configuration. You need to set new failover locations (Settings).
+* the new changes may break some CMD line tools. I'll have to rewrite some parts to support the new dynamic format.
+
+
 update 2015-04-28
 =================
 * I have received reports that a recent update degraded VPN performance for high speed connections (+1MB/s). The issue appears to be caused by a switch from a UDP to a TCP based VPN connections.      
@@ -9,9 +21,6 @@ update 2015-04-08
 =================
 * sry for the delay. This updates the connection files to match PIA's latest changes. VPN should work once again.    
   Please logout of the webUI to update your list of available VPN locations.
-* Looks like the free ride provided by FrootVPN has come to an end. Support for FrootVPN will be removed unless 
-  YOU let me know that you are using it and that it still works.   
-  I don't have a paid account with them and they don't respond to inquiries ....
 
 update 2015-04-04
 =================
