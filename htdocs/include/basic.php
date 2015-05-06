@@ -195,24 +195,45 @@ function VPN_get_connections( $name, $build_options=array()){
 
   //loop over session to generate options
   foreach( $_SESSION['ovpn'] as $ovpn ){
-    $html = htmlentities($ovpn);
-    //$ret .= "<option value=\"$html\">$html</option>\n";
-    if( supports_forwarding($html) === true ){
-      $fw_ret[] = array( $html, '*'.$html);
-    }else{
-      $ret[] = array( $html, $html);
+
+    if( provider_ready2use($ovpn) === true ){
+      $html = htmlentities($ovpn);
+      //$ret .= "<option value=\"$html\">$html</option>\n";
+      if( supports_forwarding($html) === true ){
+        $fw_ret[] = array( $html, '*'.$html);
+      }else{
+        $ret[] = array( $html, $html);
+      }
     }
   }
 
   if( $ret == '' ){ return false; }
 
   sort($ret);sort($fw_ret);
+  if( count($ret) === 0 && count($fw_ret) === 0 ){ $ret[] = array( 'invalid login data', 'invalid login data'); }
   $t = array_merge($sel, $fw_ret, $ret);
   $assembled = build_select($t);
   //return "<select name=\"vpn_connections\">\n$ret</select>\n";
+
   return $assembled;
 }
 
+
+/**
+ * checks if the login file appears to be valid
+ * @param string $ovpn the ovpn connection string "PIAtcp/France"
+ * @return boolean true when the login file looks good, false if missing or empty
+ */
+function provider_ready2use( &$ovpn ){
+
+  $tmp = explode('/', $ovpn);
+  $filename = VPN_get_loginfile($tmp[0]);
+  if( load_login($filename) === false ){
+    return false;
+  }else{
+    return true;
+  }
+}
 
 
 /**
@@ -935,9 +956,7 @@ function eol($string) {
 function load_login( $filename ){
   global $_files;
 
-  if( array_key_exists( $filename, $_SESSION) === true
-          && $_SESSION[$filename]['username'] != 'your PIA account name on this line'
-          && $_SESSION[$filename]['username'] != 'your FrootVPN account name on this line' )
+  if( array_key_exists( $filename, $_SESSION) === true  )
   {
     return $_SESSION[$filename];
 
