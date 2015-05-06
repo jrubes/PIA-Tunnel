@@ -497,6 +497,7 @@ function VM_get_status( $output = 'html'){
   $ret = array();
   exec('/sbin/ip addr show '.$settings['IF_EXT'].' | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
   $ret_arr['public_ip'] = $ret[0];
+  unset($ret);
 
   $fw_forward_state = $_pia->check_forward_state($settings['IF_EXT']);
   if( $fw_forward_state === true || $settings['FORWARD_PUBLIC_LAN'] === 'yes' )
@@ -513,9 +514,6 @@ function VM_get_status( $output = 'html'){
       $ret_arr['SOCKS_EXT_ENABLED'] = "SOCKS5 Proxy NOT running";
     }
   }
-
-  $ret_arr['public_ip'] = $ret[0];
-  unset($ret);
 
   $ret_arr['vpn_gw'] = '';
   $ret = array();
