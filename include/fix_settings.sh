@@ -269,3 +269,9 @@ ret=`grep -c "SETUP_WIZARD_COMPLETED" /pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'SETUP_WIZARD_COMPLETED="yes"' >> '/pia/settings.conf'
 fi
+
+
+# move to new format. this can be removed after a few months - added Mai 2015
+if [ -f /pia/login-frootvpn.conf ] && [ ! -f /pia/login-FrootVPN.conf ]; then
+  mv /pia/login-frootvpn.conf /pia/login-FrootVPN.conf
+fi
