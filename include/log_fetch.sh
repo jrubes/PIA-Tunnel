@@ -1,3 +1,4 @@
+#!/bin/bash
 # fetch the latest git log for the webui
 
 val=`cd /pia ; git fetch origin &> /dev/null ; git rev-list HEAD... origin/"$1" --count 2>/dev/null`

@@ -1,3 +1,7 @@
+updated 2015-05-10
+==================
+* added configuration option to allow incoming SNMP traffic through the firewall. This setting is disabled by default.
+
 update 2015-05-06
 =================
 * **WARNING** major changes! Don't update yet unless you want to use the latest and greates features. PLEASE REPORT ANY ISSUES!!!!

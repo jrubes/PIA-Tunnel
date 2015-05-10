@@ -84,8 +84,13 @@ iptables -P FORWARD DROP
 #allow outgoing traffic from this machine as long as it is sent over the VPN
 iptables -A OUTPUT -o $IF_TUNNEL -j ACCEPT
 
-#allow incoming on this machine as long as it is related
+#allow incoming as long as it is related
 iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+#allow outgoing as long as it is related
+iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+
 
 #allow dhcpd traffic if enabled
 if [ "$DHCPD_ENABLED1" = 'yes' ] || [ "$DHCPD_ENABLED2" = 'yes' ]; then
@@ -152,13 +157,42 @@ if [ ! -z "${FIREWALL_IF_SSH[0]}" ]; then
   for interface in "${FIREWALL_IF_SSH[@]}"
   do
     iptables -A INPUT -i "$interface" -p tcp --dport 22 -j ACCEPT
-    iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    #iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- SSH enabled for interface: $interface"
 	fi
   done
 fi
+
+#allowing SNMP traffic
+if [ ! -z "${FIREWALL_IF_SNMP[0]}" ]; then
+  for interface in "${FIREWALL_IF_SNMP[@]}"
+  do
+    iptables -A INPUT -i "$interface" -p udp --dport 161 -j ACCEPT
+    iptables -A OUTPUT -o "$interface" -p udp --sport 162 -j ACCEPT
+    #iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+	if [ "$VERBOSE_DEBUG" = "yes" ]; then
+		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- SNMP enabled for interface: $interface"
+	fi
+  done
+fi
+
+#allowing Secure SNMP traffic
+if [ ! -z "${FIREWALL_IF_SECSNMP[0]}" ]; then
+  for interface in "${FIREWALL_IF_SECSNMP[@]}"
+  do
+    iptables -A INPUT -i "$interface" -p udp --dport 10161 -j ACCEPT
+    iptables -A OUTPUT -o "$interface" -p udp --sport 10162 -j ACCEPT
+    #iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+	if [ "$VERBOSE_DEBUG" = "yes" ]; then
+		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+			"- Secure SNMP enabled for interface: $interface"
+	fi
+  done
+fi
+
 
 #allowing incoming SOCKS traffic
 if [ "$SOCKS_INT_ENABLED" = 'yes' ]; then
@@ -168,7 +202,7 @@ if [ "$SOCKS_INT_ENABLED" = 'yes' ]; then
     iptables -A INPUT -i "$IF_INT" -p udp --dport "$SOCKS_INT_PORT" -j ACCEPT
     iptables -A OUTPUT -o "$IF_TUNNEL" -p tcp --sport 8080 -s "$INT_IP" -j ACCEPT
     iptables -A OUTPUT -o "$IF_TUNNEL" -p udp --sport 8080 -s "$INT_IP" -j ACCEPT
-    iptables -A OUTPUT -o "$IF_INT" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    #iptables -A OUTPUT -o "$IF_INT" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- SOCKS enabled for interface: $IF_INT"
@@ -179,7 +213,7 @@ if [ "$SOCKS_EXT_ENABLED" = 'yes' ]; then
     iptables -A INPUT -i "$IF_EXT" -p udp --dport "$SOCKS_EXT_PORT" -j ACCEPT
     iptables -A OUTPUT -o "$IF_TUNNEL" -p tcp --sport 8080 -s "$EXT_IP" -j ACCEPT
     iptables -A OUTPUT -o "$IF_TUNNEL" -p udp --sport 8080 -s "$EXT_IP" -j ACCEPT
-    iptables -A OUTPUT -o "$IF_EXT" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    #iptables -A OUTPUT -o "$IF_EXT" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- SOCKS enabled for interface: $IF_EXT"
@@ -191,7 +225,7 @@ if [ ! -z "${FIREWALL_IF_WEB[0]}" ]; then
   for interface in "${FIREWALL_IF_WEB[@]}"
   do
     iptables -A INPUT -i "$interface" -p tcp --dport 80 -j ACCEPT
-    iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    #iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- webUI enabled for interface: $interface"

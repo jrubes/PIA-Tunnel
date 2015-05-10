@@ -275,3 +275,11 @@ fi
 if [ -f /pia/login-frootvpn.conf ] && [ ! -f /pia/login-FrootVPN.conf ]; then
   mv /pia/login-frootvpn.conf /pia/login-FrootVPN.conf
 fi
+
+
+if [ ! ${FIREWALL_IF_SNMP[0]+abc} ]; then
+  echo 'FIREWALL_IF_SNMP[0]=""' >> '/pia/settings.conf'
+fi
+if [ ! ${FIREWALL_IF_SECSNMP[0]+abc} ]; then
+  echo 'FIREWALL_IF_SECSNMP[0]=""' >> '/pia/settings.conf'
+fi

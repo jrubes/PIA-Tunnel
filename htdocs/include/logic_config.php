@@ -790,7 +790,7 @@ function disp_general_box(){
             array( 'FIREWALL_IF_WEB[0]', 'eth0'),
             array( 'FIREWALL_IF_WEB[1]', 'eth1')
           );
-  $disp_body .= '<tr><td>Allow web-UI access on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td><span title="incoming on port 80">Allow webUI access on</span></td><td><span title="incoming on port 80">'.build_checkbox($sel).'</span></td></tr>'."\n";
 
 
   $use = 'FIREWALL_IF_SSH';
@@ -803,7 +803,31 @@ function disp_general_box(){
             array( 'FIREWALL_IF_SSH[0]', 'eth0'),
             array( 'FIREWALL_IF_SSH[1]', 'eth1')
           );
-  $disp_body .= '<tr><td>Allow ssh connections on</td><td>'.build_checkbox($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td><span title="incoming on port 22">Allow SSH on</span></td><td><span title="incoming on port 22">'.build_checkbox($sel).'</span></td></tr>'."\n";
+
+
+  $use = 'FIREWALL_IF_SNMP';
+  $GLOB_disp_network_default_fields .= 'FIREWALL_IF_SNMP,';
+  $fw_ssh = $_settings->get_settings_array($use);
+  $sel = array(
+            'id' => $use,
+            'selected' =>  $fw_ssh,
+            array( 'FIREWALL_IF_SNMP[0]', 'eth0'),
+            array( 'FIREWALL_IF_SNMP[1]', 'eth1')
+          );
+  $disp_body .= '<tr><td><span title="incoming on port 161 and outgoing on 162">Allow SNMP on</span></td><td><span title="incoming on port 161 and outgoing on 162">'.build_checkbox($sel).'</span></td></tr>'."\n";
+
+  $use = 'FIREWALL_IF_SECSNMP';
+  $GLOB_disp_network_default_fields .= 'FIREWALL_IF_SECSNMP,';
+  $fw_ssh = $_settings->get_settings_array($use);
+  $sel = array(
+            'id' => $use,
+            'selected' =>  $fw_ssh,
+            array( 'FIREWALL_IF_SECSNMP[0]', 'eth0'),
+            array( 'FIREWALL_IF_SECSNMP[1]', 'eth1')
+          );
+  $disp_body .= '<tr><td><span title="incoming on port 10161 and outgoing on 10162">Allow Secure SNMP on</span></td><td><span title="incoming on port 10161 and outgoing on 10162">'.build_checkbox($sel).'</span></td></tr>'."\n";
+
 
 
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
