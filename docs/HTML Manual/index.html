@@ -40,6 +40,8 @@
       <li><a href="#defaultgw_single">Basic - One Network Interface</a></li>
       <li><a href="#defaultgw_dual">Advanced - Dual Network Interface</a></li>
     </ul>
+
+    <a href="#defaultgw_bindnic">Single PC with Default Gateway Setup</a>
   </li>
 
   <li><a href="#webUI">PIA-Tunnel webUI (Management Interface)</a>
@@ -59,6 +61,12 @@
   <li>Running a Server or Torrent Client</li>
 
   <li>Starting your Torrent client with monitor.vbs</li>
+
+  <li><strong>! HELP !</strong>
+    <ul>
+      <li><a href="#h_firewall">Connection issues with new VMs</a></li>
+    </ul>
+  </li>
 
   <li>Known Issues</li>
 
@@ -586,6 +594,71 @@
 
 
 
+<div id="defaultgw_bindnic" class="section">
+  <h2>Single PC with Default Gateway Setup</h2> <a href="#main_index">Back To Top</a>
+  <p>
+    It is possible to use the PIA-Tunnel connection on the host PC by installing a loop back
+    network adapter and configuring your program to use it. This is not recommended but it
+    is possible.
+  </p>
+
+  <ol>
+    <li><a href="https://www.google.com/search?q=windows+install+loopback+adapter" target="_blank">Install a loop back network adapter</a></li>
+    <li>Configure the new adapter using the following settings.<br>
+        IP: 192.168.90.10, Subnet: 255.255.255.0, Gateway: 192.168.90.1
+    </li>
+    <li>Start the "VMware Virtual Network Editor" and elevate to Administrator (Change Settings Button)<br>
+      <ol>
+        <li>Click "Add Network", Accept suggested network by clicking OK.</li>
+        <li>Select the new network in the overview box</li>
+        <li>Select "Bridged" under "VMnet Information" and use the dropdown menu to select
+        the Microsoft Loopback Adapter</li>
+      </ol>
+      <a href="./grfx/VMware_VNE.png"><img src="./grfx/VMware_VNE-small.png" alt="VMware Virtual Network Editor screenshot"></a>
+    </li>
+
+    <li>
+      Open the VMware configuration for PIA-Tunnel and set the first network adapter to
+      bridged or NAT. Set the second network adapter to custom and choose the network created
+      with the Virtual Network Editor.<br>
+      <img src="./grfx/loopback_VM.png" alt="VMware Virtual Network Editor screenshot">
+    </li>
+
+    <li>
+      Start PIA-Tunnel and update the following Settings
+      <ol>
+        <li>VPN Gateway for VM LAN: yes, VPN Gateway for public LAN: no</li>
+        <li>eth1 IP: 192.168.90.1, eth1 Subnet: 255.255.255.0, eth1 Gateway: EMPTY</li>
+        <li>DHCP Server: both disabled</li>
+        <li>Enable Port Forwarding: yes, Forward to this IP: 192.168.90.10</li>
+        <li>Click on the "Store Settings" button and reboot the VM.</li>
+      </ol>
+      Note: Ignore the dhcp-server error message after you reboot the VM.
+    </li>
+
+    <li>
+      Goto "Tools" =&gt; "Ping Utility" and test the following.
+      <ul>
+        <li>Outgoing interface: eth0, Name or IP: IP of Your Router</li>
+        <li>Outgoing interface: eth1, Name or IP: 192.168.90.10</li>
+      </ul>
+      Check the results for "8 packets transmitted, 8 received, <strong>0% packet loss</strong>"
+    </li>
+
+    <li>
+      Finally configure your software to use the network interface. This needs to be supported by your software!<br>
+      <a href="./grfx/qbittorrent_loopback.png"><img src="./grfx/qbittorrent_loopback-small.png" alt="qBittorrent Advanced Config screenshot"></a>
+    </li>
+  </ol>
+
+  <p>
+    <strong>Final Words</strong> I would not consider using this setup because you rely on the application to send your
+    data to the correct interface. Any bug in the code and your data may end up getting send out
+    the wrong interface....
+  </p>
+
+</div>
+
 <div id="pi_setup" class="section">
   <h2>PIA Tunnel on a Raspberry Pi</h2> <a href="#main_index">Back To Top</a>
   <p>
@@ -707,5 +780,32 @@
 
 </div>
 
+
+
+
+<div id="h_firewall" class="section">
+  <h2>Connection issues with new VMs</h2> <a href="#main_index">Back To Top</a>
+
+  <p>
+    Firewalls will sometimes interfere with outgoing communication until the outgoing traffic
+    is allowed to pass through. This tends to screw up the initial reset and setup procedure.
+  </p>
+
+  Below are a few things that should fix the condition. Try one and check if the problem persists.
+  <ul>
+    <li>
+      Delete the VM and redeploy with the primary network adapter set to "NAT". Some firewalls
+      can not handle bridged VM traffic, OnlineArmor is one of them.
+    </li>
+
+    <li>
+      Login to the command line and run pia-setup and pia-update manually.<br>
+      The root password is "pia" before you run the setup wizard or some random string afterwards.
+      Please use "Settings" =&amp; "Linux root Password" to change it.<br>
+      Now run the following commands and check the output for any error messages
+      <ul><li>pia-setup</li><li>pia-update</li></ul>
+    </li>
+  </ul>
+</div>
 </body>
 </html>
