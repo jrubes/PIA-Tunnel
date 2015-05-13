@@ -187,7 +187,7 @@ function disp_client_tools(){
 
   $ret = array();
   exec('/sbin/ip addr show '.$if_VLAN.' | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  $ret_arr['vlan_ip'] = $ret[0];
+  $ret_arr['vlan_ip'] = (array_key_exists(0, $ret)) ? $ret[0] : '';
   unset($ret);
 
   //offer download links to client tools
@@ -220,7 +220,7 @@ function disp_docu(){
 
   $ret = array();
   exec('/sbin/ip addr show '.$if_VLAN.' | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
-  $ret_arr['vlan_ip'] = $ret[0];
+  $ret_arr['vlan_ip'] = (array_key_exists(0, $ret)) ? $ret[0] : '';
   unset($ret);
 
   $disp_body .= '<h2>Support &amp; Documentation</h2>';

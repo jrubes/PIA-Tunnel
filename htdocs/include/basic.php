@@ -400,7 +400,16 @@ function VM_get_status( $output = 'html'){
   global $_services;
   $settings = $_settings->get_settings();
 
-  $ret_arr = array();
+  $ret_arr = array( 'vpn_public_lbl1' => '',
+                    'vpn_public_lbl2' => '',
+                    'vpn_public_ip' => '',
+                    'vpn_port' => '',
+                    'forwarding_lbl' => '',
+                    'forwarding_port' => '',
+                    'SOCKS_EXT_ENABLED' => '',
+                    );
+
+
 
 
   $sysload = get_system_load();
