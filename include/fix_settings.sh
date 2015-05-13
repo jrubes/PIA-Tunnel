@@ -22,14 +22,14 @@ if [ -z "${DAEMON_ENABLED}" ]; then
 fi
 
 if [ ! ${NAMESERVERS[0]+abc} ]; then
-  echo '# list of VPN connections to use, the first is awlays the primary' >> '/pia/settings.conf'
-  echo 'MYVPN[0]="CA Toronto"' >> '/pia/settings.conf'
-  echo 'MYVPN[1]="Switzerland"' >> '/pia/settings.conf'
-  echo 'MYVPN[2]="Sweden"' >> '/pia/settings.conf'
-  #echo 'MYVPN[3]="Romania"' >> '/pia/settings.conf'
-  #echo 'MYVPN[4]="Germany"' >> '/pia/settings.conf'
-  #echo 'MYVPN[5]="France"' >> '/pia/settings.conf'
-  #echo 'MYVPN[6]="Netherlands"' >> '/pia/settings.conf'
+  echo '# list of VPN connections to use, the first is always the primary' >> '/pia/settings.conf'
+  echo 'MYVPN[0]="PIAtcp/CA Toronto"' >> '/pia/settings.conf'
+  echo 'MYVPN[1]="PIAtcp/Switzerland"' >> '/pia/settings.conf'
+  echo 'MYVPN[2]="PIAtcp/Sweden"' >> '/pia/settings.conf'
+  #echo 'MYVPN[3]="PIAtcp/Romania"' >> '/pia/settings.conf'
+  #echo 'MYVPN[4]="PIAtcp/Germany"' >> '/pia/settings.conf'
+  #echo 'MYVPN[5]="PIAtcp/France"' >> '/pia/settings.conf'
+  #echo 'MYVPN[6]="PIAtcp/Netherlands"' >> '/pia/settings.conf'
 fi
 
 if [ -z "${SLEEP_INTERNET_DOWN}" ]; then
@@ -282,4 +282,13 @@ if [ ! ${FIREWALL_IF_SNMP[0]+abc} ]; then
 fi
 if [ ! ${FIREWALL_IF_SECSNMP[0]+abc} ]; then
   echo 'FIREWALL_IF_SECSNMP[0]=""' >> '/pia/settings.conf'
+fi
+
+
+
+ret=`grep -c "TRANSMISSION_ENABLED" /pia/settings.conf`
+if [ $ret = 0 ]; then
+  echo 'TRANSMISSION_ENABLED="no"' >> '/pia/settings.conf'
+  echo 'NETWORK_DRIVE_SMB=""' >> '/pia/settings.conf'
+  echo 'NETWORK_DRIVE_MP="/mnt/ndrive"' >> '/pia/settings.conf'
 fi

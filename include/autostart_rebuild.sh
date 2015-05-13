@@ -24,6 +24,20 @@ if [ "${DAEMON_ENABLED}" = 'yes' ]; then
     #cont="${cont}bash -c \"/pia/pia-start daemon\"\n"
 fi
 
+
+
+if [ "${TRANSMISSION_ENABLED}" = 'yes' ]; then
+    cont="${cont}transmission-daemon  -g /etc/transmission-daemon/\n"
+fi
+
+
+if [ "${NETWORK_DRIVE_SMB}" -ne "" ]; then
+    cont="${cont}mount -t cifs -o credentials=/pia/smbpasswd.conf,iocharset=utf8,noatime ${NETWORK_DRIVE_SMB} ${NETWORK_DRIVE_MP}\n"
+fi
+
+
+
+
 cont="${cont}\n"
 
 echo -e $cont > '/pia/include/autostart.conf'
