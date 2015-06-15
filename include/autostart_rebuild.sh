@@ -31,8 +31,8 @@ if [ "${TRANSMISSION_ENABLED}" = 'yes' ]; then
 fi
 
 
-if [ "${NETWORK_DRIVE_SMB}" -ne "" ]; then
-    cont="${cont}mount -t cifs -o credentials=/pia/smbpasswd.conf,iocharset=utf8,noatime ${NETWORK_DRIVE_SMB} ${NETWORK_DRIVE_MP}\n"
+if [ "${CIFS_AUTO}" = 'yes' ]; then
+    cont="${cont}mount -t cifs -o credentials=/pia/smbpasswd.conf,iocharset=utf8,noatime \"${CIFS_SHARE}\" \"${CIFS_MOUNT}\"\n"
 fi
 
 

@@ -6,7 +6,7 @@ export LANG
 # update system to latest first since transmission may depend on a latest lib
 /pia/system-update.sh
 
-apt-get install -y transmission-cli transmission-daemon
+apt-get install -y transmission-cli transmission-daemon cifs-utils
 
 # restart or start
 killall transmission-daemon

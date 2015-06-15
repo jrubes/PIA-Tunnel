@@ -105,6 +105,7 @@ switch($_REQUEST['cmd']){
       VPN_generate_interfaces();
       VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
       VPN_generate_socks_conf(); //create new danted.conf file
+      $_settings->cifs_auth();
       $_services->dhcpd_service_control();
       $_pia->rebuild_autostart();
       $disp_body .= "<div id=\"feedback\" class=\"feedback\">Settings updated</div>\n";
@@ -671,7 +672,6 @@ function disp_transmission_box(){
 
   $settings = $_settings->get_settings();
   $disp_body = '';
-  $fields = ''; //comma separate list of settings offered here
 
   $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>transmission client</h2>'."\n";
@@ -682,11 +682,20 @@ function disp_transmission_box(){
   $sel = array(
             'id' => 'TRANSMISSION_ENABLED',
             'selected' =>  $settings['TRANSMISSION_ENABLED'],
-            'onchange' => "toggle(this, 'cifs_share,cifs_user,cifs_password,network_mp', 'no', 'disabled', '');",
+            'onchange' => "toggle(this, 'CIFS_AUTO,CIFS_SHARE,CIFS_USER,CIFS_PASSWORD,CIFS_MOUNT', 'no', 'disabled', '');",
             array( 'yes', 'yes'),
             array( 'no', 'no')
           );
   $disp_body .= '<tr><td>Autostart transmission daemon </td><td>'.build_select($sel).'</td></tr>'."\n";
+
+  $GLOB_disp_network_default_fields .= 'CIFS_AUTO,';
+  $sel = array(
+            'id' => 'CIFS_AUTO',
+            'selected' =>  $settings['CIFS_AUTO'],
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>mount share on startup</td><td>'.build_select($sel).'</td></tr>'."\n";
 
 
   $GLOB_disp_network_default_fields .= 'CIFS_SHARE,CIFS_USER,CIFS_PASSWORD,CIFS_MOUNT,';

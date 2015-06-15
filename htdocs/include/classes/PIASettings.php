@@ -88,9 +88,15 @@ class PIASettings {
    */
   function save_settings( $setting, $value ){
 
+    //ensure paths use forward slashes
+    if( $setting === 'CIFS_SHARE' || $setting === 'CIFS_MOUNT' ){
+      $value = str_replace('\\', '/', $value);
+    }
+
+
     //escape slashes for 'sed' in pia-settings
     $value = str_replace(array('\\','/'), array('\\\\','\\/'), $value);
-    
+
     $k = escapeshellarg($setting);
     $v = escapeshellarg($value);
     exec("/pia/pia-settings $k $v");
@@ -430,6 +436,17 @@ function get_settings_array($name){
 
   if( count($ret) == 0 ){ return false; }
   return $ret;
+}
+
+
+/**
+ * update /pia/smbpasswd.conf
+ */
+function cifs_auth(){
+  $settings = $this->get_settings();
+  exec("echo username=\"".$settings['CIFS_USER']."\" > /pia/smbpasswd.conf" );
+  exec("echo password=\"".$settings['CIFS_PASSWORD']."\" >> /pia/smbpasswd.conf" );
+
 }
 
 }

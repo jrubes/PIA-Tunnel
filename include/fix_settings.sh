@@ -289,6 +289,7 @@ fi
 ret=`grep -c "TRANSMISSION_ENABLED" /pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'TRANSMISSION_ENABLED="no"' >> '/pia/settings.conf'
+  echo 'CIFS_AUTO="no"' >> '/pia/settings.conf'
   echo 'CIFS_SHARE=""' >> '/pia/settings.conf'
   echo 'CIFS_USER=""' >> '/pia/settings.conf'
   echo 'CIFS_PASSWORD=""' >> '/pia/settings.conf'
