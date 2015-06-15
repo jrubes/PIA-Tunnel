@@ -92,6 +92,10 @@ class PIASettings {
     if( $setting === 'CIFS_SHARE' || $setting === 'CIFS_MOUNT' ){
       $value = str_replace('\\', '/', $value);
     }
+    
+    if( $setting === 'CIFS_PASSWORD' ){
+      $value = $_SESSION['settings.conf']['CIFS_PASSWORD'];
+    }
 
 
     //escape slashes for 'sed' in pia-settings

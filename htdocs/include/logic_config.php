@@ -58,6 +58,36 @@ switch($_REQUEST['cmd']){
         break;
       }
 
+      if( array_key_exists('cifs_mount', $_POST ) === true && $_POST['cifs_mount'] != '' ){
+        $settings = $_settings->get_settings();
+        if( $_pia->is_mounted($settings['CIFS_MOUNT']) !== true )
+        {
+          $_pia->cifs_mount();
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">The drive has been mounted</div>\n";
+          $disp_body .= disp_network_default();
+          break;
+       }else{
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">The drive is already mounted</div>\n";
+          $disp_body .= disp_network_default();
+          break;
+       }
+      }
+
+      if( array_key_exists('cifs_umount', $_POST ) === true && $_POST['cifs_umount'] != '' ){
+        $settings = $_settings->get_settings();
+        if( $_pia->is_mounted($settings['CIFS_MOUNT']) === true )
+        {
+          $_pia->cifs_umount();
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">The drive has been unmounted</div>\n";
+          $disp_body .= disp_network_default();
+          break;
+       }else{
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">The drive is already unmounted</div>\n";
+          $disp_body .= disp_network_default();
+          break;
+       }
+      }
+
       if( array_key_exists('restart_dhcpd', $_POST) ){
         $ret = $_services->dhcpd_restart();
         if( $ret === true ){
@@ -714,9 +744,9 @@ function disp_transmission_box(){
 
 
   if( $_pia->is_mounted($settings['CIFS_MOUNT']) === true ){
-    $disp_body .= ' &nbsp; <input type="submit" name="unmount cifs" value="Unmount Drive">';
+    $disp_body .= ' &nbsp; <input type="submit" name="cifs_umount" value="Unmount Drive">';
   }else{
-    $disp_body .= ' &nbsp; <input type="submit" name="mount cifs" value="Mount Drive">';
+    $disp_body .= ' &nbsp; <input type="submit" name="cifs_mount" value="Mount Drive">';
   }
 
   $disp_body .= '</div>';

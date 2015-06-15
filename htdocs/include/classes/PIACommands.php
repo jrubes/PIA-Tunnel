@@ -356,7 +356,10 @@ function rand_string($lenth, $range=array('A','Z','a','z',0,9), $other='' ) {
 */
 }
 
-
+/**
+ * checks if "$mount_point" is mounted
+ * @return boolean true or false
+ */
 function is_mounted( $mount_point ){
 
   $ret = array();
@@ -368,6 +371,21 @@ function is_mounted( $mount_point ){
   }else{
     return false;
   }
+}
+
+
+/**
+ * mount the drive defined in settings
+ */
+function cifs_mount(){
+  exec('sudo /pia/include/cifs_mount.sh');
+}
+
+/**
+ * unmount the drive defined in settings
+ */
+function cifs_umount(){
+  exec('sudo /pia/include/cifs_umount.sh');
 }
 
 
