@@ -88,6 +88,9 @@ class PIASettings {
    */
   function save_settings( $setting, $value ){
 
+    //escape slashes for 'sed' in pia-settings
+    $value = str_replace(array('\\','/'), array('\\\\','\\/'), $value);
+    
     $k = escapeshellarg($setting);
     $v = escapeshellarg($value);
     exec("/pia/pia-settings $k $v");

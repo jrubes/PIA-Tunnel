@@ -665,19 +665,20 @@ function disp_pia_daemon_box_new(){
 }
 
 
-function disp_transmission_box($tokens){
+function disp_transmission_box(){
   global $_settings;
+  global $GLOB_disp_network_default_fields;
+
   $settings = $_settings->get_settings();
   $disp_body = '';
   $fields = ''; //comma separate list of settings offered here
 
   $disp_body .= '<div class="box options">';
-  $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnetwork" method="post">'."\n";
   $disp_body .= '<h2>transmission client</h2>'."\n";
-  $disp_body .= 'please check the webUI for the transmission torrent client for additional config options.';
+  $disp_body .= 'torrents may be stored on a shared network drive or a mounted drive';
   $disp_body .= "<table>\n";
 
-  $fields .= 'TRANSMISSION_ENABLED,';
+  $GLOB_disp_network_default_fields .= 'TRANSMISSION_ENABLED,';
   $sel = array(
             'id' => 'TRANSMISSION_ENABLED',
             'selected' =>  $settings['TRANSMISSION_ENABLED'],
@@ -688,17 +689,15 @@ function disp_transmission_box($tokens){
   $disp_body .= '<tr><td>Autostart transmission daemon </td><td>'.build_select($sel).'</td></tr>'."\n";
 
 
-  $disp_body .= '<tr><td>SMB/CIFS Share</td><td><input type="text" id="cifs_share" name="cifs_share" value="" placeholder="//192.168.1.10/Network/Share"></td></tr>'."\n";
-  $disp_body .= '<tr><td>SMB/CIFS Username</td><td><input type="text" id="cifs_user" name="cifs_user" value=""></td></tr>'."\n";
-  $disp_body .= '<tr><td>SMB/CIFS Password</td><td><input type="password" id="cifs_password" name="cifs_password" value="" placeholder="*****************"></td></tr>'."\n";
-  $disp_body .= '<tr><td>Local mount point</td><td><input type="text" id="network_mp" name="network_mp" value="" placeholder="/mnt/ndrive"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'CIFS_SHARE,CIFS_USER,CIFS_PASSWORD,CIFS_MOUNT,';
+  $disp_body .= '<tr><td>SMB/CIFS Share</td><td><input type="text" id="CIFS_SHARE" name="CIFS_SHARE" value="'.$settings['CIFS_SHARE'].'" placeholder="//192.168.1.10/Network/Share"></td></tr>'."\n";
+  $disp_body .= '<tr><td>SMB/CIFS Username</td><td><input type="text" id="CIFS_USER" name="CIFS_USER" value="'.$settings['CIFS_USER'].'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>SMB/CIFS Password</td><td><input type="password" id="CIFS_PASSWORD" name="CIFS_PASSWORD" value="" placeholder="*****************"></td></tr>'."\n";
+  $disp_body .= '<tr><td>Local mount point</td><td><input type="text" id="CIFS_MOUNT" name="CIFS_MOUNT" value="'.$settings['CIFS_MOUNT'].'" placeholder="/mnt/ndrive"></td></tr>'."\n";
 
 
   $disp_body .= "</table>\n";
-  $disp_body .= '<input type="hidden" name="store_fields" value="'.  rtrim($fields, ',').'">';
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
-  $disp_body .= '</form>';
   $disp_body .= '</div>';
 
   return $disp_body;

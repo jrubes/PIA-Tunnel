@@ -289,6 +289,8 @@ fi
 ret=`grep -c "TRANSMISSION_ENABLED" /pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'TRANSMISSION_ENABLED="no"' >> '/pia/settings.conf'
-  echo 'NETWORK_DRIVE_SMB=""' >> '/pia/settings.conf'
-  echo 'NETWORK_DRIVE_MP="/mnt/ndrive"' >> '/pia/settings.conf'
+  echo 'CIFS_SHARE=""' >> '/pia/settings.conf'
+  echo 'CIFS_USER=""' >> '/pia/settings.conf'
+  echo 'CIFS_PASSWORD=""' >> '/pia/settings.conf'
+  echo 'CIFS_MOUNT=""' >> '/pia/settings.conf'
 fi
