@@ -667,6 +667,7 @@ function disp_pia_daemon_box_new(){
 
 
 function disp_transmission_box(){
+  global $_pia;
   global $_settings;
   global $GLOB_disp_network_default_fields;
 
@@ -675,18 +676,23 @@ function disp_transmission_box(){
 
   $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>transmission client</h2>'."\n";
-  $disp_body .= 'torrents may be stored on a shared network drive or a mounted drive';
+  $disp_body .= 'torrents may be stored on a network or mounted drive';
   $disp_body .= "<table>\n";
 
   $GLOB_disp_network_default_fields .= 'TRANSMISSION_ENABLED,';
   $sel = array(
             'id' => 'TRANSMISSION_ENABLED',
             'selected' =>  $settings['TRANSMISSION_ENABLED'],
-            'onchange' => "toggle(this, 'CIFS_AUTO,CIFS_SHARE,CIFS_USER,CIFS_PASSWORD,CIFS_MOUNT', 'no', 'disabled', '');",
             array( 'yes', 'yes'),
             array( 'no', 'no')
           );
   $disp_body .= '<tr><td>Autostart transmission daemon </td><td>'.build_select($sel).'</td></tr>'."\n";
+
+  $GLOB_disp_network_default_fields .= 'CIFS_SHARE,CIFS_USER,CIFS_PASSWORD,CIFS_MOUNT,';
+  $disp_body .= '<tr><td>SMB/CIFS Share</td><td><input type="text" id="CIFS_SHARE" name="CIFS_SHARE" value="'.$settings['CIFS_SHARE'].'" placeholder="//192.168.1.10/Network/Share"></td></tr>'."\n";
+  $disp_body .= '<tr><td>SMB/CIFS Username</td><td><input type="text" id="CIFS_USER" name="CIFS_USER" value="'.$settings['CIFS_USER'].'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>SMB/CIFS Password</td><td><input type="password" id="CIFS_PASSWORD" name="CIFS_PASSWORD" value="" placeholder="*****************"></td></tr>'."\n";
+
 
   $GLOB_disp_network_default_fields .= 'CIFS_AUTO,';
   $sel = array(
@@ -695,18 +701,24 @@ function disp_transmission_box(){
             array( 'yes', 'yes'),
             array( 'no', 'no')
           );
-  $disp_body .= '<tr><td>mount share on startup</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>Mount share on startup</td><td>'.build_select($sel).'</td></tr>'."\n";
 
 
-  $GLOB_disp_network_default_fields .= 'CIFS_SHARE,CIFS_USER,CIFS_PASSWORD,CIFS_MOUNT,';
-  $disp_body .= '<tr><td>SMB/CIFS Share</td><td><input type="text" id="CIFS_SHARE" name="CIFS_SHARE" value="'.$settings['CIFS_SHARE'].'" placeholder="//192.168.1.10/Network/Share"></td></tr>'."\n";
-  $disp_body .= '<tr><td>SMB/CIFS Username</td><td><input type="text" id="CIFS_USER" name="CIFS_USER" value="'.$settings['CIFS_USER'].'"></td></tr>'."\n";
-  $disp_body .= '<tr><td>SMB/CIFS Password</td><td><input type="password" id="CIFS_PASSWORD" name="CIFS_PASSWORD" value="" placeholder="*****************"></td></tr>'."\n";
-  $disp_body .= '<tr><td>Local mount point</td><td><input type="text" id="CIFS_MOUNT" name="CIFS_MOUNT" value="'.$settings['CIFS_MOUNT'].'" placeholder="/mnt/ndrive"></td></tr>'."\n";
+  $mounted = ($_pia->is_mounted($settings['CIFS_MOUNT']) === true ) ? '<b>mounted</b>' : '<b>not mounted</b>';
+  $disp_body .= '<tr><td>Mount point ('.$mounted.')</td><td><input type="text" id="CIFS_MOUNT" name="CIFS_MOUNT" value="'.$settings['CIFS_MOUNT'].'" placeholder="/mnt/ndrive"></td></tr>'."\n";
 
 
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart transmission" value="Restart transmission">';
+
+
+  if( $_pia->is_mounted($settings['CIFS_MOUNT']) === true ){
+    $disp_body .= ' &nbsp; <input type="submit" name="unmount cifs" value="Unmount Drive">';
+  }else{
+    $disp_body .= ' &nbsp; <input type="submit" name="mount cifs" value="Mount Drive">';
+  }
+
   $disp_body .= '</div>';
 
   return $disp_body;

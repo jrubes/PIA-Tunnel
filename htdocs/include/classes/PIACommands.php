@@ -357,5 +357,19 @@ function rand_string($lenth, $range=array('A','Z','a','z',0,9), $other='' ) {
 }
 
 
+function is_mounted( $mount_point ){
+
+  $ret = array();
+  $mp = escapeshellarg($mount_point);
+  exec('mount | grep '.$mp ,$ret);
+
+  if( count($ret) > 0 ){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+
 }
 ?>

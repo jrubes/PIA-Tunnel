@@ -1002,7 +1002,7 @@ function build_select( &$content, $double=false ){
 
   $hash = $content['id'];//md5($content['id']); //hash this to avoid problems with MYVPN[0] and PHP
   $onchange = ( array_key_exists('onchange', $content) === true ) ? 'onchange="'.$content['onchange'].'"' : '';
-  $disabled = ( array_key_exists('disabled', $content) === true ) ? 'disabled' : '';
+  $disabled = ( array_key_exists('disabled', $content) === true && $content['disabled'] === 'disabled' ) ? 'disabled' : '';
   $head = '<select id="'.$hash.'" name="'.$hash."\" $onchange $disabled>\n";
 
   /* find out how many options need to be skipped */
