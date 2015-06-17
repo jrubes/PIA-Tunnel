@@ -63,7 +63,11 @@ switch($_REQUEST['cmd']){
         if( $_pia->is_mounted($settings['CIFS_MOUNT']) !== true )
         {
           $_pia->cifs_mount();
-          $disp_body .= "<div id=\"feedback\" class=\"feedback\">The drive has been mounted</div>\n";
+          if( $_pia->is_mounted($settings['CIFS_MOUNT']) === true ){
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">The drive has been mounted</div>\n";
+          }else{
+            $disp_body .= "<div id=\"feedback\" class=\"feedback\">ERROR: unable to mount the drive</div>\n";
+          }
           $disp_body .= disp_network_default();
           break;
        }else{

@@ -10,11 +10,6 @@ if [ "${mounted}" = "" ]; then
 
   if [ "${CIFS_AUTO}" = 'yes' ]; then
 
-    if [ "${CIFS_SHARE}" != "" ] && [ "${CIFS_MOUNT}" != "" ]; then
-      #apply firewall rules to allow CIFS traffic
-      /pia/include/cifs_fwopen.sh
-    fi
-
     /pia/include/cifs_mount.sh
 
     if [ "$?" != "0" ]; then
