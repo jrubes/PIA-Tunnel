@@ -716,10 +716,18 @@ function disp_transmission_box(){
             array( 'yes', 'yes'),
             array( 'no', 'no')
           );
-  $disp_body .= '<tr><td>Autostart transmission daemon </td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>Autostart transmission</td><td>'.build_select($sel).'</td></tr>'."\n";
 
-  $GLOB_disp_network_default_fields .= 'CIFS_SHARE,CIFS_USER,CIFS_PASSWORD,CIFS_MOUNT,';
-  $disp_body .= '<tr><td>SMB/CIFS Share</td><td><input type="text" id="CIFS_SHARE" name="CIFS_SHARE" value="'.$settings['CIFS_SHARE'].'" placeholder="//192.168.1.10/Network/Share"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'CIFS_INTERFACE,CIFS_SHARE,CIFS_USER,CIFS_PASSWORD,CIFS_MOUNT,';
+  $sel = array(
+            'id' => 'CIFS_INTERFACE',
+            'selected' =>  $settings['CIFS_INTERFACE'],
+            array( 'any', 'any'),
+            array( 'eth0', 'eth0'),
+            array( 'eth1', 'eth1')
+          );
+  $disp_body .= '<tr><td>SMB/CIFS Interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>SMB/CIFS Share</td><td><input type="text" class="long" id="CIFS_SHARE" name="CIFS_SHARE" value="'.$settings['CIFS_SHARE'].'" placeholder="//192.168.1.10/Network/Share"></td></tr>'."\n";
   $disp_body .= '<tr><td>SMB/CIFS Username</td><td><input type="text" id="CIFS_USER" name="CIFS_USER" value="'.$settings['CIFS_USER'].'"></td></tr>'."\n";
   $disp_body .= '<tr><td>SMB/CIFS Password</td><td><input type="password" id="CIFS_PASSWORD" name="CIFS_PASSWORD" value="" placeholder="*****************"></td></tr>'."\n";
 
@@ -734,8 +742,8 @@ function disp_transmission_box(){
   $disp_body .= '<tr><td>Mount share on startup</td><td>'.build_select($sel).'</td></tr>'."\n";
 
 
-  $mounted = ($_pia->is_mounted($settings['CIFS_MOUNT']) === true ) ? '<b>mounted</b>' : '<b>not mounted</b>';
-  $disp_body .= '<tr><td>Mount point ('.$mounted.')</td><td><input type="text" id="CIFS_MOUNT" name="CIFS_MOUNT" value="'.$settings['CIFS_MOUNT'].'" placeholder="/mnt/ndrive"></td></tr>'."\n";
+  $mounted = ($_pia->is_mounted($settings['CIFS_MOUNT']) === true ) ? '(<b>mounted</b>)' : '';
+  $disp_body .= '<tr><td>Mount point '.$mounted.'</td><td><input type="text" id="CIFS_MOUNT" name="CIFS_MOUNT" value="'.$settings['CIFS_MOUNT'].'" placeholder="/mnt/ndrive"></td></tr>'."\n";
 
 
   $disp_body .= "</table>\n";

@@ -294,4 +294,5 @@ if [ $ret = 0 ]; then
   echo 'CIFS_USER=""' >> '/pia/settings.conf'
   echo 'CIFS_PASSWORD=""' >> '/pia/settings.conf'
   echo 'CIFS_MOUNT=""' >> '/pia/settings.conf'
+  echo 'CIFS_INTERFACE="any"' >> '/pia/settings.conf'
 fi

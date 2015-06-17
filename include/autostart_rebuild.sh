@@ -26,13 +26,18 @@ fi
 
 
 
+#if [ "${TRANSMISSION_ENABLED}" = 'yes' ]; then
+#    cont="${cont}transmission-daemon  -g /etc/transmission-daemon/\n"
+#fi
+#if [ "${CIFS_AUTO}" = 'yes' ]; then
+#    cont="${cont}mount -t cifs -o credentials=/pia/smbpasswd.conf,iocharset=utf8,noatime \"${CIFS_SHARE}\" \"${CIFS_MOUNT}\"\n"
+#fi
+
 if [ "${TRANSMISSION_ENABLED}" = 'yes' ]; then
-    cont="${cont}transmission-daemon  -g /etc/transmission-daemon/\n"
+    cont="${cont}/pia/include/transmission-start.sh\n"
 fi
-
-
 if [ "${CIFS_AUTO}" = 'yes' ]; then
-    cont="${cont}mount -t cifs -o credentials=/pia/smbpasswd.conf,iocharset=utf8,noatime \"${CIFS_SHARE}\" \"${CIFS_MOUNT}\"\n"
+    cont="${cont}/pia/include/cifs_mount.sh\n"
 fi
 
 

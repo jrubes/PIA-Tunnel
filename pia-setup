@@ -156,6 +156,7 @@ FILES="$FILES sockd-dante-start.sh sockd-dante-status.sh sockd-dante-stop.sh soc
 FILES="$FILES dhcpd-service.sh functions.sh  ping.sh ovpn_kill.sh"
 FILES="$FILES sockd-3proxy-status.sh sockd-3proxy-start.sh sockd-3proxy-stop.sh"
 FILES="$FILES socks-start.sh socks-stop.sh socks-status.sh cifs_mount.sh cifs_umount.sh"
+FILES="$FILES transmission-start.sh transmission-install.sh"
 for f in $FILES
 do
 	chmod ug+x "/pia/include/$f"
