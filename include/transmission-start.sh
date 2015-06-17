@@ -8,17 +8,20 @@ mounted=`mount | grep "${CIFS_MOUNT}"`
 
 if [ "${mounted}" = "" ]; then
 
-  if [ "${TRANSMISSION_ENABLED}" = 'yes' ]; then
-      cont="${cont}\n"
-  fi
+  if [ "${CIFS_AUTO}" = 'yes' ]; then
 
+    if [ "${CIFS_SHARE}" != "" ] && [ "${CIFS_MOUNT}" != "" ]; then
+      #apply firewall rules to allow CIFS traffic
+      /pia/include/cifs_fwopen.sh
+    fi
 
-  /pia/include/cifs_mount.sh
+    /pia/include/cifs_mount.sh
 
-  if [ "$?" != "0" ]; then
-    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-	  "- error mounting drive"
-    exit 1
+    if [ "$?" != "0" ]; then
+      echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+        "- error mounting drive"
+      exit 1
+    fi
   fi
 fi
 
