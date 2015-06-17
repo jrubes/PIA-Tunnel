@@ -139,6 +139,7 @@ switch($_REQUEST['cmd']){
       VPN_generate_interfaces();
       VPN_generate_dhcpd_conf(); //create new dhcpd.conf file
       VPN_generate_socks_conf(); //create new danted.conf file
+      $_settings->tcupdate(); //update transmission config file
       $_settings->cifs_auth();
       $_services->dhcpd_service_control();
       $_pia->rebuild_autostart();

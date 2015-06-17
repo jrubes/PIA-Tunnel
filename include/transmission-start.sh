@@ -21,5 +21,9 @@ if [ "${mounted}" = "" ]; then
 fi
 
 
+if [ ! -d "$CIFS_MOUNT/incomplete" ]; then
+  # create incomplete directory. this is set in transmission-config.sh and is hard coded for now
+  mkdir -p "$CIFS_MOUNT/incomplete"
+fi
 
 transmission-daemon  -g /etc/transmission-daemon/

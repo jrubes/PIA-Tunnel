@@ -8,6 +8,10 @@ mounted=`mount | grep "${CIFS_MOUNT}"`
 
 if [ "${mounted}" = "" ]; then
 
+  if [ ! -d "${CIFS_MOUNT}" ]; then
+    mkdir -p "${CIFS_MOUNT}"
+  fi
+
   if [ "${CIFS_SHARE}" != "" ] && [ "${CIFS_MOUNT}" != "" ]; then
     #apply firewall rules to allow CIFS traffic
     /pia/include/cifs_fwopen.sh

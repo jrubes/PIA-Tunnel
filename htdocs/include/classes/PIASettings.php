@@ -92,7 +92,7 @@ class PIASettings {
     if( $setting === 'CIFS_SHARE' || $setting === 'CIFS_MOUNT' ){
       $value = str_replace('\\', '/', $value);
     }
-    
+
     if( $setting === 'CIFS_PASSWORD' ){
       $value = $_SESSION['settings.conf']['CIFS_PASSWORD'];
     }
@@ -451,6 +451,13 @@ function cifs_auth(){
   exec("echo username=\"".$settings['CIFS_USER']."\" > /pia/smbpasswd.conf" );
   exec("echo password=\"".$settings['CIFS_PASSWORD']."\" >> /pia/smbpasswd.conf" );
 
+}
+
+/**
+ * update transmission config file
+ */
+function tcupdate(){
+  exec('sudo /pia/include/transmission-config.sh');
 }
 
 }
