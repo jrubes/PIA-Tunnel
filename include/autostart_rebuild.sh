@@ -30,10 +30,6 @@ fi
 if [ "${CIFS_AUTO}" = 'yes' ]; then
     cont="${cont}/pia/include/cifs_mount.sh\n"
 fi
-# start torrent daemon
-if [ "${TRANSMISSION_ENABLED}" = 'yes' ]; then
-    cont="${cont}/pia/include/transmission-start.sh\n"
-fi
 
 
 

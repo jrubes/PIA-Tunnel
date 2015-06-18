@@ -101,13 +101,18 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 	    # show connection data
 	    echo_conn_established $filename
 
+	    #start firewall and enable forwarding
+	    /pia/pia-forward start quite
+
         #time to (re)start the proxy
         if [ "${SOCKS_EXT_ENABLED}" = 'yes' ] || [ "${SOCKS_INT_ENABLED}" = 'yes' ]; then
           /pia/include/socks-start.sh
         fi
 
-	    #start firewall and enable forwarding
-	    /pia/pia-forward start quite
+        # start torrent daemon
+        if [ "${TRANSMISSION_ENABLED}" = 'yes' ]; then
+            /pia/include/transmission-start.sh
+        fi
 
         # keep VPN up with daemon?
         if [ "$1" = "daemon" ]; then
@@ -140,4 +145,5 @@ else
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- no connection with name $filename."
   echo -e "\ttry ${bold}pia-start list${normal} for a list of connections."
+  exit 1
 fi

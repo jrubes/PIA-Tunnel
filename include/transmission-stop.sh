@@ -5,6 +5,7 @@ export LANG
 source '/pia/settings.conf'
 
 
+echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - killing transmission-daemon"
 killall transmission-daemon
 
 if [ "${CIFS_AUTO}" = 'yes' ]; then

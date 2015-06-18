@@ -741,7 +741,7 @@ function disp_transmission_box(){
 
   $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>transmission client</h2>'."\n";
-  $disp_body .= 'torrents may be stored on a network or mounted drive';
+  $disp_body .= 'don\'t change these while the transmission client is running!';
   $disp_body .= "<table>\n";
   $disabled = ($_pia->service_count('transmission-daemon') === true) ? 'disabled' : ''; //can not be changed if service is running
 

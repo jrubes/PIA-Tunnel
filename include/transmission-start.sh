@@ -35,4 +35,5 @@ if [ ! -z "${FIREWALL_IF_WEB[0]}" ]; then
   done
 fi
 
+echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - starting transmission-daemon"
 transmission-daemon  -g /etc/transmission-daemon/

@@ -9,6 +9,7 @@ source '/pia/settings.conf'
 
 if [ "$1" = "verbose" ]; then
 
+    /pia/include/transmission-stop.sh ; sleep 1
     /pia/include/socks-stop.sh
 
 	killall openvpn
@@ -22,6 +23,8 @@ if [ "$1" = "verbose" ]; then
 	ifdown eth1 && ifup eth1 #Debian
 
 else
+
+    /pia/include/transmission-stop.sh  &>/dev/null ; sleep 1
     /pia/include/socks-stop.sh &>/dev/null
 	killall openvpn &>/dev/null
 	/pia/pia-forward stop quite
