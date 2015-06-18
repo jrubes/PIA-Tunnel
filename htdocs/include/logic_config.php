@@ -49,7 +49,7 @@ switch($_REQUEST['cmd']){
         break;
       }
 
-      /* check for restart operations first */
+      /* check for restart operations first -- this needs to be cleaned up soon as it is getting out of hand .... very messy*/
       if( array_key_exists('restart_firewall', $_POST ) === true && $_POST['restart_firewall'] != '' ){
         $_services->firewall_fw('stop');
         $_services->firewall_fw('start');
@@ -87,6 +87,36 @@ switch($_REQUEST['cmd']){
           break;
        }else{
           $disp_body .= "<div id=\"feedback\" class=\"feedback\">The drive is already unmounted</div>\n";
+          $disp_body .= disp_network_default();
+          break;
+       }
+      }
+
+      if( array_key_exists('stop_transmission', $_POST ) === true && $_POST['stop_transmission'] != '' ){
+        $settings = $_settings->get_settings();
+        if( $_pia->service_count('transmission-daemon') === true )
+        {
+          $_pia->transmission_stop();
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">Killing transmission-daemon</div>\n";
+          $disp_body .= disp_network_default();
+          break;
+       }else{
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">transmission-daemon is not running</div>\n";
+          $disp_body .= disp_network_default();
+          break;
+       }
+      }
+
+      if( array_key_exists('start_transmission', $_POST ) === true && $_POST['start_transmission'] != '' ){
+        $settings = $_settings->get_settings();
+        if( $_pia->service_count('transmission-daemon') === false )
+        {
+          $_pia->transmission_start();
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">Starting transmission-daemon</div>\n";
+          $disp_body .= disp_network_default();
+          break;
+       }else{
+          $disp_body .= "<div id=\"feedback\" class=\"feedback\">transmission-daemon is already running</div>\n";
           $disp_body .= disp_network_default();
           break;
        }
@@ -713,8 +743,9 @@ function disp_transmission_box(){
   $disp_body .= '<h2>transmission client</h2>'."\n";
   $disp_body .= 'torrents may be stored on a network or mounted drive';
   $disp_body .= "<table>\n";
+  $disabled = ($_pia->service_count('transmission-daemon') === true) ? 'disabled' : ''; //can not be changed if service is running
 
-  $GLOB_disp_network_default_fields .= 'TRANSMISSION_ENABLED,';
+  $GLOB_disp_network_default_fields .= 'TRANSMISSION_ENABLED,TRANSMISSION_WHITELIST,TRANSMISSION_USER,TRANSMISSION_PASSWORD,TRANSMISSION_AUTH_REQUIRED,';
   $sel = array(
             'id' => 'TRANSMISSION_ENABLED',
             'selected' =>  $settings['TRANSMISSION_ENABLED'],
@@ -722,6 +753,17 @@ function disp_transmission_box(){
             array( 'no', 'no')
           );
   $disp_body .= '<tr><td>Autostart transmission</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>webUI whitelisted IPs</td><td><input type="text" '.$disabled.' class="long" id="TRANSMISSION_WHITELIST" name="TRANSMISSION_WHITELIST" value="'.$settings['TRANSMISSION_WHITELIST'].'"></td></tr>'."\n";
+  $sel = array(
+            'id' => 'TRANSMISSION_AUTH_REQUIRED',
+            'selected' =>  $settings['TRANSMISSION_AUTH_REQUIRED'],
+            'disabled' =>  $disabled,
+            array( 'true', 'enabled'),
+            array( 'false', 'disabled')
+          );
+  $disp_body .= '<tr><td>webUI authentication</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>webUI username</td><td><input type="text" '.$disabled.' id="TRANSMISSION_WHITELIST" name="TRANSMISSION_USER" value="'.$settings['TRANSMISSION_USER'].'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>webUI password</td><td><input type="text" '.$disabled.' id="TRANSMISSION_WHITELIST" name="TRANSMISSION_PASSWORD" value="" placeholder="**********"></td></tr>'."\n";
 
   $GLOB_disp_network_default_fields .= 'CIFS_INTERFACE,CIFS_SHARE,CIFS_USER,CIFS_PASSWORD,CIFS_MOUNT,';
   $sel = array(
@@ -753,8 +795,13 @@ function disp_transmission_box(){
 
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= ' &nbsp; <input type="submit" name="restart transmission" value="Restart transmission">';
 
+
+  if( $_pia->service_count('transmission-daemon') === true ){
+    $disp_body .= ' &nbsp; <input type="submit" name="stop_transmission" value="Stop transmission">';
+  }else{
+    $disp_body .= ' &nbsp; <input type="submit" name="start_transmission" value="Start transmission">';
+  }
 
   if( $_pia->is_mounted($settings['CIFS_MOUNT']) === true ){
     $disp_body .= ' &nbsp; <input type="submit" name="cifs_umount" value="Unmount Drive">';

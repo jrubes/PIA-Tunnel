@@ -295,4 +295,8 @@ if [ $ret = 0 ]; then
   echo 'CIFS_PASSWORD=""' >> '/pia/settings.conf'
   echo 'CIFS_MOUNT=""' >> '/pia/settings.conf'
   echo 'CIFS_INTERFACE="any"' >> '/pia/settings.conf'
+  echo 'TRANSMISSION_WHITELIST="127.0.0.1"' >> '/pia/settings.conf'
+  echo 'TRANSMISSION_USER="transmission"' >> '/pia/settings.conf'
+  echo 'TRANSMISSION_PASSWORD="transmission"' >> '/pia/settings.conf'
+  echo 'TRANSMISSION_AUTH_REQUIRED="true"' >> '/pia/settings.conf'
 fi

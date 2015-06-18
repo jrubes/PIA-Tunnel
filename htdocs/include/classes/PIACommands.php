@@ -47,6 +47,23 @@ class PIACommands {
     }
   }
 
+    /**
+   * returns the current status of a service by counting the output of ps
+   * @return boolean true if service is running, false if not
+   */
+  function service_count($service_name){
+
+    //check the return from screen -ls
+    $ex = array();
+    $esc = escapeshellarg($service_name);
+    exec('ps aux | grep -c '.$esc, $ex);
+    if( array_key_exists('0', $ex) === true && (int)$ex[0] > 2 ){ // 2 for command and grep itself
+      return true;
+    }else{
+      return false;
+    }
+  }
+
 
   /**
    * checks if iptables has forwarding enabled or not
@@ -386,6 +403,21 @@ function cifs_mount(){
  */
 function cifs_umount(){
   exec('sudo /pia/include/cifs_umount.sh');
+}
+
+
+/**
+ * killall transmission-daemon
+ */
+function transmission_stop(){
+  exec('sudo /pia/include/transmission-stop.sh');
+}
+
+/**
+ * start transmission-daemon
+ */
+function transmission_start(){
+  exec('sudo /pia/include/transmission-start.sh');
 }
 
 
