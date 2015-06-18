@@ -76,6 +76,10 @@ while true; do
 	    echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 		  "- VPN has failed, about to stop all FORWARDING!"
 	  fi
+      # terminate transmission to prevent traffic leaking out
+      /pia/include/transmission-stop.sh
+      echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")"- transmission daemon needs to be restart manually .... for now"
+
 	  # disable port forwarding and reset the firewall until this is fixed
 	  /pia/pia-forward stop quite
 	fi

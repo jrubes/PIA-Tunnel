@@ -3,6 +3,17 @@
 LANG=en_US.UTF-8
 export LANG
 source '/pia/settings.conf'
+source '/pia/include/functions.sh'
+
+# do not start if VPN is down
+ping_host_new "vpn"
+vpn_up=$RET_PING_HOST
+if [ "$RET_PING_HOST" != "OK" ]; then
+  echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+      "- VPN is down - refusing to start torrent client"
+  exit 1
+fi
+
 
 mounted=`mount | grep "${CIFS_MOUNT}"`
 
