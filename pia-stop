@@ -10,8 +10,16 @@ source '/pia/settings.conf'
 if [ "$1" = "verbose" ]; then
 
     /pia/include/transmission-stop.sh
-    /pia/include/socks-stop.sh
+    if [ "$?" != "0" ]; then
+      echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+          "- unable to terminate transmission daemon - this is serious"
+      echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+          "- closing the firewall and rebooting the system - NOW!"
+      /pia/include/fw-close.sh
+      reboot
+    fi
 
+    /pia/include/socks-stop.sh
 	killall openvpn
 
 	#disable forwarding
