@@ -58,6 +58,8 @@
 
   <li><a href="#client_setup_overview">Configure Client PC/Devices for your VPN connection</a></li>
 
+  <li><a href="#transmission_setup">Setup transmission daemon (torrent client) on the VM</a></li>
+
   <li>Running a Server or Torrent Client</li>
 
   <li>Starting your Torrent client with monitor.vbs</li>
@@ -591,6 +593,44 @@
       </div>
     </div>
 </div>
+
+
+<div id="transmission_setup" class="section">
+  <h2>Setup transmission daemon (torrent client) on the VM</h2> <a href="#main_index">Back To Top</a>
+  <p>
+    <strong>WARNING</strong> this feature is barely tested and could be quite dangerous to use!<br>
+    The idea behind PIA-Tunnel was to separate the computer accessing the VPN from the rest of the network.
+    This is done to prevent traffic from leaking out when the VPN is not connected.<br>
+    Installing transmission on the VM itself presents a problem when the VPN goes down and IF the firewall
+    rules are set back to the disconnected state. The firewall will allow traffic to exit on eth0 so the
+    torrent client may switch from tun0 to eth0 and traffic will now originate from your ISP, your IP!<br>
+    I have implemented a few security checks but have not done much testing - keep this in mind when you use this feature!<br>
+    The VPN stop scripts are currently checking for any running transmission-daemons and will not disconnect
+    the VPN until the process has ended. The VM will flush the firewall, deny ANY further traffic and reboot if the
+    torrent client fails to terminate. This <strong>should</strong> prevent any traffic from leaking ....<br>
+    These safety checks have been added to pia-daemon and pia-stop.
+  </p>
+
+  <p>
+    Looks like the warning above did not scare you off. Please report any issues or improvement suggestions.<br>
+    The VM is designed to be as small as possible so the idea is that you share some hard drive space
+    from a computer on your network and make it available as a Windows/SMB/CIFS share.<br>
+    The VM will connect to that network drive and use it to store the downloaded files.
+  </p>
+
+  <div>
+    <ul>
+      <li>Use the link "Install transmission-daemon", found in Settings, to start the installation process.
+          This will run a complete system update before installing transmission so it could take a while.
+          Please refresh the "Settings" page every now and then until you are presented with the configuration options.<br>
+          You may also run the installation manually by executing "/pia/include/transmission-install.sh"
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+
 
 
 
