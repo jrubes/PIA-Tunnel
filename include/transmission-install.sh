@@ -10,7 +10,7 @@ apt-get install -y transmission-cli transmission-daemon cifs-utils
 
 # make sure it is not running yet
 killall transmission-daemon
-update-rc.d transmission remove
+update-rc.d transmission-daemon remove
 
 
 reboot
