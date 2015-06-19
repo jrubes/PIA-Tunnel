@@ -8,6 +8,9 @@ export LANG
 
 apt-get install -y transmission-cli transmission-daemon cifs-utils
 
-# restart or start
+# make sure it is not running yet
 killall transmission-daemon
-transmission-daemon  -g /etc/transmission-daemon/
+update-rc.d transmission remove
+
+
+reboot

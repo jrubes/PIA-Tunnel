@@ -3,7 +3,9 @@
 # fix an issue caused by modifying /etc/init.d/open-vm-tools
 # added 19.06.2015 - remove after a few months
 rm /etc/init.d/open-vm-tools
+rm /etc/rc*.d/S01open-vm-tools
 yes '' | apt-get update
+yes '' | apt-get purge open-vm-tools
 yes '' | apt-get install open-vm-tools
 
 
