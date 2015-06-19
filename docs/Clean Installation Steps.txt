@@ -17,7 +17,7 @@ This is a cut and paste file so getting everything working should only take a fe
 
 
 
-50) 
+50)
 apt-get install -y psmisc openvpn dnsutils isc-dhcp-server vim git-core ntp open-vm-tools gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt sudo ca-certificates
 update-rc.d  ntp remove
 update-rc.d  mpt-statusd remove
@@ -28,11 +28,11 @@ addgroup vpnvm
 usermod -G vpnvm www-data
 usermod -G vpnvm root
 
-51)
-sed '/modprobe vmsync/d' -i /etc/rc*.d/S01open-vm-tools
-sed '/modprobe vmhgfs/d' -i /etc/rc*.d/S01open-vm-tools
-sed '/modprobe vmsync/d' -i /etc/init.d/open-vm-tools
-sed '/modprobe vmhgfs/d' -i /etc/init.d/open-vm-tools
+51) #don't do this step for now as it brakes apt-get upgrade ... I'll look into this later
+#sed '/modprobe vmsync/d' -i /etc/rc*.d/S01open-vm-tools
+#sed '/modprobe vmhgfs/d' -i /etc/rc*.d/S01open-vm-tools
+#sed '/modprobe vmsync/d' -i /etc/init.d/open-vm-tools
+#sed '/modprobe vmhgfs/d' -i /etc/init.d/open-vm-tools
 
 
 60)  avoid using SWAP

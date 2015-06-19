@@ -600,10 +600,13 @@
   <p>
     <strong>WARNING</strong> this feature is barely tested and could be quite dangerous to use!<br>
     The idea behind PIA-Tunnel was to separate the computer accessing the VPN from the rest of the network.
-    This is done to prevent traffic from leaking out when the VPN is not connected.<br>
+    This is done to prevent traffic from leaking out when the VPN is not connected.
+  </p>
+  <p>
     Installing transmission on the VM itself presents a problem when the VPN goes down and IF the firewall
     rules are set back to the disconnected state. The firewall will allow traffic to exit on eth0 so the
-    torrent client may switch from tun0 to eth0 and traffic will now originate from your ISP, your IP!<br>
+    torrent client may switch from tun0 to eth0 and traffic will now originate from your ISP, your IP!
+  <p>
     I have implemented a few security checks but have not done much testing - keep this in mind when you use this feature!<br>
     The VPN stop scripts are currently checking for any running transmission-daemons and will not disconnect
     the VPN until the process has ended. The VM will flush the firewall, deny ANY further traffic and reboot if the
@@ -620,10 +623,9 @@
 
   <div>
     <ul>
-      <li>Use the link "Install transmission-daemon", found in Settings, to start the installation process.
-          This will run a complete system update before installing transmission so it could take a while.
-          Please refresh the "Settings" page every now and then until you are presented with the configuration options.<br>
-          You may also run the installation manually by executing "/pia/include/transmission-install.sh"
+      <li>Click on the "Install transmission-daemon" link found under Settings to start the installation process.
+        This will run a complete system update before installing transmission and the VM will reboot once completed.<br>
+          You may also run the installation manually by executing "/pia/include/transmission-install.sh"<br>
       </li>
     </ul>
   </div>
