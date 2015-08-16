@@ -15,8 +15,10 @@
 <h1>PIA-Tunnel Documentation</h1>
 
 <p>
-  This documentation is work in progress. Some sections may not have been verified yet or are still
-  being tested.
+  This documentation is work in progress. Some sections have not been verified, need to be
+  spell checked or even rewritten. This document is also using very basic formatting to make
+  it easier to split it into sections later on.<br>
+  The pdf is no longer maintained so this page contains the latest information.
 </p>
 
 <div id="main_index" class="section">
@@ -627,6 +629,13 @@
         This will run a complete system update before installing transmission and the VM will reboot once completed.<br>
           You may also run the installation manually by executing "/pia/include/transmission-install.sh"<br>
       </li>
+      <li>
+        The settings page will show additional configuration options once the transmission client has been installed.
+        Please enter the login information for the network share where transmission client will store
+        the downloaded files.<br>
+        Alternatively, you may mount the network share yourself and only enter the local mount point for your network share.<br>
+        PIA-Tunnel will attempt to connect your network share if it is not mounted when the transmission client is started.
+      </li>
     </ul>
   </div>
 </div>
@@ -843,7 +852,7 @@
     <li>
       Login to the command line and run pia-setup and pia-update manually.<br>
       The root password is "pia" before you run the setup wizard or some random string afterwards.
-      Please use "Settings" =&amp; "Linux root Password" to change it.<br>
+      Please use "Settings" =&gt; "Linux root Password" to change it.<br>
       Now run the following commands and check the output for any error messages
       <ul><li>pia-setup</li><li>pia-update</li></ul>
     </li>
