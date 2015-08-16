@@ -11,8 +11,4 @@
 - pkgng: name="open-vm-tools-nox11"
 - pkgng: name="gawk"
 - pkgng: name="curl"
-- pkgng: name="lighttpd"
-- pkgng: name="php56"
-- pkgng: name="php56-curl"
-- pkgng: name="php56-mcrypt"
 - pkgng: name="sudo"

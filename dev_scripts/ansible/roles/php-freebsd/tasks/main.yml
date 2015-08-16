@@ -1,0 +1,8 @@
+---
+# install php56 
+
+- pkgng: name="php56"
+- pkgng: name="php56-curl"
+- pkgng: name="php56-mcrypt"
+
+
