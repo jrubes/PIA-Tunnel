@@ -1,0 +1,19 @@
+---
+# vm tools tasks
+
+- pkgng: name="virtualbox-ose"
+
+
+- shell: grep -q "vboxdrv_load" /boot/loader.conf || echo 'vboxdrv_load="YES"' >> /boot/loader.conf 
+
+- user: name=root groups=vboxusers
+
+
+- name: enable bridge networking
+  shell: grep -q "vboxnet_enable" /etc/rc.conf || echo 'vboxnet_enable="YES"' >> /etc/rc.conf
+
+# USB Support
+- user: name=root groups=operator
+- template: src=devfs.rules dest=/etc/devfs.rules
+
+

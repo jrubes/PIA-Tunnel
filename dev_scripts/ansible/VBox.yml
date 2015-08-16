@@ -1,0 +1,8 @@
+---
+- name: setup a PIA-Tunnel freeBSD system 
+  hosts: pia-tunnel-freebsd 
+  remote_user: root
+
+  roles:
+    - virtualbox-freebsd 
+

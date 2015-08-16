@@ -1,0 +1,15 @@
+---
+# vm tools tasks
+
+- pkgng: name="open-vm-tools-nox11"
+
+
+- shell: grep -q "vmware_guest_vmblock_enable" /etc/rc.conf || echo 'vmware_guest_vmblock_enable="YES"' >> /etc/rc.conf
+
+- shell: grep -q "vmware_guest_vmhgfs_enable" /etc/rc.conf || echo 'vmware_guest_vmhgfs_enable="YES"' >> /etc/rc.conf
+
+- shell: grep -q "vmware_guest_vmmemctl_enable" /etc/rc.conf || echo 'vmware_guest_vmmemctl_enable="YES"' >> /etc/rc.conf
+
+- shell: grep -q "vmware_guest_vmxnet_enable" /etc/rc.conf || echo 'vmware_guest_vmxnet_enable="YES"' >> /etc/rc.conf
+
+- shell: grep -q "vmware_guestd_enable" /etc/rc.conf || echo 'vmware_guestd_enable="YES"' >> /etc/rc.conf

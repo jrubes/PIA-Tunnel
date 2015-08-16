@@ -1,0 +1,18 @@
+---
+# common tasks
+
+- pkgng: name="vim" state=present cached="no"
+
+- pkgng: name="openvpn"
+- pkgng: name="dnsutl"
+- pkgng: name="isc-dhcp43-server"
+- pkgng: name="git"
+- pkgng: name="ntp"
+- pkgng: name="open-vm-tools-nox11"
+- pkgng: name="gawk"
+- pkgng: name="curl"
+- pkgng: name="lighttpd"
+- pkgng: name="php56"
+- pkgng: name="php56-curl"
+- pkgng: name="php56-mcrypt"
+- pkgng: name="sudo"
