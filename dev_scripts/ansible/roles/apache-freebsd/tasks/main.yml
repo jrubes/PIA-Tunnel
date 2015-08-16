@@ -4,4 +4,5 @@
 - pkgng: name="apache24"
 
 - shell: grep -q "apache24_enable" /etc/rc.conf || echo 'apache24_enable="YES"' >> /etc/rc.conf
+  notify: restart apache24
 
