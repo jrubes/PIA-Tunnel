@@ -33,6 +33,6 @@
 
 - shell: pw groupshow vpnvm | grep -q "vpnvm:" && pw groupmod vpnvm -m root,www 
 
-- shell: "[ ! -f /bin/bash ] && ln -s /usr/local/bin/bash /bin/bash"
+- shell: "[ ! -f /bin/bash ] && ln -s /usr/local/bin/bash /bin/bash || exit 0"
 
 
