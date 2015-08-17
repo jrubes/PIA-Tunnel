@@ -755,7 +755,7 @@
         lighttpd-enable-mod fastcgi fastcgi-php
         /etc/init.d/lighttpd force-reload
         addgroup vpnvm
-        usermod -G vpnvm www-data
+        usermod -G vpnvm www
         usermod -G vpnvm root
         echo "0" > /proc/sys/vm/swappiness
       </pre>
@@ -782,14 +782,14 @@
     <li>
       Add the following to line 21 in /etc/sudoers
       <pre>
-        www-data ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown
+        www ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown
       </pre>
     </li>
 
     <li>
       Almost done. Time to pull the PIA Tunnel scripts .... this will take a bit
       <pre>
-        mkdir /usr/local/pia ; chown -R root.root /usr/local/pia ; chmod -R og-rwx /usr/local/pia;
+        mkdir /usr/local/pia ; chown -R root:root /usr/local/pia ; chmod -R og-rwx /usr/local/pia;
         git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia
         cd /usr/local/pia ; git checkout release_php-gui
       </pre>

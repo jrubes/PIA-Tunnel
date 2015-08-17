@@ -25,7 +25,7 @@ update-rc.d lighttpd enable
 lighttpd-enable-mod fastcgi fastcgi-php
 /etc/init.d/lighttpd force-reload
 addgroup vpnvm
-usermod -G vpnvm www-data
+usermod -G vpnvm www
 usermod -G vpnvm root
 
 51) #don't do this step for now as it brakes apt-get upgrade ... I'll look into this later
@@ -153,11 +153,11 @@ OR this is how I created the package in /usr/local/pia/extra_software/
 
 130) vi /etc/sudoers
   Add this on line 21
-    www-data ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown
+    www ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown
 
 
 140)
-mkdir /usr/local/pia ; chown -R root.root /usr/local/pia ; chmod -R og-rwx /usr/local/pia;
+mkdir /usr/local/pia ; chown -R root:root /usr/local/pia ; chmod -R og-rwx /usr/local/pia;
 git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia
 cd /usr/local/pia ; git checkout release_php-gui
 

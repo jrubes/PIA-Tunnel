@@ -56,7 +56,7 @@ function disp_tc_ui(){
   $ret .= '<h2>Traffic Control Utility</h2>';
   $ret .= '<noscript><strong>The utility requires javascript. You may use the command line instead</strong></noscript>';
   $ret .= '<p>This will be a hidden tool until I figure it out how to present the options in a UI.<br>'
-          . 'You need to add ",/sbin/tc" to the end of the line for "www-data" in /etc/sudoers</p>';
+          . 'You need to add ",/sbin/tc" to the end of the line for "www" in /etc/sudoers</p>';
 
   $ret .= ' <input id="btn_add" type="button" href="#" onclick="send_ping();" name="ping it" value="Add Rules" disabled>';
   $ret .= '<div id="tcfeedback"></div>';

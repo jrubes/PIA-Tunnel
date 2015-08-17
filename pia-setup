@@ -187,7 +187,7 @@ if [ ! -f '/usr/local/pia/ip_list.txt' ]; then
 	  "- ip_list.txt does not exist - rebuilding!"
 	echo -e "\tthis will take a couple of minutes...."
 	/usr/local/pia/include/build_ping_list.sh
-    chown -R root.vpnvm /usr/local/pia/ip_list.txt
+    chown -R root:vpnvm /usr/local/pia/ip_list.txt
     chmod 0660 /usr/local/pia/ip_list.txt
 fi
 
@@ -199,7 +199,7 @@ rm -f /var/www/monitor-windows.zip
 cd /usr/local/pia/client_scripts ; zip -r /var/www/monitor-windows.zip monitor-windows/ &> /dev/null
 cp "/usr/local/pia/docs/PIA-Tunnel Documentation.pdf" /var/www/pia-tunnel_documentation.pdf &> /dev/null
 mkdir -p /var/www/docs/ ; cp -r "/usr/local/pia/docs/HTML Manual/"* /var/www/docs/
-chown -R www-data.www-data /var/www
+chown -R www:www /var/www
 find /var/www -type d -exec chmod 0750 {} \;
 find /var/www -type f -exec chmod 0640 {} \;
 
@@ -243,12 +243,12 @@ fi
 
 if [ ! -d "/usr/local/pia/cache/" ]; then
   mkdir /usr/local/pia/cache/
-  chown -R root.vpnvm /usr/local/pia/cache/
+  chown -R root:vpnvm /usr/local/pia/cache/
   chmod 0770 /usr/local/pia/cache/
 fi
 
 
 #ALWAYS RUN THIS LAST
-chown -R root.vpnvm /usr/local/pia
+chown -R root:vpnvm /usr/local/pia
 chmod 0770 /usr/local/pia
 chmod -R o-rwx /usr/local/pia
