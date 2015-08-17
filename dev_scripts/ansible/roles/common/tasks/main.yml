@@ -1,7 +1,6 @@
 ---
 # common tasks
 
-
 - name: creating /usr/local/pia 
   file: path=/usr/local/pia state=directory owner=root group=wheel mode=0700
 

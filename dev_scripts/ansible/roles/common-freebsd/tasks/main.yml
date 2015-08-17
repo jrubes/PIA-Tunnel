@@ -27,6 +27,12 @@
 - name: add fstab entries for bash 
   shell: "grep -q '/dev/fd' /etc/fstab || echo 'fdesc    /dev/fd    fdescfs    rw    0  0' >> /etc/fstab"
 
-
-
 - template: src=pia-autostart.sh dest=/usr/local/etc/rc.d/pia-autostart owner=root group=wheel mode=0755
+
+- shell: grep -q 'vpnwm' /etc/group || pw groupadd vpnwm -M root,www
+
+- shell: pw groupshow vpnwm | grep -q "vpnwm:" && pw groupmod vpnwm -m root,www 
+
+- shell: "[ ! -f /bin/bash ] && ln -s /usr/local/bin/bash /bin/bash"
+
+
