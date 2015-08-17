@@ -10,119 +10,24 @@ find /usr/local/pia -type d -exec chmod 0770 {} \;
 find /usr/local/pia -type f -exec chmod 0660 {} \;
 
 
-# the ping functions now require dig
-if [ ! -f "/usr/bin/dig" ]; then
-	apt-get -y install dnsutils > /dev/null
-fi
-# add php5-cli for pia-daemon 2.0
-if [ ! -f "/usr/bin/php" ]; then
-    apt-get -y install php5-cli php5-curl
-fi
-# add zip
-if [ ! -f "/usr/bin/zip" ]; then
-    apt-get -y install zip unzip
-fi
-
-
-#install Dante SOCKS 5 Proxy
-if [ ! -f "/usr/sbin/sockd" ]; then
-
-  #check for correct CPU architecture - can't get the above code to work so let's hack it
-  CPU_type=`uname -m`
-  if [ "$CPU_type" = "i686" ]; then
-    cp /usr/local/pia/extra_software/dante-1.4.1-bin.tar.xz /tmp/dante-1.4.1-bin.tar.xz
-
-  elif [ "$CPU_type" = "armv6l" ]; then #WATCH OUT this is armv6L
-    cp /usr/local/pia/extra_software/dante-1.4.1-arm-bin.tar.xz /tmp/dante-1.4.1-bin.tar.xz
-
-  else
-    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-      "- no precompiled package for your CPU architecture found ($CPU_type)"
-  fi
-
-  if [ -f /tmp/dante-1.4.1-bin.tar.xz ]; then
-    xz -d /tmp/dante-1.4.1-bin.tar.xz ; tar -xf /tmp/dante-1.4.1-bin.tar -C /tmp/
-    cp -r /tmp/dante-1.4.1-bin/* /usr/
-    rm /tmp/dante-1.4.1-bin.tar ; rm -rf /tmp/dante-1.4.1-bin
-  else
-    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-      "- SOCKS5 binaries where NOT setup! This feature will not work."
-  fi
-
-else
-  #update existing dante - came after ARM release so no need to check right now
-  DANTE_VERSION=`/usr/sbin/sockd -v | gawk -F" " '{print $2}'`
-  if [ "$DANTE_VERSION" = "v1.4.0." ]; then
-    if [ -f "/usr/local/pia/extra_software/dante-1.4.1-bin.tar.xz" ]; then
-      cp /usr/local/pia/extra_software/dante-1.4.1-bin.tar.xz /tmp/
-      xz -d /tmp/dante-1.4.1-bin.tar.xz ; tar -xf /tmp/dante-1.4.1-bin.tar -C /tmp/
-      cp -r /tmp/dante-1.4.1-bin/* /usr/
-      rm /tmp/dante-1.4.1-bin.tar ; rm -rf /tmp/dante-1.4.1-bin
-    else
-      echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-        "- dante-1.4.1-bin.tar.xz not found. Please run pia-update!"
-    fi
-  fi
-fi
-
-
-#install 3proxy SOCKS5
-if [ ! -f "/usr/sbin/socks" ]; then
-
-  #check for correct CPU architecture - can't get the above code to work so let's hack it
-  CPU_type=`uname -m`
-  if [ "$CPU_type" = "i686" ]; then
-    mkdir -p /tmp/3proxy/
-    cp /usr/local/pia/extra_software/3proxy-0.7.1.2-socks-i686.tar.xz /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz
-
-  elif [ "$CPU_type" = "armv6l" ]; then #WATCH OUT this is armv6L
-    mkdir -p /tmp/3proxy/
-    cp /usr/local/pia/extra_software/3proxy-0.7.1.2-socks-arm.tar.xz /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz
-
-  else
-    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-      "- no precompiled package for your CPU architecture found ($CPU_type)"
-  fi
-
-  if [ -f /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz ]; then
-    xz -d /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz ; tar -xf /tmp/3proxy/3proxy-0.7.1.2-socks.tar -C /tmp/3proxy/
-    cp -r /tmp/3proxy/socks /usr/sbin
-    rm -rf /tmp/3proxy
-  else
-    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-      "- SOCKS5 binaries where NOT setup! This feature will not work."
-  fi
-fi
-
-
-#remove /bin/bash from sudoers
-pos=`grep -n '/bin/bash,/sbin/shutdown' /etc/sudoers | gawk -F":" '{print $1}'`
-if [ ! -z "$pos" ]; then
-  sed -i /etc/sudoers -e "$pos"'s!\/bin\/bash,!!'
-  if [ "$?" != "0" ]; then
-    echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-      "- unable to remove bash entry from sudoers. you can fix this by getting the latest VM image."
-  fi
-fi
-
 
 #create a fresh settings file
 if [ ! -f "/usr/local/pia/settings.conf" ]; then
-	echo '#!/bin/bash' > '/usr/local/pia/settings.conf'
-	echo 'LANG=en_US.UTF-8' >> '/usr/local/pia/settings.conf'
-	echo 'export LANG' >> '/usr/local/pia/settings.conf'
-	echo '' >> '/usr/local/pia/settings.conf'
-	echo '' >> '/usr/local/pia/settings.conf'
-	echo '# interface and network settings' >> '/usr/local/pia/settings.conf'
-	echo '#####' >> '/usr/local/pia/settings.conf'
-	echo '# name of your external interface. this connects to the Internet/Router' >> '/usr/local/pia/settings.conf'
-	echo 'IF_EXT="eth0"' >> '/usr/local/pia/settings.conf'
-	echo '# name of your internal interface. this if for the private VM network' >> '/usr/local/pia/settings.conf'
-	echo 'IF_INT="eth1"' >> '/usr/local/pia/settings.conf'
-	echo '# name of your VPN interface' >> '/usr/local/pia/settings.conf'
-	echo 'IF_TUNNEL="tun0"' >> '/usr/local/pia/settings.conf'
-	echo '# IP of target computer for port forwarding - if supported by location' >> '/usr/local/pia/settings.conf'
-	echo 'FORWARD_IP="192.168.10.100"' >> '/usr/local/pia/settings.conf'
+    echo '#!/bin/bash' > '/usr/local/pia/settings.conf'
+    echo 'LANG=en_US.UTF-8' >> '/usr/local/pia/settings.conf'
+    echo 'export LANG' >> '/usr/local/pia/settings.conf'
+    echo '' >> '/usr/local/pia/settings.conf'
+    echo '' >> '/usr/local/pia/settings.conf'
+    echo '# interface and network settings' >> '/usr/local/pia/settings.conf'
+    echo '#####' >> '/usr/local/pia/settings.conf'
+    echo '# name of your external interface. this connects to the Internet/Router' >> '/usr/local/pia/settings.conf'
+    echo 'IF_EXT="eth0"' >> '/usr/local/pia/settings.conf'
+    echo '# name of your internal interface. this if for the private VM network' >> '/usr/local/pia/settings.conf'
+    echo 'IF_INT="eth1"' >> '/usr/local/pia/settings.conf'
+    echo '# name of your VPN interface' >> '/usr/local/pia/settings.conf'
+    echo 'IF_TUNNEL="tun0"' >> '/usr/local/pia/settings.conf'
+    echo '# IP of target computer for port forwarding - if supported by location' >> '/usr/local/pia/settings.conf'
+    echo 'FORWARD_IP="192.168.10.100"' >> '/usr/local/pia/settings.conf'
     echo '# Enable/Disable forwarding yes/no' >> '/usr/local/pia/settings.conf'
     echo 'FORWARD_PORT_ENABLED="no"' >> '/usr/local/pia/settings.conf'
     echo '# Enable/Disable forwarding for public LAN yes/no' >> '/usr/local/pia/settings.conf'
@@ -134,17 +39,17 @@ if [ ! -f "/usr/local/pia/settings.conf" ]; then
     echo '# Enable web on the following interfaces' >> '/usr/local/pia/settings.conf'
     echo 'FIREWALL_IF_WEB[0]="eth0"' >> '/usr/local/pia/settings.conf'
     echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/usr/local/pia/settings.conf'
-	echo '' >> '/usr/local/pia/settings.conf'
+    echo '' >> '/usr/local/pia/settings.conf'
 fi
 
 FILES="pia-start pia-stop pia-status pia-update pia-settings"
 FILES="$FILES pia-setup pia-forward  pia-prepare-ovpn pia-daemon"
 for f in $FILES
 do
-	if [ -f "/bin/$f" ]; then
-		rm "/bin/$f"
+	if [ -f "/sbin/$f" ]; then
+		rm "/sbin/$f"
 	fi
-	ln -s "/usr/local/pia/$f" "/bin/$f"
+	ln -s "/usr/local/pia/$f" "/sbin/$f"
 	chmod ug+x "/usr/local/pia/$f"
 done
 
@@ -194,8 +99,8 @@ fi
 
 #update files in /var/www
 cp -r /usr/local/pia/htdocs/* /var/www
-rm -f /var/www/README.txt
-rm -f /var/www/monitor-windows.zip
+if [ -f /var/www/docs/README.txt ]; then rm -f /var/www/docs/README.txt; fi
+if [ -f /var/www/docs/monitor-windows.zip ]; then rm -f /var/www/docs/monitor-windows.zip ; fi
 cd /usr/local/pia/client_scripts ; zip -r /var/www/monitor-windows.zip monitor-windows/ &> /dev/null
 cp "/usr/local/pia/docs/PIA-Tunnel Documentation.pdf" /var/www/pia-tunnel_documentation.pdf &> /dev/null
 mkdir -p /var/www/docs/ ; cp -r "/usr/local/pia/docs/HTML Manual/"* /var/www/docs/
@@ -205,31 +110,6 @@ find /var/www -type f -exec chmod 0640 {} \;
 
 # clear webUI update cache
 rm -rf "/usr/local/pia/cache/webui-update_status.txt"
-
-
-# add "automatic update" cronjob - remove these soon
-#crontab -l > /tmp/crontab.piaout
-#ret=`grep -c "apt-get upgrade" /tmp/crontab.piaout`
-#if [ $ret = 0 ]; then
-#  echo '00 04 * * * apt-get update -y ; apt-get upgrade -y' >> '/tmp/crontab.piaout'
-#  crontab /tmp/crontab.piaout
-#  rm /tmp/crontab.piaout
-#fi
-
-# change "automatic update" to every 8 hours
-crontab -l > /tmp/crontab.piaout
-ret1=`grep -c "00 04 \* \* \* apt-get update -y ; apt-get upgrade -y" /tmp/crontab.piaout`
-ret2=`grep -c "00 8/\* \* \* \* /usr/local/pia/system-update.sh" /tmp/crontab.piaout`
-if [ $ret1 = 1 ] && [ $ret2 = 0 ]; then
-  pos=`grep -n '00 04 \* \* \* apt-get update -y' /tmp/crontab.piaout | gawk -F":" '{print $1}'`
-  sed -i".tmp" "${pos}d" /tmp/crontab.piaout
-  echo '00 8/* * * * /usr/local/pia/system-update.sh' >> '/tmp/crontab.piaout'
-  crontab /tmp/crontab.piaout
-  rm /tmp/crontab.piaout
-else
-  #echo "already up to date"
-  rm /tmp/crontab.piaout
-fi
 
 
 # move login.conf to login-pia.conf

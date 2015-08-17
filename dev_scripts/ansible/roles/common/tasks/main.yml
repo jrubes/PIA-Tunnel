@@ -10,4 +10,4 @@
 - name: checking out release_php-gui
   shell: cd /usr/local/pia ; git checkout {{ git_branch }}
 
-
+- cron: name="system update" user=root minute="0" hour="*/8" job="/usr/local/pia/system-update.sh"
