@@ -11,10 +11,17 @@ RET_FORWARD_STATE="FUCK"
 RET_GET_PACKET_LOSS=""
 
 # WARNING DO NOT CHANGE the ping command! ping_host uses sed to modify the string
-PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
-#PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\" | gawk -F\",\" '{print \$3}' | gawk -F \"%\" '{print \$1}' | tr -d ' '"
-PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\""
-
+PING_VER=`ping -V > /dev/null 2>&1`
+if [ $? -eq 0 ]; then
+	#Debian
+	PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
+	#PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\" | gawk -F\",\" '{print \$3}' | gawk -F \"%\" '{print \$1}' | tr -d ' '"
+	PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\""
+else
+	#FreeBSD
+        PING_COMMAND="ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
+        PING_PACKET_LOSS="ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | grep \"packet loss\""
+fi
 
 # fallback list
 PING_IP_LIST[0]="8.8.8.8"
@@ -631,8 +638,11 @@ function interface_exists() {
     return
   fi
 
-  check=`ip addr show $1 2>&1 | grep -c "does not exist"`
-  if [ "$check" = "0" ]; then
+  
+  #check=`ip addr show $1 2>&1 | grep -c "does not exist"`
+  check=`ifconfig $1 >/dev/null 2>&1`
+  #if [ "$check" = "0" ]; then
+  if [ $? -eq 0 ]; then
     RET_INTERFACE_EXISTS="yes"
     return
   else
@@ -689,13 +699,13 @@ function ping_host_new() {
 		pingthis=$PING_PACKET_LOSS
 	fi
 
-
   if [ "$1" = "internet" ]; then
     #replace IP in $PING_COMMAND with $host_ip
     pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
     pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_EXT/g"`
     PING_RESULT=`eval $pingthis`
     #echo "$pingthis"
+    #echo "$PING_RESULT"
     #exit
 
   elif [ "$1" = "vpn" ]; then
@@ -703,6 +713,7 @@ function ping_host_new() {
     pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_TUNNEL/g"`
     PING_RESULT=`eval $pingthis`
     #echo "$pingthis"
+    #echo "$PING_RESULT"
     #exit
 
   else
@@ -720,6 +731,10 @@ function ping_host_new() {
   #retrieve return of ping
   get_packet_loss "$PING_RESULT"
   PING_RESULT="$RET_GET_PACKET_LOSS"
+
+  #Debug
+  #echo "$PING_RESULT"
+  #exit
 
   # see if the ping failed or is OK
   if [ "$PING_RESULT" = "" ]; then
@@ -791,14 +806,17 @@ function get_packet_loss(){
     passed=$1
     unset RET_GET_PACKET_LOSS
 
-    ret=`echo "$passed" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | tr -d ' '`
+    #Debian returns 0%
+    #ret=`echo "$passed" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | tr -d ' '`
+    # BSD returns as 0.0%
+    ret=`echo "$passed" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | gawk -F "." '{print \$1}' | tr -d ' '`
     errors=`echo "$ret" | grep -c "errors"`
 
     if [ "$errors" = "0" ]; then
         RET_GET_PACKET_LOSS=$ret
     else
         #failure string detected, run grep again
-        RET_GET_PACKET_LOSS=`echo "$passed" | gawk -F"," '{print \$4}' | gawk -F "%" '{print \$1}' | tr -d ' '`
+	RET_GET_PACKET_LOSS=`echo "$passed" | gawk -F"," '{print \$4}' | gawk -F "%" '{print \$1}' | tr -d ' '`
     fi
     return
 }
