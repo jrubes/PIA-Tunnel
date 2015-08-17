@@ -133,6 +133,9 @@ fi
 echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
   "- stored $ip_count IPs in ip_list.txt"
 
+# set correct permissions
+chown -R root:vpnvm /usr/local/pia/ip_list.txt
+chmod 0660 /usr/local/pia/ip_list.txt
 
 
 #reset packet loss
