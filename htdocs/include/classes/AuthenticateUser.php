@@ -24,7 +24,7 @@ class AuthenticateUser {
     $this->cookie_name = 'pia-tunnel_reauth';
     $this->cookie_hash = $this->rand_string(10); //this sets a default value but breaks the functionality
                                                 //use set_cookie_hash() to pass your value
-    $this->login_form = '/var/www/login.php';
+    $this->login_form = '/usr/local/www/apache24/data/login.php';
     $this->cookie_lifetime = 30;
   }
   

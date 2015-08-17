@@ -1109,7 +1109,7 @@ function VPN_get_loginfile($VPN_provider){
   $cmdret = array();
   exec('grep "auth-user-pass" '.$inj.' | gawk -F" " \'{print $2}\' ', $cmdret);
   $login_file = $cmdret[0];
-  if( !preg_match("/^\/usr/local/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $login_file ) ){throw new Exception('FATAL ERROR: invalid login file name retrieved'); }
+  if( !preg_match("/^\/usr\/local\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $login_file ) ){throw new Exception('FATAL ERROR: invalid login file name retrieved'); }
 
   return $login_file;
 }
