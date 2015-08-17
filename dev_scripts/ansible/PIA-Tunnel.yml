@@ -2,6 +2,9 @@
 - name: setup a PIA-Tunnel freeBSD system 
   hosts: pia-tunnel-freebsd 
   remote_user: root
+  vars:
+    git_branch: release_php-gui
+    git_branch: master	
 
   roles:
     - common-freebsd
