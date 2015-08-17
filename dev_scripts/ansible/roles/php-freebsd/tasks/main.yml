@@ -2,7 +2,10 @@
 # install php56 
 
 - pkgng: name="php56"
+- pkgng: name="mod_php56"
 - pkgng: name="php56-curl"
 - pkgng: name="php56-mcrypt"
+- pkgng: name="php56-session"
+- pkgng: name="php56-mbstring"
 
-
+- template: src=090_mod_php.conf dest=/usr/local/etc/apache24/modules.d/090_mod_php.conf

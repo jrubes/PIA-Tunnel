@@ -95,16 +95,16 @@ if [ ! -f '/usr/local/pia/ip_list.txt' ]; then
 fi
 
 
-#update files in /var/www
-cp -r /usr/local/pia/htdocs/* /var/www
-if [ -f /var/www/docs/README.txt ]; then rm -f /var/www/docs/README.txt; fi
-if [ -f /var/www/docs/monitor-windows.zip ]; then rm -f /var/www/docs/monitor-windows.zip ; fi
-cd /usr/local/pia/client_scripts ; zip -r /var/www/monitor-windows.zip monitor-windows/ &> /dev/null
-cp "/usr/local/pia/docs/PIA-Tunnel Documentation.pdf" /var/www/pia-tunnel_documentation.pdf &> /dev/null
-mkdir -p /var/www/docs/ ; cp -r "/usr/local/pia/docs/HTML Manual/"* /var/www/docs/
-chown -R www:www /var/www
-find /var/www -type d -exec chmod 0750 {} \;
-find /var/www -type f -exec chmod 0640 {} \;
+#update files in /usr/local/www/apache24/data/ 
+cp -r /usr/local/pia/htdocs/* /usr/local/www/apache24/data/ 
+if [ -f /usr/local/www/apache24/data/README.txt ]; then rm -f /usr/local/www/apache24/data/docs/README.txt; fi
+if [ -f /usr/local/www/apache24/data/monitor-windows.zip ]; then rm -f /usr/local/www/apache24/data/monitor-windows.zip ; fi
+cd /usr/local/pia/client_scripts ; zip -r /usr/local/www/apache24/data/monitor-windows.zip monitor-windows/ &> /dev/null
+cp "/usr/local/pia/docs/PIA-Tunnel Documentation.pdf" /usr/local/www/apache24/data/pia-tunnel_documentation.pdf &> /dev/null
+mkdir -p /usr/local/www/apache24/data/docs/ ; cp -r "/usr/local/pia/docs/HTML Manual/"* /usr/local/www/apache24/data/docs/
+chown -R www:www /usr/local/www/apache24/data/
+find /var/www/docs -type d -exec chmod 0750 {} \;
+find /var/www/docs -type f -exec chmod 0640 {} \;
 
 # clear webUI update cache
 rm -rf "/usr/local/pia/cache/webui-update_status.txt"

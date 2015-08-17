@@ -50,7 +50,7 @@ $meta['charset'] = 'UTF-8';
 $meta['icon'] = ''; //'/favicon.ico';
 $meta['stylesheet'] = '/style.css'; // '/css/twoColElsLtHdr.css';
 $meta['javascript'][] = '/js/RequestHandler.js';
-$meta['javascript'][] = '/js/usr/local/pia.js';
+$meta['javascript'][] = '/js/pia.js';
 
 $CONF = array();
 $CONF['date_format'] = 'H:i:s'; //PHP date() format
