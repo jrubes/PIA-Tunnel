@@ -2,18 +2,18 @@
 # script to start the socks server, used by the webUI
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 
 
 # make sure sockd is not currently running
-socks_stat=`/pia/include/sockd-dante-status.sh`
+socks_stat=`/usr/local/pia/include/sockd-dante-status.sh`
 if [ "${socks_stat}" = 'running' ]; then
   LOOP_PROTECT=0
   while true; do
 
-    socks_stat=`/pia/include/sockd-dante-status.sh`
+    socks_stat=`/usr/local/pia/include/sockd-dante-status.sh`
     if [ "${socks_stat}" = 'running' ]; then
-      /pia/include/sockd-dante-stop.sh
+      /usr/local/pia/include/sockd-dante-stop.sh
 
     elif [ "${socks_stat}" = 'not running' ]; then
       break
@@ -43,7 +43,7 @@ fi
 LOOP_PROTECT=0
 while true; do
 
-  socks_stat=`/pia/include/sockd-dante-status.sh`
+  socks_stat=`/usr/local/pia/include/sockd-dante-status.sh`
   if [ "${socks_stat}" = 'running' ]; then
     echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
         "- Dante SOCKS 5 Proxy Server has been started."

@@ -6,7 +6,7 @@
 #   2 = Invalid password
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 
 if [ $# -eq 0 ]; then
   exit 2

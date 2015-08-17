@@ -2,8 +2,8 @@
 # script to help debug issues when port forwarding will not enable
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
-source '/pia/include/functions.sh'
+source '/usr/local/pia/settings.conf'
+source '/usr/local/pia/include/functions.sh'
 RET_FORWARD_PORT="FALSE"
 
 #function to get the port used for port forwarding
@@ -16,12 +16,12 @@ function get_forward_port() {
   if [ "$RET_PROVIDER_NAME" = "PIAtcp" ] || [ "$RET_PROVIDER_NAME" = "PIAudp" ]; then
 
     #check if the client ID has been generated and get it
-    if [ ! -f "/pia/client_id" ]; then
-      head -n 100 /dev/urandom | md5sum | tr -d " -" > "/pia/client_id"
+    if [ ! -f "/usr/local/pia/client_id" ]; then
+      head -n 100 /dev/urandom | md5sum | tr -d " -" > "/usr/local/pia/client_id"
     fi
-    PIA_CLIENT_ID=`cat /pia/client_id`
-    PIA_UN=`sed -n '1p' /pia/login-pia.conf`
-    PIA_PW=`sed -n '2p' /pia/login-pia.conf`
+    PIA_CLIENT_ID=`cat /usr/local/pia/client_id`
+    PIA_UN=`sed -n '1p' /usr/local/pia/login-pia.conf`
+    PIA_PW=`sed -n '2p' /usr/local/pia/login-pia.conf`
 
     TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
 

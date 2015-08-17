@@ -26,7 +26,7 @@ PING_IP_LIST[3]="208.67.220.220"
 # checks if at least one of the login files has been filled
 function check_default_username(){
 	#check if login files exist
-    FCOUNT=`ls -1 /pia/login-*.conf 2>/dev/null | wc -l`
+    FCOUNT=`ls -1 /usr/local/pia/login-*.conf 2>/dev/null | wc -l`
 
     if [ "$FCOUNT" -lt 1 ]; then
         # FATAL ERROR: make sure to always print IP info
@@ -40,15 +40,15 @@ function check_default_username(){
 		echo "No VPN account info found! Please use the WebUI to configure "
         echo "your account or add the information manually to one of the following files."
         echo
-		echo -e "\t/pia/login-pia.conf"
-		echo -e "\t/pia/login-FrootVPN.conf"
+		echo -e "\t/usr/local/pia/login-pia.conf"
+		echo -e "\t/usr/local/pia/login-FrootVPN.conf"
         echo
 		echo "Try"
-		echo -e "\tvi /pia/login-pia.conf"
-		echo -e "\tvi /pia/login-FrootVPN.conf"
+		echo -e "\tvi /usr/local/pia/login-pia.conf"
+		echo -e "\tvi /usr/local/pia/login-FrootVPN.conf"
 		echo "or"
-		echo -e "\tnano /pia/login-pia.conf"
-		echo -e "\tnano /pia/login-FrootVPN.conf"
+		echo -e "\tnano /usr/local/pia/login-pia.conf"
+		echo -e "\tnano /usr/local/pia/login-FrootVPN.conf"
 		echo
 		exit
 	fi
@@ -89,13 +89,13 @@ function is_ip_unique() {
   RET_IP_UNIQUE="yes"
 }
 
-#function to grab a few IPs from /pia/ip_list.txt
+#function to grab a few IPs from /usr/local/pia/ip_list.txt
 # and store them for later in $PING_eIP_LIST[]
 function gen_ip_list() {
 
-	if [ ! -f "/pia/ip_list.txt" ]; then
+	if [ ! -f "/usr/local/pia/ip_list.txt" ]; then
 		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-		  "- \"/pia/ip_list.txt\" does not exist. Please run pia-setup first"
+		  "- \"/usr/local/pia/ip_list.txt\" does not exist. Please run pia-setup first"
 		exit
 	fi
 
@@ -111,7 +111,7 @@ function gen_ip_list() {
   fi
 
   #read list of IPs into IP_LIST array
-  IFS=$'\r\n' IP_LIST=($(cat "/pia/ip_list.txt" | tail -n+2))
+  IFS=$'\r\n' IP_LIST=($(cat "/usr/local/pia/ip_list.txt" | tail -n+2))
   #get array length
   IP_COUNT=${#IP_LIST[@]}
   IP_COUNT=$((IP_COUNT - 1)) #zero based
@@ -321,9 +321,9 @@ function remove_ip_from_array() {
 # $1 connection name
 function echo_conn_established() {
   # show connection data
-  maintain_status_cache '/pia/cache/status.txt'
-  vpn_port=`cat "/pia/cache/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
-  #vpn_ip=`cat "/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+  maintain_status_cache '/usr/local/pia/cache/status.txt'
+  vpn_port=`cat "/usr/local/pia/cache/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+  #vpn_ip=`cat "/usr/local/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
   vpn_ip=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
   echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- VPN connection to $1 established\n\tVPN IP: $vpn_ip Port: $vpn_port"
@@ -336,21 +336,21 @@ function switch_vpn() {
 		if [ "$VERBOSE" = "yes" ]; then
 			echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- establishing a VPN connection to $CONN."
-			echo -e "\tsee ${bold}/pia/cache/session.log${normal} for details"
+			echo -e "\tsee ${bold}/usr/local/pia/cache/session.log${normal} for details"
 		fi
 		killall openvpn &> /dev/null
-        echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $CONN" > /pia/cache/session.log
+        echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $CONN" > /usr/local/pia/cache/session.log
 
         #get the provider / directory name
         VPNprovider=`echo "$CONN" | gawk -F"/" '{print $1}'`
 
         #start openVPN session
-        if [ -f "/pia/ovpn/$CONN.ovpn" ]; then
-          echo "$VPNprovider" > /pia/cache/provider.txt
-          openvpn "/pia/ovpn/$CONN.ovpn" &>> /pia/cache/session.log &
+        if [ -f "/usr/local/pia/ovpn/$CONN.ovpn" ]; then
+          echo "$VPNprovider" > /usr/local/pia/cache/provider.txt
+          openvpn "/usr/local/pia/ovpn/$CONN.ovpn" &>> /usr/local/pia/cache/session.log &
         else
           echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-              "- specified file not found in switch_vpn() - /pia/ovpn/$CONN.ovpn"
+              "- specified file not found in switch_vpn() - /usr/local/pia/ovpn/$CONN.ovpn"
           echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
               "- terminating...."
           exit 1
@@ -367,16 +367,16 @@ function switch_vpn() {
 				# show connection data
 				echo_conn_established $CONN
 				#start firewall and enable forwarding
-				/pia/pia-forward start quite
+				/usr/local/pia/pia-forward start quite
 				RAN_FORWARD_FIX="no" #reset on working connection
-                rm "/pia/cache/status.txt"
+                rm "/usr/local/pia/cache/status.txt"
 				return
 			fi
 
 			#endless loop protect, about 40 seconds
 			if [ "$LOOP_PROTECT" -eq 20 ]; then
 				killall openvpn 2>/dev/null
-				/pia/pia-forward stop quite
+				/usr/local/pia/pia-forward stop quite
 				break
 			else
 				sleep 2
@@ -397,10 +397,10 @@ function switch_vpn() {
 
 # retrieve provider from cache file
 # "returns" RET_PROVIDER_NAME with the provider string "PICtcp", "PIAudp" ...
-#   it is the name of the directory inside /pia/ovpn/
+#   it is the name of the directory inside /usr/local/pia/ovpn/
 function get_provider(){
-  if [ -f "/pia/cache/provider.txt" ];then
-    RET_PROVIDER_NAME=`cat /pia/cache/provider.txt`
+  if [ -f "/usr/local/pia/cache/provider.txt" ];then
+    RET_PROVIDER_NAME=`cat /usr/local/pia/cache/provider.txt`
   else
     RET_PROVIDER_NAME=""
   fi
@@ -417,12 +417,12 @@ function get_forward_port() {
   if [ "$RET_PROVIDER_NAME" = "PIAtcp" ] || [ "$RET_PROVIDER_NAME" = "PIAudp" ]; then
 
     #check if the client ID has been generated and get it
-    if [ ! -f "/pia/client_id" ]; then
-      head -n 100 /dev/urandom | md5sum | tr -d " -" > "/pia/client_id"
+    if [ ! -f "/usr/local/pia/client_id" ]; then
+      head -n 100 /dev/urandom | md5sum | tr -d " -" > "/usr/local/pia/client_id"
     fi
-    PIA_CLIENT_ID=`cat /pia/client_id`
-    PIA_UN=`sed -n '1p' /pia/login-pia.conf`
-    PIA_PW=`sed -n '2p' /pia/login-pia.conf`
+    PIA_CLIENT_ID=`cat /usr/local/pia/client_id`
+    PIA_UN=`sed -n '1p' /usr/local/pia/login-pia.conf`
+    PIA_PW=`sed -n '2p' /usr/local/pia/login-pia.conf`
     TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
 
     #get open port of tunnel connection
@@ -461,7 +461,7 @@ function check_repair_internet() {
 					"- Internet connection appears to be down"
 				echo -e "\trunning ${bold}pia-forward fix${normal}"
 				RAN_FORWARD_FIX="yes"
-				/pia/pia-forward fix quite
+				/usr/local/pia/pia-forward fix quite
 			fi
 		fi
 
@@ -472,8 +472,8 @@ function check_repair_internet() {
 				"- forwarding disabled until the VPN is back up."
 			echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
-            rm -f "/pia/cache/session.log" &> /dev/null
-			/pia/pia-forward stop quite
+            rm -f "/usr/local/pia/cache/session.log" &> /dev/null
+			/usr/local/pia/pia-forward stop quite
 			exit
 		else
 			if [ "$VERBOSE" = "yes" ]; then
@@ -584,16 +584,16 @@ function maintain_status_cache() {
   get_provider
   if [ "$RET_PROVIDER_NAME" = "PIAtcp" ] || [ "$RET_PROVIDER_NAME" = "PIAudp" ]; then
 
-    #get PIA username and password from /pia/login-pia.conf
-    PIA_UN=`sed -n '1p' /pia/login-pia.conf`
-    PIA_PW=`sed -n '2p' /pia/login-pia.conf`
+    #get PIA username and password from /usr/local/pia/login-pia.conf
+    PIA_UN=`sed -n '1p' /usr/local/pia/login-pia.conf`
+    PIA_PW=`sed -n '2p' /usr/local/pia/login-pia.conf`
 
 
     #check if the client ID has been generated and get it
-    if [ ! -f /pia/client_id ]; then
-      head -n 100 /dev/urandom | md5sum | tr -d " -" > /pia/client_id
+    if [ ! -f /usr/local/pia/client_id ]; then
+      head -n 100 /dev/urandom | md5sum | tr -d " -" > /usr/local/pia/client_id
     fi
-    PIA_CLIENT_ID=`cat /pia/client_id`
+    PIA_CLIENT_ID=`cat /usr/local/pia/client_id`
 
 
     #get open port of tunnel connection

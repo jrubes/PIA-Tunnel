@@ -1,8 +1,8 @@
 #!/bin/bash
-# updates /etc/transmission-daemon/settings.json with settings loaded from '/pia/settings.conf'
+# updates /etc/transmission-daemon/settings.json with settings loaded from '/usr/local/pia/settings.conf'
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 
 escaped=`echo "$CIFS_MOUNT" | sed -e 's./.\\\/.g'`
 

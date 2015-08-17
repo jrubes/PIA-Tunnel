@@ -148,9 +148,9 @@ switch($_REQUEST['cmd']){
           //check if the git branch needs to be switched
           if( $settings['GIT_BRANCH'] !== $_POST['GIT_BRANCH'] ){
             $sarg = escapeshellcmd($_POST['GIT_BRANCH']); //this is not proper!
-            exec('cd /pia ; git reset --hard HEAD; git fetch ; git checkout '.$sarg.' &> /dev/null');
-            exec('chmod ug+x /pia/pia-setup ; /pia/pia-setup &> /dev/null');
-            exec('/pia/pia-update &> /dev/null');
+            exec('cd /usr/local/pia ; git reset --hard HEAD; git fetch ; git checkout '.$sarg.' &> /dev/null');
+            exec('chmod ug+x /usr/local/pia/pia-setup ; /usr/local/pia/pia-setup &> /dev/null');
+            exec('/usr/local/pia/pia-update &> /dev/null');
 
             $_settings->save_settings('GIT_BRANCH', $_POST['GIT_BRANCH']);
             $settings = $_settings->get_settings();
@@ -209,7 +209,7 @@ $disp_body .= '<script type="text/javascript">'
  * based on settings.conf
  */
 function VPN_generate_interfaces(){
-  exec("sudo /pia/include/network-interfaces.sh"); //write new dhcpd.conf
+  exec("sudo /usr/local/pia/include/network-interfaces.sh"); //write new dhcpd.conf
 }
 
 /**
@@ -218,7 +218,7 @@ function VPN_generate_interfaces(){
 function VPN_generate_dhcpd_conf(){
   $template = dhcpd_process_template();
   $save = escapeshellarg($template);
-  exec("sudo /pia/include/dhcpd-reconfigure.sh $save"); //write new dhcpd.conf
+  exec("sudo /usr/local/pia/include/dhcpd-reconfigure.sh $save"); //write new dhcpd.conf
 }
 
 /**
@@ -227,7 +227,7 @@ function VPN_generate_dhcpd_conf(){
 function VPN_generate_socks_conf(){
   $template = socks_process_template();
   $save = escapeshellarg($template);
-  exec("sudo /pia/include/sockd-dante-reconfigure.sh $save"); //write new dhcpd.conf
+  exec("sudo /usr/local/pia/include/sockd-dante-reconfigure.sh $save"); //write new dhcpd.conf
 }
 
 /**
@@ -272,7 +272,7 @@ function VPN_get_post_storage_arrays($match=null){
 }
 
 /**
- * function to modify /pia/include/danted.conf in RAM and return the changes
+ * function to modify /usr/local/pia/include/danted.conf in RAM and return the changes
  * @global object $_files
  * @return string,bool string containing the modified dhcpd.conf file or false on error
  */
@@ -280,7 +280,7 @@ function socks_process_template(){
   global $_files;
   global $_settings;
   $SometimesIreallyHatePHP = 1;
-  $templ = $_files->readfile('/pia/include/sockd-dante.conf');
+  $templ = $_files->readfile('/usr/local/pia/include/sockd-dante.conf');
   $client_templ = "client pass {\n"
                 ."  from: INTERNAL_NETWORK_HERE\n"
                 ."  #log: error #connect disconnect\n"
@@ -342,7 +342,7 @@ function socks_process_template(){
 
 
 /**
- * function to modify /pia/include/dhcpd.conf in RAM and return the changes
+ * function to modify /usr/local/pia/include/dhcpd.conf in RAM and return the changes
  * @global object $_files
  * @return string,bool string containing the modified dhcpd.conf file or false on error
  */
@@ -350,7 +350,7 @@ function dhcpd_process_template(){
   global $_files;
   global $_settings;
   $SometimesIreallyHatePHP = 1;
-  $templ = $_files->readfile('/pia/include/dhcpd.conf');
+  $templ = $_files->readfile('/usr/local/pia/include/dhcpd.conf');
   $subnet_templ = "subnet SUBNET_IP_HERE netmask NETWORK_MASK_HERE {\n"
                   ."  range IP_RANGE_HERE;\n"
                   ."  option routers ROUTER_IP_HERE;\n"
@@ -466,7 +466,7 @@ function group_enabled_providers(){
     if( !array_key_exists(0, $ovpns) ){ return FALSE; }
 
     //pick first one of the ovpn files to get "auth-user-pass" setting
-    $inj = escapeshellarg('/pia/ovpn/'.$ovpns[0].'.ovpn');
+    $inj = escapeshellarg('/usr/local/pia/ovpn/'.$ovpns[0].'.ovpn');
     exec('grep "auth-user-pass" '.$inj.' | gawk -F" " \'{print $2}\' ', $cmdret);
     $providers[$cmdret[0]][] = $ep[1];
   }

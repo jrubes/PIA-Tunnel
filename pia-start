@@ -6,8 +6,8 @@
 
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
-source '/pia/include/functions.sh'
+source '/usr/local/pia/settings.conf'
+source '/usr/local/pia/include/functions.sh'
 FAIL_RETRY_INTERNET=3
 SLEEP_PING_RETEST=4
 
@@ -15,15 +15,15 @@ SLEEP_PING_RETEST=4
 gen_ip_list
 
 # remove old status.txt
-rm -f '/pia/cache/status.txt' 2>/dev/null
+rm -f '/usr/local/pia/cache/status.txt' 2>/dev/null
 
 
 
 
 #show usage
 if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
-	LIST1=`ls -I "ca.crt" -1 /pia/ovpn/pia/ | gawk -F"." '{print $1}'`
-    LIST2=`ls -1 /pia/ovpn/frootvpn/ | gawk -F"." '{print $1}'`
+	LIST1=`ls -I "ca.crt" -1 /usr/local/pia/ovpn/pia/ | gawk -F"." '{print $1}'`
+    LIST2=`ls -1 /usr/local/pia/ovpn/frootvpn/ | gawk -F"." '{print $1}'`
 
 	echo
 	echo "Listing available VPN connections:"
@@ -46,7 +46,7 @@ if [ "$1" = "daemon" ]; then
 fi
 
 #execute if .ovpn file exists with name passed
-if [ -f "/pia/ovpn/$filename.ovpn" ]; then
+if [ -f "/usr/local/pia/ovpn/$filename.ovpn" ]; then
 	# check for default username and exit
     check_default_username
 
@@ -56,10 +56,10 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 	if [ "$RET_PING_HOST" = "OK" ]; then
 		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- closing current VPN tunnel"
-		/pia/pia-stop quite
+		/usr/local/pia/pia-stop quite
 	else
 		#set iptables to something save until the tunnel is set up
-		/pia/pia-forward stop quite
+		/usr/local/pia/pia-forward stop quite
 	fi
 
 	#ensure internet works before going further
@@ -70,23 +70,23 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
     VPNprovider=`echo "$filename" | gawk -F"/" '{print $1}'`
 
     #start openVPN session
-    if [ -f "/pia/ovpn/$filename.ovpn" ]; then
+    if [ -f "/usr/local/pia/ovpn/$filename.ovpn" ]; then
       echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
           "- establishing a VPN connection to $filename."
-      echo -e "\tsee ${bold}/pia/cache/session.log${normal} for details"
-      echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $filename" > /pia/cache/session.log
+      echo -e "\tsee ${bold}/usr/local/pia/cache/session.log${normal} for details"
+      echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $filename" > /usr/local/pia/cache/session.log
 
-      echo "$VPNprovider" > /pia/cache/provider.txt
-      openvpn "/pia/ovpn/$filename.ovpn" &>> /pia/cache/session.log &
+      echo "$VPNprovider" > /usr/local/pia/cache/provider.txt
+      openvpn "/usr/local/pia/ovpn/$filename.ovpn" &>> /usr/local/pia/cache/session.log &
 
     else
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-          "- specified file not found in pia-start - /pia/ovpn/$filename.ovpn"
+          "- specified file not found in pia-start - /usr/local/pia/ovpn/$filename.ovpn"
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
           "- terminating...."
       # remove old status.txt
-      rm -f '/pia/cache/status.txt' 2>/dev/null
-      rm -f '/pia/cache/php_pia-start.log' 2>/dev/null
+      rm -f '/usr/local/pia/cache/status.txt' 2>/dev/null
+      rm -f '/usr/local/pia/cache/php_pia-start.log' 2>/dev/null
       exit 1
     fi
 
@@ -102,16 +102,16 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 	    echo_conn_established $filename
 
 	    #start firewall and enable forwarding
-	    /pia/pia-forward start quite
+	    /usr/local/pia/pia-forward start quite
 
         #time to (re)start the proxy
         if [ "${SOCKS_EXT_ENABLED}" = 'yes' ] || [ "${SOCKS_INT_ENABLED}" = 'yes' ]; then
-          /pia/include/socks-start.sh
+          /usr/local/pia/include/socks-start.sh
         fi
 
         # start torrent daemon
         if [ "${TRANSMISSION_ENABLED}" = 'yes' ]; then
-            /pia/include/transmission-start.sh
+            /usr/local/pia/include/transmission-start.sh
         fi
 
         # keep VPN up with daemon?
@@ -120,8 +120,8 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
           echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
             "- starting pia-daemon with nohup"
           killall pia-daemon &> /dev/null
-          #screen -d -m /pia/pia-daemon
-          nohup /pia/pia-daemon &> /pia/cache/pia-daemon.log &
+          #screen -d -m /usr/local/pia/pia-daemon
+          nohup /usr/local/pia/pia-daemon &> /usr/local/pia/cache/pia-daemon.log &
         fi
 	    break
 	  fi
@@ -130,11 +130,11 @@ if [ -f "/pia/ovpn/$filename.ovpn" ]; then
 	  #endless loop protect, about 30 seconds
 	  if [ "$LOOP_PROTECT" -eq 30 ]; then
 		echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- VPN connection fail - please check /pia/cache/session.log for details."
+			"- VPN connection fail - please check /usr/local/pia/cache/session.log for details."
 	    killall openvpn 2>/dev/null
-        mv /pia/cache/session.log /pia/cache/session.old.log
-        mv '/pia/cache/php_pia-start.log' '/pia/cache/php_pia-start.lastfail.log' 2>/dev/null
-	    /pia/pia-forward stop quite
+        mv /usr/local/pia/cache/session.log /usr/local/pia/cache/session.old.log
+        mv '/usr/local/pia/cache/php_pia-start.log' '/usr/local/pia/cache/php_pia-start.lastfail.log' 2>/dev/null
+	    /usr/local/pia/pia-forward stop quite
 	    exit
 	  else
 		sleep 1

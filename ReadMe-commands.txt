@@ -19,7 +19,7 @@ pia-update
 	
 pia-setup
 	Will setup the scripts above and fix any permission issues.
-	This command can also generate new login.conf and settings.conf files if the files are not found in /pia/.
+	This command can also generate new login.conf and settings.conf files if the files are not found in /usr/local/pia/.
 
 	
 

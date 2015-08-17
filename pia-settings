@@ -4,7 +4,7 @@
 #		pia-settings "NAME_OF_SETTING" "VALUE_OF_SETTING"
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 
 
 if [ ! "$1" = "" ]; then
@@ -12,5 +12,5 @@ if [ ! "$1" = "" ]; then
     escaped=`echo "$1" | sed -e 's/\[/\\\[/g'`
 
     #update settings
-    sed -i "s/$escaped=.*/$escaped='$2'/" /pia/settings.conf
+    sed -i "s/$escaped=.*/$escaped='$2'/" /usr/local/pia/settings.conf
 fi

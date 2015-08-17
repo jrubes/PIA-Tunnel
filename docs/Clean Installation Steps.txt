@@ -121,7 +121,7 @@ You may also compile your own using the following steps.
 	make
 	make install
 
-OR this is how I created the package in /pia/extra_software/
+OR this is how I created the package in /usr/local/pia/extra_software/
 	apt-get install build-essential
   Download latest 1.4 release from http://www.inet.no/dante/download.html
 
@@ -153,21 +153,21 @@ OR this is how I created the package in /pia/extra_software/
 
 130) vi /etc/sudoers
   Add this on line 21
-    www-data ALL = NOPASSWD: /pia/*,/pia/include/*,/sbin/shutdown
+    www-data ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown
 
 
 140)
-mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
-git clone https://github.com/KaiserSoft/PIA-Tunnel.git /pia
-cd /pia ; git checkout release_php-gui
+mkdir /usr/local/pia ; chown -R root.root /usr/local/pia ; chmod -R og-rwx /usr/local/pia;
+git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia
+cd /usr/local/pia ; git checkout release_php-gui
 
 
-150)	chmod 777 /pia/pia-setup ; /pia/pia-setup
+150)	chmod 777 /usr/local/pia/pia-setup ; /usr/local/pia/pia-setup
 
 
 160) vi /etc/rc.local (add above exit 0)
 #execute PIA start scripts
-/pia/include/autostart.sh
+/usr/local/pia/include/autostart.sh
 
 
 170) paste the block below into a bash terminal
@@ -182,7 +182,7 @@ depmod -a ; update-initramfs -u
 
 
 
-180) /pia/reset-pia ; halt
+180) /usr/local/pia/reset-pia ; halt
 
 190) Export to OVF Template and compress with
     7z a -mx9 -m0=lzma2 -md=128m -ms=on -mmt=off -t7z "PIA-Tunnel-release_php-gui-2013-11-23.7z" "PIA-Tunnel-release_php-gui-2013-11-23/"

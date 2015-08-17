@@ -15,10 +15,8 @@
 <h1>PIA-Tunnel Documentation</h1>
 
 <p>
-  This documentation is work in progress. Some sections have not been verified, need to be
-  spell checked or even rewritten. This document is also using very basic formatting to make
-  it easier to split it into sections later on.<br>
-  The pdf is no longer maintained so this page contains the latest information.
+  This documentation is work in progress. Some sections may not have been verified yet or are still
+  being tested.
 </p>
 
 <div id="main_index" class="section">
@@ -259,7 +257,7 @@
       <li>
         <strong>Allow web-UI access on</strong>: &lt;eth0&gt; &lt;eth1&gt; (default: both checked)<br>
         This option will open port 80 on the selected interfaces. This is needs to be enabled if you want to use the web-UI to mange PIA-Tunnel and if you want to use Torrent Monitor client.<br>
-        <strong>Warning</strong>: Unchecking both options will prevent you from accessing the web-UI. You may regain access by adding   FIREWALL_IF_WEB[0]=eth0    back into /pia/settings.conf
+        <strong>Warning</strong>: Unchecking both options will prevent you from accessing the web-UI. You may regain access by adding   FIREWALL_IF_WEB[0]=eth0    back into /usr/local/pia/settings.conf
       </li>
 
       <li>
@@ -269,7 +267,7 @@
 
       <li>
         <strong>Web-UI Username and Web-UI Password</strong><br>
-        This option specifies the username and password for the Web-UI. Note: You may reset the password by setting the following options to nothing in /pia/settings.conf<br>
+        This option specifies the username and password for the Web-UI. Note: You may reset the password by setting the following options to nothing in /usr/local/pia/settings.conf<br>
         WEB_UI_USER=<br>
         WEB_UI_PASSWORD=<br>
       </li>
@@ -627,14 +625,7 @@
     <ul>
       <li>Click on the "Install transmission-daemon" link found under Settings to start the installation process.
         This will run a complete system update before installing transmission and the VM will reboot once completed.<br>
-          You may also run the installation manually by executing "/pia/include/transmission-install.sh"<br>
-      </li>
-      <li>
-        The settings page will show additional configuration options once the transmission client has been installed.
-        Please enter the login information for the network share where transmission client will store
-        the downloaded files.<br>
-        Alternatively, you may mount the network share yourself and only enter the local mount point for your network share.<br>
-        PIA-Tunnel will attempt to connect your network share if it is not mounted when the transmission client is started.
+          You may also run the installation manually by executing "/usr/local/pia/include/transmission-install.sh"<br>
       </li>
     </ul>
   </div>
@@ -791,16 +782,16 @@
     <li>
       Add the following to line 21 in /etc/sudoers
       <pre>
-        www-data ALL = NOPASSWD: /pia/*,/pia/include/*,/sbin/shutdown
+        www-data ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown
       </pre>
     </li>
 
     <li>
       Almost done. Time to pull the PIA Tunnel scripts .... this will take a bit
       <pre>
-        mkdir /pia ; chown -R root.root /pia ; chmod -R og-rwx /pia;
-        git clone https://github.com/KaiserSoft/PIA-Tunnel.git /pia
-        cd /pia ; git checkout release_php-gui
+        mkdir /usr/local/pia ; chown -R root.root /usr/local/pia ; chmod -R og-rwx /usr/local/pia;
+        git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia
+        cd /usr/local/pia ; git checkout release_php-gui
       </pre>
     </li>
 
@@ -808,14 +799,14 @@
       The next commands will execute the PIA-Tunnel setup script.
       Please report any error messages you encounter.
       <pre>
-        chmod 777 /pia/pia-setup ; /pia/pia-setup
+        chmod 777 /usr/local/pia/pia-setup ; /usr/local/pia/pia-setup
       </pre>
     </li>
 
     <li>
       Add the following line to /etc/rc.local make sure you paste it above "exit 0"
       <pre>
-        /pia/include/autostart.sh
+        /usr/local/pia/include/autostart.sh
       </pre>
     </li>
 
@@ -852,7 +843,7 @@
     <li>
       Login to the command line and run pia-setup and pia-update manually.<br>
       The root password is "pia" before you run the setup wizard or some random string afterwards.
-      Please use "Settings" =&gt; "Linux root Password" to change it.<br>
+      Please use "Settings" =&amp; "Linux root Password" to change it.<br>
       Now run the following commands and check the output for any error messages
       <ul><li>pia-setup</li><li>pia-update</li></ul>
     </li>

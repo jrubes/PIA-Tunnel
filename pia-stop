@@ -4,26 +4,26 @@
 
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 
 
 if [ "$1" = "verbose" ]; then
 
-    /pia/include/transmission-stop.sh
+    /usr/local/pia/include/transmission-stop.sh
     if [ "$?" != "0" ]; then
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
           "- unable to terminate transmission daemon - this is serious"
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
           "- closing the firewall and rebooting the system - NOW!"
-      /pia/include/fw-close.sh
+      /usr/local/pia/include/fw-close.sh
       reboot
     fi
 
-    /pia/include/socks-stop.sh
+    /usr/local/pia/include/socks-stop.sh
 	killall openvpn
 
 	#disable forwarding
-	/pia/pia-forward stop
+	/usr/local/pia/pia-forward stop
 
 	# restart networking to get default routes through eth0 working again
 	# service network restart #CentOS
@@ -32,10 +32,10 @@ if [ "$1" = "verbose" ]; then
 
 else
 
-    /pia/include/transmission-stop.sh  &>/dev/null
-    /pia/include/socks-stop.sh &>/dev/null
+    /usr/local/pia/include/transmission-stop.sh  &>/dev/null
+    /usr/local/pia/include/socks-stop.sh &>/dev/null
 	killall openvpn &>/dev/null
-	/pia/pia-forward stop quite
+	/usr/local/pia/pia-forward stop quite
 	ifdown eth0 &>/dev/null && ifup eth0 &>/dev/null #Debian
 	ifdown eth1 &>/dev/null && ifup eth1 &>/dev/null #Debian
 fi
@@ -72,8 +72,8 @@ fi
 
 
 # remove old status.txt
-rm -f '/pia/cache/status.txt' &>/dev/null
-rm -f '/pia/cache/session.log' &>/dev/null
-rm -f '/pia/cache/php_pia-start.log' &>/dev/null
+rm -f '/usr/local/pia/cache/status.txt' &>/dev/null
+rm -f '/usr/local/pia/cache/session.log' &>/dev/null
+rm -f '/usr/local/pia/cache/php_pia-start.log' &>/dev/null
 
 exit 0

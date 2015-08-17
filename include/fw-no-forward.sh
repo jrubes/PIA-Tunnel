@@ -4,7 +4,7 @@ LANG=en_US.UTF-8
 export LANG
 
 # load a default firewall
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 iptables -F
 iptables -t nat -F
 iptables -t nat -X

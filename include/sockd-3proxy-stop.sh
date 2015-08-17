@@ -5,7 +5,7 @@ export LANG
 
 LOOP_PROTECT=0
 while true; do
-   socks_stat=`/pia/include/sockd-3proxy-status.sh`
+   socks_stat=`/usr/local/pia/include/sockd-3proxy-status.sh`
   if [ "${socks_stat}" = 'running' ]; then
     killall socks &> /dev/null
 

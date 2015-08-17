@@ -2,10 +2,10 @@
 # script to stop the socks server, used by the webUI
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 
 # make sure sockd is not currently running
-socks_stat=`/pia/include/sockd-dante-status.sh`
+socks_stat=`/usr/local/pia/include/sockd-dante-status.sh`
 if [ "${socks_stat}" = 'not running' ]; then
 
   exit
@@ -14,7 +14,7 @@ elif [ "${socks_stat}" = 'running' ]; then
 
   LOOP_PROTECT=0
   while true; do
-     socks_stat=`/pia/include/sockd-dante-status.sh`
+     socks_stat=`/usr/local/pia/include/sockd-dante-status.sh`
     if [ "${socks_stat}" = 'running' ]; then
       killall sockd &> /dev/null
 

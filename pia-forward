@@ -2,7 +2,7 @@
 # script to control the firewall, start and stop for now
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 
 if [ "$1" = "start" ]; then
 	#this needs a loop to check if tun0 exists ... later
@@ -11,7 +11,7 @@ if [ "$1" = "start" ]; then
 			"- turning port forwarding ON"
 	fi
 
-	/pia/include/fw-forward.sh
+	/usr/local/pia/include/fw-forward.sh
 	exit
 fi
 
@@ -21,7 +21,7 @@ if [ "$1" = "stop" ] || [ "$2" = "stop" ]; then
 		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- turning port forwarding OFF"
 	fi
-	/pia/include/fw-no-forward.sh
+	/usr/local/pia/include/fw-no-forward.sh
 	exit
 fi
 
@@ -32,14 +32,14 @@ if [ "$1" = "fix" ]; then
 			"- will attempt to stop any VPN tunnels \n\tand restart all network interfaces"
 
 		killall openvpn 2>/dev/null
-        rm -f /pia/cache/status.txt 2>/dev/null
-		/pia/include/fw-no-forward.sh
+        rm -f /usr/local/pia/cache/status.txt 2>/dev/null
+		/usr/local/pia/include/fw-no-forward.sh
 		# restart networking to get default routes through eth0 working again
 		# service network restart #CentOS
 		ifdown eth0 && ifup eth0 #Debian
 	else
 		killall openvpn 2>/dev/null
-		/pia/include/fw-no-forward.sh
+		/usr/local/pia/include/fw-no-forward.sh
 		ifdown eth0 2>/dev/null	 && ifup eth0 2>/dev/null
 	fi
 

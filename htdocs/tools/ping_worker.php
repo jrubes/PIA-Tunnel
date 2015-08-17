@@ -29,11 +29,11 @@ switch($_POST['cmd'])
     $host = escapeshellarg($_POST['IP']);
     $intf = escapeshellarg($_POST['IF']);
     echo "ping $host over $intf\n";
-    exec("bash -c \"/pia/include/ping.sh $host $intf &> /dev/null &\" &>/dev/null &");
+    exec("bash -c \"/usr/local/pia/include/ping.sh $host $intf &> /dev/null &\" &>/dev/null &");
     break;
 
   case 'read':
-    $c = $_files->readfile('/pia/cache/tools_ping.txt');
+    $c = $_files->readfile('/usr/local/pia/cache/tools_ping.txt');
     echo $c;
     break;
 }

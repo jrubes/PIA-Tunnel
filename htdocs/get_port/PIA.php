@@ -19,7 +19,7 @@ function get_port(){
 
   //get the client ID
   if( array_key_exists('client_id', $_SESSION) !== true ){
-    $c = $_files->readfile('/pia/client_id');
+    $c = $_files->readfile('/usr/local/pia/client_id');
     if( $c !== false ){
       if( mb_strlen($c) < 1 ){
         return false;

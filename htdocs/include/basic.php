@@ -50,7 +50,7 @@ $meta['charset'] = 'UTF-8';
 $meta['icon'] = ''; //'/favicon.ico';
 $meta['stylesheet'] = '/style.css'; // '/css/twoColElsLtHdr.css';
 $meta['javascript'][] = '/js/RequestHandler.js';
-$meta['javascript'][] = '/js/pia.js';
+$meta['javascript'][] = '/js/usr/local/pia.js';
 
 $CONF = array();
 $CONF['date_format'] = 'H:i:s'; //PHP date() format
@@ -267,7 +267,7 @@ function get_port_forward_locations( &$conn_name ){
   $conn_parts = explode('/', $conn_name); //is "PIAudp/Germany", need "PIAudp"
   if( $conn_parts[0] == '' ){ return false; }
 
-  $content = $_files->readfile('/pia/ovpn/'.$conn_parts[0].'/port_forward.txt');
+  $content = $_files->readfile('/usr/local/pia/ovpn/'.$conn_parts[0].'/port_forward.txt');
   if( $content === false ){ return false; }
 
   //build array to be returned and remove first line
@@ -283,13 +283,13 @@ function get_port_forward_locations( &$conn_name ){
 
 
 /**
- * method read /pia/login-pia.conf into an array
+ * method read /usr/local/pia/login-pia.conf into an array
  * @return array,bool array with ['name'], ['password'] OR FALSE on failure
  */
 function VPN_get_user( $provider ){
 
   $filename = VPN_get_loginfile($provider);
-  if( !preg_match("/^\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $filename ) ){throw new Exception('FATAL ERROR: invalid login file name - '.$filename); }
+  if( !preg_match("/^\/usr/local/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $filename ) ){throw new Exception('FATAL ERROR: invalid login file name - '.$filename); }
 
   //get username and password from file or SESSION
   if( array_key_exists($filename, $_SESSION) !== true ){
@@ -313,7 +313,7 @@ function VPN_get_user( $provider ){
 function VPN_provider_connected(){
   global $_files;
 
-  $c = $_files->readfile('/pia/cache/provider.txt');
+  $c = $_files->readfile('/usr/local/pia/cache/provider.txt');
   if( $c !== false ){
     return trim($c);
   }
@@ -333,7 +333,7 @@ function VPN_ovpn_to_session(){
   $providers = $_settings->get_settings_array('VPN_PROVIDERS'); //possible providers
 
   foreach( $providers as $set ){
-    if( is_dir('/pia/ovpn/'.$set[1]) ){
+    if( is_dir('/usr/local/pia/ovpn/'.$set[1]) ){
 
       $ovpn_list = get_ovpn_list($set[1]);
       foreach( $ovpn_list as $ovpn ){
@@ -358,7 +358,7 @@ function get_ovpn_list($provider_dir){
   $_files->set_ls_filter_mode('include');
 
   //strip .ovpn before storing in session
-  $ls = $_files->ls('/pia/ovpn/'.$provider_dir);
+  $ls = $_files->ls('/usr/local/pia/ovpn/'.$provider_dir);
   foreach( $ls as $val ){
     $ret[] = $provider_dir.'/'.substr($val, 0, (mb_strlen($val)-5) );
   }
@@ -372,7 +372,7 @@ function get_ovpn_list($provider_dir){
  */
 function VPN_get_providers( ){
   $ret = array();
-  $dir = "/pia/ovpn";
+  $dir = "/usr/local/pia/ovpn";
   $handle = opendir($dir);
   if($handle)
   {
@@ -672,7 +672,7 @@ function get_meminfo(){
 
 
 /**
- * function checks /pia/cache/session.log for specific words and returns an array with
+ * function checks /usr/local/pia/cache/session.log for specific words and returns an array with
  * the status at [0] and any errors at [1]
  * @global object $_files
  * @return array [0]='connected', [0]='connecting', [0]='error',[1]=message
@@ -681,9 +681,9 @@ function VPN_sessionlog_status(){
   global $_files;
   global $_pia;
 
-  $content = $_files->readfile('/pia/cache/session.log');
+  $content = $_files->readfile('/usr/local/pia/cache/session.log');
   if( $content == '' ){
-    $content = $_files->readfile('/pia/cache/php_pia-start.log');
+    $content = $_files->readfile('/usr/local/pia/cache/php_pia-start.log');
     if( $content == '' ){
       return array('disconnected');
     }else{
@@ -729,7 +729,7 @@ function VPN_sessionlog_status(){
         $_pia->clear_session();
         $_SESSION['conn_auth_fail_cnt'] = 0;
         $_SESSION['conn_auth_perma_error'] = true;
-        exec('killall pia-start; /pia/include/ovpn_kill.sh; sudo /pia/pia-daemon stop &> /dev/null ; rm -rf /pia/cache/pia-daemon.log');
+        exec('killall pia-start; /usr/local/pia/include/ovpn_kill.sh; sudo /usr/local/pia/pia-daemon stop &> /dev/null ; rm -rf /usr/local/pia/cache/pia-daemon.log');
 
       }elseif( $_SESSION['conn_auth_perma_error'] === false ){
         ++$_SESSION['conn_auth_fail_cnt'];
@@ -755,7 +755,7 @@ function VPN_sessionlog_status(){
  */
 function VPN_get_IP(){
   $cmdret = array();
-  exec('grep "link remote: \[AF_INET]" /pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $cmdret);
+  exec('grep "link remote: \[AF_INET]" /usr/local/pia/cache/session.log | gawk -F"]" \'{print $2}\' | gawk -F":" \'{print $1}\'', $cmdret);
   if(array_key_exists(0, $cmdret) === true && $cmdret[0] != '' ){
     return $cmdret[0];
   }
@@ -775,7 +775,7 @@ function VPN_get_IP(){
   */
  function VPN_get_port(){
    global $_files;
-   $cache_file = '/pia/cache/webui-port.txt';
+   $cache_file = '/usr/local/pia/cache/webui-port.txt';
 
    //check if we are connected yet
   $session_status = VPN_sessionlog_status();
@@ -865,7 +865,7 @@ function get_port(){
   //get provider from connectin2
   $provider = explode('/', $_SESSION['connecting2']);
   $filename = VPN_get_loginfile($provider[0]);
-  if( !preg_match("/^\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $filename ) ){throw new Exception('FATAL ERROR: invalid login file name - '.$filename); }
+  if( !preg_match("/^\/usr/local/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $filename ) ){throw new Exception('FATAL ERROR: invalid login file name - '.$filename); }
 
 
   //get username and password from file or SESSION
@@ -875,7 +875,7 @@ function get_port(){
 
   //get the client ID
   if( array_key_exists('client_id', $_SESSION) !== true ){
-    $c = $_files->readfile('/pia/client_id');
+    $c = $_files->readfile('/usr/local/pia/client_id');
     if( $c !== false ){
       if( mb_strlen($c) < 1 ){ return false; }
       $_SESSION['client_id'] = $c; //store for later
@@ -1105,11 +1105,11 @@ function VPN_get_loginfile($VPN_provider){
   if( !array_key_exists(0, $ovpns) ){ return FALSE; }
 
   //pick first one of the ovpn files to get "auth-user-pass" setting
-  $inj = escapeshellarg('/pia/ovpn/'.$ovpns[0].'.ovpn');
+  $inj = escapeshellarg('/usr/local/pia/ovpn/'.$ovpns[0].'.ovpn');
   $cmdret = array();
   exec('grep "auth-user-pass" '.$inj.' | gawk -F" " \'{print $2}\' ', $cmdret);
   $login_file = $cmdret[0];
-  if( !preg_match("/^\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $login_file ) ){throw new Exception('FATAL ERROR: invalid login file name retrieved'); }
+  if( !preg_match("/^\/usr/local/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $login_file ) ){throw new Exception('FATAL ERROR: invalid login file name retrieved'); }
 
   return $login_file;
 }

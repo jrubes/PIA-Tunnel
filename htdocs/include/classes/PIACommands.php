@@ -73,7 +73,7 @@ class PIACommands {
   function check_forward_state( $interface = '' ){
     $ret = array();
     $pass = escapeshellarg($interface);
-    exec('sudo /pia/include/fw_get_forward_state.sh '.$pass, $ret);
+    exec('sudo /usr/local/pia/include/fw_get_forward_state.sh '.$pass, $ret);
     if( array_key_exists( '0', $ret) === true ){
         if( $ret[0] === 'ON' ){
             return true;
@@ -86,12 +86,12 @@ class PIACommands {
   }
 
    /**
-   * method to rebuild /pia/include/autostart.conf file based on configuration settings
+   * method to rebuild /usr/local/pia/include/autostart.conf file based on configuration settings
    * @return boolean TRUE on success or FALSE on failure
    */
   function rebuild_autostart(){
     $ret = array();
-    exec('sudo /pia/include/autostart_rebuild.sh', $ret);
+    exec('sudo /usr/local/pia/include/autostart_rebuild.sh', $ret);
     if( array_key_exists( '0', $ret) === true ){
         if( $ret[0] === 'OK' ){
             return true;
@@ -122,7 +122,7 @@ class PIACommands {
    * deletes the status file so the next version check will be forced
    */
   function clear_update_status(){
-    $cache_file = '/pia/cache/webui-update_status.txt';
+    $cache_file = '/usr/local/pia/cache/webui-update_status.txt';
     if( file_exists($cache_file) ){ unlink($cache_file); }
   }
 
@@ -133,7 +133,7 @@ class PIACommands {
    */
   function get_update_status($force_update=false){
     static $running = false; //set to true will shell script is running
-    $cache_file = '/pia/cache/webui-update_status.txt';
+    $cache_file = '/usr/local/pia/cache/webui-update_status.txt';
 
     if( $force_update === true ){
         $git_ret = $this->get_revlist_count();
@@ -186,7 +186,7 @@ class PIACommands {
   private function get_revlist_count(){
     global $settings;
     $sh = escapeshellarg($settings['GIT_BRANCH']);
-    exec("bash -c \" /pia/include/log_fetch.sh $sh &>>/dev/null &\" &>/dev/null &");
+    exec("bash -c \" /usr/local/pia/include/log_fetch.sh $sh &>>/dev/null &\" &>/dev/null &");
   }
 
 
@@ -200,7 +200,7 @@ class PIACommands {
     $ret = array();
     $sret = '';
     $count = escapeshellarg($count);
-    exec('cd /pia ; git --no-pager log -n '.$count.' --pretty="format:%ci%n>> %s <<%n" origin/'.$settings['GIT_BRANCH'], $ret);
+    exec('cd /usr/local/pia ; git --no-pager log -n '.$count.' --pretty="format:%ci%n>> %s <<%n" origin/'.$settings['GIT_BRANCH'], $ret);
 
     $cnt = count($ret);
     if( $cnt > 0 ){
@@ -218,7 +218,7 @@ class PIACommands {
   }
 
   /**
-   * start /pia/pia-start with passed argument
+   * start /usr/local/pia/pia-start with passed argument
    * @param string $ovpn name of connection or 'daemon' to use MYVPN array
    */
   function pia_connect( $ovpn ){
@@ -237,13 +237,13 @@ class PIACommands {
       $_SESSION['connecting2'] = $ovpn; //store for messages
     }
 
-    $f = '/pia/cache/php_pia-start.log';
+    $f = '/usr/local/pia/cache/php_pia-start.log';
     $this->_files->rm($f);
     $this->_files->writefile( $f, $c ); //write file so status overview works right away
 
     //time to initiate the connection
     //using bash allows this to happen in the background
-    exec("bash -c \"sudo /pia/pia-start $arg &>> $f &\" &>/dev/null &");
+    exec("bash -c \"sudo /usr/local/pia/pia-start $arg &>> $f &\" &>/dev/null &");
   }
 
   /**
@@ -252,12 +252,12 @@ class PIACommands {
   function pia_disconnect(){
     $this->clear_session();
 
-    $this->_files->rm('/pia/cache/php_pia-start.log');
-    exec("bash -c \"sudo /pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
+    $this->_files->rm('/usr/local/pia/cache/php_pia-start.log');
+    exec("bash -c \"sudo /usr/local/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
   }
 
   /**
-   * interact with /pia/pia-daemon commnad
+   * interact with /usr/local/pia/pia-daemon commnad
    * @param string $command string containing command
    * <ul>
    * <li>stop</li>
@@ -268,12 +268,12 @@ class PIACommands {
     switch( $command ){
       case 'stop':
         $foo = array();
-        exec('sudo /pia/pia-daemon stop', $foo);
+        exec('sudo /usr/local/pia/pia-daemon stop', $foo);
         break;
       case 'start':
-        exec('killall /pia/pia-daemon &> /dev/null');
-        exec('sudo /pia/pia-daemon stop');
-        exec('bash -c "sudo /pia/pia-daemon &>/pia/cache/pia-daemon.log &" &>/dev/null &');
+        exec('killall /usr/local/pia/pia-daemon &> /dev/null');
+        exec('sudo /usr/local/pia/pia-daemon stop');
+        exec('bash -c "sudo /usr/local/pia/pia-daemon &>/usr/local/pia/cache/pia-daemon.log &" &>/dev/null &');
         break;
     }
   }
@@ -282,9 +282,9 @@ class PIACommands {
    * method to clear any cached data
    */
   function clear_session(){
-    $f = '/pia/cache/session.log';
+    $f = '/usr/local/pia/cache/session.log';
     $this->_files->rm($f);
-    $f = '/pia/cache/webui-port.txt';
+    $f = '/usr/local/pia/cache/webui-port.txt';
     $this->_files->rm($f);
 
     if( array_key_exists('PIA_port', $_SESSION) === true ){
@@ -316,7 +316,7 @@ function update_root_password( $new_pw = null ){
 
   $out = array();
   $stat = 99;
-  exec("sudo /pia/include/update_root.sh $new_pw", $out, $stat);
+  exec("sudo /usr/local/pia/include/update_root.sh $new_pw", $out, $stat);
 
   $ret = "";
   switch($stat){
@@ -395,14 +395,14 @@ function is_mounted( $mount_point ){
  * mount the drive defined in settings
  */
 function cifs_mount(){
-  exec('sudo /pia/include/cifs_mount.sh');
+  exec('sudo /usr/local/pia/include/cifs_mount.sh');
 }
 
 /**
  * unmount the drive defined in settings
  */
 function cifs_umount(){
-  exec('sudo /pia/include/cifs_umount.sh');
+  exec('sudo /usr/local/pia/include/cifs_umount.sh');
 }
 
 
@@ -410,14 +410,14 @@ function cifs_umount(){
  * killall transmission-daemon
  */
 function transmission_stop(){
-  exec('sudo /pia/include/transmission-stop.sh');
+  exec('sudo /usr/local/pia/include/transmission-stop.sh');
 }
 
 /**
  * start transmission-daemon
  */
 function transmission_start(){
-  exec('sudo /pia/include/transmission-start.sh');
+  exec('sudo /usr/local/pia/include/transmission-start.sh');
 }
 
 

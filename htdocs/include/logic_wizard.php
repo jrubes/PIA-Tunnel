@@ -26,11 +26,11 @@ switch($_REQUEST['cmd']){
 
     if( $settings['HAS_BEEN_RESET'] != "yes" ){ //don't run again on page refresh
       //reset to HEAD then run update
-      exec("cd /pia ; git reset --hard HEAD");
-      exec("sudo /pia/pia-update");
+      exec("cd /usr/local/pia ; git reset --hard HEAD");
+      exec("sudo /usr/local/pia/pia-update");
 
       $result = array();
-      exec("sudo /pia/reset-pia", $result);
+      exec("sudo /usr/local/pia/reset-pia", $result);
       if( array_key_exists('0', $result) === true ){
         $_SESSION = array(); //clear all session vars
         $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.<br>Please double check the IP as it tends to change after a reset.</div>\n";

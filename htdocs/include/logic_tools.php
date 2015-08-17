@@ -22,7 +22,7 @@ if(array_key_exists('ovpn', $_SESSION) !== true ){
 switch($_REQUEST['cmd']){
   case 'force_update':
     if( $_token->pval($_GET['token'], 'force operating system update') === true ){
-      exec("bash -c \"sudo /pia/system-update.sh &> /dev/null &\" &>/dev/null &");
+      exec("bash -c \"sudo /usr/local/pia/system-update.sh &> /dev/null &\" &>/dev/null &");
       $disp_body .= "<div id=\"feedback\" class=\"feedback\">Operating System Update is now running in the background.</div>\n";
     }else{
       $disp_body .= "<div id=\"feedback\" class=\"feedback\">Invalid token - request ignored.</div>\n";
@@ -40,7 +40,7 @@ switch($_REQUEST['cmd']){
     if( array_key_exists('pia-update', $_POST) === true ){
       //GUI access to pia-setup
       $result = array();
-      exec("sudo /pia/pia-update", $result);
+      exec("sudo /usr/local/pia/pia-update", $result);
       $disp_body .= "<div id=\"feedback\" class=\"feedback\">Update Executed</div>\n";
       $disp_body .= "<div id=\"feedback\" class=\"feedback\">\n";
       if( array_key_exists('0', $result) === true ){
@@ -56,12 +56,12 @@ switch($_REQUEST['cmd']){
     }elseif( array_key_exists('reset-pia', $_POST) === true ){
       if( $_token->pval($_POST['token'], 'complete system reset') === true ){
         //reset repo and apply latest updates first
-        exec("cd /pia ; git reset --hard HEAD");
-        exec("sudo /pia/pia-update");
+        exec("cd /usr/local/pia ; git reset --hard HEAD");
+        exec("sudo /usr/local/pia/pia-update");
 
         //GUI access to reset-pia
         $result = array();
-        exec("sudo /pia/reset-pia", $result);
+        exec("sudo /usr/local/pia/reset-pia", $result);
         if( array_key_exists('0', $result) === true ){
           $_SESSION = array(); //clear all session vars
           $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.<br>Please double check the IP as it tends to change after a reset.</div>\n";

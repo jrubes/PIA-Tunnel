@@ -2,8 +2,8 @@
 # script to generate a list of IPs to be used when pinging
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
-source '/pia/include/functions.sh'
+source '/usr/local/pia/settings.conf'
+source '/usr/local/pia/include/functions.sh'
 
 # simulate packet loss
 #tc qdisc del root dev eth0 2> /dev/null
@@ -26,7 +26,7 @@ aIPS[0]=""
 #used for debug in this script
 VERBOSE="yes"
 
-IPCACHE="/pia/ip_list.txt"
+IPCACHE="/usr/local/pia/ip_list.txt"
 
 
 
@@ -122,7 +122,7 @@ if [ $ip_count -lt 11 ]; then
 
 else
   # aIPS is now a string over IPs separated by space
-  # loop over and write to /pia/ip_list.txt
+  # loop over and write to /usr/local/pia/ip_list.txt
   echo "# generated on "$(date +"%Y-%m-%d %H:%M:%S") > "$IPCACHE"
   for ip in ${aIPS[@]}
   do

@@ -2,8 +2,8 @@
 # script to monitor the tunnel connection and terminate or restart it if it fails
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
-source '/pia/include/functions.sh'
+source '/usr/local/pia/settings.conf'
+source '/usr/local/pia/include/functions.sh'
 
 
 # How it works
@@ -29,7 +29,7 @@ function control_c() {
   echo #or ^C will make it ugly
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- stopping pia-daemon and closing open connections"
-  /pia/pia-stop "quite"
+  /usr/local/pia/pia-stop "quite"
   exit "$?"
 }
 
@@ -78,7 +78,7 @@ while true; do
 	  fi
 
       # terminate transmission to prevent traffic leaking out
-      /pia/include/transmission-stop.sh
+      /usr/local/pia/include/transmission-stop.sh
       if [ "$?" = "0" ]; then
         echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")"- transmission daemon needs to be restart manually .... for now"
 
@@ -87,28 +87,28 @@ while true; do
             "- unable to terminate transmission daemon - this is serious"
         echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
             "- closing the firewall and rebooting the system - NOW!"
-        /pia/include/fw-close.sh
+        /usr/local/pia/include/fw-close.sh
         reboot
       fi
 
 
 
 	  # disable port forwarding and reset the firewall until this is fixed
-	  /pia/pia-forward stop quite
+	  /usr/local/pia/pia-forward stop quite
 	fi
 	#end of VPN test
 
         #check if SOCKS proxy is up
         if [ "${vpn_up}" = "OK" ] && [ "${SOCKS_EXT_ENABLED}" = "yes" ] || [ "${SOCKS_INT_ENABLED}" = "yes" ]; then
-          socks_stat=`/pia/include/socks-status.sh`
+          socks_stat=`/usr/local/pia/include/socks-status.sh`
           if [ "${socks_stat}" = 'not running' ]; then
-            /pia/include/socks-start.sh
+            /usr/local/pia/include/socks-start.sh
           fi
 
         elif [ ! "{$vpn_up}" = "OK" ] && [ "${SOCKS_EXT_ENABLED}" = "yes" ] || [ "${SOCKS_INT_ENABLED}" = "yes" ]; then
-          socks_stat=`/pia/include/socks-status.sh`
+          socks_stat=`/usr/local/pia/include/socks-status.sh`
           if [ "${socks_stat}" = 'running' ]; then
-            /pia/include/socks-stop.sh
+            /usr/local/pia/include/socks-stop.sh
           fi
 
         fi
@@ -120,14 +120,14 @@ while true; do
                 if [ "$FORWARD_PUBLIC_LAN" = 'yes' ] || [ "$FORWARD_VM_LAN" = 'yes' ]; then
                     echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
                     "- FW not enabled but it should be. restarting FW!"
-                    /pia/pia-forward start quite
+                    /usr/local/pia/pia-forward start quite
                 fi
 
             else
                 if [ "$FORWARD_PUBLIC_LAN" = 'no' ] && [ "$FORWARD_VM_LAN" = 'no' ]; then
                     echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
                     "- FW disabled but running. stopping FW!"
-                    /pia/pia-forward stop quite
+                    /usr/local/pia/pia-forward stop quite
                 fi
             fi
         fi
@@ -159,7 +159,7 @@ while true; do
 
 					echo -e "\trunning ${bold}pia-forward fix${normal}"
 					RAN_FORWARD_FIX="yes"
-					/pia/pia-forward fix quite
+					/usr/local/pia/pia-forward fix quite
 				fi
 			fi
 
@@ -171,13 +171,13 @@ while true; do
 
 				echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 					"- Internet is DOWN! Recheck in $SLEEP_INTERNET_DOWN seconds"
-                                rm -f "/pia/cache/session.log"
-				/pia/pia-forward stop quite
+                                rm -f "/usr/local/pia/cache/session.log"
+				/usr/local/pia/pia-forward stop quite
 				sleep $SLEEP_INTERNET_DOWN
 
 				#restarting pia-daemon because there is no goto :(
 				# will have to rewrite this script as a later timer
-				/pia/pia-daemon shutup
+				/usr/local/pia/pia-daemon shutup
 				exit
 				break
 
@@ -213,8 +213,8 @@ while true; do
 			switch_vpn
 
 		else
-			/pia/pia-stop quite
-			/pia/pia-forward stop quite
+			/usr/local/pia/pia-stop quite
+			/usr/local/pia/pia-forward stop quite
 			echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- VPN has failed - connection terminated and forwarding disabled!"
 			exit
@@ -223,7 +223,7 @@ while true; do
 
 
 	# create and or maintain the status cache file
-	maintain_status_cache '/pia/cache/status.txt'
+	maintain_status_cache '/usr/local/pia/cache/status.txt'
 	if [ "$?" != "0" ]; then
 	  echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	    "- error during status cache maintenance\n\tpia-status will not work"
@@ -231,8 +231,8 @@ while true; do
 	fi
 
 	if [ "$VERBOSE" = "yes" ]; then
-	  vpn_port=`cat "/pia/cache/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
-	  #vpn_ip=`cat "/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
+	  vpn_port=`cat "/usr/local/pia/cache/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
+	  #vpn_ip=`cat "/usr/local/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
       vpn_ip=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
 	  if [ "$vpn_port" = "none" ]; then
 	    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
@@ -249,7 +249,7 @@ while true; do
 	sleep $SLEEP_MAIN_LOOP
 
         #refresh settings after each run
-        source '/pia/settings.conf'
+        source '/usr/local/pia/settings.conf'
 
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 	  echo #print empty lines in debug mode to prevent cross eyes :)
@@ -257,6 +257,6 @@ while true; do
 	fi
 
 	#call self for now to allow auto update during dev
-	#/pia/pia-daemon shutup
+	#/usr/local/pia/pia-daemon shutup
 	#exit
 done

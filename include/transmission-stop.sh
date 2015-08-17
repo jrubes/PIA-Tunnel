@@ -2,7 +2,7 @@
 # kills the transmission daemon
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 
 
 echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - killing transmission-daemon"
@@ -29,7 +29,7 @@ done
 
 if [ "${CIFS_AUTO}" = 'yes' ]; then
     sync
-    /pia/include/cifs_umount.sh
+    /usr/local/pia/include/cifs_umount.sh
 fi
 
 

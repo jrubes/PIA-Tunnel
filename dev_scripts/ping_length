@@ -2,14 +2,14 @@
 # script to test different ping timeout settings using the ip_cache file
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 
 PING_COMMAND_VPN="ping -qn -i 0.5 -w 1 -W 0.5 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
 PING_COMMAND_INTERNET="ping -qn -i 0.5 -w 1 -W 0.5 -I $IF_EXT 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
 
 
 #read list of IPs into IP_LIST array
-IFS=$'\r\n' IP_LIST=($(cat "/pia/ip_list.txt" | tail -n+2))
+IFS=$'\r\n' IP_LIST=($(cat "/usr/local/pia/ip_list.txt" | tail -n+2))
 
 stat_cnt_ok=0
 stat_cnt_er=0

@@ -2,7 +2,7 @@
 # checks if sockd is currently running
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 
 # try with pid first. this should be most accurate
 sockd_pid=`cat /tmp/sockd.pid 2&> /dev/null`

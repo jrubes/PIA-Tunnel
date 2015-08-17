@@ -1,6 +1,6 @@
 <?php
 /**
- * class to interact with /pia/settings.conf
+ * class to interact with /usr/local/pia/settings.conf
  * get, store, delete settings
  *
  * @author dev
@@ -13,7 +13,7 @@ class PIASettings {
   private $settings_changed;
 
   function __construct(){
-    $this->_settings_file = '/pia/settings.conf';
+    $this->_settings_file = '/usr/local/pia/settings.conf';
     $this->_settings = '';
     $this->settings_array_changes = 0;
     $this->settings_changed = 0;
@@ -103,7 +103,7 @@ class PIASettings {
 
     $k = escapeshellarg($setting);
     $v = escapeshellarg($value);
-    exec("/pia/pia-settings $k $v");
+    exec("/usr/local/pia/pia-settings $k $v");
     //$disp_body .= "$k is now $v<br>\n"; //dev stuff
 
     //clear to force a reload
@@ -125,8 +125,8 @@ class PIASettings {
 
     //the array functions do not honor line numbers so strip all comments as they will not
     //be above the settings anymore
-    exec('sed \'/^#/ d\' "/pia/settings.conf" > "/pia/settings.conf.bak"');
-    exec('mv "/pia/settings.conf.bak" "/pia/settings.conf"');
+    exec('sed \'/^#/ d\' "/usr/local/pia/settings.conf" > "/usr/local/pia/settings.conf.bak"');
+    exec('mv "/usr/local/pia/settings.conf.bak" "/usr/local/pia/settings.conf"');
 
 
     $this->remove_array($array_name);
@@ -332,7 +332,7 @@ function is_settings_array( $array_name ){
 }
 
   /**
-  * read /pia/settings.conf into an array
+  * read /usr/local/pia/settings.conf into an array
   * @return array,bool array with ['name'], ['password'] OR FALSE on failure
   */
  function get_settings(){
@@ -444,12 +444,12 @@ function get_settings_array($name){
 
 
 /**
- * update /pia/smbpasswd.conf
+ * update /usr/local/pia/smbpasswd.conf
  */
 function cifs_auth(){
   $settings = $this->get_settings();
-  exec("echo username=\"".$settings['CIFS_USER']."\" > /pia/smbpasswd.conf" );
-  exec("echo password=\"".$settings['CIFS_PASSWORD']."\" >> /pia/smbpasswd.conf" );
+  exec("echo username=\"".$settings['CIFS_USER']."\" > /usr/local/pia/smbpasswd.conf" );
+  exec("echo password=\"".$settings['CIFS_PASSWORD']."\" >> /usr/local/pia/smbpasswd.conf" );
 
 }
 
@@ -457,7 +457,7 @@ function cifs_auth(){
  * update transmission config file
  */
 function tcupdate(){
-  exec('sudo /pia/include/transmission-config.sh');
+  exec('sudo /usr/local/pia/include/transmission-config.sh');
 }
 
 }

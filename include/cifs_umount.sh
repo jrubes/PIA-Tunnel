@@ -2,7 +2,7 @@
 # unmounts the network drive
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
+source '/usr/local/pia/settings.conf'
 
 mounted=`mount | grep "${CIFS_MOUNT}"`
 
@@ -12,6 +12,6 @@ if [ "${mounted}" != "" ]; then
 
   if [ "${CIFS_SHARE}" != "" ] && [ "${CIFS_MOUNT}" != "" ]; then
     #remove firewall rules allowing CIFS traffic
-    /pia/include/cifs_fwclose.sh
+    /usr/local/pia/include/cifs_fwclose.sh
   fi
 fi

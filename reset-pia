@@ -24,34 +24,34 @@ cd /var/lib/dhcp/ ; rm -f *.leases~
 cd /var/lib/dhcp/ ; touch dhcpd.leases
 
 #delete pia-* files
-rm -f /pia/login-*.conf
+rm -f /usr/local/pia/login-*.conf
 FILES="session.log login.conf client_id status.txt include/status.txt"
 for f in $FILES
 do
-	if [ -f "/pia/$f" ]; then
-		rm -f "/pia/$f"
+	if [ -f "/usr/local/pia/$f" ]; then
+		rm -f "/usr/local/pia/$f"
 	fi
 done
 
 #delete cache files
-rm -rf "/pia/cache/"
+rm -rf "/usr/local/pia/cache/"
 
 
 #delete settings.conf
-rm -f /pia/settings.conf
+rm -f /usr/local/pia/settings.conf
 
 
 # clear cache and SWAP
 sync && /sbin/sysctl vm.drop_caches=3 && swapoff -a && swapon -a
 
 # reset the git repo to the last know commit
-cd /pia ; git reset --hard HEAD &> /dev/null
+cd /usr/local/pia ; git reset --hard HEAD &> /dev/null
 
 #Now run setup to get settings back and apply permissions
-chmod ugo+x /pia/pia-setup
-/pia/pia-setup
+chmod ugo+x /usr/local/pia/usr/local/pia-setup
+/usr/local/pia/usr/local/pia-setup
 
 #force wizard to start
-sed -i 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /pia/settings.conf
+sed -i 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf
 
 echo "Done, reboot or shutdown now!"

@@ -2,8 +2,8 @@
 # ensures that the storage drive is mounted, then starts the transmission client
 LANG=en_US.UTF-8
 export LANG
-source '/pia/settings.conf'
-source '/pia/include/functions.sh'
+source '/usr/local/pia/settings.conf'
+source '/usr/local/pia/include/functions.sh'
 
 # do not start if VPN is down
 ping_host_new "vpn"
@@ -18,7 +18,7 @@ fi
 mounted=`mount | grep "${CIFS_MOUNT}"`
 
 if [ "${mounted}" = "" ]; then
-  /pia/include/cifs_mount.sh
+  /usr/local/pia/include/cifs_mount.sh
 
   if [ "$?" != "0" ]; then
     echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\

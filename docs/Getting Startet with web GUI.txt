@@ -114,7 +114,7 @@ Install VMware Player with default options, then continue to the "SETUP" section
 	passwd
 	
 9) Run "pia-status" to get a list of IPs.
-   /pia/pia-status
+   /usr/local/pia/pia-status
 
 10) Open your Webbroser and connect to the "Public LAN IP" displayed in the previous step
     The PIA-Tunnel Management Interface will open, goto step 11
