@@ -103,8 +103,8 @@ cd /usr/local/pia/client_scripts ; zip -r /usr/local/www/apache24/data/monitor-w
 cp "/usr/local/pia/docs/PIA-Tunnel Documentation.pdf" /usr/local/www/apache24/data/pia-tunnel_documentation.pdf &> /dev/null
 mkdir -p /usr/local/www/apache24/data/docs/ ; cp -r "/usr/local/pia/docs/HTML Manual/"* /usr/local/www/apache24/data/docs/
 chown -R www:www /usr/local/www/apache24/data/
-find /var/www/docs -type d -exec chmod 0750 {} \;
-find /var/www/docs -type f -exec chmod 0640 {} \;
+find /usr/local/www/apache24/data/ -type d -exec chmod 0750 {} \;
+find /usr/local/www/apache24/data/ -type f -exec chmod 0640 {} \;
 
 # clear webUI update cache
 rm -rf "/usr/local/pia/cache/webui-update_status.txt"
