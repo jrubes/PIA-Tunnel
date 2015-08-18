@@ -12,7 +12,8 @@ if [ $# -eq 0 ]; then
   exit 2
 fi
 
-len=`expr length "$1"`
+#len=`expr length "$1"
+len=${#1}
 
 if [ "$len" -lt 3 ]; then
  exit 2
