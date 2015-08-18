@@ -37,7 +37,7 @@ function get_port(){
   $PIA_PW = urlencode($_SESSION['login-pia.conf']['password']);
   $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
   $ret = array();
-  exec('/sbin/ip addr show tun0 2>/dev/null | grep -w "inet" | gawk -F" " \'{print $2}\' | cut -d/ -f1', $ret);
+  exec('/sbin/ip addr show tun0 2>/dev/null | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
   if( array_key_exists( '0', $ret) !== true ){
     //VPN  is down, can not continue to check for open ports
     return false;

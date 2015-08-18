@@ -293,7 +293,7 @@ function remove_array($array_name){
   }else{
     $config_value = substr($array_name, 0, strpos($array_name, '[') ); //this is the value of $key without [n]. this is used for the array name when writing it back
   }
-  exec('grep -n  "'.$config_value.'" '.$this->_settings_file.' | cut -d: -f1', $ret); // $ret[] will contain line number with current settings
+  exec('/usr/bin/grep -n  "'.$config_value.'" '.$this->_settings_file.' | /usr/bin/cut -d: -f1', $ret); // $ret[] will contain line number with current settings
 
   //loop over returned values and remove the lines
   for( $x = count($ret)-1 ; $x >= 0 ; --$x ){ //go backwards or line numbers need to be adjusted

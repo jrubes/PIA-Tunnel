@@ -15,7 +15,7 @@ if [ "$RET_PING_HOST" != "OK" ]; then
 fi
 
 
-mounted=`mount | grep "${CIFS_MOUNT}"`
+mounted=`mount | /usr/bin/grep "${CIFS_MOUNT}"`
 
 if [ "${mounted}" = "" ]; then
   /usr/local/pia/include/cifs_mount.sh

@@ -60,7 +60,7 @@ if [ -z "${VERBOSE}" ]; then
 
 fi
 
-ret=`grep -c 'bold=' /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c 'bold=' /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo '#for pretty print' >> '/usr/local/pia/settings.conf'
   echo '#####' >> '/usr/local/pia/settings.conf'
@@ -155,45 +155,45 @@ fi
 
 
 # in BASH DHCPD_STATIC_MAC="" then -z fails
-ret=`grep -c "DHCPD_STATIC_MAC" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "DHCPD_STATIC_MAC" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'DHCPD_STATIC_MAC=""' >> '/usr/local/pia/settings.conf'
 fi
-ret=`grep -c "DHCPD_STATIC_IP" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "DHCPD_STATIC_IP" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'DHCPD_STATIC_IP=""' >> '/usr/local/pia/settings.conf'
 fi
 
 #add web UI user info
-ret=`grep -c "WEB_UI_USER" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "WEB_UI_USER" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_USER=""' >> '/usr/local/pia/settings.conf'
 fi
-ret=`grep -c "WEB_UI_PASSWORD" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "WEB_UI_PASSWORD" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_PASSWORD=""' >> '/usr/local/pia/settings.conf'
 fi
-ret=`grep -c "WEB_UI_NAMESPACE" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "WEB_UI_NAMESPACE" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_NAMESPACE="3DApa2ezdm"' >> '/usr/local/pia/settings.conf'
 fi
-ret=`grep -c "WEB_UI_COOKIE" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "WEB_UI_COOKIE" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_COOKIE=""' >> '/usr/local/pia/settings.conf'
 fi
-ret=`grep -c "WEB_UI_COOKIE_LIFETIME" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "WEB_UI_COOKIE_LIFETIME" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_COOKIE_LIFETIME="120"' >> '/usr/local/pia/settings.conf'
 fi
 
 #ping failure
-ret=`grep -c "PING_MAX_LOSS" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "PING_MAX_LOSS" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'PING_MAX_LOSS="20"' >> '/usr/local/pia/settings.conf'
 fi
 
 #SOCKS proxy failure
-ret=`grep -c "SOCKS_EXT_ENABLED" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "SOCKS_EXT_ENABLED" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'SOCKS_EXT_ENABLED="no"' >> '/usr/local/pia/settings.conf'
   echo 'SOCKS_EXT_PORT="8080"' >> '/usr/local/pia/settings.conf'
@@ -209,7 +209,7 @@ if [ $ret = 0 ]; then
 fi
 
 # git branch setting for online updates
-ret=`grep -c "GIT_BRANCH" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "GIT_BRANCH" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   CURRENT_BRANCH=`cd /usr/local/pia/ ; /usr/local/bin/git branch | /usr/bin/grep '*' | i/usr/local/bin/gawk -F" " '{print $2}'`
   if [ "$CURRENT_BRANCH" != "" ]; then
@@ -225,7 +225,7 @@ fi
 
 
 # initial setup of phpDCHPD
-ret=`grep -c "GIT_SUB_PDHCPD" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "GIT_SUB_PDHCPD" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   cd /usr/local/pia/
   /usr/local/bin/git submodule init htdocs/plugin/phpdhcpd
@@ -265,7 +265,7 @@ fi
 
 
 # add setup wizard value to settings - default to yes since a full reset will set it to no
-ret=`grep -c "SETUP_WIZARD_COMPLETED" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "SETUP_WIZARD_COMPLETED" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'SETUP_WIZARD_COMPLETED="yes"' >> '/usr/local/pia/settings.conf'
 fi

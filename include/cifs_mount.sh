@@ -4,7 +4,7 @@ LANG=en_US.UTF-8
 export LANG
 source '/usr/local/pia/settings.conf'
 
-mounted=`mount | grep "${CIFS_MOUNT}"`
+mounted=`mount | /usr/bin/grep "${CIFS_MOUNT}"`
 
 if [ "${mounted}" = "" ]; then
 

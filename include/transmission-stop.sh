@@ -8,7 +8,7 @@ source '/usr/local/pia/settings.conf'
 echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - killing transmission-daemon"
 LOOP_PROTECT=0
 while true; do
-  running=`ps aux | grep -c "transmission-daemon"`
+  running=`ps aux | /usr/bin/grep -c "transmission-daemon"`
   if [ "$running" -gt 1 ]; then
     killall "transmission-daemon"
   else

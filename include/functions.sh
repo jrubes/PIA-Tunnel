@@ -19,8 +19,8 @@ if [ $? -eq 0 ]; then
 	PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\""
 else
 	#FreeBSD
-        PING_COMMAND="ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
-        PING_PACKET_LOSS="ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | grep \"packet loss\""
+        PING_COMMAND="ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | /usr/bin/grep -c \", 0% packet loss\""
+        PING_PACKET_LOSS="ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | /usr/bin/grep \"packet loss\""
 fi
 
 # fallback list
@@ -37,8 +37,8 @@ function check_default_username(){
 
     if [ "$FCOUNT" -lt 1 ]; then
         # FATAL ERROR: make sure to always print IP info
-        INT_IP=`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-        EXT_IP=`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+        INT_IP=`/sbin/ip addr show $IF_INT | /usr/bin/grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+        EXT_IP=`/sbin/ip addr show $IF_EXT | /usr/bin/grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
         echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: $EXT_IP"
         echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: $INT_IP"
 
@@ -274,9 +274,9 @@ function check_forward_state(){
     unset RET_FORWARD_STATE
 
     if [ "${1}" = "" ]; then
-      ret=`iptables -nL FORWARD | grep -c "ACCEPT"`
+      ret=`iptables -nL FORWARD | /usr/bin/grep -c "ACCEPT"`
     else
-      ret=`iptables -vnL FORWARD | grep "ACCEPT" | grep -c "${1}"`
+      ret=`iptables -vnL FORWARD | /usr/bin/grep "ACCEPT" | /usr/bin/grep -c "${1}"`
     fi
 
 
@@ -329,9 +329,9 @@ function remove_ip_from_array() {
 function echo_conn_established() {
   # show connection data
   maintain_status_cache '/usr/local/pia/cache/status.txt'
-  vpn_port=`cat "/usr/local/pia/cache/status.txt" | grep "VPNPORT" | gawk -F":" '{print $2}'`
-  #vpn_ip=`cat "/usr/local/pia/cache/status.txt" | grep "VPNIP" | gawk -F":" '{print $2}'`
-  vpn_ip=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  vpn_port=`cat "/usr/local/pia/cache/status.txt" | /usr/bin/grep "VPNPORT" | gawk -F":" '{print $2}'`
+  #vpn_ip=`cat "/usr/local/pia/cache/status.txt" | /usr/bin/grep "VPNIP" | gawk -F":" '{print $2}'`
+  vpn_ip=`/sbin/ip addr show $IF_TUNNEL | /usr/bin/grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
   echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- VPN connection to $1 established\n\tVPN IP: $vpn_ip Port: $vpn_port"
 }
@@ -430,7 +430,7 @@ function get_forward_port() {
     PIA_CLIENT_ID=`cat /usr/local/pia/client_id`
     PIA_UN=`sed -n '1p' /usr/local/pia/login-pia.conf`
     PIA_PW=`sed -n '2p' /usr/local/pia/login-pia.conf`
-    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | /usr/bin/grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
 
     #get open port of tunnel connection
     TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
@@ -575,14 +575,14 @@ function maintain_status_cache() {
 
   #get default gateway of tunnel interface using "ip"
   #get IP of tunnel Gateway
-  TUN_GATEWAY=`/sbin/ip route show | grep "0.0.0.0/1" | gawk -F" " '{print $3}'`
+  TUN_GATEWAY=`/sbin/ip route show | /usr/bin/grep "0.0.0.0/1" | /usr/local/bin/gawk -F" " '{print $3}'`
   #get IPs of interfaces
-  INT_IP=`/sbin/ip addr show $IF_INT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-  EXT_IP=`/sbin/ip addr show $IF_EXT | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  INT_IP=`/sbin/ip addr show $IF_INT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
+  EXT_IP=`/sbin/ip addr show $IF_EXT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
 
   interface_exists "$IF_TUNNEL"
   if [ "$RET_INTERFACE_EXISTS" = "yes" ]; then
-    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
   else
     TUN_IP=""
   fi
@@ -638,8 +638,8 @@ function interface_exists() {
     return
   fi
 
-  
-  #check=`ip addr show $1 2>&1 | grep -c "does not exist"`
+
+  #check=`ip addr show $1 2>&1 | /usr/bin/grep -c "does not exist"`
   check=`ifconfig $1 >/dev/null 2>&1`
   #if [ "$check" = "0" ]; then
   if [ $? -eq 0 ]; then
@@ -809,8 +809,8 @@ function get_packet_loss(){
     #Debian returns 0%
     #ret=`echo "$passed" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | tr -d ' '`
     # BSD returns as 0.0%
-    ret=`echo "$passed" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | gawk -F "." '{print \$1}' | tr -d ' '`
-    errors=`echo "$ret" | grep -c "errors"`
+    ret=`echo "$passed" | /usr/local/bin/gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | /usr/local/bin/gawk -F "." '{print \$1}' | tr -d ' '`
+    errors=`echo "$ret" | /usr/bin/grep -c "errors"`
 
     if [ "$errors" = "0" ]; then
         RET_GET_PACKET_LOSS=$ret

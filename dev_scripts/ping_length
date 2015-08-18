@@ -4,8 +4,8 @@ LANG=en_US.UTF-8
 export LANG
 source '/usr/local/pia/settings.conf'
 
-PING_COMMAND_VPN="ping -qn -i 0.5 -w 1 -W 0.5 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
-PING_COMMAND_INTERNET="ping -qn -i 0.5 -w 1 -W 0.5 -I $IF_EXT 8.8.8.8 2>/dev/null | grep -c \", 0% packet loss\""
+PING_COMMAND_VPN="ping -qn -i 0.5 -w 1 -W 0.5 -I $IF_TUNNEL 8.8.8.8 2>/dev/null | /usr/bin/grep -c \", 0% packet loss\""
+PING_COMMAND_INTERNET="ping -qn -i 0.5 -w 1 -W 0.5 -I $IF_EXT 8.8.8.8 2>/dev/null | /usr/bin/grep -c \", 0% packet loss\""
 
 
 #read list of IPs into IP_LIST array

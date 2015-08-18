@@ -39,7 +39,7 @@ class PIACommands {
 
     //check the return from screen -ls
     $ex = array();
-    exec('ps aux | grep -c "pia-daemon"', $ex);
+    exec('ps aux | /usr/bin/grep -c "pia-daemon"', $ex);
     if( array_key_exists('0', $ex) === true && (int)$ex[0] > 2 ){ // 2 for command and grep itself
       return 'running';
     }else{
@@ -56,7 +56,7 @@ class PIACommands {
     //check the return from screen -ls
     $ex = array();
     $esc = escapeshellarg($service_name);
-    exec('ps aux | grep -c '.$esc, $ex);
+    exec('ps aux | /usr/bin/grep -c '.$esc, $ex);
     if( array_key_exists('0', $ex) === true && (int)$ex[0] > 2 ){ // 2 for command and grep itself
       return true;
     }else{
@@ -381,7 +381,7 @@ function is_mounted( $mount_point ){
 
   $ret = array();
   $mp = escapeshellarg($mount_point);
-  exec('mount | grep '.$mp ,$ret);
+  exec('mount | /usr/bin/grep '.$mp ,$ret);
 
   if( count($ret) > 0 ){
     return true;

@@ -467,7 +467,7 @@ function group_enabled_providers(){
 
     //pick first one of the ovpn files to get "auth-user-pass" setting
     $inj = escapeshellarg('/usr/local/pia/ovpn/'.$ovpns[0].'.ovpn');
-    exec('grep "auth-user-pass" '.$inj.' | gawk -F" " \'{print $2}\' ', $cmdret);
+    exec('/usr/bin/grep "auth-user-pass" '.$inj.' | /usr/local/bin/gawk -F" " \'{print $2}\' ', $cmdret);
     $providers[$cmdret[0]][] = $ep[1];
   }
 

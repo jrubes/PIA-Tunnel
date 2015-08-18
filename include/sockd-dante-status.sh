@@ -20,7 +20,7 @@ fi
 
 # last attempt with general ps
 # *WARNING* needs ww in ps or grep will not work on startup because the output is truncated!!
-ps_cnt=`ps asxww |  grep -c "/usr/sbin/sockd"`
+ps_cnt=`ps asxww |  /usr/bin/grep -c "/usr/sbin/sockd"`
 if [ "${ps_cnt}" = 0 ] || [ "${ps_cnt}" = 1 ]; then
   echo 'not running'
   exit;
