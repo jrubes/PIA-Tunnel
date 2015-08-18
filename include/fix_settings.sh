@@ -211,7 +211,7 @@ fi
 # git branch setting for online updates
 ret=`grep -c "GIT_BRANCH" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
-  CURRENT_BRANCH=`cd /usr/local/pia/ ; git branch | grep '*' | gawk -F" " '{print $2}'`
+  CURRENT_BRANCH=`cd /usr/local/pia/ ; /usr/local/bin/git branch | /usr/bin/grep '*' | i/usr/local/bin/gawk -F" " '{print $2}'`
   if [ "$CURRENT_BRANCH" != "" ]; then
     echo "using ${CURRENT_BRANCH}"
     echo "GIT_BRANCH='${CURRENT_BRANCH}'" >> '/usr/local/pia/settings.conf'
@@ -228,30 +228,30 @@ fi
 ret=`grep -c "GIT_SUB_PDHCPD" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   cd /usr/local/pia/
-  git submodule init htdocs/plugin/phpdhcpd
-  git submodule update htdocs/plugin/phpdhcpd
+  /usr/local/bin/git submodule init htdocs/plugin/phpdhcpd
+  /usr/local/bin/git submodule update htdocs/plugin/phpdhcpd
   echo 'GIT_SUB_PDHCPD="ran setup"' >> '/usr/local/pia/settings.conf'
 fi
 
 # initial setup of Parsedown
-ret=`grep -c "GIT_SUB_PARSEDOWN" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "GIT_SUB_PARSEDOWN" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   cd /usr/local/pia/
-  git submodule init htdocs/plugin/parsedown
-  git submodule update htdocs/plugin/parsedown
+  /usr/local/bin/git submodule init htdocs/plugin/parsedown
+  /usr/local/bin/git submodule update htdocs/plugin/parsedown
   echo 'GIT_SUB_PARSEDOWN="ran setup"' >> '/usr/local/pia/settings.conf'
 fi
 
 
 # webUI Overview refresh interval
-ret=`grep -c "WEB_UI_REFRESH_TIME" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "WEB_UI_REFRESH_TIME" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_REFRESH_TIME="15000"' >> '/usr/local/pia/settings.conf'
 fi
 
 
 # SOCKS5 software selection
-ret=`grep -c "SOCKS_SERVER_TYPE" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "SOCKS_SERVER_TYPE" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'SOCKS_SERVER_TYPE="3proxy"' >> '/usr/local/pia/settings.conf'
 fi
@@ -286,7 +286,7 @@ fi
 
 
 
-ret=`grep -c "TRANSMISSION_ENABLED" /usr/local/pia/settings.conf`
+ret=`/usr/bin/grep -c "TRANSMISSION_ENABLED" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'TRANSMISSION_ENABLED="no"' >> '/usr/local/pia/settings.conf'
   echo 'CIFS_AUTO="no"' >> '/usr/local/pia/settings.conf'

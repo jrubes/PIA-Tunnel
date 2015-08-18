@@ -6,8 +6,8 @@ export LANG
 clear
 echo "getting updates from https://github.com/KaiserSoft/PIA-Tunnel"
 cd /usr/local/pia/
-git config core.fileMode false
-git reset --hard HEAD
+/usr/local/bin/git config core.fileMode false
+/usr/local/bin/git reset --hard HEAD
 
 git pull origin 2>&1
 if [ "$?" -ne "0" ]; then
@@ -27,7 +27,7 @@ if [ "$?" -ne "0" ]; then
   exit 1
 fi
 
-git submodule init htdocs/plugin/parsedown 2>&1
+/usr/local/bin/git submodule init htdocs/plugin/parsedown 2>&1
 if [ "$?" -ne "0" ]; then
   # error updating repo, abort
   exit 1
@@ -47,4 +47,4 @@ chmod ugo+x /usr/local/pia/pia-setup
 
 
 echo "Showing the last 3 commit messages"
-git --no-pager log -n 3 --pretty="format:%ci%n>> %s <<%n"
+/usr/local/bin/git --no-pager log -n 3 --pretty="format:%ci%n>> %s <<%n"

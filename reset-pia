@@ -19,9 +19,11 @@ find /var/log -type f -delete
 
 #delete and recreate dhcpd cache files
 service isc-dhcp-server stop
-cd /var/lib/dhcp/ ; rm -f *.leases
-cd /var/lib/dhcp/ ; rm -f *.leases~
-cd /var/lib/dhcp/ ; touch dhcpd.leases
+# Debian cd /var/lib/dhcp/ ; rm -f *.leases
+# Debian cd /var/lib/dhcp/ ; rm -f *.leases~
+# Debian cd /var/lib/dhcp/ ; touch dhcpd.leases
+rm -f /tmp/dhcpd.leases* ; touch /tmp/dhcpd.leases
+
 
 #delete pia-* files
 rm -f /usr/local/pia/login-*.conf
@@ -42,7 +44,8 @@ rm -f /usr/local/pia/settings.conf
 
 
 # clear cache and SWAP
-sync && /sbin/sysctl vm.drop_caches=3 && swapoff -a && swapon -a
+# Debian sync && /sbin/sysctl vm.drop_caches=3 && swapoff -a && swapon -a
+sync && swapoff -a && swapon -a
 
 # reset the git repo to the last know commit
 cd /usr/local/pia ; /usr/local/bin/git reset --hard HEAD &> /dev/null
