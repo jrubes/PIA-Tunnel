@@ -45,7 +45,7 @@ rm -f /usr/local/pia/settings.conf
 sync && /sbin/sysctl vm.drop_caches=3 && swapoff -a && swapon -a
 
 # reset the git repo to the last know commit
-cd /usr/local/pia ; git reset --hard HEAD &> /dev/null
+cd /usr/local/pia ; /usr/local/bin/git reset --hard HEAD &> /dev/null
 
 #Now run setup to get settings back and apply permissions
 chmod ugo+x /usr/local/pia/pia-setup
