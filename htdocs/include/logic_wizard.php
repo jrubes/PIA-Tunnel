@@ -26,7 +26,7 @@ switch($_REQUEST['cmd']){
 
     if( $settings['HAS_BEEN_RESET'] != "yes" ){ //don't run again on page refresh
       //reset to HEAD then run update
-      exec("cd /usr/local/pia ; git reset --hard HEAD");
+      exec("cd /usr/local/pia ; /usr/local/bin/git reset --hard HEAD");
       exec("/usr/local/bin/sudo /usr/local/pia/pia-update");
 
       $result = array();
