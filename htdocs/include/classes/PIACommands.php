@@ -73,7 +73,7 @@ class PIACommands {
   function check_forward_state( $interface = '' ){
     $ret = array();
     $pass = escapeshellarg($interface);
-    exec('sudo /usr/local/pia/include/fw_get_forward_state.sh '.$pass, $ret);
+    exec('/usr/local/bin/sudo /usr/local/pia/include/fw_get_forward_state.sh '.$pass, $ret);
     if( array_key_exists( '0', $ret) === true ){
         if( $ret[0] === 'ON' ){
             return true;
@@ -91,7 +91,7 @@ class PIACommands {
    */
   function rebuild_autostart(){
     $ret = array();
-    exec('sudo /usr/local/pia/include/autostart_rebuild.sh', $ret);
+    exec('/usr/local/bin/sudo /usr/local/pia/include/autostart_rebuild.sh', $ret);
     if( array_key_exists( '0', $ret) === true ){
         if( $ret[0] === 'OK' ){
             return true;
@@ -243,7 +243,7 @@ class PIACommands {
 
     //time to initiate the connection
     //using bash allows this to happen in the background
-    exec("bash -c \"sudo /usr/local/pia/pia-start $arg &>> $f &\" &>/dev/null &");
+    exec("bash -c \"/usr/local/bin/sudo /usr/local/pia/pia-start $arg &>> $f &\" &>/dev/null &");
   }
 
   /**
@@ -253,7 +253,7 @@ class PIACommands {
     $this->clear_session();
 
     $this->_files->rm('/usr/local/pia/cache/php_pia-start.log');
-    exec("bash -c \"sudo /usr/local/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
+    exec("bash -c \"/usr/local/bin/sudo /usr/local/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
   }
 
   /**
@@ -268,12 +268,12 @@ class PIACommands {
     switch( $command ){
       case 'stop':
         $foo = array();
-        exec('sudo /usr/local/pia/pia-daemon stop', $foo);
+        exec('/usr/local/bin/sudo /usr/local/pia/pia-daemon stop', $foo);
         break;
       case 'start':
         exec('killall /usr/local/pia/pia-daemon &> /dev/null');
-        exec('sudo /usr/local/pia/pia-daemon stop');
-        exec('bash -c "sudo /usr/local/pia/pia-daemon &>/usr/local/pia/cache/pia-daemon.log &" &>/dev/null &');
+        exec('/usr/local/bin/sudo /usr/local/pia/pia-daemon stop');
+        exec('bash -c "/usr/local/bin/sudo /usr/local/pia/pia-daemon &>/usr/local/pia/cache/pia-daemon.log &" &>/dev/null &');
         break;
     }
   }
@@ -316,7 +316,7 @@ function update_root_password( $new_pw = null ){
 
   $out = array();
   $stat = 99;
-  exec("sudo /usr/local/pia/include/update_root.sh $new_pw", $out, $stat);
+  exec("/usr/local/bin/sudo /usr/local/pia/include/update_root.sh $new_pw", $out, $stat);
 
   $ret = "";
   switch($stat){
@@ -395,14 +395,14 @@ function is_mounted( $mount_point ){
  * mount the drive defined in settings
  */
 function cifs_mount(){
-  exec('sudo /usr/local/pia/include/cifs_mount.sh');
+  exec('/usr/local/bin/sudo /usr/local/pia/include/cifs_mount.sh');
 }
 
 /**
  * unmount the drive defined in settings
  */
 function cifs_umount(){
-  exec('sudo /usr/local/pia/include/cifs_umount.sh');
+  exec('/usr/local/bin/sudo /usr/local/pia/include/cifs_umount.sh');
 }
 
 
@@ -410,14 +410,14 @@ function cifs_umount(){
  * killall transmission-daemon
  */
 function transmission_stop(){
-  exec('sudo /usr/local/pia/include/transmission-stop.sh');
+  exec('/usr/local/bin/sudo /usr/local/pia/include/transmission-stop.sh');
 }
 
 /**
  * start transmission-daemon
  */
 function transmission_start(){
-  exec('sudo /usr/local/pia/include/transmission-start.sh');
+  exec('/usr/local/bin/sudo /usr/local/pia/include/transmission-start.sh');
 }
 
 
