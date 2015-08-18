@@ -122,7 +122,7 @@ function VM_shutdown(){
 function VM_restart(){
   global $_pia;
   $_pia->clear_session();
-  exec('sudo /sbin/shutdown -r now &>/dev/null &');
+  exec('/usr/local/bin/sudo /sbin/shutdown -r now &>/dev/null &');
 }
 
 

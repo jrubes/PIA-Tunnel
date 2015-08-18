@@ -48,10 +48,10 @@ sync && /sbin/sysctl vm.drop_caches=3 && swapoff -a && swapon -a
 cd /usr/local/pia ; git reset --hard HEAD &> /dev/null
 
 #Now run setup to get settings back and apply permissions
-chmod ugo+x /usr/local/pia/usr/local/pia-setup
-/usr/local/pia/usr/local/pia-setup
+chmod ugo+x /usr/local/pia/pia-setup
+/usr/local/pia/pia-setup
 
 #force wizard to start
-sed -i 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf
+sed -i '' 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf
 
 echo "Done, reboot or shutdown now!"
