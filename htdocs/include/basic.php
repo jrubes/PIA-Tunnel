@@ -289,7 +289,7 @@ function get_port_forward_locations( &$conn_name ){
 function VPN_get_user( $provider ){
 
   $filename = VPN_get_loginfile($provider);
-  if( !preg_match("/^\/usr/local/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $filename ) ){throw new Exception('FATAL ERROR: invalid login file name - '.$filename); }
+  if( !preg_match("/^\/usr\/local\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $filename ) ){throw new Exception('FATAL ERROR: invalid login file name - '.$filename); }
 
   //get username and password from file or SESSION
   if( array_key_exists($filename, $_SESSION) !== true ){
