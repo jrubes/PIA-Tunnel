@@ -18,7 +18,8 @@ if [ "$len" -lt 3 ]; then
  exit 2
 fi
 
-echo "root:$1" | chpasswd -c SHA512 2> /dev/null
+# Linux echo "root:$1" | chpasswd -c SHA512 2> /dev/null
+echo "$1" | pw mod user root -h 0 2>/dev/null
 
 if [ $? = 0 ]; then
   # PW has been changed
