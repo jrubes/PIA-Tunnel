@@ -21,9 +21,11 @@ if [ ! -f "/usr/local/pia/settings.conf" ]; then
     echo '# interface and network settings' >> '/usr/local/pia/settings.conf'
     echo '#####' >> '/usr/local/pia/settings.conf'
     echo '# name of your external interface. this connects to the Internet/Router' >> '/usr/local/pia/settings.conf'
-    echo 'IF_EXT="eth0"' >> '/usr/local/pia/settings.conf'
+    #echo 'IF_EXT="eth0"' >> '/usr/local/pia/settings.conf'
+    echo 'IF_EXT="em0"' >> '/usr/local/pia/settings.conf'
     echo '# name of your internal interface. this if for the private VM network' >> '/usr/local/pia/settings.conf'
-    echo 'IF_INT="eth1"' >> '/usr/local/pia/settings.conf'
+    #echo 'IF_INT="eth1"' >> '/usr/local/pia/settings.conf'
+    echo 'IF_INT="em1"' >> '/usr/local/pia/settings.conf'
     echo '# name of your VPN interface' >> '/usr/local/pia/settings.conf'
     echo 'IF_TUNNEL="tun0"' >> '/usr/local/pia/settings.conf'
     echo '# IP of target computer for port forwarding - if supported by location' >> '/usr/local/pia/settings.conf'
@@ -95,8 +97,8 @@ if [ ! -f '/usr/local/pia/ip_list.txt' ]; then
 fi
 
 
-#update files in /usr/local/www/apache24/data/ 
-cp -r /usr/local/pia/htdocs/* /usr/local/www/apache24/data/ 
+#update files in /usr/local/www/apache24/data/
+cp -r /usr/local/pia/htdocs/* /usr/local/www/apache24/data/
 if [ -f /usr/local/www/apache24/data/README.txt ]; then rm -f /usr/local/www/apache24/data/docs/README.txt; fi
 if [ -f /usr/local/www/apache24/data/monitor-windows.zip ]; then rm -f /usr/local/www/apache24/data/monitor-windows.zip ; fi
 cd /usr/local/pia/client_scripts ; zip -r /usr/local/www/apache24/data/monitor-windows.zip monitor-windows/ &> /dev/null
