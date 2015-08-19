@@ -7,5 +7,6 @@
 - pkgng: name="php56-mcrypt"
 - pkgng: name="php56-session"
 - pkgng: name="php56-mbstring"
+- pkgng: name="php56-json"
 
 - template: src=090_mod_php.conf dest=/usr/local/etc/apache24/modules.d/090_mod_php.conf
