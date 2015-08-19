@@ -279,7 +279,7 @@ function disp_pia_update_client(){
   $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
 
   $disp_body .= '<div class="box changelog">';
-  $cl = $_files->readfile("/var/www/pia_latest_changes.md");
+  $cl = $_files->readfile("/usr/local/www/apache24/data/pia_latest_changes.md");
   $disp_body .=  $Parsedown->text($cl);
   $disp_body .= '</div>';
 
