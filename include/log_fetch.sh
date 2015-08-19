@@ -11,7 +11,7 @@ if [ "$val" = "0" ]; then
     #fetch latest changelog - updated installations without the file
     cd /tmp
     mkdir piatmpget ; cd /tmp/piatmpget
-    wget http://www.kaisersoft.net/pia_latest_changes.md
+    /usr/local/bin/wget http://www.kaisersoft.net/pia_latest_changes.md
     mv pia_latest_changes.md /var/www/pia_latest_changes.md
     cd /tmp ; rm -rf /tmp/piatmpget
   fi
@@ -23,7 +23,7 @@ elif [ "$val" -gt "0" ]; then
   #fetch latest changelog
   cd /tmp
   mkdir piatmpget ; cd /tmp/piatmpget
-  wget http://www.kaisersoft.net/pia_latest_changes.md
+  /usr/local/bin/wget http://www.kaisersoft.net/pia_latest_changes.md
   mv pia_latest_changes.md /var/www/pia_latest_changes.md
   cd /tmp ; rm -rf /tmp/piatmpget
 
