@@ -11,16 +11,16 @@ RET_FORWARD_STATE="FUCK"
 RET_GET_PACKET_LOSS=""
 
 # WARNING DO NOT CHANGE the ping command! ping_host uses sed to modify the string
-PING_VER=`ping -V > /dev/null 2>&1`
+PING_VER=`/sbin/ping -V > /dev/null 2>&1`
 if [ $? -eq 0 ]; then
 	#Debian
-	PING_COMMAND="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
+	PING_COMMAND="/sbin/ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
 	#PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\" | gawk -F\",\" '{print \$3}' | gawk -F \"%\" '{print \$1}' | tr -d ' '"
-	PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\""
+	PING_PACKET_LOSS="/sbin/ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\""
 else
 	#FreeBSD
-        PING_COMMAND="ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | /usr/bin/grep -c \", 0% packet loss\""
-        PING_PACKET_LOSS="ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | /usr/bin/grep \"packet loss\""
+        PING_COMMAND="/sbin/ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | /usr/bin/grep -c \", 0% packet loss\""
+        PING_PACKET_LOSS="/sbin/ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | /usr/bin/grep \"packet loss\""
 fi
 
 # fallback list
@@ -32,13 +32,13 @@ PING_IP_LIST[3]="208.67.220.220"
 
 # checks if at least one of the login files has been filled
 function check_default_username(){
-	#check if login files exist
-    FCOUNT=`ls -1 /usr/local/pia/login-*.conf 2>/dev/null | wc -l`
+    #check if login files exist
+    FCOUNT=`ls -1 /usr/local/pia/login-*.conf 2>/dev/null | /usr/bin/wc -l`
 
     if [ "$FCOUNT" -lt 1 ]; then
         # FATAL ERROR: make sure to always print IP info
-        INT_IP=`/sbin/ip addr show $IF_INT | /usr/bin/grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
-        EXT_IP=`/sbin/ip addr show $IF_EXT | /usr/bin/grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+        INT_IP=`/sbin/ip addr show $IF_INT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
+        EXT_IP=`/sbin/ip addr show $IF_EXT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
         echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: $EXT_IP"
         echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: $INT_IP"
 
@@ -75,7 +75,7 @@ function is_ip_unique() {
 
   if [ "$2" = "" ]; then
     ping_array=("${PING_IP_LIST[@]}")
-	#echo "using PING_IP_LIST"
+    #echo "using PING_IP_LIST"
   else
     declare -a ping_array=("${!2}")
   fi
