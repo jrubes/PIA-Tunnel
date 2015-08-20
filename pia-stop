@@ -25,10 +25,10 @@ if [ "$1" = "verbose" ]; then
 	#disable forwarding
 	/usr/local/pia/pia-forward stop
 
-	# restart networking to get default routes through eth0 working again
+	# restart networking to get default routes through em0 working again
 	# service network restart #CentOS
-	ifdown eth0 && ifup eth0 #Debian
-	ifdown eth1 && ifup eth1 #Debian
+	ifdown em0 && ifup em0 #Debian
+	ifdown em1 && ifup em1 #Debian
 
 else
 
@@ -36,8 +36,8 @@ else
     /usr/local/pia/include/socks-stop.sh &>/dev/null
 	killall openvpn &>/dev/null
 	/usr/local/pia/pia-forward stop quite
-	ifdown eth0 &>/dev/null && ifup eth0 &>/dev/null #Debian
-	ifdown eth1 &>/dev/null && ifup eth1 &>/dev/null #Debian
+	ifdown em0 &>/dev/null && ifup em0 &>/dev/null #Debian
+	ifdown em1 &>/dev/null && ifup em1 &>/dev/null #Debian
 fi
 
 

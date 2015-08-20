@@ -133,7 +133,7 @@ while true; do
         fi
 
 	#check if the Internet is up but only if the VPN is down because
-	# the firewall is configured to block traffic over eth0 while tun0 is active
+	# the firewall is configured to block traffic over em0 while tun0 is active
 	if [ "$vpn_up" = "ERROR" ]; then
             ping_host_new "internet"
         fi

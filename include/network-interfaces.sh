@@ -16,13 +16,13 @@ cont="${cont}iface lo inet loopback\n"
 cont="${cont}\n"
 
 
-#setup eth0
+#setup em0
 cont="${cont}# The primary network interface\n"
-cont="${cont}allow-hotplug eth0\n"
+cont="${cont}allow-hotplug em0\n"
 if [ "${IF_ETH0_DHCP}" = 'yes' ]; then
-  cont="${cont}iface eth0 inet dhcp\n"
+  cont="${cont}iface em0 inet dhcp\n"
 else
-  cont="${cont}iface eth0 inet static\n"
+  cont="${cont}iface em0 inet static\n"
 fi
 
 if [ ! -z "${IF_ETH0_IP}" ] && [ ! -z "${IF_ETH0_SUB}" ]; then
@@ -43,11 +43,11 @@ cont="${cont}\n"
 
 
 cont="${cont}# The private VM LAN interface\n"
-cont="${cont}auto eth1\n"
+cont="${cont}auto em1\n"
 if [ "${IF_ETH1_DHCP}" = 'yes' ] && [ ! -z "${IF_ETH1_IP}" ] && [ ! -z "${IF_ETH1_SUB}" ]; then
-  cont="${cont}iface eth1 inet dhcp\n"
+  cont="${cont}iface em1 inet dhcp\n"
 else
-  cont="${cont}iface eth1 inet static\n"
+  cont="${cont}iface em1 inet static\n"
 fi
 
 if [ ! -z "${IF_ETH1_IP}" ] && [ ! -z "${IF_ETH1_SUB}" ]; then

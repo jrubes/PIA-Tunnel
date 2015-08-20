@@ -34,13 +34,13 @@ if [ "$1" = "fix" ]; then
 		killall openvpn 2>/dev/null
         rm -f /usr/local/pia/cache/status.txt 2>/dev/null
 		/usr/local/pia/include/fw-no-forward.sh
-		# restart networking to get default routes through eth0 working again
+		# restart networking to get default routes through em0 working again
 		# service network restart #CentOS
-		ifdown eth0 && ifup eth0 #Debian
+		ifdown em0 && ifup em0 #Debian
 	else
 		killall openvpn 2>/dev/null
 		/usr/local/pia/include/fw-no-forward.sh
-		ifdown eth0 2>/dev/null	 && ifup eth0 2>/dev/null
+		ifdown em0 2>/dev/null	 && ifup em0 2>/dev/null
 	fi
 
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Done! Please try again."

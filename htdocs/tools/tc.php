@@ -25,16 +25,16 @@ $disp_body .= disp_tc_ui();
 function disp_tc_ui(){
   $ret = '';
 
-  if( $_REQUEST['ping_if'] !== 'tun0' || $_REQUEST['ping_if'] !== 'eth0' || $_REQUEST['ping_if'] !== 'eth1' ){
-    $_REQUEST['ping_if'] = 'eth0';
+  if( $_REQUEST['ping_if'] !== 'tun0' || $_REQUEST['ping_if'] !== 'em0' || $_REQUEST['ping_if'] !== 'em1' ){
+    $_REQUEST['ping_if'] = 'em0';
   }
 
   //interface dropdown
   $sel = array(
         'id' => 'tc_if',
         'selected' => $_REQUEST['ping_if'],
-        array( 'eth0', 'eth0'),
-        array( 'eth1', 'eth1'),
+        array( 'em0', 'em0'),
+        array( 'em1', 'em1'),
         array( 'tun0', 'tun0')
       );
   $speed_sel = array(

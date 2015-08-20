@@ -6,9 +6,9 @@ source '/usr/local/pia/settings.conf'
 source '/usr/local/pia/include/functions.sh'
 
 # simulate packet loss
-#tc qdisc del root dev eth0 2> /dev/null
-#tc qdisc add dev eth0 root netem loss 50%
-#tc qdisc change dev eth0 root netem loss 25%
+#tc qdisc del root dev em0 2> /dev/null
+#tc qdisc add dev em0 root netem loss 50%
+#tc qdisc change dev em0 root netem loss 25%
 
 HOSTS="startpage.com icann.org wikipedia.org internic.net"
 HOSTS="$HOSTS google.com google.de"
@@ -117,7 +117,7 @@ if [ $ip_count -lt 11 ]; then
       "- did not find enough IPs to generate ip_list.txt. is you Internet working?"
     echo -e "\tplease wait a few minutes then run pia-setup again."
     #reset packet loss
-    #tc qdisc del root dev eth0
+    #tc qdisc del root dev em0
     exit 99
 
 else
@@ -139,4 +139,4 @@ chmod 0660 /usr/local/pia/ip_list.txt
 
 
 #reset packet loss
-#tc qdisc del root dev eth0
+#tc qdisc del root dev em0

@@ -17,5 +17,5 @@ rm -f /usr/local/pia/cache/pia-daemon.log
 
 
 # restart the network interface
-ifdown eth0 &>/dev/null && ifup eth0 &>/dev/null
-ifdown eth1 &>/dev/null && ifup eth1 &>/dev/null
+ifdown em0 &>/dev/null && ifup em0 &>/dev/null
+ifdown em1 &>/dev/null && ifup em1 &>/dev/null

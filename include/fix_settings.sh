@@ -100,8 +100,8 @@ fi
 
 if [ ! ${FIREWALL_IF_WEB[0]+abc} ]; then
   echo '# Enable web UI on the following interfaces' >> '/usr/local/pia/settings.conf'
-  echo 'FIREWALL_IF_WEB[0]="eth0"' >> '/usr/local/pia/settings.conf'
-  echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/usr/local/pia/settings.conf'
+  echo 'FIREWALL_IF_WEB[0]="em0"' >> '/usr/local/pia/settings.conf'
+  echo 'FIREWALL_IF_WEB[1]="em1"' >> '/usr/local/pia/settings.conf'
 fi
 
 if [ ! ${NAMESERVERS[0]+abc} ]; then
