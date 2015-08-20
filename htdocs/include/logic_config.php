@@ -209,7 +209,7 @@ $disp_body .= '<script type="text/javascript">'
  * based on settings.conf
  */
 function VPN_generate_interfaces(){
-  exec("sudo /usr/local/pia/include/network-interfaces.sh"); //write new dhcpd.conf
+  exec("/usr/local/bin/sudo /usr/local/pia/include/network-interfaces.sh"); //write new dhcpd.conf
 }
 
 /**
@@ -218,7 +218,7 @@ function VPN_generate_interfaces(){
 function VPN_generate_dhcpd_conf(){
   $template = dhcpd_process_template();
   $save = escapeshellarg($template);
-  exec("sudo /usr/local/pia/include/dhcpd-reconfigure.sh $save"); //write new dhcpd.conf
+  exec("/usr/local/bin/sudo /usr/local/pia/include/dhcpd-reconfigure.sh $save"); //write new dhcpd.conf
 }
 
 /**
@@ -227,7 +227,7 @@ function VPN_generate_dhcpd_conf(){
 function VPN_generate_socks_conf(){
   $template = socks_process_template();
   $save = escapeshellarg($template);
-  exec("sudo /usr/local/pia/include/sockd-dante-reconfigure.sh $save"); //write new dhcpd.conf
+  exec("/usr/local/bin/sudo /usr/local/pia/include/sockd-dante-reconfigure.sh $save"); //write new dhcpd.conf
 }
 
 /**

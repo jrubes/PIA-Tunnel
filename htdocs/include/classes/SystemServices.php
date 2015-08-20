@@ -16,9 +16,9 @@ class SystemServices {
  */
 function firewall_fw( $command ){
   if( $command === 'start' )
-    exec('sudo /usr/local/pia/pia-forward start &>/dev/null &');
+    exec('/usr/local/bin/sudo /usr/local/pia/pia-forward start &>/dev/null &');
   else{
-    exec('sudo /usr/local/pia/pia-forward stop &>/dev/null &');
+    exec('/usr/local/bin/sudo /usr/local/pia/pia-forward stop &>/dev/null &');
   }
 }
 
@@ -27,7 +27,7 @@ function firewall_fw( $command ){
  */
 function network_restart(){
   $_SESSION['connecting2'] = '';
-  exec('sudo "/usr/local/pia/include/network-restart.sh"');
+  exec('/usr/local/bin/sudo "/usr/local/pia/include/network-restart.sh"');
 }
 
 /**
@@ -57,14 +57,14 @@ function dhcpd_restart(){
  */
 function dhcpd_start(){
   $restart = array();
-  exec('sudo "/usr/local/pia/include/dhcpd-start.sh"', $restart );
+  exec('/usr/local/bin/sudo "/usr/local/pia/include/dhcpd-start.sh"', $restart );
 
   $cnt = count($restart);
   if( $cnt === 1 && $restart[0] === 'Starting ISC DHCP server: dhcpd.' ){
 
     /* double check */
     $restart = array();
-    exec('sudo "/usr/local/pia/include/dhcpd-status.sh"', $restart );
+    exec('/usr/local/bin/sudo "/usr/local/pia/include/dhcpd-status.sh"', $restart );
     $cnt = count($restart);
     if( $cnt === 1 && $restart[0] === 'Status of ISC DHCP server: dhcpd is running.' ){
       return true;
@@ -95,14 +95,14 @@ function dhcpd_stop(){
 
   /* check if dhcpd is running before trying to stop it */
   $restart = array();
-  exec('sudo "/usr/local/pia/include/dhcpd-status.sh"', $restart );
+  exec('/usr/local/bin/sudo "/usr/local/pia/include/dhcpd-status.sh"', $restart );
   $cnt = count($restart);
   if( $cnt === 1 && $restart[0] === 'Status of ISC DHCP server: dhcpd is not running.' ){
     return true;
   }
 
   $restart = array();
-  exec('sudo "/usr/local/pia/include/dhcpd-stop.sh"', $restart );
+  exec('/usr/local/bin/sudo/local/bin/sudo "/usr/local/pia/include/dhcpd-stop.sh"', $restart );
 
   $cnt = count($restart);
   if( $cnt === 1 && $restart[0] === 'Stopping ISC DHCP server: dhcpd.' ){
@@ -176,10 +176,10 @@ function socks_start(){
     {
       switch ($settings['SOCKS_SERVER_TYPE']){
         case 'dante':
-          exec("bash -c \"sudo /usr/local/pia/include/sockd-dante-start.sh &> /dev/null &\" &>/dev/null &");
+          exec("bash -c \"/usr/local/bin/sudo /usr/local/pia/include/sockd-dante-start.sh &> /dev/null &\" &>/dev/null &");
           break;
         case '3proxy':
-          exec("bash -c \"sudo /usr/local/pia/include/sockd-3proxy-start.sh &> /dev/null &\" &>/dev/null &");
+          exec("bash -c \"/usr/local/bin/sudo /usr/local/pia/include/sockd-3proxy-start.sh &> /dev/null &\" &>/dev/null &");
 
       }
 
@@ -212,10 +212,10 @@ function socks_stop(){
     {
      switch ($settings['SOCKS_SERVER_TYPE']){
         case 'dante':
-          exec('sudo "/usr/local/pia/include/sockd-dante-stop.sh"');
+          exec('/usr/local/bin/sudo "/usr/local/pia/include/sockd-dante-stop.sh"');
           break;
         case '3proxy':
-          exec('sudo "/usr/local/pia/include/sockd-3proxy-stop.sh"');
+          exec('/usr/local/bin/sudo "/usr/local/pia/include/sockd-3proxy-stop.sh"');
 
       }
       usleep(50000);
@@ -249,10 +249,10 @@ function socks_status( $use_cache = true ){
     $ret = array();
     switch ($settings['SOCKS_SERVER_TYPE']){
       case 'dante':
-        exec('sudo "/usr/local/pia/include/sockd-dante-status.sh"', $ret );
+        exec('/usr/local/bin/sudo "/usr/local/pia/include/sockd-dante-status.sh"', $ret );
         break;
       case '3proxy':
-        exec('sudo "/usr/local/pia/include/sockd-3proxy-status.sh"', $ret );
+        exec('/usr/local/bin/sudo "/usr/local/pia/include/sockd-3proxy-status.sh"', $ret );
 
     }
 

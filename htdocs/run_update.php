@@ -21,7 +21,7 @@ $_auth->authenticate();
 header("Content-Type:text/plain");
 $ret = '';
 $result = array();
-exec("sudo /usr/local/pia/pia-update", $result);
+exec("/usr/local/bin/sudo /usr/local/pia/pia-update", $result);
 if( array_key_exists('0', $result) === true ){
   foreach( $result as $val ){
     $ret .= "$val\n";
