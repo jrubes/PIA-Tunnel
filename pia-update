@@ -15,7 +15,7 @@ if [ "$?" -ne "0" ]; then
   exit 1
 fi
 
-/usr/local/bin/git submodule init htdocs/plugin/phpdhcpd 2>&1
+/usr/local/bin/git submodule init htdocs/plugitgin/phpdhcpd 2>&1
 if [ "$?" -ne "0" ]; then
   # error updating repo, abort
   exit 1
