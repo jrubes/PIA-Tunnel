@@ -211,7 +211,7 @@ fi
 # git branch setting for online updates
 ret=`/usr/bin/grep -c "GIT_BRANCH" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
-  CURRENT_BRANCH=`cd /usr/local/pia/ ; /usr/local/bin/git branch | /usr/bin/grep '*' | i/usr/local/bin/gawk -F" " '{print $2}'`
+  CURRENT_BRANCH=`cd /usr/local/pia/ ; /usr/local/bin/git branch | /usr/bin/grep '*' | /usr/local/bin/gawk -F" " '{print $2}'`
   if [ "$CURRENT_BRANCH" != "" ]; then
     echo "using ${CURRENT_BRANCH}"
     echo "GIT_BRANCH='${CURRENT_BRANCH}'" >> '/usr/local/pia/settings.conf'

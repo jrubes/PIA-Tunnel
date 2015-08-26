@@ -8,7 +8,8 @@ source '/usr/local/pia/settings.conf'
 sockd_pid=`cat /tmp/sockd.pid 2&> /dev/null`
 if [ ! -z "${sockd_pid}" ]; then
   # daemon should be running
-  ps_out=`ps s "${sockd_pid}" | tail -n1 | gawk -F" " '{print $10}'`
+  #ps_out=`ps s "${sockd_pid}" | tail -n1 | gawk -F" " '{print $10}'`
+  ps_out=`ps -p "${sockd_pid}" | tail -n1 | gawk -F" " '{print $1}'`
 
   if [ "${ps_out}" = '/usr/sbin/sockd' ]; then
     echo 'running'
@@ -20,7 +21,8 @@ fi
 
 # last attempt with general ps
 # *WARNING* needs ww in ps or grep will not work on startup because the output is truncated!!
-ps_cnt=`ps asxww |  /usr/bin/grep -c "/usr/sbin/sockd"`
+#ps_cnt=`ps asxww |  /usr/bin/grep -c "/usr/sbin/sockd"`
+ps_cnt=`ps axww |  /usr/bin/grep -c "/usr/sbin/sockd"`
 if [ "${ps_cnt}" = 0 ] || [ "${ps_cnt}" = 1 ]; then
   echo 'not running'
   exit;
