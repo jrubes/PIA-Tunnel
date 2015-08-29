@@ -32,9 +32,7 @@ switch($_POST['cmd'])
 {
   case 'exec':
     if( array_key_exists( $_POST['exec'], $valid_commands) !== true ){
-      //file_put_contents('/usr/local/pia/cache/cmd_runner.txt', "invalid command\n\nCMDDONE");
-      exec('/bin/bash -c "echo \"invalid command\" > /usr/local/pia/cache/cmd_runner.txt"');
-      exec( "/bin/bash -c \"echo 'CMDDONE' >> /usr/local/pia/cache/cmd_runner.txt\"");
+      exec('/bin/bash -c "/usr/bin/printf \"invalid command\n\nCMDDONE\" > /usr/local/pia/cache/cmd_runner.txt"');
       die();
     }
 
