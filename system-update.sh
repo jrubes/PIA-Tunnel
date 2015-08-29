@@ -2,7 +2,7 @@
 
 
 # Debian
-if [ -f /usr/bin/apt-get ]; 
+if [ -f /usr/bin/apt-get ];
 then
 	# non interactive system updates
 	# http://debian-handbook.info/browse/wheezy/sect.automatic-upgrades.html
@@ -14,6 +14,6 @@ fi
 # FreeBSD
 if [ -f /usr/sbin/pkg ];
 then
-	pkg update
-	pkg upgrade
+	pkg update >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
+	pkg upgrade >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
 fi

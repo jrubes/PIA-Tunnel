@@ -13,6 +13,11 @@ $inc_dir = '../include/';
 require_once $inc_dir.'basic.php';
 
 
+//list of commands this script is allowed to execture
+$valid_commands = array(
+  'transmission' => '/usr/local/pia/include/transmission-install.sh'
+);
+
 /*
  * translates the login form into values used by authentication function
  */
@@ -25,18 +30,22 @@ $_auth->authenticate( $expected, $supplied );
 
 switch($_POST['cmd'])
 {
-  case 'ping':
-    $host = escapeshellarg($_POST['IP']);
-    $intf = escapeshellarg($_POST['IF']);
-    echo "ping $host over $intf\n";
-    exec("bash -c \"/usr/local/pia/include/ping.sh $host $intf &> /dev/null &\" &>/dev/null &");
+  case 'exec':
+    if( array_key_exists( $_POST['exec'], $valid_commands) !== true ){
+      //file_put_contents('/usr/local/pia/cache/cmd_runner.txt', "invalid command\n\nCMDDONE");
+      exec('/bin/bash -c "echo \"invalid command\" > /usr/local/pia/cache/cmd_runner.txt"');
+      exec( "/bin/bash -c \"echo 'CMDDONE' >> /usr/local/pia/cache/cmd_runner.txt\"");
+      die();
+    }
+
+    echo "executing command {$_POST['exec']}\n";
+    exec("bash -c \"/usr/local/bin/sudo {$valid_commands[$_POST['exec']]} &> /dev/null &\" &>/dev/null &");
     break;
 
   case 'read':
-    $c = $_files->readfile('/usr/local/pia/cache/tools_ping.txt');
+    $c = $_files->readfile('/usr/local/pia/cache/cmd_runner.txt');
     echo $c;
     break;
 }
-
 
 ?>

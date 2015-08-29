@@ -739,6 +739,14 @@ function disp_transmission_box(){
   $settings = $_settings->get_settings();
   $disp_body = '';
 
+  if( ! file_exists('/usr/local/bin/transmission-cli2') ){
+    $disp_body .= '<div class="box options">';
+    $disp_body .= '<h2>transmission client</h2>'."\n";
+    $disp_body .= '<a href="#">Install transmission client</a>';
+    $disp_body .= '</div>';
+    return $disp_body;
+  }
+
   $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>transmission client</h2>'."\n";
   $disp_body .= 'don\'t change these while the transmission client is running!';
