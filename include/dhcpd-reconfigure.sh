@@ -5,4 +5,4 @@ export LANG
 source '/usr/local/pia/settings.conf'
 
 
-echo "$1" > '/etc/dhcp/dhcpd.conf';
+echo "$1" > '/usr/local/etc/dhcpd.conf';
