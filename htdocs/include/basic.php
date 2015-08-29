@@ -414,8 +414,8 @@ function VM_get_status( $output = 'html'){
 
   $sysload = get_system_load();
   $ret_arr['system_load'] = $sysload['load'];
-  $ret_arr['system_mem'] = $sysload['mem'];
-  $ret_arr['system_swap'] = $sysload['swap'];
+  //$ret_arr['system_mem'] = $sysload['mem'];
+  //$ret_arr['system_swap'] = $sysload['swap'];
 
 
 
@@ -558,7 +558,7 @@ function VM_get_status( $output = 'html'){
   if( $output !== 'array'){
     $table = "<table border=\"0\" id=\"vm_status\"><tbody>\n";
     $table .= "<tr><td style=\"width:7em\">System</td><td>system load <span id=\"system_load\">{$sysload['load']}</span></td></tr>\n";
-    $table .= "<tr><td></td><td>Mem <span id=\"system_mem\">{$sysload['mem']}</span> SWAP <span id=\"system_swap\">{$sysload['swap']}</span></td></tr>\n";
+    //$table .= "<tr><td></td><td>Mem <span id=\"system_mem\">{$sysload['mem']}</span> SWAP <span id=\"system_swap\">{$sysload['swap']}</span></td></tr>\n";
     $table .= '<tr><td>Software</td><td id="software_update">'.$up_txt.'</td></tr>';
     $table .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">{$ret_arr['daemon_status']}</td></tr>\n";
     $table .= "<tr><td>VPN Status</td><td id=\"vpn_status\">{$ret_arr['vpn_status']}</td></tr>\n";
@@ -590,7 +590,7 @@ function get_system_load(){
   //$cpu = get_cpuload();
   //$ret .= "CPU {$cpu['sy']}% usr,  {$cpu['sy']}% sys, {$cpu['id']}% idle\n";
   $cpu = sys_getloadavg();
-  $ret['load'] = "$cpu[0], $cpu[1], $cpu[2]";
+  $ret['load'] = round($cpu[0], 2).', '.round($cpu[1], 2).', '.round($cpu[2], 2);
 
   $mem = get_meminfo();
   $used = $mem['total'] - $mem['free'];
