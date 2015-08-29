@@ -6,7 +6,7 @@ export LANG
 source '/usr/local/pia/settings.conf'
 source '/usr/local/pia/include/functions.sh'
 
-ping_host_new "any" "quick"
+ping_host_new "any" "quick" "keep"
 echo "$RET_PING_HOST"
 
 

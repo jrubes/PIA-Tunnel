@@ -153,6 +153,7 @@ class PIACommands {
     static $running = false; //set to true will shell script is running
     $cache_file = '/usr/local/pia/cache/webui-update_status.txt';
 
+
     //make sure the Internet is up before going further
     $running = true; //set to true to prevent multiple checks at the same time
     if( $this->is_internet_up() !== true ){
