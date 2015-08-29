@@ -103,6 +103,23 @@ class PIACommands {
     }
   }
 
+
+  /**
+   * checks if the internet is up
+   * @return boolean true if Internet is up, false if not
+   */
+  function is_internet_up(){
+    $ret = array();
+    exec('/usr/local/pia/include/up_internet.sh', $ret);
+    if( array_key_exists( 0, $ret) ){
+      if( $ret[0] === 'ERROR' ){
+        return false;
+      }else{
+        return true;
+      }
+    }
+  }
+
   /**
    * method will run a check if tun0 return an IP and assume "UP" when one is found
    * @return booolean TRUE if VPN is up or FALSE if VPN is down
@@ -135,6 +152,15 @@ class PIACommands {
   function get_update_status($force_update=false){
     static $running = false; //set to true will shell script is running
     $cache_file = '/usr/local/pia/cache/webui-update_status.txt';
+
+    //make sure the Internet is up before going further
+    $running = true; //set to true to prevent multiple checks at the same time
+    if( $this->is_internet_up() !== true ){
+      $running = false;
+      return 'Internet down';
+    }
+    $running = false; //back to false for normal operations
+
 
     if( $force_update === true ){
         $git_ret = $this->get_revlist_count();
