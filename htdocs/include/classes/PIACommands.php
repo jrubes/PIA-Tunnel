@@ -109,7 +109,8 @@ class PIACommands {
    */
   function is_vpn_up(){
     $ret = array();
-    exec('/sbin/ip addr show tun0 2>/dev/null', $ret);
+    //exec('/sbin/ip addr show tun0 2>/dev/null', $ret);
+    exec('/sbin/ifconfig tun0 2>/dev/null', $ret);
     if( array_key_exists( '0', $ret) !== true ){
       return false;
     }
