@@ -19,17 +19,22 @@ $disp_body .= disp_command_ui();
  * generates the UI in HTML and returns it
  */
 function disp_command_ui(){
+
+  $sel = array(
+        'id' => 'cmdsel',
+        'selected' => $_REQUEST['cmdsel'],
+        array( 'transmission', 'install transmission')
+      );
+
   $ret = '';
 
   $ret .= '<h2>Shell Command Utility</h2>';
   $ret .= '<noscript><strong>The utility requires javascript. You may use the command line instead</strong></noscript>';
-  $ret .= '<p>This tool allows the execution of certain commands through the webUI.</p>';
 
-
-  $ret .= ' <input id="cmdsel" type="text" name="cmdsel" placeholder="transmission" value="" style="width: 20em;"> ';
+  $ret .= 'Comand to execute '.build_select($sel);
   $ret .= ' <input id="btn_exec" type="button" href="#" onclick="execute_command();" name="execute" value="Execute" disabled><br>';
 
-  $ret .= '<textarea id="cmd_out" style="width: 625px; height: 20em;">reading results...';
+  $ret .= '<textarea id="cmd_out" style="width: 625px; height: 20em;">this box will contain the command output';
   $ret .= "</textarea>\n";
 
 
