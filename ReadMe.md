@@ -7,11 +7,12 @@ PIA-Tunnel VM is currently switching from Debian to FreeBSD in the master branch
 This should not affect anyone since the VM is setup to use the 'release_php-gui' branch
 https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui
 You will receive a notification when the FreeBSD version replaces the Linux VM.
+------
 
 
 
-
-
+Overview
+--------
 
 PIA-Tunnel is a series of scripts designed to share an openVPN connection with your network.
 It supports port forwarding, failover locations, LAN segments and a SOCKS5 proxy.
