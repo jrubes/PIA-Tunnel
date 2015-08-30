@@ -10,6 +10,7 @@
 
 - name: checking out release_php-gui
   shell: cd /usr/local/pia ; git checkout {{ git_branch }}
+  ignore_errors: yes
 
 - name: REMOVE FOR RELEASE - copy dummy ip_list.txt to stop pia-setup from creating it
   template: src=ip_list.txt dest=/usr/local/pia/ip_list.txt owner=root group=wheel mode=0755
