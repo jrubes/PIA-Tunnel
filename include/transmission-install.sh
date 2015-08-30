@@ -21,4 +21,7 @@ killall transmission-daemon
 
 
 echo 'transmission installed - rebooting system' >> /usr/local/pia/cache/cmd_runner.txt
+printf "\n\nCMDDONE" >> /usr/local/pia/cache/cmd_runner.txt
+sleep 2 #give webUI time to fetch CMDDONE
+
 /sbin/reboot

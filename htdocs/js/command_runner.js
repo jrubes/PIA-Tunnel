@@ -19,6 +19,7 @@ function CmdRunnerObj( ){
         if( ele.innerHTML !== ret ){
           ele.innerHTML = '';
           ele.innerHTML = ret;
+          ele.scrollTop = ele.scrollHeight;
 
           if( ret.search('CMDDONE') !== -1 ){
             clearInterval(timr2);
