@@ -10,7 +10,7 @@ PermitRootLogin yes
 
 
 * For Virtual Box
-	ansible-playbook -i hosts PIA-Tunnel.yml VBox.yml
+	ansible-playbook -i hosts --ask-pass PIA-Tunnel.yml VBox.yml
 
 * For VMware
-	ansible-playbook -i hosts PIA-Tunnel.yml VMware.yml
+	ansible-playbook -i hosts --ask-pass PIA-Tunnel.yml VMware.yml
