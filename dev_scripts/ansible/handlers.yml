@@ -14,5 +14,4 @@
   service: name=sshd state=restarted
 
 - name: reboot VM
-  shell: "/usr/bin/nohup /sbin/shutdown -r +1"
-
+  shell: "/usr/bin/nohup /bin/sh -c 'sleep 10 ; /sbin/shutdown -r now'  2>&1 /dev/null &"
