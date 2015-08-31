@@ -113,7 +113,7 @@ function load_menu(){
 function VM_shutdown(){
   global $_pia;
   $_pia->clear_session();
-  exec('/usr/local/bin/sudo /sbin/shutdown -h now &>/dev/null &');
+  exec('/usr/local/bin/sudo /sbin/shutdown -p now &>/dev/null &');
 }
 
 /**
