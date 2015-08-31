@@ -11,5 +11,8 @@
   service: name=mysql state=restarted
 
 - name: restart sshd
-  service: name=sshd state=restarted 
+  service: name=sshd state=restarted
+
+- name: reboot VM
+  shell: "/usr/bin/nohup /sbin/shutdown -r +1"
 
