@@ -30,14 +30,14 @@
 - name: install bash
   pkgng: name="bash"
 
-- name: add fstab entries for bash 
+- name: add fstab entries for bash
   shell: "grep -q '/dev/fd' /etc/fstab || echo 'fdesc    /dev/fd    fdescfs    rw    0  0' >> /etc/fstab"
 
-- template: src=pia-autostart.sh dest=/usr/local/etc/rc.d/pia-autostart owner=root group=wheel mode=0755
+- template: src=pia-autostart.sh dest=/usr/local/etc/rc.d/pia-autostart owner=root group=wheel mode=0555
 
 - shell: grep -q 'vpnvm' /etc/group || pw groupadd vpnvm -M root,www
 
-- shell: pw groupshow vpnvm | grep -q "vpnvm:" && pw groupmod vpnvm -m root,www 
+- shell: pw groupshow vpnvm | grep -q "vpnvm:" && pw groupmod vpnvm -m root,www
 
 - shell: "[ ! -f /bin/bash ] && ln -s /usr/local/bin/bash /bin/bash || exit 0"
 
