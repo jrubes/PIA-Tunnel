@@ -1,3 +1,9 @@
+bug 2015-09-01
+=================
+* there is a bug in the code counting the available updates. The 90+ updates have been in 
+the development branch but not in the release branch. Applying the update will only reset the counter since there are no release updates.
+Will try to get a fix out soonish....
+
 update 2015-05-12
 =================
 * had some time to work on the new manual. still a mess but it is slowly getting there.    
@@ -9,7 +15,7 @@ updated 2015-05-10
 
 update 2015-05-06
 =================
-* **WARNING** major changes! Don't update yet unless you want to use the latest and greates features. PLEASE REPORT ANY ISSUES!!!!
+* **WARNING** major changes! Don't update yet unless you want to use the latest and greatest features. PLEASE REPORT ANY ISSUES!!!!
 * removed most of the code that binds PIA-Tunnel to PrivateInternetAccess.com.      
   It should be possible to use this VM with most VPN providers soon.
 * PrivateInternetAccess.com: added openVPN files for TCP and UDP connections.     
