@@ -809,7 +809,7 @@ function get_packet_loss(){
     #Debian returns 0%
     #ret=`echo "$passed" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | tr -d ' '`
     # BSD returns as 0.0%
-    ret=`echo "$passed" | /usr/local/bin/gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | /usr/local/bin/gawk -F "." '{print \$1}' | tr -d ' '`
+    ret=`echo "$passed" | /usr/local/bin/gawk -F"," '{print \$3}' | /usr/local/bin/gawk -F "%" '{print \$1}' | /usr/local/bin/gawk -F "." '{print \$1}' | tr -d ' '`
     errors=`echo "$ret" | /usr/bin/grep -c "errors"`
 
     if [ "$errors" = "0" ]; then
