@@ -21,7 +21,7 @@ $disp_body .= disp_ping_ui();
 function disp_ping_ui(){
   $ret = '';
 
-  if( $_REQUEST['ping_if'] !== 'tun0' || $_REQUEST['ping_if'] !== 'em0' || $_REQUEST['ping_if'] !== 'em1' ){
+  if( !isset($_REQUEST['ping_if']) || $_REQUEST['ping_if'] !== 'tun0' || $_REQUEST['ping_if'] !== 'em0' || $_REQUEST['ping_if'] !== 'em1' ){
     $_REQUEST['ping_if'] = 'em0';
   }
 
@@ -48,9 +48,10 @@ function disp_ping_ui(){
 
   $ret .= '<input type="hidden" name="cmd" value="ping_host">';
   $ret .= 'Outgoing interface: '.build_select($sel).'<br>';
-  $ret .= 'Name or IP ';
+  $ret .= 'Name or IP <div>';
   $ret .= ' <input id="inp_host" type="text" name="IP" placeholder="google.com" value="" style="width: 20em;"> ';
   $ret .= ' <input id="btn_ping" type="button" href="#" onclick="send_ping();" name="ping it" value="Ping Host" disabled>';
+  $ret .= '</div>';
 
   $ret .= '<textarea id="ping_out" style="width: 625px; height: 20em;">ping results are stored in /pia/cache/tools_ping.txt ....';
   $ret .= "</textarea>\n";
