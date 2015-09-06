@@ -36,7 +36,7 @@ if( $plen > 1 && $plen < 20 && isset($_REQUEST['page']) ){
     case 'ping':
       $UNLOCKED='byPIA';
       //require_once '/var/www/tools/ping.php';
-      require_once '/usr/local/www/apache24/data/tools.php';
+      require_once '/usr/local/www/apache24/data/tools/ping.php';
       unset($UNLOCKED);
       break;
     case 'command_runner':

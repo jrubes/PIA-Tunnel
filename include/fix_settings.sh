@@ -300,3 +300,7 @@ if [ $ret = 0 ]; then
   echo 'TRANSMISSION_PASSWORD="transmission"' >> '/usr/local/pia/settings.conf'
   echo 'TRANSMISSION_AUTH_REQUIRED="true"' >> '/usr/local/pia/settings.conf'
 fi
+
+if [ ! -d "/usr/local/pia/firewall" ]; then
+    mkdir "/usr/local/pia/firewall"
+fi
