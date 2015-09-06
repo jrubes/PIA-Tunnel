@@ -592,12 +592,13 @@ function get_system_load(){
   $cpu = sys_getloadavg();
   $ret['load'] = round($cpu[0], 2).', '.round($cpu[1], 2).', '.round($cpu[2], 2);
 
+  /* FreeBSD disabled 
   $mem = get_meminfo();
   $used = $mem['total'] - $mem['free'];
   $used_swap = $mem['swap_total'] - $mem['swap_free'];
   $ret['mem'] = "{$used}/{$mem['total']}";
   $ret['swap'] =  "{$used_swap}/{$mem['swap_total']}";
-
+*/
   return $ret;
 }
 
