@@ -54,4 +54,4 @@ Setup
 =====
 
 Current but dated Documentation: http://www.KaiserSoft.net/r/?PIADOCU
-Latest Documentation (work in progress): http://www.KaiserSoft.net/usr/local/pia_doc/index.html
+Latest Documentation (work in progress): http://www.KaiserSoft.net/pia_doc/index.html
