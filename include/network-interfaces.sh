@@ -18,7 +18,7 @@ cont="${cont}\n"
 
 #setup eth0
 cont="${cont}# The primary network interface\n"
-cont="${cont}allow-hotplug eth0\n"
+cont="${cont}auto eth0\n"
 if [ "${IF_ETH0_DHCP}" = 'yes' ]; then
   cont="${cont}iface eth0 inet dhcp\n"
 else
