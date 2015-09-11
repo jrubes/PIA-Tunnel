@@ -39,6 +39,14 @@ fi
 # passed as command line argument
 filename="$1"
 
+# network status at before VPN is started
+echo $(date +"%Y-%m-%d %H:%M:%S")\
+			"running pia-start and these are the network settings before the VPN"
+ifconfig tun0 >> /pia/cache/network.log
+ifconfig eth0 >> /pia/cache/network.log
+ifconfig eth1 >> /pia/cache/network.log
+route -n >> /pia/cache/network.log
+
 # check if this is a "daemon" run
 if [ "$1" = "daemon" ]; then
 	# select the first connection from the failover array
@@ -141,3 +149,11 @@ else
 	  "- no connection with name $filename."
   echo -e "\ttry ${bold}pia-start list${normal} for a list of connections."
 fi
+
+
+echo $(date +"%Y-%m-%d %H:%M:%S")\
+			"running pia-start and these are the network settings after the VPN is connected"
+ifconfig tun0 >> /pia/cache/network.log
+ifconfig eth0 >> /pia/cache/network.log
+ifconfig eth1 >> /pia/cache/network.log
+route -n >> /pia/cache/network.log
