@@ -31,6 +31,7 @@ if [ "$1" = "fix" ]; then
 		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- running pia-forward fix. This is the current network status"
 
+			echo -e "\n\n" >> /pia/cache/network.log
 			echo $(date +"%Y-%m-%d %H:%M:%S")\
 						"script pia-forward fix needs to run ... network status right now" >> /pia/cache/network.log
 			ifconfig tun0 >> /pia/cache/network.log
