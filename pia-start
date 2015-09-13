@@ -41,7 +41,7 @@ filename="$1"
 
 # network status at before VPN is started
 echo $(date +"%Y-%m-%d %H:%M:%S")\
-			"running pia-start and these are the network settings before the VPN"
+			"running pia-start and these are the network settings before the VPN" >> /pia/cache/network.log
 ifconfig tun0 >> /pia/cache/network.log
 ifconfig eth0 >> /pia/cache/network.log
 ifconfig eth1 >> /pia/cache/network.log
@@ -152,7 +152,7 @@ fi
 
 
 echo $(date +"%Y-%m-%d %H:%M:%S")\
-			"running pia-start and these are the network settings after the VPN is connected"
+			"running pia-start and these are the network settings after the VPN is connected" >> /pia/cache/network.log
 ifconfig tun0 >> /pia/cache/network.log
 ifconfig eth0 >> /pia/cache/network.log
 ifconfig eth1 >> /pia/cache/network.log
