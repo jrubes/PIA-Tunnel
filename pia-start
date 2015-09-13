@@ -151,7 +151,7 @@ else
   echo -e "\ttry ${bold}pia-start list${normal} for a list of connections."
 fi
 
-
+echo -e "\n\n" >> /pia/cache/network.log
 echo $(date +"%Y-%m-%d %H:%M:%S")\
 			"running pia-start and these are the network settings after the VPN is connected" >> /pia/cache/network.log
 ifconfig tun0 >> /pia/cache/network.log
