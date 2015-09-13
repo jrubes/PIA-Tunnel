@@ -286,3 +286,6 @@ fi
 
 # added fix for eth0 not getting an IP quick enough during boot for pia-status to display the IP
 grep "allow-hotplug eth0" /etc/network/interfaces &> /dev/null  && /pia/include/network-interfaces.sh
+
+# improved logging and log handling during restarts
+chmod 777 /pia/include/autostart_rebuild.sh ; /pia/include/autostart_rebuild.sh > /dev/null
