@@ -1,3 +1,8 @@
+update 2015-09-13
+=================
+* VM now waits until it receives an IP from the DHCP server. This should fix any issues where the LAN IP was not displayed after booting.
+* added network.log to log the state of the network before and after connecting to the VPN
+
 bug 2015-09-01
 =================
 * there is a bug in the code counting the available updates. The 90+ updates have been in 
