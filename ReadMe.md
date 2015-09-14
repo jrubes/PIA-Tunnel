@@ -4,8 +4,8 @@ Project: PIA-Tunnel VM
 NOTICE
 ------
 PIA-Tunnel VM is currently switching from Debian to FreeBSD in the master branch!
-This should not affect anyone since the VM is setup to use the 'release_php-gui' branch
-https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui
+This should not affect anyone since the VM is setup to use the 'release_php-gui' branch    
+https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui   
 You will receive a notification when the FreeBSD version replaces the Linux VM.
 
 
@@ -16,13 +16,13 @@ Overview
 PIA-Tunnel is a series of scripts designed to share an openVPN connection with your network.
 It supports port forwarding, failover locations, LAN segments and a SOCKS5 proxy.
 The included web interface makes it easy to setup connections and get the system configured to
-your network.
+your network.    
 The included shell scripts make it possible to control the system from the command line as well.
 
 PIA-Tunnel started out as a virtual machine for VMware Workstation, Player and ESXi but
-is now being used on KVM, XEN, Hyper-V and other solutions.
+is now being used on KVM, XEN, Hyper-V and other solutions.    
 PIA-Tunnel is currently being tested on a Raspberry Pi 1 Model B+, with promising results.
-The combination turns PIA-Tunnel into a stand alone VPN router for your network.
+The combination turns PIA-Tunnel into a stand alone VPN router for your network.    
 Advanced setups may utilize two network adapters to completely isolate a network or system.
 
 Documentation:	http://www.KaiserSoft.net/r/?PIADOCU    
