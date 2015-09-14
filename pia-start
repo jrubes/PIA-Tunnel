@@ -44,10 +44,10 @@ filename="$1"
 echo -e "\n\n" >> /pia/cache/network.log
 echo $(date +"%Y-%m-%d %H:%M:%S")\
 			"running pia-start and these are the network settings before the VPN" >> /pia/cache/network.log
-ifconfig tun0 >> /pia/cache/network.log
-ifconfig eth0 >> /pia/cache/network.log
-ifconfig eth1 >> /pia/cache/network.log
-route -n >> /pia/cache/network.log
+ifconfig tun0 &>> /pia/cache/network.log
+ifconfig eth0 &>> /pia/cache/network.log
+ifconfig eth1 &>> /pia/cache/network.log
+route -n &>> /pia/cache/network.log
 
 
 # check if this is a "daemon" run
@@ -163,8 +163,8 @@ fi
 echo -e "\n\n" >> /pia/cache/network.log
 echo $(date +"%Y-%m-%d %H:%M:%S")\
 			"running pia-start and these are the network settings after the VPN is connected" >> /pia/cache/network.log
-ifconfig tun0 >> /pia/cache/network.log
-ifconfig eth0 >> /pia/cache/network.log
-ifconfig eth1 >> /pia/cache/network.log
-route -n >> /pia/cache/network.log
+ifconfig tun0 &>> /pia/cache/network.log
+ifconfig eth0 &>> /pia/cache/network.log
+ifconfig eth1 &>> /pia/cache/network.log
+route -n &>> /pia/cache/network.log
 echo -e "\n\n" >> /pia/cache/network.log
