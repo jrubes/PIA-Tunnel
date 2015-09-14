@@ -1,3 +1,8 @@
+update 2015-09-14
+=================
+* Added Virtual Box setup instructions to the new manual
+* Updated the "Credits" section
+
 update 2015-09-13
 =================
 * VM now waits until it receives an IP from the DHCP server. This should fix any issues where the LAN IP was not displayed after booting.
