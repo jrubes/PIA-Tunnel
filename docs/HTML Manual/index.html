@@ -24,7 +24,13 @@
   <ul>
   <li><a href="#overview">Overview</a></li>
 
-  <li><a href="#vm_setup">Virtual Machine Setup</a></li>
+  <li><a href="#vm_setup">Virtual Machine Setup</a>
+      <ul>
+          <li><a href="#vm_wrk_player">VMware Workstation and Player</a></li>
+          <li><a href="#vm_esxi">ESXi</a></li>
+          <li><a href="#vm_vbox">Virtual Box</a></li>
+      </ul>
+  </li>
 
   <li><a href="#pi_setup">Raspberry Pi / stand alone setup</a></li>
 
@@ -70,7 +76,7 @@
 
   <li>Known Issues</li>
 
-  <li>Credits</li>
+  <li><a href="#credits">Credits</a></li>
 
   </ul>
 </div>
@@ -118,7 +124,7 @@
     <li>Extract the 7-Zip archive. 7-Zip is a free compression utility <a href="http://www.7-zip.org/" target="_blank">http://www.7-zip.org</a></li>
   </ol>
 
-  <h3>VMware Workstation and Player</h3>
+  <h3 id="vm_wrk_player">VMware Workstation and Player</h3>
   <ol>
     <li>Add the OVF Template to VMware Workstation or Player by double clicking on "PIA-Tunnel.ovf" then on "Import".</li>
     <li>Ensure that the second network adapter is a member of a private LAN segment
@@ -134,7 +140,7 @@
     </li>
   </ol>
 
-  <h3>ESXi</h3>
+  <h3 id="vm_esxi">ESXi</h3>
   <ol>
   <li>Setup private VM LAN segment first using vSphere Client
     <ol>
@@ -173,6 +179,22 @@
     Remove the second network card if you don't intend use network isolation. You may always add
     the interface later.
   </p>
+  
+  <h3 id="vm_vbox">Virtual Box</h3>
+  <ol>
+      <li>Use the menu option "File" => "Import Appliance" to import the OVF Template</li>
+      <li>
+          Select the option "Reinitialize the MAC address of all network cards"<br>
+          <a href="./grfx/overview.png"><img src="./grfx/overview-small.png" alt="webUI screenshot"></a>
+      </li>
+      <li>Once imported, select the VM and click on settings</li>
+      <li>Under "General", rename the VM to PIA-Tunnel</li>
+      <li>Under Network, set Adapter 1 to "Bridged Adapter" and select the correct interface for "Name"</li>
+      <li>Under Network, set Adapter 2 to "Host-only Adapter" and select a private network for "Name". This network will be used by your client VMs to 
+            access the VPN.</li>
+      
+  </ol>
+  
 </div>
 
 
@@ -569,7 +591,7 @@
         One network connects to the first network card, the other to the second network card. Complete isolation.<br>
         You could turn WLAN off at your Internet router and replace the network switch inside
         the isolated network with an access point/switch combo.
-        Many things are possible with networking ... .
+        Many things are possible with networking ...<br>
         <img src="./grfx/default_home_pia_standalone.png" alt="typical home network map"><br>
       </p>
 
@@ -801,11 +823,22 @@
     <li>
       Login to the command line and run pia-setup and pia-update manually.<br>
       The root password is "pia" before you run the setup wizard or some random string afterwards.
-      Please use "Settings" =&amp; "Linux root Password" to change it.<br>
+      Please use "Settings" =&gt; "Linux root Password" to change it.<br>
       Now run the following commands and check the output for any error messages
       <ul><li>pia-setup</li><li>pia-update</li></ul>
     </li>
   </ul>
 </div>
+
+<div id="credits" class="section">
+    <h2>Credits</h2> <a href="#main_index">Back To Top</a>
+    <ul>
+        <li><a href="https://github.com/erusev/parsedown" target="_blank">parsedown by Emanuil Rusev</a></li>
+        <li><a href="https://github.com/firefly2442/phpdhcpd" target="_blank">PHPdhcpd by Patrick</a></li>
+        <li>Special thank to Alan Diamond for rescuing the old documentation from Microsoft's ODF</li>
+    </ul>
+</div>
+
+
 </body>
 </html>
