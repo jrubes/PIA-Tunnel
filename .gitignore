@@ -1,4 +1,5 @@
 *~
+.DS_Store
 /login.conf
 /login-pia.conf
 /login-frootvpn.conf
