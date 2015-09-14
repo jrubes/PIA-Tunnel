@@ -27,13 +27,13 @@ fi
 
 
 if [ "$1" = "fix" ]; then
-	printf "\n" >> /pia/cache/network.log
+	printf "\n" >> /usr/local/pia/cache/network.log
 	echo $(date +"%Y-%m-%d %H:%M:%S")\
-		"script pia-forward fix needs to run ... network status right now" >> /pia/cache/network.log
-	ifconfig tun0 &>> /pia/cache/network.log
-	ifconfig eth0 &>> /pia/cache/network.log
-	ifconfig eth1 &>> /pia/cache/network.log
-	route -n &>> /pia/cache/network.log
+		"script pia-forward fix needs to run ... network status right now" >> /usr/local/pia/cache/network.log
+	ifconfig tun0 &>> /usr/local/pia/cache/network.log
+	ifconfig eth0 &>> /usr/local/pia/cache/network.log
+	ifconfig eth1 &>> /usr/local/pia/cache/network.log
+	route -n &>> /usr/local/pia/cache/network.log
 
 
 	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
@@ -54,13 +54,13 @@ if [ "$1" = "fix" ]; then
 
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Done! Please try again."
 
-	printf "\n" >> /pia/cache/network.log
+	printf "\n" >> /usr/local/pia/cache/network.log
 	echo $(date +"%Y-%m-%d %H:%M:%S")\
-	        "network status after run" >> /pia/cache/network.log
-	ifconfig tun0 &>> /pia/cache/network.log
-	ifconfig eth0 &>> /pia/cache/network.log
-	ifconfig eth1 &>> /pia/cache/network.log
-	route -n &>> /pia/cache/network.log
+	        "network status after run" >> /usr/local/pia/cache/network.log
+	ifconfig tun0 &>> /usr/local/pia/cache/network.log
+	ifconfig eth0 &>> /usr/local/pia/cache/network.log
+	ifconfig eth1 &>> /usr/local/pia/cache/network.log
+	route -n &>> /usr/local/pia/cache/network.log
 	printf "\nforward fix done"
 
 fi
