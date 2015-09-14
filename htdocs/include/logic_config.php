@@ -1159,6 +1159,12 @@ function disp_interface(){
   $disp_body .= '<tr><td>VPN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
 
 
+  //default route
+  $disabled = ($settings['IF_ETH0_DHCP'] === 'yes' && $settings['IF_ETH1_DHCP'] === 'yes' ) ? 'disabled' : ''; //disable input fields when DHCP is set
+  $GLOB_disp_network_default_fields .= 'IF_DEFAULTROUTE,';
+  $disp_body .= '<tr><td>Default route</td><td><input '.$disabled.' type="text" id="IF_DEFAULTROUTE" name="IF_DEFAULTROUTE" value="'.$settings['IF_DEFAULTROUTE'].'"></td></tr>'."\n";
+
+
     //em0
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $disabled = ($settings['IF_ETH0_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
@@ -1166,7 +1172,7 @@ function disp_interface(){
   $sel = array(
           'id' => 'IF_ETH0_DHCP',
           'selected' => $settings['IF_ETH0_DHCP'],
-          'onchange' => "toggle(this, 'IF_ETH0_IP,IF_ETH0_SUB,IF_ETH0_GW', 'yes', 'disabled', '', '');",
+          'onchange' => "toggle(this, 'IF_ETH0_IP,IF_ETH0_SUB', 'yes', 'disabled', '', '');",
           array( 'yes', 'yes'),
           array( 'no', 'no')
         );
@@ -1175,8 +1181,6 @@ function disp_interface(){
   $disp_body .= '<tr><td>em0 IP</td><td><input '.$disabled.' type="text" id="IF_ETH0_IP" name="IF_ETH0_IP" value="'.$settings['IF_ETH0_IP'].'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'IF_ETH0_SUB,';
   $disp_body .= '<tr><td>em0 Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH0_SUB" name="IF_ETH0_SUB" value="'.$settings['IF_ETH0_SUB'].'"></td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH0_GW,';
-  $disp_body .= '<tr><td>em0 Gateway</td><td><input '.$disabled.' type="text" id="IF_ETH0_GW" name="IF_ETH0_GW" value="'.$settings['IF_ETH0_GW'].'"></td></tr>'."\n";
 
   //em1
   $disabled = ($settings['IF_ETH1_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
@@ -1185,7 +1189,7 @@ function disp_interface(){
   $sel = array(
           'id' => 'IF_ETH1_DHCP',
           'selected' => $settings['IF_ETH1_DHCP'],
-          'onchange' => "toggle(this, 'IF_ETH1_IP,IF_ETH1_SUB,IF_ETH1_GW', 'yes', 'disabled', '', '');",
+          'onchange' => "toggle(this, 'IF_ETH1_IP,IF_ETH1_SUB', 'yes', 'disabled', '', '');",
           array( 'yes', 'yes'),
           array( 'no', 'no')
         );
@@ -1194,8 +1198,6 @@ function disp_interface(){
   $disp_body .= '<tr><td>em1 IP</td><td><input '.$disabled.' type="text" id="IF_ETH1_IP" name="IF_ETH1_IP" value="'.$settings['IF_ETH1_IP'].'"></td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'IF_ETH1_SUB,';
   $disp_body .= '<tr><td>em1 Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH1_SUB" name="IF_ETH1_SUB" value="'.$settings['IF_ETH1_SUB'].'"></td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH1_GW,';
-  $disp_body .= '<tr><td>em1 Gateway</td><td><input '.$disabled.' type="text" id="IF_ETH1_GW" name="IF_ETH1_GW" value="'.$settings['IF_ETH1_GW'].'"></td></tr>'."\n";
 
   $disp_body .= '</table>';
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';
