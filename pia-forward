@@ -30,10 +30,10 @@ if [ "$1" = "fix" ]; then
 	printf "\n" >> /usr/local/pia/cache/network.log
 	echo $(date +"%Y-%m-%d %H:%M:%S")\
 		"script pia-forward fix needs to run ... network status right now" >> /usr/local/pia/cache/network.log
-	ifconfig tun0 &>> /usr/local/pia/cache/network.log
-	ifconfig eth0 &>> /usr/local/pia/cache/network.log
-	ifconfig eth1 &>> /usr/local/pia/cache/network.log
-	route -n &>> /usr/local/pia/cache/network.log
+		ifconfig tun0 &>> /usr/local/pia/cache/network.log
+		ifconfig em0 &>> /usr/local/pia/cache/network.log
+		ifconfig em1 &>> /usr/local/pia/cache/network.log
+		netstat -rn &>> /usr/local/pia/cache/network.log
 
 
 	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
@@ -58,9 +58,9 @@ if [ "$1" = "fix" ]; then
 	echo $(date +"%Y-%m-%d %H:%M:%S")\
 	        "network status after run" >> /usr/local/pia/cache/network.log
 	ifconfig tun0 &>> /usr/local/pia/cache/network.log
-	ifconfig eth0 &>> /usr/local/pia/cache/network.log
-	ifconfig eth1 &>> /usr/local/pia/cache/network.log
-	route -n &>> /usr/local/pia/cache/network.log
+	ifconfig em0 &>> /usr/local/pia/cache/network.log
+	ifconfig em1 &>> /usr/local/pia/cache/network.log
+	netstat -rn &>> /usr/local/pia/cache/network.log
 	printf "\nforward fix done"
 
 fi

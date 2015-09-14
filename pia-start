@@ -45,9 +45,9 @@ echo -e "\n\n" >> /usr/local/pia/cache/network.log
 echo $(date +"%Y-%m-%d %H:%M:%S")\
 			"running pia-start and these are the network settings before the VPN" >> /usr/local/pia/cache/network.log
 ifconfig tun0 &>> /usr/local/pia/cache/network.log
-ifconfig eth0 &>> /usr/local/pia/cache/network.log
-ifconfig eth1 &>> /usr/local/pia/cache/network.log
-route -n &>> /usr/local/pia/cache/network.log
+ifconfig em0 &>> /usr/local/pia/cache/network.log
+ifconfig em1 &>> /usr/local/pia/cache/network.log
+netstat -rn &>> /usr/local/pia/cache/network.log
 
 
 # check if this is a "daemon" run
@@ -164,7 +164,7 @@ echo -e "\n\n" >> /usr/local/pia/cache/network.log
 echo $(date +"%Y-%m-%d %H:%M:%S")\
 			"running pia-start and these are the network settings after the VPN is connected" >> /usr/local/pia/cache/network.log
 ifconfig tun0 &>> /usr/local/pia/cache/network.log
-ifconfig eth0 &>> /usr/local/pia/cache/network.log
-ifconfig eth1 &>> /usr/local/pia/cache/network.log
-route -n &>> /usr/local/pia/cache/network.log
+ifconfig em0 &>> /usr/local/pia/cache/network.log
+ifconfig em1 &>> /usr/local/pia/cache/network.log
+netstat -rn &>> /usr/local/pia/cache/network.log
 echo -e "\n\n" >> /usr/local/pia/cache/network.log
