@@ -179,7 +179,7 @@
     Remove the second network card if you don't intend use network isolation. You may always add
     the interface later.
   </p>
-  
+
   <h3 id="vm_vbox">Virtual Box</h3>
   <ol>
       <li>Use the menu option "File" => "Import Appliance" to import the OVF Template</li>
@@ -191,7 +191,7 @@
       <li>Under "General", rename the VM to PIA-Tunnel</li>
       <li>Under "Storage", add an optical drive (leave empty)</li>
       <li>Under Network, set Adapter 1 to "Bridged Adapter" and select the correct interface for "Name"</li>
-      <li>Under Network, set Adapter 2 to "Host-only Adapter" and select a private network for "Name". This network will be used by your client VMs to 
+      <li>Under Network, set Adapter 2 to "Host-only Adapter" and select a private network for "Name". This network will be used by your client VMs to
             access the VPN.</li>
       <li>Start the VM and complete the Setup Wizard.</li>
       <li>The VM has the open-vm-tools pre installed but does not come with the Virtual Box support software. Here is how to install the required software<br>
@@ -199,8 +199,11 @@
           <ol>
               <li>Login as root and run the following commands</li>
               <li><pre>rm /etc/rc[0-6].d/S01open-vm*
-apt-get autoremove open-vm-tools</pre></li>
-              <li><pre>apt-get update && apt-get upgrade && apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-images1.3</pre></li>
+apt-get autoremove open-vm-tools
+apt-get update
+apt-get upgrade
+apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-images1.3
+</pre></li>
               <li><strong>Reboot the VM</strong>
                   <pre>reboot</pre>
               </li>
@@ -218,12 +221,12 @@ apt-get autoremove open-vm-tools</pre></li>
               <li>It's probably a good idea to reboot one final time.
                   <pre>reboot</pre>
               </li>
- 
+
           </ol>
       </li>
-      
+
   </ol>
-  
+
 </div>
 
 
