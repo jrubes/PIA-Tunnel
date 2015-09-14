@@ -49,15 +49,17 @@ class PIASettings {
 
         $parray = $this->get_post_array($posted, true);
         $sarray = $this->get_settings_array($posted);
-        $tmp_array = $this->compare_settings_arrays( $sarray, $parray);
+        if( $sarray !== false ){
+            $tmp_array = $this->compare_settings_arrays( $sarray, $parray);
 
-        /* new_settings now contains the new values to be stored or empty for "no values" */
-        $array2store = $this->format_array($posted, $tmp_array);
-        $this->save_settings_array($posted, $array2store);
-        if( $this->settings_array_changes > 0 ){
-          $onechanged=true;
-        }else{
-          //echo "no changes to $posted<br>";
+            /* new_settings now contains the new values to be stored or empty for "no values" */
+            $array2store = $this->format_array($posted, $tmp_array);
+            $this->save_settings_array($posted, $array2store);
+            if( $this->settings_array_changes > 0 ){
+              $onechanged=true;
+            }else{
+              //echo "no changes to $posted<br>";
+            }
         }
 
       }else{
