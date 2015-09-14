@@ -307,3 +307,6 @@ fi
 
 # added fix for eth0 not getting an IP quick enough during boot for pia-status to display the IP
 grep "allow-hotplug eth0" /etc/network/interfaces &> /dev/null  && /pia/include/network-interfaces.sh
+
+
+grep "IF_DEFAULTROUTER" /usr/local/pia/settings.conf &> /dev/null || echo 'IF_DEFAULTROUTER=""' >> /usr/local/pia/settings.conf
