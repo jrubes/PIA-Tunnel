@@ -27,12 +27,21 @@ fi
 
 
 if [ "$1" = "fix" ]; then
+	printf "\n" >> /pia/cache/network.log
+	echo $(date +"%Y-%m-%d %H:%M:%S")\
+		"script pia-forward fix needs to run ... network status right now" >> /pia/cache/network.log
+	ifconfig tun0 &>> /pia/cache/network.log
+	ifconfig eth0 &>> /pia/cache/network.log
+	ifconfig eth1 &>> /pia/cache/network.log
+	route -n &>> /pia/cache/network.log
+
+
 	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
 		echo -e "[\e[1;33mwarn\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- will attempt to stop any VPN tunnels \n\tand restart all network interfaces"
 
 		killall openvpn 2>/dev/null
-        rm -f /usr/local/pia/cache/status.txt 2>/dev/null
+        	rm -f /usr/local/pia/cache/status.txt 2>/dev/null
 		/usr/local/pia/include/fw-no-forward.sh
 		# restart networking to get default routes through em0 working again
 		# service network restart #CentOS
@@ -44,4 +53,14 @@ if [ "$1" = "fix" ]; then
 	fi
 
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Done! Please try again."
+
+	printf "\n" >> /pia/cache/network.log
+	echo $(date +"%Y-%m-%d %H:%M:%S")\
+	        "network status after run" >> /pia/cache/network.log
+	ifconfig tun0 &>> /pia/cache/network.log
+	ifconfig eth0 &>> /pia/cache/network.log
+	ifconfig eth1 &>> /pia/cache/network.log
+	route -n &>> /pia/cache/network.log
+	printf "\nforward fix done"
+
 fi
