@@ -1161,8 +1161,8 @@ function disp_interface(){
 
   //default route
   $disabled = ($settings['IF_ETH0_DHCP'] === 'yes' && $settings['IF_ETH1_DHCP'] === 'yes' ) ? 'disabled' : ''; //disable input fields when DHCP is set
-  $GLOB_disp_network_default_fields .= 'IF_DEFAULTROUTE,';
-  $disp_body .= '<tr><td>Default route</td><td><input '.$disabled.' type="text" id="IF_DEFAULTROUTE" name="IF_DEFAULTROUTE" value="'.$settings['IF_DEFAULTROUTE'].'"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'IF_DEFAULTROUTER,';
+  $disp_body .= '<tr><td>Default route</td><td><input '.$disabled.' type="text" id="IF_DEFAULTROUTER" name="IF_DEFAULTROUTER" value="'.$settings['IF_DEFAULTROUTER'].'"></td></tr>'."\n";
 
 
     //em0
