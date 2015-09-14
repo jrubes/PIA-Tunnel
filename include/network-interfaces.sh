@@ -17,6 +17,10 @@ if [ ! -z "${IF_DEFAULTROUTER}" ] ; then
   else
     echo 'defaultrouter="'${IF_DEFAULTROUTER}'"' >> /etc/rc.conf
   fi
+else
+    # make sure default router is gone
+    sed 's/defaultrouter=.*//g' /etc/rc.conf > /tmp/rc.conf
+    mv /tmp/rc.conf /etc/rc.conf
 fi
 
 
