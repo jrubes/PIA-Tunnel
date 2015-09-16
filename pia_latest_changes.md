@@ -1,3 +1,7 @@
+update 2015-09-16
+=================
+* fixed a bug configuring the second network interface for DHCP use. Before: iface eth1 inet static, after: iface eth1 inet dhcp
+
 update 2015-09-14
 =================
 * Added Virtual Box setup instructions to the new manual

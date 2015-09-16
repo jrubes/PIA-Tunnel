@@ -44,7 +44,7 @@ cont="${cont}\n"
 
 cont="${cont}# The private VM LAN interface\n"
 cont="${cont}auto eth1\n"
-if [ "${IF_ETH1_DHCP}" = 'yes' ] && [ ! -z "${IF_ETH1_IP}" ] && [ ! -z "${IF_ETH1_SUB}" ]; then
+if [ "${IF_ETH1_DHCP}" = 'yes' ] && [ -z "${IF_ETH1_IP}" ] && [ -z "${IF_ETH1_SUB}" ]; then
   cont="${cont}iface eth1 inet dhcp\n"
 else
   cont="${cont}iface eth1 inet static\n"
