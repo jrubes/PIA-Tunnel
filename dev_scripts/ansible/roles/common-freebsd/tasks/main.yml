@@ -4,18 +4,25 @@
 - name: set pkg to assume "yes"
   replace: dest=/usr/local/etc/pkg.conf regexp='^#ASSUME_ALWAYS_YES = false;$' replace='ASSUME_ALWAYS_YES = true;'
 
+# added to force update cache
 - pkgng: name="vim" state=present cached="no"
-- pkgng: name="isc-dhcp43-server"
-- pkgng: name="git"
-- pkgng: name="ntp"
-- pkgng: name="gawk"
-- pkgng: name="curl"
-- pkgng: name="sudo"
-- pkgng: name="bind-tools"
-- pkgng: name="zip"
-- pkgng: name="dante"
-- pkgng: name="3proxy"
-- pkgng: name="wget"
+
+- name: install basic software
+  when: ansible_distribution == 'FreeBSD'
+  pkgng: name={{ item }}
+  with_items:
+   - isc-dhcp43-server
+   - git
+   - ntp
+   - gawk
+   - curl
+   - sudo
+   - bind-tools
+   - zip
+   - dante
+   - 3proxy
+   - wget
+ 
 
 - shell: grep -q "supersede domain-name-servers" /etc/dhclient.conf || echo 'supersede domain-name-servers 8.8.8.8, 208.67.222.222, 8.8.4.4, 208.67.220.220;' >> /etc/dhclient.conf
 
