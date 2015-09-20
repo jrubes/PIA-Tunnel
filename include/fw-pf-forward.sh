@@ -101,7 +101,7 @@ echo 'pass out all keep state' >> "$fwfile"
 
 
 #allow outgoing traffic from this machine as long as it is sent over the VPN
-echo 'pass out $tun_if proto any from any to any keep state' >> "$fwfile"
+echo 'pass out ($tun_if) proto any from any to any keep state' >> "$fwfile"
 
 
 #allow dhcpd traffic if enabled
@@ -137,7 +137,7 @@ fi
 
 #setup forwarding for private VM LAN
 if [ "$FORWARD_VM_LAN" = 'yes' ]; then
-  echo 'nat on $tun_if from $localnet to any -> ($int_if)' >> "$fwfile"
+  echo 'nat on ($tun_if) from $localnet to any -> ($int_if)' >> "$fwfile"
 
   if [ "$VERBOSE_DEBUG" = "yes" ]; then
       echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
@@ -226,7 +226,7 @@ fi
 
 #allowing incoming traffic to web UI
 if [ ! -z "${FIREWALL_IF_WEB[0]}" ]; then
-  printf "\n#Allow ssh traffic\n" >> "$fwfile"
+  printf "\n#Allow webUI traffic\n" >> "$fwfile"
 
   for interface in "${FIREWALL_IF_WEB[@]}"
   do
