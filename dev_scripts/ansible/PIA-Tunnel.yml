@@ -1,17 +1,12 @@
 ---
-- name: setup PIA-Tunnel on Debian Linux
-  when: ansible_distribution == 'Debian'
-  hosts: pia-tunnel-debian
-  remote_user: root
-  vars:
-    git_branch: "release_php-gui"
-    git_branch: "master-debian"
 
 - name: setup PIA-Tunnel on FreeBSD
   when: ansible_distribution == 'FreeBSD'
   hosts: pia-tunnel-freebsd
   remote_user: root
   vars:
+    git_branch: "release_php-gui"
+    git_branch: "master-debian"
     git_branch: "master"
 
   roles:
@@ -19,4 +14,4 @@
     - apache-freebsd
     - php-freebsd
     - common
-	- openvpn-freebsd
+    - openvpn-freebsd
