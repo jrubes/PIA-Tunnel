@@ -12,27 +12,27 @@
 
 - name: setting up git source in /usr/src
   when: ansible_distribution == 'FreeBSD'
-  shell: '[ ! -d /usr/src/openvpn ] git clone https://github.com/OpenVPN/openvpn.git /usr/src/openvpn'
+  shell: 'if [ ! -d /usr/src/openvpn ]; then git clone https://github.com/OpenVPN/openvpn.git /usr/src/openvpn ; fi'
 
   
 - name: reset openvpn branch 
   when: ansible_distribution == 'FreeBSD'
-  shell: '[ -d /usr/src/openvpn ] cd /usr/src/openvpn ; git reset --hard ; git checkout release/2.3'
+  shell: 'if [ -d /usr/src/openvpn ]; then cd /usr/src/openvpn ; git reset --hard ; git checkout release/2.3 ; fi'
 
 - name: reset openvpn branch and update
   when: ansible_distribution == 'FreeBSD'
-  shell: '[ -d /usr/src/openvpn ] cd /usr/src/openvpn ; git reset --hard ; git pull origin'
+  shell: 'if [ -d /usr/src/openvpn ]; then cd /usr/src/openvpn ; git reset --hard ; git pull origin ; fi'
 
   
 - name: make configure
   when: ansible_distribution == 'FreeBSD'
-  shell: '[ -d /usr/src/openvpn ] cd /usr/src/openvpn ; autoreconf -i -v -f'
+  shell: 'if [ -d /usr/src/openvpn ]; then cd /usr/src/openvpn ; autoreconf -i -v -f ; fi'
   
 - name: configure openVPN
   when: ansible_distribution == 'FreeBSD'
-  shell: '[ -d /usr/src/openvpn ] cd /usr/src/openvpn ; ./configure --enable-password-save CFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib"'
+  shell: 'if [ -d /usr/src/openvpn ]; then cd /usr/src/openvpn ; ./configure --enable-password-save CFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib" ; fi'
  
 - name: make and install
   when: ansible_distribution == 'FreeBSD'
-  shell: '[ -d /usr/src/openvpn ] cd /usr/src/openvpn ; make && make install'
+  shell: 'if [ -d /usr/src/openvpn ]; then cd /usr/src/openvpn ; make && make install ; fi'
    
