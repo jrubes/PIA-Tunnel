@@ -101,7 +101,7 @@ echo 'pass out all keep state' >> "$fwfile"
 
 
 #allow outgoing traffic from this machine as long as it is sent over the VPN
-pass out $tun_if proto any from any to any keep state
+echo 'pass out $tun_if proto any from any to any keep state' >> "$fwfile"
 
 
 #allow dhcpd traffic if enabled
@@ -146,7 +146,7 @@ if [ "$FORWARD_VM_LAN" = 'yes' ]; then
 fi
 
 #setup port forwarding
-if [ "$PORT_FW" = 'enabled' ] && [ "$FORWARD_PORT_ENABLED" = 'yes' ]; then
+#if [ "$PORT_FW" = 'enabled' ] && [ "$FORWARD_PORT_ENABLED" = 'yes' ]; then
 #	iptables -A PREROUTING -t nat -p tcp --dport $TUN_PORT -j DNAT --to "$FORWARD_IP"
 #	iptables -A PREROUTING -t nat -p udp --dport $TUN_PORT -j DNAT --to "$FORWARD_IP"
 #	iptables -A FORWARD -i $IF_TUNNEL -p tcp --dport $TUN_PORT -d "$FORWARD_IP" -j ACCEPT
@@ -155,12 +155,12 @@ if [ "$PORT_FW" = 'enabled' ] && [ "$FORWARD_PORT_ENABLED" = 'yes' ]; then
 #		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 #			"- port forwaring $IF_TUNNEL => '$FORWARD_IP':$TUN_PORT enabled"
 #	fi
-else
+#else
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- port forwaring $IF_TUNNEL => '$FORWARD_IP' has NOT been enabled"
 	fi
-fi
+#fi
 
 #allowing incoming ssh traffic
 if [ ! -z "${FIREWALL_IF_SSH[0]}" ]; then
