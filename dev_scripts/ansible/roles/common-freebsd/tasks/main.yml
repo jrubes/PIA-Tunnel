@@ -5,7 +5,6 @@
   replace: dest=/usr/local/etc/pkg.conf regexp='^#ASSUME_ALWAYS_YES = false;$' replace='ASSUME_ALWAYS_YES = true;'
 
 - pkgng: name="vim" state=present cached="no"
-- pkgng: name="openvpn"
 - pkgng: name="isc-dhcp43-server"
 - pkgng: name="git"
 - pkgng: name="ntp"
