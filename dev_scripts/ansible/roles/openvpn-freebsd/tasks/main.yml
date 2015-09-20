@@ -31,7 +31,6 @@
   
 - name: configure openVPN
   when: ansible_distribution == 'FreeBSD'
-  ignore_errors: yes
   shell: 'if [ -d /usr/src/openvpn ]; then cd /usr/src/openvpn ; ./configure --enable-password-save CFLAGS="-I/usr/local/include" LDFLAGS="-L/usr/local/lib" ; fi'
  
 - name: make and install
