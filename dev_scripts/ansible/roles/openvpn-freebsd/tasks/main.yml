@@ -10,7 +10,7 @@
    - libtool
    
 
-- name: setting up git source in /usr/src
+- name: setting up git source in /usr/src/openvpn
   when: ansible_distribution == 'FreeBSD'
   shell: 'if [ ! -d /usr/src/openvpn ]; then git clone https://github.com/OpenVPN/openvpn.git /usr/src/openvpn ; fi'
 
