@@ -4,13 +4,12 @@
 - name: set pkg to assume "yes"
   replace: dest=/usr/local/etc/pkg.conf regexp='^#ASSUME_ALWAYS_YES = false;$' replace='ASSUME_ALWAYS_YES = true;'
 
-# added to force update cache
-- pkgng: name="vim" state=present cached="no"
 
 - name: install basic software
   when: ansible_distribution == 'FreeBSD'
-  pkgng: name={{ item }}
+  pkgng: name={{ item }} cached="no"
   with_items:
+   - vim
    - isc-dhcp43-server
    - git
    - ntp
