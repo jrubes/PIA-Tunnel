@@ -1,7 +1,6 @@
 ---
 
 - name: setup PIA-Tunnel on FreeBSD
-  when: ansible_distribution == 'FreeBSD'
   hosts: pia-tunnel-freebsd
   remote_user: root
   vars:
