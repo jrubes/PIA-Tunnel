@@ -4,14 +4,15 @@ LANG=en_US.UTF-8
 export LANG
 source '/usr/local/pia/settings.conf'
 source '/usr/local/pia/include/functions.sh'
+fwfile="/usr/local/pia/firewall/fw-forward.conf"
 RET_FORWARD_PORT="FALSE"
 
 #get default gateway of tunnel interface using "ip"
 #get IP of tunnel Gateway
-TUN_GATEWAY=`/sbin/ip route show | /usr/bin/grep "0.0.0.0/1" | gawk -F" " '{print $3}'`
+TUN_GATEWAY=`/usr/bin/netstat -rn -4 | /usr/bin/grep "0.0.0.0/1" | gawk -F" " '{print $2}'`
 
 #get tunnel IP
-TUN_IP=`/sbin/ip addr show $IF_TUNNEL 2> /dev/null | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | cut -d/ -f1`
+TUN_IP=`/sbin/ifconfig $IF_TUNNEL 2> /dev/null | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | cut -d/ -f1`
 if [ "$TUN_IP" = "" ]; then
 	echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- FATAL SCRIPT ERROR, tunnel interface: '$IF_TUNNEL' does not exist!"
@@ -19,7 +20,7 @@ if [ "$TUN_IP" = "" ]; then
 fi
 
 #get IP of external interface
-EXT_IP=`/sbin/ip addr show $IF_EXT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
+EXT_IP=`/sbin/ifconfig $IF_EXT 2> /dev/null | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
 
 #current default gateway
 EXT_GW=`/usr/bin/netstat -rn -4 | /usr/bin/grep "default" | /usr/local/bin/gawk -F" " '{print $2}'`
@@ -71,53 +72,63 @@ else
 	PORT_FW="disabled"
 fi
 
-#apply iptables settings
-iptables -F
-iptables -t nat -F
-iptables -t nat -X
-iptables -t mangle -F
-iptables -t mangle -X
-iptables -P INPUT DROP
-iptables -P OUTPUT DROP
-iptables -P FORWARD DROP
+# Interface definitions
+echo 'tun_if = "tun0"' > "$fwfile"
+echo 'ext_if = "em0"' >> "$fwfile"
+echo 'int_if = "em1"' >> "$fwfile"
+echo 'localnet = $int_if:network' >> "$fwfile"
+echo 'set require-order yes' >> "$fwfile"
+
+#### Normalization
+#scrub provides a measure of protection against certain kinds of attacks based on incorrect handling of packet fragments
+echo 'scrub in all' >> "$fwfile"
+
+# activate spoofing protection for all interfaces
+echo 'block in quick from urpf-failed' >> "$fwfile"
+
+echo 'antispoof for $tun_if' >> "$fwfile"
+echo 'antispoof for $ext_if' >> "$fwfile"
+echo 'antispoof for $int_if' >> "$fwfile"
+
+# drop Non-Routable Addresses
+echo 'martians = "{ 127.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8, 169.254.0.0/16, 192.0.2.0/24, 0.0.0.0/8, 240.0.0.0/4 }" ' >> "$fwfile"
+echo 'block drop out quick on { $tun_if, $ext_if, int_if } from any to $martians' >> "$fwfile"
+
+
+# Drop incoming everything
+echo 'block in all' >> "$fwfile"
+echo 'pass out all keep state' >> "$fwfile"
+
 
 #allow outgoing traffic from this machine as long as it is sent over the VPN
-iptables -A OUTPUT -o $IF_TUNNEL -j ACCEPT
-
-#allow incoming as long as it is related
-iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-
-#allow outgoing as long as it is related
-iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
-
+pass out $tun_if proto any from any to any keep state
 
 
 #allow dhcpd traffic if enabled
 if [ "$DHCPD_ENABLED1" = 'yes' ] || [ "$DHCPD_ENABLED2" = 'yes' ]; then
-    iptables -A INPUT -i $IF_EXT -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+    echo "pass in on $IF_EXT proto udp from any to any port { 67,68 } keep state" >> "$fwfile"
 
-    iptables -A INPUT -i $IF_INT -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+    echo "pass in on $IF_INT proto udp from any to any port { 67,68 } keep state" >> "$fwfile"
 fi
 
 #allow dhcp traffic if interface is not static
 if [ "$IF_ETH0_DHCP" = 'yes' ]; then
-	iptables -A OUTPUT -o $IF_EXT -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+        echo "pass out $IF_EXT proto udp from any to any port { 67,68 } keep state" >> "$fwfile"
 fi
 if [ "$IF_ETH1_DHCP" = 'yes' ]; then
-	iptables -A OUTPUT -o $IF_INT -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+        echo "pass out $IF_INT proto udp from any to any port { 67,68 } keep state" >> "$fwfile"
 fi
 
 
 #enable POSTROUTING?
 if [ "$FORWARD_PUBLIC_LAN" = 'yes' ] || [ "$FORWARD_VM_LAN" = 'yes' ] || [ "$FORWARD_PORT_ENABLED" = 'yes' ]; then
-  iptables -A POSTROUTING -t nat -o $IF_TUNNEL -j MASQUERADE
+  echo 'nat on $ext_if from $localnet to any -> ($tun_if)' >> "$fwfile"
 fi
 
 #setup forwarding for public LAN
 if [ "$FORWARD_PUBLIC_LAN" = 'yes' ]; then
-  #iptables -A POSTROUTING -t nat -o $IF_TUNNEL -j MASQUERADE
-  iptables -A FORWARD -i $IF_EXT -o $IF_TUNNEL -j ACCEPT
-  iptables -A FORWARD -i $IF_TUNNEL -o $IF_EXT -m state --state RELATED,ESTABLISHED -j ACCEPT
+  echo 'nat on $tun_if from $localnet to any -> ($ext_if)' >> "$fwfile"
+
   if [ "$VERBOSE_DEBUG" = "yes" ]; then
       echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
           "- forwarding $IF_TUNNEL => $IF_EXT enabled"
@@ -126,9 +137,8 @@ fi
 
 #setup forwarding for private VM LAN
 if [ "$FORWARD_VM_LAN" = 'yes' ]; then
-  #iptables -A POSTROUTING -t nat -o $IF_TUNNEL -j MASQUERADE
-  iptables -A FORWARD -i $IF_INT -o $IF_TUNNEL -j ACCEPT
-  iptables -A FORWARD -i $IF_TUNNEL -o $IF_INT -m state --state RELATED,ESTABLISHED -j ACCEPT
+  echo 'nat on $tun_if from $localnet to any -> ($int_if)' >> "$fwfile"
+
   if [ "$VERBOSE_DEBUG" = "yes" ]; then
       echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
           "- forwarding $IF_TUNNEL => $IF_INT enabled"
@@ -137,14 +147,14 @@ fi
 
 #setup port forwarding
 if [ "$PORT_FW" = 'enabled' ] && [ "$FORWARD_PORT_ENABLED" = 'yes' ]; then
-	iptables -A PREROUTING -t nat -p tcp --dport $TUN_PORT -j DNAT --to "$FORWARD_IP"
-	iptables -A PREROUTING -t nat -p udp --dport $TUN_PORT -j DNAT --to "$FORWARD_IP"
-	iptables -A FORWARD -i $IF_TUNNEL -p tcp --dport $TUN_PORT -d "$FORWARD_IP" -j ACCEPT
-	iptables -A FORWARD -i $IF_TUNNEL -p udp --dport $TUN_PORT -d "$FORWARD_IP" -j ACCEPT
-	if [ "$VERBOSE_DEBUG" = "yes" ]; then
-		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- port forwaring $IF_TUNNEL => '$FORWARD_IP':$TUN_PORT enabled"
-	fi
+#	iptables -A PREROUTING -t nat -p tcp --dport $TUN_PORT -j DNAT --to "$FORWARD_IP"
+#	iptables -A PREROUTING -t nat -p udp --dport $TUN_PORT -j DNAT --to "$FORWARD_IP"
+#	iptables -A FORWARD -i $IF_TUNNEL -p tcp --dport $TUN_PORT -d "$FORWARD_IP" -j ACCEPT
+#	iptables -A FORWARD -i $IF_TUNNEL -p udp --dport $TUN_PORT -d "$FORWARD_IP" -j ACCEPT
+#	if [ "$VERBOSE_DEBUG" = "yes" ]; then
+#		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+#			"- port forwaring $IF_TUNNEL => '$FORWARD_IP':$TUN_PORT enabled"
+#	fi
 else
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
@@ -154,13 +164,15 @@ fi
 
 #allowing incoming ssh traffic
 if [ ! -z "${FIREWALL_IF_SSH[0]}" ]; then
+  printf "\n#Allow ssh traffic\n" >> "$fwfile"
+
   for interface in "${FIREWALL_IF_SSH[@]}"
   do
-    iptables -A INPUT -i "$interface" -p tcp --dport 22 -j ACCEPT
+    echo "pass in on $interface proto tcp from any to any port 22  keep state" >> "$fwfile"
     #iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- SSH enabled for interface: $interface"
+			"- SSH has been enabled for interface: $interface"
 	fi
   done
 fi
@@ -169,9 +181,8 @@ fi
 if [ ! -z "${FIREWALL_IF_SNMP[0]}" ]; then
   for interface in "${FIREWALL_IF_SNMP[@]}"
   do
-    iptables -A INPUT -i "$interface" -p udp --dport 161 -j ACCEPT
-    iptables -A OUTPUT -o "$interface" -p udp --sport 162 -j ACCEPT
-    #iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    echo "pass in on $interface proto udp from any to any port 161 keep state" >> "$fwfile"
+    echo "pass out on $interface proto udp from any to any port 162 keep state" >> "$fwfile"
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- SNMP enabled for interface: $interface"
@@ -183,9 +194,8 @@ fi
 if [ ! -z "${FIREWALL_IF_SECSNMP[0]}" ]; then
   for interface in "${FIREWALL_IF_SECSNMP[@]}"
   do
-    iptables -A INPUT -i "$interface" -p udp --dport 10161 -j ACCEPT
-    iptables -A OUTPUT -o "$interface" -p udp --sport 10162 -j ACCEPT
-    #iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    echo "pass in on $interface proto udp from any to any port 10161 keep state" >> "$fwfile"
+    echo "pass out on $interface proto udp from any to any port 10162 keep state" >> "$fwfile"
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- Secure SNMP enabled for interface: $interface"
@@ -196,24 +206,18 @@ fi
 
 #allowing incoming SOCKS traffic
 if [ "$SOCKS_INT_ENABLED" = 'yes' ]; then
-    INT_IP=`/sbin/ip addr show "$IF_INT" | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/local/cut -d/ -f1`
+    INT_IP=`/sbin/ifconfig "$IF_INT" | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/local/cut -d/ -f1`
 
-    iptables -A INPUT -i "$IF_INT" -p tcp --dport "$SOCKS_INT_PORT" -j ACCEPT
-    iptables -A INPUT -i "$IF_INT" -p udp --dport "$SOCKS_INT_PORT" -j ACCEPT
-    iptables -A OUTPUT -o "$IF_TUNNEL" -p tcp --sport 8080 -s "$INT_IP" -j ACCEPT
-    iptables -A OUTPUT -o "$IF_TUNNEL" -p udp --sport 8080 -s "$INT_IP" -j ACCEPT
-    #iptables -A OUTPUT -o "$IF_INT" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    echo "pass in on $IF_INT proto {tcp, udp} from any to any port $SOCKS_INT_PORT keep state" >> "$fwfile"
+    echo "pass out on $IF_TUNNEL proto {tcp, udp} from $INT_IP port 8080 to any state" >> "$fwfile"
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- SOCKS enabled for interface: $IF_INT"
 	fi
 fi
 if [ "$SOCKS_EXT_ENABLED" = 'yes' ]; then
-    iptables -A INPUT -i "$IF_EXT" -p tcp --dport "$SOCKS_EXT_PORT" -j ACCEPT
-    iptables -A INPUT -i "$IF_EXT" -p udp --dport "$SOCKS_EXT_PORT" -j ACCEPT
-    iptables -A OUTPUT -o "$IF_TUNNEL" -p tcp --sport 8080 -s "$EXT_IP" -j ACCEPT
-    iptables -A OUTPUT -o "$IF_TUNNEL" -p udp --sport 8080 -s "$EXT_IP" -j ACCEPT
-    #iptables -A OUTPUT -o "$IF_EXT" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    echo "pass in on $IF_EXT proto {tcp, udp} from any to any port $SOCKS_EXT_PORT keep state" >> "$fwfile"
+    echo "pass out on $IF_TUNNEL proto {tcp, udp} from $EXT_IP port 8080 to any state" >> "$fwfile"
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- SOCKS enabled for interface: $IF_EXT"
@@ -222,13 +226,15 @@ fi
 
 #allowing incoming traffic to web UI
 if [ ! -z "${FIREWALL_IF_WEB[0]}" ]; then
+  printf "\n#Allow ssh traffic\n" >> "$fwfile"
+
   for interface in "${FIREWALL_IF_WEB[@]}"
   do
-    iptables -A INPUT -i "$interface" -p tcp --dport 80 -j ACCEPT
+    echo "pass in on $interface proto tcp from any to any port 80  keep state" >> "$fwfile"
     #iptables -A OUTPUT -o "$interface" -m state --state RELATED,ESTABLISHED -j ACCEPT
 	if [ "$VERBOSE_DEBUG" = "yes" ]; then
 		echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- webUI enabled for interface: $interface"
+			"- webUI has been enabled for interface: $interface"
 	fi
   done
 fi
@@ -236,10 +242,10 @@ fi
 
 
 # setup default routes - 2>/dev/null needs to be fixed, check if exists first, then remove or keep
-#echo "E: route delete default dev $IF_EXT"
-route delete default dev $IF_EXT 2>/dev/null
-#echo "E: route add default gw $TUN_GATEWAY dev $IF_TUNNEL"
-route add default gw $TUN_GATEWAY dev $IF_TUNNEL 2>/dev/null
+echo "E: route delete default dev $IF_EXT"
+#route delete default dev $IF_EXT 2>/dev/null
+echo "E: route add default gw $TUN_GATEWAY dev $IF_TUNNEL"
+#route add default gw $TUN_GATEWAY dev $IF_TUNNEL 2>/dev/null
 
 # Enable forwarding
-echo 1 > /proc/sys/net/ipv4/ip_forward
+sysctl net.inet.ip.forwarding=1

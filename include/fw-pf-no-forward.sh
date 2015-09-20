@@ -5,22 +5,35 @@ export LANG
 
 source '/usr/local/pia/settings.conf'
 
-fwfile="/usr/local/pia/firewall/fw-no-forward"
+fwfile="/usr/local/pia/firewall/fw-no-forward.conf"
 
 
-echo 'set require-order yes' > "$fwfile"
-
+# Interface definitions
+echo 'tun_if = "tun0"' > "$fwfile"
+echo 'ext_if = "em0"' >> "$fwfile"
+echo 'int_if = "em1"' >> "$fwfile"
+echo 'localnet = $int_if:network' >> "$fwfile"
+echo 'set require-order yes' >> "$fwfile"
 
 #### Normalization
 #scrub provides a measure of protection against certain kinds of attacks based on incorrect handling of packet fragments
 echo 'scrub in all' >> "$fwfile"
 
+# activate spoofing protection for all interfaces
+echo 'block in quick from urpf-failed' >> "$fwfile"
+
+echo 'antispoof for $tun_if' >> "$fwfile"
+echo 'antispoof for $ext_if' >> "$fwfile"
+echo 'antispoof for $int_if' >> "$fwfile"
+
+# drop Non-Routable Addresses
+echo 'martians = "{ 127.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8, 169.254.0.0/16, 192.0.2.0/24, 0.0.0.0/8, 240.0.0.0/4 }" ' >> "$fwfile"
+echo 'block drop out quick on { $tun_if, $ext_if, int_if } from any to $martians' >> "$fwfile"
+
+
 # Drop incoming everything
 echo 'block in all' >> "$fwfile"
 echo 'pass out all keep state' >> "$fwfile"
-
-# activate spoofing protection for all interfaces
-echo 'block in quick from urpf-failed' >> "$fwfile"
 
 
 #allow in
@@ -33,17 +46,17 @@ echo 'block in quick from urpf-failed' >> "$fwfile"
 
 #allow dhcpd traffic if enabled
 if [ "$DHCPD_ENABLED1" = 'yes' ] || [ "$DHCPD_ENABLED2" = 'yes' ]; then
-    echo "pass in on $IF_EXT proto udp from any to any port 67,68  keep state" >> "$fwfile"
+    echo "pass in on $IF_EXT proto udp from any to any port { 67,68 } keep state" >> "$fwfile"
 
-    echo "pass in on $IF_INT proto udp from any to any port 67,68  keep state" >> "$fwfile"
+    echo "pass in on $IF_INT proto udp from any to any port { 67,68 } keep state" >> "$fwfile"
 fi
 
 #allow dhcp traffic if interface is not static
 if [ "$IF_ETH0_DHCP" = 'yes' ]; then
-        echo "pass out $IF_EXT proto udp from any to any port 67,68 keep state" >> "$fwfile"
+        echo "pass out $IF_EXT proto udp from any to any port { 67,68 } keep state" >> "$fwfile"
 fi
 if [ "$IF_ETH1_DHCP" = 'yes' ]; then
-        echo "pass out $IF_INT proto udp from any to any port 67,68 keep state" >> "$fwfile"
+        echo "pass out $IF_INT proto udp from any to any port { 67,68 } keep state" >> "$fwfile"
 fi
 
 
