@@ -14,6 +14,6 @@ fi
 # FreeBSD
 if [ -f /usr/sbin/pkg ];
 then
-	pkg update >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
-	pkg upgrade >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
+	/usr/sbin/pkg update >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
+	/usr/sbin/pkg upgrade >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
 fi
