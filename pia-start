@@ -8,6 +8,7 @@ LANG=en_US.UTF-8
 export LANG
 source '/usr/local/pia/settings.conf'
 source '/usr/local/pia/include/functions.sh'
+source '/usr/local/pia/include/functions-freebsd.sh'
 FAIL_RETRY_INTERNET=3
 SLEEP_PING_RETEST=4
 
@@ -31,8 +32,8 @@ if [ "$1" = "list" ] || [ $# -eq 0 ] || [ "$1" = "--help" ]; then
 	echo "$LIST2"
 	echo
 	echo "Examples:"
-	echo -e "\tpia-start Germany"
-	echo -e "\tpia-start \"UK London\""
+	echo -e "\tpia-start PIAtcp/Germany"
+	echo -e "\tpia-start \"PIAudp/UK London\""
 	exit
 fi
 
@@ -50,31 +51,28 @@ ifconfig em1 &>> /usr/local/pia/cache/network.log
 netstat -rn &>> /usr/local/pia/cache/network.log
 
 
-# check if this is a "daemon" run
-if [ "$1" = "daemon" ]; then
-	# select the first connection from the failover array
-	filename="${MYVPN[0]}"
-fi
 
 #execute if .ovpn file exists with name passed
 if [ -f "/usr/local/pia/ovpn/$filename.ovpn" ]; then
 	# check for default username and exit
     check_default_username
 
+    #check if openvpn is running
+    check_openvpn_running
+    if [ ! "$RET_CHK_OPENVPN" = "down" ] ; then
+      echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+          "- VPN active, attempting to end current connection"
+      VPNstop
+    fi
 
-	#see if we have a tunnel open
-	ping_host_new "vpn" "quick" "keep"
-	if [ "$RET_PING_HOST" = "OK" ]; then
-		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
-			"- closing current VPN tunnel"
-		/usr/local/pia/pia-stop quite
-	else
-		#set iptables to something save until the tunnel is set up
-		/usr/local/pia/pia-forward stop quite
-	fi
 
-	#ensure internet works before going further
-	check_repair_internet
+    #check if tun0 is already up
+    check_tun0_up
+    if [ ! "$RET_CHK_IF_TUN0" = "down" ]; then
+      echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
+          "- tun0 is still active - refusing to continue"
+      exit 99
+    fi
 
 
     #get the provider / directory name
@@ -102,7 +100,8 @@ if [ -f "/usr/local/pia/ovpn/$filename.ovpn" ]; then
     fi
 
 
-
+echo "Debug script end"
+exit 0
 
 	# start the FW script once the VPN is up and running
 	LOOP_PROTECT=0
