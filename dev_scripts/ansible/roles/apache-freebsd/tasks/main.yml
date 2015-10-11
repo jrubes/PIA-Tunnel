@@ -8,5 +8,5 @@
 
 - replace: dest=/usr/local/etc/apache24/httpd.conf regexp='^(\s*)DirectoryIndex index.html$' replace='    DirectoryIndex index.php index.html'
 
-- replace: dest=/usr/local/etc/apache24/httpd.conf regexp='^(\s*)ServerName www.example.com$' replace='ServerName pia-tunnel.local:80'
+- replace: dest=/usr/local/etc/apache24/httpd.conf regexp='^(\#*\s*)ServerName www\.example\.com:80$' replace='ServerName pia-tunnel.local:80'
 
