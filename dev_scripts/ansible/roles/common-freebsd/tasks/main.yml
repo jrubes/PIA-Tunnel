@@ -43,6 +43,8 @@
 
 - shell: grep -q 'vpnvm' /etc/group || pw groupadd vpnvm -M root,www
 
+- shell: grep -q 'ntpd_enable=' /etc/rc.conf || echo 'ntpd_enable="YES"' >> /etc/rc.conf
+
 - shell: pw groupshow vpnvm | grep -q "vpnvm:" && pw groupmod vpnvm -m root,www
 
 - shell: "[ ! -f /bin/bash ] && ln -s /usr/local/bin/bash /bin/bash || exit 0"
