@@ -1,3 +1,7 @@
+update 2015-11-19
+=================
+* added arm7l for Raspberry Pi 2
+
 update 2015-09-16
 =================
 * fixed a bug configuring the second network interface for DHCP use. Before: iface eth1 inet static, after: iface eth1 inet dhcp
