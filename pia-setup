@@ -32,7 +32,7 @@ if [ ! -f "/usr/sbin/sockd" ]; then
   if [ "$CPU_type" = "i686" ]; then
     cp /pia/extra_software/dante-1.4.1-bin.tar.xz /tmp/dante-1.4.1-bin.tar.xz
 
-  elif [ "$CPU_type" = "armv6l" ]; then #WATCH OUT this is armv6L
+  elif [ "$CPU_type" = "armv6l" ] || [ "$CPU_type" = "armv7l" ]; then #WATCH OUT this is armv6L
     cp /pia/extra_software/dante-1.4.1-arm-bin.tar.xz /tmp/dante-1.4.1-bin.tar.xz
 
   else
@@ -75,7 +75,7 @@ if [ ! -f "/usr/sbin/socks" ]; then
     mkdir -p /tmp/3proxy/
     cp /pia/extra_software/3proxy-0.7.1.2-socks-i686.tar.xz /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz
 
-  elif [ "$CPU_type" = "armv6l" ]; then #WATCH OUT this is armv6L
+  elif [ "$CPU_type" = "armv6l" ] || [ "$CPU_type" = "armv7l" ]; then #WATCH OUT this is armv6L
     mkdir -p /tmp/3proxy/
     cp /pia/extra_software/3proxy-0.7.1.2-socks-arm.tar.xz /tmp/3proxy/3proxy-0.7.1.2-socks.tar.xz
 
