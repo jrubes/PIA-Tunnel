@@ -82,7 +82,7 @@ function get_port(){
   }
 
   // grab URL and pass it to the browser
-  $return = json_decode(curl_exec($ch), true);
+  $return = json_decode($curl_ret, true);
 
   // close cURL resource, and free up system resources
   curl_close($ch);
