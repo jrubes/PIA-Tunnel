@@ -55,6 +55,10 @@ chmod ugo+x /usr/local/pia/pia-setup
 /usr/local/pia/pia-setup
 
 #force wizard to start
-sed -i '' 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf
+if [ "$OS_TYPE" = "Linux ]; then
+    sed -i 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf
+else
+    sed -i '' 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf
+fi
 
 echo "Done, reboot or shutdown now!"
