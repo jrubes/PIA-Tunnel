@@ -1,0 +1,13 @@
+---
+# compile openvpn to enable passing username and password from a file
+# no required under Debian
+
+- name: install required packages
+  apt: name="{{ item }}" state=present update_cache=yes
+  with_items:
+    - openvpn
+  notify: 
+    - restart apache
+  when: ansible_distribution == 'Debian'
+
+   

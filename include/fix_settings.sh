@@ -3,6 +3,7 @@
 # this script will add missing settings to the config file
 LANG=en_US.UTF-8
 export LANG
+source '/usr/local/pia/include/commands.sh'
 source '/usr/local/pia/settings.conf'
 
 
@@ -60,7 +61,7 @@ if [ -z "${VERBOSE}" ]; then
 
 fi
 
-ret=`/usr/bin/grep -c 'bold=' /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c 'bold=' /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo '#for pretty print' >> '/usr/local/pia/settings.conf'
   echo '#####' >> '/usr/local/pia/settings.conf'
@@ -155,45 +156,45 @@ fi
 
 
 # in BASH DHCPD_STATIC_MAC="" then -z fails
-ret=`/usr/bin/grep -c "DHCPD_STATIC_MAC" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "DHCPD_STATIC_MAC" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'DHCPD_STATIC_MAC=""' >> '/usr/local/pia/settings.conf'
 fi
-ret=`/usr/bin/grep -c "DHCPD_STATIC_IP" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "DHCPD_STATIC_IP" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'DHCPD_STATIC_IP=""' >> '/usr/local/pia/settings.conf'
 fi
 
 #add web UI user info
-ret=`/usr/bin/grep -c "WEB_UI_USER" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "WEB_UI_USER" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_USER=""' >> '/usr/local/pia/settings.conf'
 fi
-ret=`/usr/bin/grep -c "WEB_UI_PASSWORD" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "WEB_UI_PASSWORD" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_PASSWORD=""' >> '/usr/local/pia/settings.conf'
 fi
-ret=`/usr/bin/grep -c "WEB_UI_NAMESPACE" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "WEB_UI_NAMESPACE" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_NAMESPACE="3DApa2ezdm"' >> '/usr/local/pia/settings.conf'
 fi
-ret=`/usr/bin/grep -c "WEB_UI_COOKIE" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "WEB_UI_COOKIE" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_COOKIE=""' >> '/usr/local/pia/settings.conf'
 fi
-ret=`/usr/bin/grep -c "WEB_UI_COOKIE_LIFETIME" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "WEB_UI_COOKIE_LIFETIME" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_COOKIE_LIFETIME="120"' >> '/usr/local/pia/settings.conf'
 fi
 
 #ping failure
-ret=`/usr/bin/grep -c "PING_MAX_LOSS" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "PING_MAX_LOSS" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'PING_MAX_LOSS="20"' >> '/usr/local/pia/settings.conf'
 fi
 
 #SOCKS proxy failure
-ret=`/usr/bin/grep -c "SOCKS_EXT_ENABLED" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "SOCKS_EXT_ENABLED" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'SOCKS_EXT_ENABLED="no"' >> '/usr/local/pia/settings.conf'
   echo 'SOCKS_EXT_PORT="8080"' >> '/usr/local/pia/settings.conf'
@@ -209,9 +210,9 @@ if [ $ret = 0 ]; then
 fi
 
 # git branch setting for online updates
-ret=`/usr/bin/grep -c "GIT_BRANCH" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "GIT_BRANCH" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
-  CURRENT_BRANCH=`cd /usr/local/pia/ ; /usr/local/bin/git branch | /usr/bin/grep '*' | /usr/local/bin/gawk -F" " '{print $2}'`
+  CURRENT_BRANCH=`cd /usr/local/pia/ ; $CMD_GIT branch | $CMD_GREP '*' | $CMD_GAWK -F" " '{print $2}'`
   if [ "$CURRENT_BRANCH" != "" ]; then
     echo "using ${CURRENT_BRANCH}"
     echo "GIT_BRANCH='${CURRENT_BRANCH}'" >> '/usr/local/pia/settings.conf'
@@ -225,33 +226,33 @@ fi
 
 
 # initial setup of phpDCHPD
-ret=`/usr/bin/grep -c "GIT_SUB_PDHCPD" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "GIT_SUB_PDHCPD" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   cd /usr/local/pia/
-  /usr/local/bin/git submodule init htdocs/plugin/phpdhcpd
-  /usr/local/bin/git submodule update htdocs/plugin/phpdhcpd
+  $CMD_GIT submodule init htdocs/plugin/phpdhcpd
+  $CMD_GIT submodule update htdocs/plugin/phpdhcpd
   echo 'GIT_SUB_PDHCPD="ran setup"' >> '/usr/local/pia/settings.conf'
 fi
 
 # initial setup of Parsedown
-ret=`/usr/bin/grep -c "GIT_SUB_PARSEDOWN" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "GIT_SUB_PARSEDOWN" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   cd /usr/local/pia/
-  /usr/local/bin/git submodule init htdocs/plugin/parsedown
-  /usr/local/bin/git submodule update htdocs/plugin/parsedown
+  $CMD_GIT submodule init htdocs/plugin/parsedown
+  $CMD_GIT submodule update htdocs/plugin/parsedown
   echo 'GIT_SUB_PARSEDOWN="ran setup"' >> '/usr/local/pia/settings.conf'
 fi
 
 
 # webUI Overview refresh interval
-ret=`/usr/bin/grep -c "WEB_UI_REFRESH_TIME" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "WEB_UI_REFRESH_TIME" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_REFRESH_TIME="15000"' >> '/usr/local/pia/settings.conf'
 fi
 
 
 # SOCKS5 software selection
-ret=`/usr/bin/grep -c "SOCKS_SERVER_TYPE" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "SOCKS_SERVER_TYPE" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'SOCKS_SERVER_TYPE="3proxy"' >> '/usr/local/pia/settings.conf'
 fi
@@ -265,7 +266,7 @@ fi
 
 
 # add setup wizard value to settings - default to yes since a full reset will set it to no
-ret=`/usr/bin/grep -c "SETUP_WIZARD_COMPLETED" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "SETUP_WIZARD_COMPLETED" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'SETUP_WIZARD_COMPLETED="yes"' >> '/usr/local/pia/settings.conf'
 fi
@@ -285,8 +286,7 @@ if [ ! ${FIREWALL_IF_SECSNMP[0]+abc} ]; then
 fi
 
 
-
-ret=`/usr/bin/grep -c "TRANSMISSION_ENABLED" /usr/local/pia/settings.conf`
+ret=`$CMD_GREP -c "TRANSMISSION_ENABLED" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'TRANSMISSION_ENABLED="no"' >> '/usr/local/pia/settings.conf'
   echo 'CIFS_AUTO="no"' >> '/usr/local/pia/settings.conf'
@@ -310,3 +310,19 @@ grep "allow-hotplug eth0" /etc/network/interfaces &> /dev/null  && /pia/include/
 
 
 grep "IF_DEFAULTROUTER" /usr/local/pia/settings.conf &> /dev/null || echo 'IF_DEFAULTROUTER=""' >> /usr/local/pia/settings.conf
+
+ret=`$CMD_GREP -c "HTDOCS_PATH" /usr/local/pia/settings.conf`
+if [ $ret = 0 ]; then
+    unamestr=`uname`
+
+    if [ "$unamestr" == "Linux" ]; then
+        echo 'OS_TYPE="Linux"' >> '/usr/local/pia/settings.conf'
+        echo 'HTDOCS_PATH="/var/www/html"' >> '/usr/local/pia/settings.conf'
+        echo 'APACHE_USER="www-data"' >> '/usr/local/pia/settings.conf'
+    else
+        echo 'OS_TYPE="FreeBSD"' >> '/usr/local/pia/settings.conf'
+        echo 'HTDOCS_PATH="/usr/local/www/apache24/data"' >> '/usr/local/pia/settings.conf'
+        echo 'APACHE_USER="www"' >> '/usr/local/pia/settings.conf'
+    fi
+    
+fi

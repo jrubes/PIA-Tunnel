@@ -1,0 +1,8 @@
+---
+# vm tools tasks
+
+- name: install required packages
+  apt: name="{{ item }}" state=present update_cache=yes
+  with_items:
+    - open-vm-tools
+  when: ansible_distribution == 'Debian'

@@ -1,0 +1,23 @@
+# common to install pia
+---
+
+
+- name: creating /usr/local/pia
+  file: path=/usr/local/pia state=directory owner=root group=staff mode=0750
+
+- name: cloning git repo ... this may take a few minutes
+  shell: "[ ! -f /usr/local/pia/pia-start ] && git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia || exit 0"
+  ignore_errors: yes
+
+- name: checking out release_php-gui
+  shell: cd /usr/local/pia ; git checkout {{ git_branch }}
+  ignore_errors: yes
+
+- name: REMOVE FOR RELEASE - copy dummy ip_list.txt to stop pia-setup from creating it
+  template: src=ip_list.txt dest=/usr/local/pia/ip_list.txt owner=root group=staff mode=0755
+
+- cron: name="system update" user=root minute="0" hour="*/8" job="/usr/local/pia/system-update.sh"
+
+- file: path=/usr/local/pia/pia-setup owner=root group=root mode=0750
+
+- shell: /usr/local/pia/pia-setup

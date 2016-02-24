@@ -3,11 +3,12 @@
 
 LANG=en_US.UTF-8
 export LANG
+source '/usr/local/pia/include/commands.sh'
 
 #set file permissions as needed
-chmod 0770 /usr/local/pia
-find /usr/local/pia -type d -exec chmod 0770 {} \;
-find /usr/local/pia -type f -exec chmod 0660 {} \;
+chmod 0750 /usr/local/pia
+find /usr/local/pia -type d -exec chmod 0750 {} \;
+find /usr/local/pia -type f -exec chmod 0640 {} \;
 
 
 
@@ -67,7 +68,7 @@ FILES="$FILES transmission-start.sh transmission-stop.sh transmission-install.sh
 FILES="$FILES cifs_fwopen.sh cifs_fwclose.sh fw-close.sh up_internet.sh"
 for f in $FILES
 do
-	chmod ug+x "/usr/local/pia/include/$f"
+    chmod ug+x "/usr/local/pia/include/$f"
 done
 
 #reset-pia is special - ug+x but no /bin link
@@ -83,7 +84,7 @@ chmod ug+x "/usr/local/pia/system-update.sh"
 
 # move ip list from old to new location
 if [ ! -f '/usr/local/pia/ip_list.txt' ] && [ -f '/usr/local/pia/cache/ip_list.txt' ]; then
-  mv '/usr/local/pia/cache/ip_list.txt' '/usr/local/pia/ip_list.txt'
+    mv '/usr/local/pia/cache/ip_list.txt' '/usr/local/pia/ip_list.txt'
 fi
 
 
@@ -98,15 +99,16 @@ fi
 
 
 #update files in /usr/local/www/apache24/data/
-cp -r /usr/local/pia/htdocs/* /usr/local/www/apache24/data/
-if [ -f /usr/local/www/apache24/data/README.txt ]; then rm -f /usr/local/www/apache24/data/docs/README.txt; fi
-if [ -f /usr/local/www/apache24/data/monitor-windows.zip ]; then rm -f /usr/local/www/apache24/data/monitor-windows.zip ; fi
-cd /usr/local/pia/client_scripts ; zip -r /usr/local/www/apache24/data/monitor-windows.zip monitor-windows/ &> /dev/null
-cp "/usr/local/pia/docs/PIA-Tunnel Documentation.pdf" /usr/local/www/apache24/data/pia-tunnel_documentation.pdf &> /dev/null
-mkdir -p /usr/local/www/apache24/data/docs/ ; cp -r "/usr/local/pia/docs/HTML Manual/"* /usr/local/www/apache24/data/docs/
-chown -R www:www /usr/local/www/apache24/data/
-find /usr/local/www/apache24/data/ -type d -exec chmod 0750 {} \;
-find /usr/local/www/apache24/data/ -type f -exec chmod 0640 {} \;
+source '/usr/local/pia/settings.conf'
+cp -r /usr/local/pia/htdocs/* "$HTDOCS_PATH/"
+if [ -f "$HTDOCS_PATH/README.txt" ]; then rm -f "$HTDOCS_PATH/README.txt"; fi
+if [ -f "$HTDOCS_PATH/monitor-windows.zip" ]; then rm -f "$HTDOCS_PATH/monitor-windows.zip" ; fi
+cd /usr/local/pia/client_scripts ; zip -r "$HTDOCS_PATH/monitor-windows.zip" monitor-windows/ &> /dev/null
+cp "/usr/local/pia/docs/PIA-Tunnel Documentation.pdf" "$HTDOCS_PATH/pia-tunnel_documentation.pdf" &> /dev/null
+mkdir -p "$HTDOCS_PATH/docs/" ; cp -r "/usr/local/pia/docs/HTML Manual/"* "$HTDOCS_PATH/docs/"
+chown -R "$APACHE_USER":"$APACHE_USER" "$HTDOCS_PATH/"
+find /usr/local/pia/htdocs/ -type d -exec chmod 0750 {} \;
+find /usr/local/pia/htdocs/ -type f -exec chmod 0640 {} \;
 
 # clear webUI update cache
 rm -rf "/usr/local/pia/cache/webui-update_status.txt"
@@ -122,13 +124,16 @@ fi
 /usr/local/pia/include/autostart_rebuild.sh &> /dev/null
 
 if [ ! -d "/usr/local/pia/cache/" ]; then
-  mkdir /usr/local/pia/cache/
-  chown -R root:vpnvm /usr/local/pia/cache/
-  chmod 0770 /usr/local/pia/cache/
+    mkdir /usr/local/pia/cache/
+    chown -R root:vpnvm /usr/local/pia/cache/
+    chmod 0770 /usr/local/pia/cache/
 fi
 
 
+
+
 #ALWAYS RUN THIS LAST
+chmod 0760 /usr/local/pia/settings.conf
 chown -R root:vpnvm /usr/local/pia
-chmod 0770 /usr/local/pia
+chmod 0750 /usr/local/pia
 chmod -R o-rwx /usr/local/pia

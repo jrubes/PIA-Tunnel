@@ -27,8 +27,6 @@
 
 - template: src=dhcpd.conf dest=/usr/local/etc/dhcpd.conf
 
-- shell: grep -q "" /etc/dhclient.conf || echo 'supersede domain-name-servers 8.8.8.8, 208.67.222.222, 8.8.4.4, 208.67.220.220;' >> /etc/dhclient.conf
-
 
 - shell: "grep -q 'www ALL = NOPASSWD' /usr/local/etc/sudoers || echo 'www ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown' >> /usr/local/etc/sudoers"
 
@@ -52,4 +50,4 @@
 - name: reduce boot menu timeout
   shell: "grep -q 'autoboot_delay' /boot/loader.conf || echo 'autoboot_delay=3' >> /boot/loader.conf"
 
-
+  

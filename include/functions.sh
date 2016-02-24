@@ -1,6 +1,7 @@
 #!/bin/bash
 LANG=en_US.UTF-8
 export LANG
+source '/usr/local/pia/include/commands.sh'
 
 #return variables and static stuff
 RET_PING_HOST=""
@@ -10,17 +11,17 @@ RET_FORWARD_PORT="FALSE"
 RET_FORWARD_STATE="FALSE"
 RET_GET_PACKET_LOSS=""
 
-# WARNING DO NOT CHANGE the ping command! ping_host uses sed to modify the string
-PING_VER=`/sbin/ping -V > /dev/null 2>&1`
+# WARNING DO NOT CHANGE the ping command! ping_host uses $CMD_SED to modify the string
+PING_VER=`$CMD_PING -V > /dev/null 2>&1`
 if [ $? -eq 0 ]; then
 	#Debian
-	PING_COMMAND="/sbin/ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
+	PING_COMMAND="$CMD_PING -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
 	#PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\" | gawk -F\",\" '{print \$3}' | gawk -F \"%\" '{print \$1}' | tr -d ' '"
-	PING_PACKET_LOSS="/sbin/ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\""
+	PING_PACKET_LOSS="$CMD_PING -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\""
 else
 	#FreeBSD
-        PING_COMMAND="/sbin/ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | /usr/bin/grep -c \", 0% packet loss\""
-        PING_PACKET_LOSS="/sbin/ping -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | /usr/bin/grep \"packet loss\""
+    PING_COMMAND="$CMD_PING -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | $CMD_GREP -c \", 0% packet loss\""
+    PING_PACKET_LOSS="$CMD_PING -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | $CMD_GREP \"packet loss\""
 fi
 
 # fallback list
@@ -37,8 +38,8 @@ function check_default_username(){
 
     if [ "$FCOUNT" -lt 1 ]; then
         # FATAL ERROR: make sure to always print IP info
-        INT_IP=`/sbin/ip addr show $IF_INT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
-        EXT_IP=`/sbin/ip addr show $IF_EXT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
+        INT_IP=`$CMD_IP addr show $IF_INT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+        EXT_IP=`$CMD_IP addr show $IF_EXT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
         echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: $EXT_IP"
         echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: $INT_IP"
 
@@ -121,7 +122,7 @@ function gen_ip_list() {
   IFS=$'\r\n' IP_LIST=($(cat "/usr/local/pia/ip_list.txt" | tail -n+2))
   #get array length
   IP_COUNT=${#IP_LIST[@]}
-  IP_COUNT=$((IP_COUNT - 1)) #zero based
+  IP_COUNT=$((IP_COUNT - 1)) #zero ba$CMD_SED
 
   #get THIS_MANY random numbers
   PING_INDEX=0
@@ -160,7 +161,7 @@ function gen_ip_list() {
   fi
 
   # $PING_IP_LIST[] now contains a few IPs which may
-  # be used by other functions
+  # be u$CMD_SED by other functions
 }
 
 # new ping function for pinging internet hosts
@@ -191,9 +192,9 @@ function ping_host() {
 			gen_ip_list 15
 		fi
 
-		#pick one IP from $PING_IP_LIST[] to be used this time
+		#pick one IP from $PING_IP_LIST[] to be u$CMD_SED this time
 		ip_count=${#PING_IP_LIST[@]}
-		ip_count=$((ip_count - 1)) #zero based
+		ip_count=$((ip_count - 1)) #zero ba$CMD_SED
 		rand=$[ ( $RANDOM % $ip_count )  + 1 ]
 		host_ip=${PING_IP_LIST[$rand]}
 	fi
@@ -201,7 +202,7 @@ function ping_host() {
 
 	#shall we make this a "quick" ping?
 	if [ "$2" = "quick" ] || [ "$3" = "quick" ]; then
-		pingthis=`echo "$PING_COMMAND" | sed -e "s/-i 0.5 -w 4 -W 0.5/-c 1 -w 1/g"`
+		pingthis=`echo "$PING_COMMAND" | $CMD_SED -e "s/-i 0.5 -w 4 -W 0.5/-c 1 -w 1/g"`
 		if [ "$VERBOSE_DEBUG" = "yes" ]; then
 			echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
 				"- using \"quick\" ping command"
@@ -213,14 +214,14 @@ function ping_host() {
 
   if [ "$1" = "internet" ]; then
     #replace IP in $PING_COMMAND with $host_ip
-    pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
-    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_EXT/g"`
+    pingthis=`echo "$pingthis" | $CMD_SED -e "s/IP2TOPING/$host_ip/g"`
+    pingthis=`echo "$pingthis" | $CMD_SED -e "s/INTERFACE/$IF_EXT/g"`
 	PING_RESULT=`eval $pingthis`
 	#echo "$pingthis"
 
   elif [ "$1" = "vpn" ]; then
-    pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
-    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_TUNNEL/g"`
+    pingthis=`echo "$pingthis" | $CMD_SED -e "s/IP2TOPING/$host_ip/g"`
+    pingthis=`echo "$pingthis" | $CMD_SED -e "s/INTERFACE/$IF_TUNNEL/g"`
     PING_RESULT=`eval $pingthis`
 	#echo "$pingthis"
 
@@ -269,14 +270,14 @@ function ping_host() {
 }
 
 # checks if any rules are active in the FORWARD chain
-# $s1 is optional and may be used to specify a single interface
+# $s1 is optional and may be u$CMD_SED to specify a single interface
 function check_forward_state(){
     unset RET_FORWARD_STATE
 
     if [ "${1}" = "" ]; then
-      ret=`iptables -nL FORWARD | /usr/bin/grep -c "ACCEPT"`
+      ret=`iptables -nL FORWARD | $CMD_GREP -c "ACCEPT"`
     else
-      ret=`iptables -vnL FORWARD | /usr/bin/grep "ACCEPT" | /usr/bin/grep -c "${1}"`
+      ret=`iptables -vnL FORWARD | $CMD_GREP "ACCEPT" | $CMD_GREP -c "${1}"`
     fi
 
 
@@ -329,9 +330,9 @@ function remove_ip_from_array() {
 function echo_conn_established() {
   # show connection data
   maintain_status_cache '/usr/local/pia/cache/status.txt'
-  vpn_port=`cat "/usr/local/pia/cache/status.txt" | /usr/bin/grep "VPNPORT" | gawk -F":" '{print $2}'`
-  #vpn_ip=`cat "/usr/local/pia/cache/status.txt" | /usr/bin/grep "VPNIP" | gawk -F":" '{print $2}'`
-  vpn_ip=`/sbin/ip addr show $IF_TUNNEL | /usr/bin/grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+  vpn_port=`cat "/usr/local/pia/cache/status.txt" | $CMD_GREP "VPNPORT" | $CMD_GAWK -F":" '{print $2}'`
+  #vpn_ip=`cat "/usr/local/pia/cache/status.txt" | $CMD_GREP "VPNIP" | gawk -F":" '{print $2}'`
+  vpn_ip=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | cut -d/ -f1`
   echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- VPN connection to $1 established\n\tVPN IP: $vpn_ip Port: $vpn_port"
 }
@@ -414,7 +415,7 @@ function get_provider(){
 }
 
 
-#function to get the port used for port forwarding
+#function to get the port u$CMD_SED for port forwarding
 # "returns" RET_FORWARD_PORT with the port number as the value or FALSE
 function get_forward_port() {
   RET_FORWARD_PORT="FALSE"
@@ -428,9 +429,9 @@ function get_forward_port() {
       head -n 100 /dev/urandom | md5sum | tr -d " -" > "/usr/local/pia/client_id"
     fi
     PIA_CLIENT_ID=`cat /usr/local/pia/client_id`
-    PIA_UN=`sed -n '1p' /usr/local/pia/login-pia.conf`
-    PIA_PW=`sed -n '2p' /usr/local/pia/login-pia.conf`
-    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | /usr/bin/grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+    PIA_UN=`$CMD_SED -n '1p' /usr/local/pia/login-pia.conf`
+    PIA_PW=`$CMD_SED -n '2p' /usr/local/pia/login-pia.conf`
+    TUN_IP=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
 
     #get open port of tunnel connection
     TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
@@ -527,16 +528,16 @@ function file_is_writable() {
 # s2 how many minutes ago as integer, defaults to 30
 # returns RET_CACHE_AGE_CHECK "OK", "EXPIRED", "NOT FOUND"
 function cache_age_check() {
-	cache_age_check_time_passed=30
+	cache_age_check_time_pas$CMD_SED=30
 	if [ "$2" != "" ]; then
-		cache_age_check_time_passed="$2"
+		cache_age_check_time_pas$CMD_SED="$2"
 	fi
 
 	if [ -f "$1" ]; then
 		date_string=`head -n1 $1 | gawk -F" " '{print $4" "$5}'`
 		#convert date into timestamp
 		cache_ts=`date -d "$date_string" "+%s"`
-		cache_ts_expired=`date -d "$cache_age_check_time_passed minutes ago" "+%s"`
+		cache_ts_expired=`date -d "$cache_age_check_time_pas$CMD_SED minutes ago" "+%s"`
 		if [ $cache_ts -gt $cache_ts_expired ]; then
 			RET_CACHE_AGE_CHECK="OK"
 			return
@@ -575,14 +576,14 @@ function maintain_status_cache() {
 
   #get default gateway of tunnel interface using "ip"
   #get IP of tunnel Gateway
-  TUN_GATEWAY=`/sbin/ip route show | /usr/bin/grep "0.0.0.0/1" | /usr/local/bin/gawk -F" " '{print $3}'`
+  TUN_GATEWAY=`$CMD_IP route show | $CMD_GREP "0.0.0.0/1" | $CMD_GAWK -F" " '{print $3}'`
   #get IPs of interfaces
-  INT_IP=`/sbin/ip addr show $IF_INT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
-  EXT_IP=`/sbin/ip addr show $IF_EXT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
+  INT_IP=`$CMD_IP addr show $IF_INT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+  EXT_IP=`$CMD_IP addr show $IF_EXT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
 
   interface_exists "$IF_TUNNEL"
   if [ "$RET_INTERFACE_EXISTS" = "yes" ]; then
-    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
+    TUN_IP=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
   else
     TUN_IP=""
   fi
@@ -592,8 +593,8 @@ function maintain_status_cache() {
   if [ "$RET_PROVIDER_NAME" = "PIAtcp" ] || [ "$RET_PROVIDER_NAME" = "PIAudp" ]; then
 
     #get PIA username and password from /usr/local/pia/login-pia.conf
-    PIA_UN=`sed -n '1p' /usr/local/pia/login-pia.conf`
-    PIA_PW=`sed -n '2p' /usr/local/pia/login-pia.conf`
+    PIA_UN=`$CMD_SED -n '1p' /usr/local/pia/login-pia.conf`
+    PIA_PW=`$CMD_SED -n '2p' /usr/local/pia/login-pia.conf`
 
 
     #check if the client ID has been generated and get it
@@ -639,7 +640,7 @@ function interface_exists() {
   fi
 
 
-  #check=`ip addr show $1 2>&1 | /usr/bin/grep -c "does not exist"`
+  #check=`ip addr show $1 2>&1 | $CMD_GREP -c "does not exist"`
   check=`ifconfig $1 >/dev/null 2>&1`
   #if [ "$check" = "0" ]; then
   if [ $? -eq 0 ]; then
@@ -679,9 +680,9 @@ function ping_host_new() {
 			gen_ip_list 15
 		fi
 
-		#pick one IP from $PING_IP_LIST[] to be used this time
+		#pick one IP from $PING_IP_LIST[] to be u$CMD_SED this time
 		ip_count=${#PING_IP_LIST[@]}
-		ip_count=$((ip_count - 1)) #zero based
+		ip_count=$((ip_count - 1)) #zero ba$CMD_SED
 		rand=$[ ( $RANDOM % $ip_count )  + 1 ]
 		host_ip=${PING_IP_LIST[$rand]}
 	fi
@@ -689,7 +690,7 @@ function ping_host_new() {
 
 	#shall we make this a "quick" ping?
 	if [ "$2" = "quick" ] || [ "$3" = "quick" ]; then
-		pingthis=`echo "$PING_PACKET_LOSS" | sed -e "s/-i 0.5 -w 4 -W 0.5/-c 1 -w 1/g"`
+		pingthis=`echo "$PING_PACKET_LOSS" | $CMD_SED -e "s/-i 0.5 -w 4 -W 0.5/-c 1 -w 1/g"`
 
 		if [ "$VERBOSE_DEBUG" = "yes" ]; then
 			echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
@@ -701,16 +702,16 @@ function ping_host_new() {
 
   if [ "$1" = "internet" ]; then
     #replace IP in $PING_COMMAND with $host_ip
-    pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
-    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_EXT/g"`
+    pingthis=`echo "$pingthis" | $CMD_SED -e "s/IP2TOPING/$host_ip/g"`
+    pingthis=`echo "$pingthis" | $CMD_SED -e "s/INTERFACE/$IF_EXT/g"`
     PING_RESULT=`eval $pingthis`
     #echo "$pingthis"
     #echo "$PING_RESULT"
     #exit
 
   elif [ "$1" = "vpn" ]; then
-    pingthis=`echo "$pingthis" | sed -e "s/IP2TOPING/$host_ip/g"`
-    pingthis=`echo "$pingthis" | sed -e "s/INTERFACE/$IF_TUNNEL/g"`
+    pingthis=`echo "$pingthis" | $CMD_SED -e "s/IP2TOPING/$host_ip/g"`
+    pingthis=`echo "$pingthis" | $CMD_SED -e "s/INTERFACE/$IF_TUNNEL/g"`
     PING_RESULT=`eval $pingthis`
     #echo "$pingthis"
     #echo "$PING_RESULT"
@@ -803,20 +804,20 @@ function ping_host_new() {
 # ping with 100% packet loss
 #   6 packets transmitted, 0 received, +3 errors, 100% packet loss, time 2547ms
 function get_packet_loss(){
-    passed=$1
+    pas$CMD_SED=$1
     unset RET_GET_PACKET_LOSS
 
     #Debian returns 0%
-    #ret=`echo "$passed" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | tr -d ' '`
+    #ret=`echo "$pas$CMD_SED" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | tr -d ' '`
     # BSD returns as 0.0%
-    ret=`echo "$passed" | /usr/local/bin/gawk -F"," '{print \$3}' | /usr/local/bin/gawk -F "%" '{print \$1}' | /usr/local/bin/gawk -F "." '{print \$1}' | tr -d ' '`
-    errors=`echo "$ret" | /usr/bin/grep -c "errors"`
+    ret=`echo "$pas$CMD_SED" | $CMD_GAWK -F"," '{print \$3}' | $CMD_GAWK -F "%" '{print \$1}' | $CMD_GAWK -F "." '{print \$1}' | tr -d ' '`
+    errors=`echo "$ret" | $CMD_GREP -c "errors"`
 
     if [ "$errors" = "0" ]; then
         RET_GET_PACKET_LOSS=$ret
     else
         #failure string detected, run grep again
-	RET_GET_PACKET_LOSS=`echo "$passed" | gawk -F"," '{print \$4}' | gawk -F "%" '{print \$1}' | tr -d ' '`
+	RET_GET_PACKET_LOSS=`echo "$pas$CMD_SED" | gawk -F"," '{print \$4}' | gawk -F "%" '{print \$1}' | tr -d ' '`
     fi
     return
 }

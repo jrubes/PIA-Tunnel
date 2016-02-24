@@ -10,6 +10,7 @@
 /* @var $_token token */
 
 $inc_dir = './include/';
+require_once $inc_dir.'commands.php';
 require_once $inc_dir.'basic.php';
 
 //force setup wizard if PIA username is set to default

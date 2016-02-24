@@ -1,8 +1,9 @@
 ---
 
-- name: setup PIA-Tunnel on FreeBSD
-  hosts: pia-tunnel-freebsd
-  remote_user: root
+- name: setup PIA-Tunnel on a Raspberry running a fresh installation of Raspbian Lite 
+  hosts: pia-tunnel-raspberry
+  remote_user: pi
+  sudo: yes
   vars:
     git_branch: "release_php-gui"
     git_branch: "master-debian"
@@ -12,5 +13,6 @@
     - common
     - apache
     - php
+    - common
     - openvpn
     - pia

@@ -1,21 +1,15 @@
 ---
 # common tasks
 
-- name: creating /usr/local/pia
-  file: path=/usr/local/pia state=directory owner=root group=wheel mode=0700
+- name: create common "vpnvm" group
+  group: name=vpnvm state=present 
+  
+- name: add apache user to vpnvm group
+  user: name=www-data groups=vpnvm append=yes
 
-- name: cloning git repo ... this may take a few minutes
-  shell: "[ ! -f /usr/local/pia/pia-start ] && git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia || exit 0"
-  ignore_errors: yes
+- include: debian.yml
+  when: ansible_os_family == 'Debian'
+  
+- include: freebsd.yml
+  when: ansible_os_family == 'FreeBSD'
 
-- name: checking out release_php-gui
-  shell: cd /usr/local/pia ; git checkout {{ git_branch }}
-  ignore_errors: yes
-
-- name: REMOVE FOR RELEASE - copy dummy ip_list.txt to stop pia-setup from creating it
-  template: src=ip_list.txt dest=/usr/local/pia/ip_list.txt owner=root group=wheel mode=0755
-
-- cron: name="system update" user=root minute="0" hour="*/8" job="/usr/local/pia/system-update.sh"
-
-
-- shell: /usr/local/pia/pia-setup

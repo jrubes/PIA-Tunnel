@@ -1,0 +1,25 @@
+---
+# common tasks
+
+- name: install required packages
+  apt: name="{{ item }}" state=present update_cache=yes
+  with_items:
+    - git
+    - gawk
+    - zip
+    - unzip
+    - wget
+    - psmisc
+    - dnsutils
+    - isc-dhcp-server
+    - vim
+    - git-core
+    - gawk
+    - curl
+    - psmisc
+  when: ansible_distribution == 'Debian'
+ 
+ 
+ - shell: grep -q "supersede domain-name-servers" /etc/dhclient.conf || echo 'supersede domain-name-servers 8.8.8.8, 208.67.222.222, 8.8.4.4, 208.67.220.220;' >> /etc/dhclient.conf
+ 
+ - shell: "grep -q 'www-data ALL = NOPASSWD' /etc/sudoers || echo 'www-data ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown' >> /etc/sudoers"

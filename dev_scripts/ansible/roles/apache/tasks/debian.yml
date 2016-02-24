@@ -1,0 +1,12 @@
+---
+# install apach24
+
+- name: install required packages
+  apt: name="{{ item }}" state=present update_cache=yes
+  with_items:
+    - apache2
+  notify: 
+    - restart apache
+  when: ansible_distribution == 'Debian'
+
+- file: path=/var/www/html/index.html state=absent
