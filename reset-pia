@@ -4,6 +4,7 @@
 
 LANG=en_US.UTF-8
 export LANG
+source '/usr/local/pia/include/commands.sh'
 
 
 #clear existing ssh key
@@ -56,9 +57,9 @@ chmod ugo+x /usr/local/pia/pia-setup
 
 #force wizard to start
 if [ "$OS_TYPE" = "Linux ]; then
-    sed -i 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf
+    $CMD_SED -i 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf
 else
-    sed -i '' 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf
+    $CMD_SED -i '' 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf
 fi
 
 echo "Done, reboot or shutdown now!"
