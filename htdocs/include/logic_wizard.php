@@ -66,6 +66,7 @@ switch($_REQUEST['cmd']){
 function disp_wizard_reset(){
   $disp_body = '';
 
+  $disp_body .= '<noscript><br><br>Please enable javascript and refresh the page <strong>first</strong><br><br></noscript>';
   $disp_body .= '<p>Brand new setup detected!<br>';
   $disp_body .= 'PIA-Tunnel needs to check for updates and reset some settings to unkown values.</p>'
                 .'<p>Please be patient, this is for your protection.</p>';
