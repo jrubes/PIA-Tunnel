@@ -778,6 +778,43 @@ function disp_general_box(){
 */
 
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $disp_body .= '<tr><td>Web-UI Username</td><td><input type="text" name="WEB_UI_USER" value="'.htmlspecialchars($settings['WEB_UI_USER']).'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>Web-UI Password</td><td><input type="password" name="WEB_UI_PASSWORD" value="" placeholder="*********"></td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'WEB_UI_COOKIE_LIFETIME,';
+  $disp_body .= '<tr><td>Remember Me for</td><td><input type="text" class="short" name="WEB_UI_COOKIE_LIFETIME" value="'.htmlspecialchars($settings['WEB_UI_COOKIE_LIFETIME']).'"> days</td></tr>'."\n";
+
+  $GLOB_disp_network_default_fields .= 'WEB_UI_REFRESH_TIME,';
+  $sel = array(
+            'id' => 'WEB_UI_REFRESH_TIME',
+            'selected' =>  $settings['WEB_UI_REFRESH_TIME'],
+            array( '5000', '5 seconds'),
+            array( '10000', '10 seconds'),
+            array( '15000', '15 seconds'),
+            array( '30000', '30 seconds'),
+            array( '60000', '60 seconds')
+          );
+  $disp_body .= '<tr><td>Refresh Overview every </td><td>'.build_select($sel).'</td></tr>'."\n";
+
+
+  $disp_body .= "</table>\n";
+  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firewall">';
+  $disp_body .= '</div>';
+
+  return $disp_body;
+}
+
+
+function disp_firewall_box(){
+  global $_settings;
+  global $GLOB_disp_network_default_fields;
+
+  $settings = $_settings->get_settings();
+  $disp_body = '';
+
+  $disp_body .= '<div class="box options">';
+  $disp_body .= '<h2>Firewall Settings</h2>'."\n";
+  $disp_body .= "<table>\n";
 
   //now FIREWALL_IF_WEB options
   $use = 'FIREWALL_IF_WEB';
@@ -790,7 +827,7 @@ function disp_general_box(){
             array( 'FIREWALL_IF_WEB[0]', 'eth0'),
             array( 'FIREWALL_IF_WEB[1]', 'eth1')
           );
-  $disp_body .= '<tr><td><span title="incoming on port 80">Allow webUI access on</span></td><td><span title="incoming on port 80">'.build_checkbox($sel).'</span></td></tr>'."\n";
+  $disp_body .= '<tr><td><span title="incoming on port 80">Allow webUI access on</span></td><td><span title="incoming on port 80">'.   build_checkbox($sel).'</span></td></tr>'."\n";
 
 
   $use = 'FIREWALL_IF_SSH';
@@ -827,27 +864,37 @@ function disp_general_box(){
             array( 'FIREWALL_IF_SECSNMP[1]', 'eth1')
           );
   $disp_body .= '<tr><td><span title="incoming on port 10161 and outgoing on 10162">Allow Secure SNMP on</span></td><td><span title="incoming on port 10161 and outgoing on 10162">'.build_checkbox($sel).'</span></td></tr>'."\n";
-
-
-
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $disp_body .= '<tr><td>Web-UI Username</td><td><input type="text" name="WEB_UI_USER" value="'.htmlspecialchars($settings['WEB_UI_USER']).'"></td></tr>'."\n";
-  $disp_body .= '<tr><td>Web-UI Password</td><td><input type="password" name="WEB_UI_PASSWORD" value="" placeholder="*********"></td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'WEB_UI_COOKIE_LIFETIME,';
-  $disp_body .= '<tr><td>Remember Me for</td><td><input type="text" class="short" name="WEB_UI_COOKIE_LIFETIME" value="'.htmlspecialchars($settings['WEB_UI_COOKIE_LIFETIME']).'"> days</td></tr>'."\n";
+  $disp_body .= "</table>\n";
 
-  $GLOB_disp_network_default_fields .= 'WEB_UI_REFRESH_TIME,';
-  $sel = array(
-            'id' => 'WEB_UI_REFRESH_TIME',
-            'selected' =>  $settings['WEB_UI_REFRESH_TIME'],
-            array( '5000', '5 seconds'),
-            array( '10000', '10 seconds'),
-            array( '15000', '15 seconds'),
-            array( '30000', '30 seconds'),
-            array( '60000', '60 seconds')
-          );
-  $disp_body .= '<tr><td>Refresh Overview every </td><td>'.build_select($sel).'</td></tr>'."\n";
+  
+  $disp_body .= 'Enter one port per field or keep empty.';
+  $disp_body .= "<table>\n";
+  $GLOB_disp_network_default_fields .= 'FIREWALL_EXT,';  
+  $max_range = $_settings->get_array_count('FIREWALL_EXT');
+  $ports = '';
+  for( $x = 0 ; $x < $max_range ; ++$x ){
+    if( array_key_exists('FIREWALL_EXT['.$x.']', $settings) === true && $settings['FIREWALL_EXT['.$x.']'] !== '' ){
 
+      $ports .= '<tr><td>Port on '.$settings['IF_EXT'].'</td><td><input type="text" name="FIREWALL_EXT['.$x.']" value="'.$settings['FIREWALL_EXT['.$x.']'].'"></td></tr>'."\n";
+    }
+  }
+  $disp_body .= '<tr><td>New Port on '.$settings['IF_EXT'].'</td><td><input type="text" name="FIREWALL_EXT['.$x.']" value=""></td></tr>'."\n";
+  $disp_body .= $ports; //add existing ports below "new field"
+  
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'FIREWALL_INT,';  
+  $max_range = $_settings->get_array_count('FIREWALL_INT');
+  $ports = '';
+  for( $x = 0 ; $x < $max_range ; ++$x ){
+    if( array_key_exists('FIREWALL_INT['.$x.']', $settings) === true ){
+
+      $ports .= '<tr><td>Port on '.$settings['IF_INT'].'</td><td><input type="text" name="FIREWALL_INT['.$x.']" value="'.$settings['FIREWALL_INT['.$x.']'].'"></td></tr>'."\n";
+    }
+  }
+  $disp_body .= '<tr><td>New Port on '.$settings['IF_INT'].'</td><td><input type="text" name="FIREWALL_INT['.$x.']" value=""></td></tr>'."\n";
+  $disp_body .= $ports; //add existing ports below "new field"
+  
 
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
@@ -856,6 +903,8 @@ function disp_general_box(){
 
   return $disp_body;
 }
+
+
 
 function disp_advanced_box(){
   global $_settings;
@@ -1134,6 +1183,7 @@ function disp_network_default(){
   $disp_body .= '<div id="toggle_advanced_settings">';
   $disp_body .= disp_advanced_box();
   $disp_body .= disp_dhcpd_box_new();
+  $disp_body .= disp_firewall_box();
   $disp_body .= '</div>';
 
 

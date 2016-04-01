@@ -26,6 +26,27 @@ class PIASettings {
   function set_files(&$files){
     $this->_files = $files;
   }
+  
+  
+  
+  /**
+   * returns the number of members an array setting contains
+   * @param string $name name of member without []
+   */
+  function get_array_count( $name ){
+      $settings = $this->get_settings();
+      $name_len = mb_strlen($name);
+      $cnt = 0;
+      
+      reset($settings);
+      foreach( $settings as $key => $val ){
+          if( substr($key, 0, $name_len) === $name  ){
+              ++$cnt;
+          }
+      }
+      return $cnt;
+  }
+  
 
   /**
    * main method to call when you want settings stored
