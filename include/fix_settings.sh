@@ -289,12 +289,3 @@ grep "allow-hotplug eth0" /etc/network/interfaces &> /dev/null  && /pia/include/
 
 # improved logging and log handling during restarts
 chmod 777 /pia/include/autostart_rebuild.sh ; /pia/include/autostart_rebuild.sh > /dev/null
-
-
-# add support for custom firewall ports
-if [ ! ${FIREWALL_INT[0]+abc} ]; then
-  echo 'FIREWALL_INT[0]=""' >> '/pia/settings.conf'
-fi
-if [ ! ${FIREWALL_EXT[0]+abc} ]; then
-  echo 'FIREWALL_EXT[0]=""' >> '/pia/settings.conf'
-fi
