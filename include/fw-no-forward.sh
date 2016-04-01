@@ -58,6 +58,30 @@ if [ ! -z "${FIREWALL_IF_WEB[0]}" ]; then
   done
 fi
 
+#allow custom ports through the firewall
+if [ ! -z "${FIREWALL_INT[0]}" ]; then
+    for FIPORT in "${FIREWALL_INT[@]}"
+    do
+        iptables -A INPUT -i "$IF_INT" -p tcp --dport "$FIPORT" -m state --state NEW -j ACCEPT
+        if [ "$VERBOSE_DEBUG" = "yes" ]; then
+                echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+                        "- custom port ($FIPORT) on $interface OPEN"
+        fi
+    done
+fi
+
+#allow custom ports through the firewall
+if [ ! -z "${FIREWALL_EXT[0]}" ]; then
+    for FIPORT in "${FIREWALL_EXT[@]}"
+    do
+        iptables -A INPUT -i "$IF_EXT" -p tcp --dport "$FIPORT" -m state --state NEW -j ACCEPT
+        if [ "$VERBOSE_DEBUG" = "yes" ]; then
+                echo -e "[deb ] "$(date +"%Y-%m-%d %H:%M:%S")\
+                        "- custom port ($FIPORT) on $interface OPEN"
+        fi
+    done
+fi
+
 
 #disable forwarding
 echo 0 > /proc/sys/net/ipv4/ip_forward
