@@ -1,3 +1,9 @@
+update 2016-04-01
+=================
+* added support for custom firewall TCP ports    
+  Settings => Advanced => Firewall Settings    
+  Ports listed here will be open even if the VPN is disconnected.
+
 update 2015-11-19
 =================
 * added arm7l for Raspberry Pi 2
