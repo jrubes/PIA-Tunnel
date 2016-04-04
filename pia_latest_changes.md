@@ -1,3 +1,9 @@
+update 2016-04-04
+=================
+* found an issue that would prevent an empty setting from accepting     
+  a new value after it has been cleared. I don't think that this was causing    
+  any issues before but it would break the new custom firewall rules
+
 update 2016-04-01
 =================
 * added support for custom firewall TCP ports    
