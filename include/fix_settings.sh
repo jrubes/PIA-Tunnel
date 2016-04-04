@@ -284,6 +284,15 @@ if [ ! ${FIREWALL_IF_SECSNMP[0]+abc} ]; then
   echo 'FIREWALL_IF_SECSNMP[0]=""' >> '/pia/settings.conf'
 fi
 
+
+# add support for custom firewall ports
+if [ ! ${FIREWALL_INT[0]+abc} ]; then
+  echo 'FIREWALL_INT[0]=""' >> '/pia/settings.conf'
+fi
+if [ ! ${FIREWALL_EXT[0]+abc} ]; then
+  echo 'FIREWALL_EXT[0]=""' >> '/pia/settings.conf'
+fi
+
 # added fix for eth0 not getting an IP quick enough during boot for pia-status to display the IP
 grep "allow-hotplug eth0" /etc/network/interfaces &> /dev/null  && /pia/include/network-interfaces.sh
 

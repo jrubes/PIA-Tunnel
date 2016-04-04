@@ -887,7 +887,7 @@ function disp_firewall_box(){
   $max_range = $_settings->get_array_count('FIREWALL_INT');
   $ports = '';
   for( $x = 0 ; $x < $max_range ; ++$x ){
-    if( array_key_exists('FIREWALL_INT['.$x.']', $settings) === true ){
+    if( array_key_exists('FIREWALL_INT['.$x.']', $settings) === true && $settings['FIREWALL_INT['.$x.']'] !== '' ){
 
       $ports .= '<tr><td>Port on '.$settings['IF_INT'].'</td><td><input type="text" name="FIREWALL_INT['.$x.']" value="'.$settings['FIREWALL_INT['.$x.']'].'"></td></tr>'."\n";
     }

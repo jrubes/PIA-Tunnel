@@ -57,7 +57,6 @@ class PIASettings {
   function save_settings_logic( &$fields_string ){
     $ret = '';
     $onechanged=false;
-
     $post2expect = explode(',', $fields_string);
     if( count($post2expect) == 0 ){
       die('fatal error, count zero in save_settings_logic!');
@@ -67,7 +66,7 @@ class PIASettings {
     foreach( $post2expect as $posted ){
       if( $this->is_settings_array($posted) === true ){
         /*# this is a settings array, compare post with existing settings #*/
-
+          
         $parray = $this->get_post_array($posted, true);
         $sarray = $this->get_settings_array($posted);
         $tmp_array = $this->compare_settings_arrays( $sarray, $parray);
@@ -135,10 +134,13 @@ class PIASettings {
     //be above the settings anymore
     exec('sed \'/^#/ d\' "/pia/settings.conf" > "/pia/settings.conf.bak"');
     exec('mv "/pia/settings.conf.bak" "/pia/settings.conf"');
-
-
-    $this->remove_array($array_name);
-
+  
+    // ensure SettingsArray of [0] always exists
+    if( $array2store === '' ){
+        $array2store = "$index=''";
+    }
+    
+    $this->remove_array($array_name);   
     $this->append_settings($array2store);
 
     //clear to force a reload
@@ -268,26 +270,9 @@ class PIASettings {
     return $ret;
   }
 
-  /**
-   * method to write an array to settings.conf
-   * call this after remove_array()
-   * @param array $array2store BASH formatted array of settings
-   */
-  function write_array( &$array2store ){
-    die('decided to go anohter route - not done');
-    // add the settings back at the bottom of the file
-    reset($array2store);
-    foreach( $array2store as $key => $val ){
-      for( $x = 0 ; $x < count($values) ; ++$x ){ //yes count in a loop - only doing it since this is a single user script -- ohh yeah, sue me!
-        exec("echo '".$config_value.'['.$x."]=\"".$values[$x]."\"' >> '$this->_settings_file'");
-        ++$upcnt;
-      }
-    }
-
-  }
 
 /**
- * methhod to remove a settings array from settings.conf
+ * method to remove a settings array from settings.conf
  * @return int number of lines removed
  */
 function remove_array($array_name){
