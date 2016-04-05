@@ -20,11 +20,12 @@ class AuthenticateUser {
   private $cookie_lifetime; //time in days for the cookie to life
   
   function __construct(){
+    global $settings;
     $this->namespace = '45BauNuMYV';
     $this->cookie_name = 'pia-tunnel_reauth';
     $this->cookie_hash = $this->rand_string(10); //this sets a default value but breaks the functionality
                                                 //use set_cookie_hash() to pass your value
-    $this->login_form = '/var/www/login.php';
+    $this->login_form = $settings['HTDOCS_ROOT'].'/login.php';
     $this->cookie_lifetime = 30;
   }
   

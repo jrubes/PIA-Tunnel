@@ -190,16 +190,16 @@ if [ ! -f '/pia/ip_list.txt' ]; then
 fi
 
 
-#update files in /var/www
-cp -r /pia/htdocs/* /var/www
-rm -f /var/www/README.txt
-rm -f /var/www/monitor-windows.zip
-cd /pia/client_scripts ; zip -r /var/www/monitor-windows.zip monitor-windows/ &> /dev/null
-cp "/pia/docs/PIA-Tunnel Documentation.pdf" /var/www/pia-tunnel_documentation.pdf &> /dev/null
-mkdir -p /var/www/docs/ ; cp -r "/pia/docs/HTML Manual/"* /var/www/docs/
-chown -R www-data.www-data /var/www
-find /var/www -type d -exec chmod 0750 {} \;
-find /var/www -type f -exec chmod 0640 {} \;
+#update files in htdocs
+cp -r /pia/htdocs/* "$HTDOCS_ROOT"
+rm -f "$HTDOCS_ROOT/README.txt"
+rm -f "$HTDOCS_ROOT/monitor-windows.zip"
+cd /pia/client_scripts ; zip -r "$HTDOCS_ROOT/monitor-windows.zip" monitor-windows/ &> /dev/null
+cp "/pia/docs/PIA-Tunnel Documentation.pdf" "$HTDOCS_ROOT/pia-tunnel_documentation.pdf" &> /dev/null
+mkdir -p "$HTDOCS_ROOT/docs/" ; cp -r "/pia/docs/HTML Manual/"* "$HTDOCS_ROOT/docs/"
+chown -R www-data.www-data "$HTDOCS_ROOT"
+find "$HTDOCS_ROOT" -type d -exec chmod 0750 {} \;
+find "$HTDOCS_ROOT" -type f -exec chmod 0640 {} \;
 
 # clear webUI update cache
 rm -rf "/pia/cache/webui-update_status.txt"

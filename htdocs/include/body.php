@@ -35,12 +35,12 @@ if( $plen > 1 && $plen < 20 && isset($_REQUEST['page']) ){
       break;
     case 'ping':
       $UNLOCKED='byPIA';
-      require_once '/var/www/tools/ping.php';
+      require_once $settings['HTDOCS_ROOT'].'/tools/ping.php';
       unset($UNLOCKED);
       break;
     case 'tc':
       $UNLOCKED='byPIA';
-      require_once '/var/www/tools/tc.php';
+      require_once $settings['HTDOCS_ROOT'].'/tools/tc.php';
       unset($UNLOCKED);
       break;
     default:

@@ -7,12 +7,12 @@ if [ "$val" = "0" ]; then
   dt=`date +%s`
   echo "$dt|$val" > /pia/cache/webui-update_status.txt
 
-  if [ ! -f "/var/www/pia_latest_changes.md" ]; then
+  if [ ! -f "$HTDOCS_ROOT/pia_latest_changes.md" ]; then
     #fetch latest changelog - updated installations without the file
     cd /tmp
     mkdir piatmpget ; cd /tmp/piatmpget
     wget http://www.kaisersoft.net/pia_latest_changes.md
-    mv pia_latest_changes.md /var/www/pia_latest_changes.md
+    mv pia_latest_changes.md "$HTDOCS_ROOT/pia_latest_changes.md"
     cd /tmp ; rm -rf /tmp/piatmpget
   fi
 
@@ -24,7 +24,7 @@ elif [ "$val" -gt "0" ]; then
   cd /tmp
   mkdir piatmpget ; cd /tmp/piatmpget
   wget http://www.kaisersoft.net/pia_latest_changes.md
-  mv pia_latest_changes.md /var/www/pia_latest_changes.md
+  mv pia_latest_changes.md "$HTDOCS_ROOT/pia_latest_changes.md"
   cd /tmp ; rm -rf /tmp/piatmpget
 
 else
