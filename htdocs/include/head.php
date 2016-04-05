@@ -20,12 +20,12 @@ foreach( $meta as $key => $val ){
       break;
     case 'icon':
       if( $val != '' ){
-        $disp_header .= '<link rel="icon" type="image/ico" href="'.urlencode($val)."\" />\n";
+        $disp_header .= '<link rel="icon" type="image/ico" href="'.$val."\">\n";
       }
       break;
     case 'stylesheet':
       if( $val != '' ){
-        $disp_header .= '<link rel="stylesheet" type="text/css" href="'.urlencode($val)."\" />\n";
+        $disp_header .= '<link rel="stylesheet" type="text/css" href="'.$val."\">\n";
       }
       break;
     case 'title':
@@ -41,7 +41,7 @@ foreach( $meta as $key => $val ){
     case 'javascript':
       foreach( $meta[$key] as $val ){
         if( $val != '' ){
-          $disp_header .= '<script src="'.urlencode($val).'" type="text/javascript"></script>'."\n";
+          $disp_header .= '<script src="'.$val.'" type="text/javascript"></script>'."\n";
         }
       }
       break;
