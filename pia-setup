@@ -191,6 +191,13 @@ fi
 
 
 #update files in htdocs
+if [ -z "$HTDOCS_ROOT" ]; then
+    if [ -d "/var/www/html" ]; then
+        HTDOCS_ROOT="/var/www/html"
+    else
+        HTDOCS_ROOT="/var/www"
+    fi
+fi
 cp -r /pia/htdocs/* "$HTDOCS_ROOT"
 rm -f "$HTDOCS_ROOT/README.txt"
 rm -f "$HTDOCS_ROOT/monitor-windows.zip"
@@ -204,15 +211,6 @@ find "$HTDOCS_ROOT" -type f -exec chmod 0640 {} \;
 # clear webUI update cache
 rm -rf "/pia/cache/webui-update_status.txt"
 
-
-# add "automatic update" cronjob - remove these soon
-#crontab -l > /tmp/crontab.piaout
-#ret=`grep -c "apt-get upgrade" /tmp/crontab.piaout`
-#if [ $ret = 0 ]; then
-#  echo '00 04 * * * apt-get update -y ; apt-get upgrade -y' >> '/tmp/crontab.piaout'
-#  crontab /tmp/crontab.piaout
-#  rm /tmp/crontab.piaout
-#fi
 
 # change "automatic update" to every 8 hours
 crontab -l > /tmp/crontab.piaout

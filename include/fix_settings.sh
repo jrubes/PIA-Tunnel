@@ -300,7 +300,7 @@ grep "allow-hotplug eth0" /etc/network/interfaces &> /dev/null  && /pia/include/
 chmod 777 /pia/include/autostart_rebuild.sh ; /pia/include/autostart_rebuild.sh > /dev/null
 
 
-ret=`grep -q -c "HTDOCS_ROOT" /pia/settings.conf`
+ret=`grep -c "HTDOCS_ROOT" /pia/settings.conf`
 if [ $ret = 0 ]; then
-  echo 'HTDOCS_ROOT="/var/www/htdocs"' >> '/pia/settings.conf'
+  echo 'HTDOCS_ROOT="/var/www/html"' >> '/pia/settings.conf'
 fi
