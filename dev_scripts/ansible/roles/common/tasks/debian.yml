@@ -23,12 +23,13 @@
   
 - name: fuck systemD
   replace: dest='/etc/systemd/system/getty.target.wants/getty@tty1.service' regexp='TTYVTDisallocate=yes' replace='TTYVTDisallocate=no'
+  when: ansible_distribution == 'Debian'
   
 - template: src=dhcpd-debian.conf dest=/etc/dhcp/dhcpd.conf
   when: ansible_distribution == 'Debian'
 
   
-- cron: name="update time" minute="0" hour="6/*" job="ntpd -q > /dev/null"
+- cron: name="update time" minute="0" hour="*/6" job="ntpd -q > /dev/null"
   when: ansible_distribution == 'Debian'
 
 

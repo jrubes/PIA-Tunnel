@@ -1,0 +1,14 @@
+---
+
+- name: setup PIA-Tunnel with Debian
+  hosts: pia-tunnel-debian
+  remote_user: root
+  vars:
+    git_branch: "release_php-gui"
+
+  roles:
+    - common
+    - apache
+    - php
+    - openvpn
+    - pia
