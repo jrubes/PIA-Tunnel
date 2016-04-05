@@ -19,6 +19,10 @@
 - cron: name="system update" user=root minute="0" hour="*/8" job="/usr/local/pia/system-update.sh"
 
 - file: path=/usr/local/pia/pia-setup owner=root group=wheel mode=0750
+  when: ansible_distribution == 'FreeBSD'
+  
+- file: path=/usr/local/pia/pia-setup owner=root group=root mode=0750
+  when: ansible_distribution == 'Debian'  
 
 - shell: /usr/local/pia/pia-setup
 
