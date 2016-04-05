@@ -24,7 +24,9 @@
 - file: path=/usr/local/pia/pia-setup owner=root group=root mode=0750
   when: ansible_distribution == 'Debian'  
 
-- shell: /usr/local/pia/pia-setup
-
 - template: src=rc-debian.local dest=/etc/rc.local
   when: ansible_distribution == 'Debian'
+  
+  
+- name: setup PIA
+  shell: /usr/local/pia/pia-setup
