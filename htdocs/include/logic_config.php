@@ -733,26 +733,7 @@ function disp_general_box(){
   $disp_body .= "<table>\n";
 
   $disp_body .= build_providers();
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
-  //VM LAN segment forwarding
-  $GLOB_disp_network_default_fields .= 'FORWARD_VM_LAN,';
-  $sel = array(
-            'id' => 'FORWARD_VM_LAN',
-            'selected' =>  $settings['FORWARD_VM_LAN'],
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>VPN Gateway for VM LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
-  //use public LAN segment for forwarding
-  $GLOB_disp_network_default_fields .= 'FORWARD_PUBLIC_LAN,';
-  $sel = array(
-            'id' => 'FORWARD_PUBLIC_LAN',
-            'selected' =>  $settings['FORWARD_PUBLIC_LAN'],
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>VPN Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
 
 /*  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $GLOB_disp_network_default_fields .= 'NETWORK_MAX_SPEED,';
@@ -798,7 +779,6 @@ function disp_general_box(){
 
   $disp_body .= "</table>\n";
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
-  $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firewall">';
   $disp_body .= '</div>';
 
   return $disp_body;
@@ -816,6 +796,27 @@ function disp_firewall_box(){
   $disp_body .= '<h2>Firewall Settings</h2>'."\n";
   $disp_body .= "<table>\n";
 
+  //VM LAN segment forwarding
+  $GLOB_disp_network_default_fields .= 'FORWARD_VM_LAN,';
+  $sel = array(
+            'id' => 'FORWARD_VM_LAN',
+            'selected' =>  $settings['FORWARD_VM_LAN'],
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>VPN Gateway for VM LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+  //use public LAN segment for forwarding
+  $GLOB_disp_network_default_fields .= 'FORWARD_PUBLIC_LAN,';
+  $sel = array(
+            'id' => 'FORWARD_PUBLIC_LAN',
+            'selected' =>  $settings['FORWARD_PUBLIC_LAN'],
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>VPN Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  
+  
   //now FIREWALL_IF_WEB options
   $use = 'FIREWALL_IF_WEB';
   $GLOB_disp_network_default_fields .= 'FIREWALL_IF_WEB,';
