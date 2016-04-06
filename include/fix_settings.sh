@@ -302,5 +302,9 @@ chmod 777 /pia/include/autostart_rebuild.sh ; /pia/include/autostart_rebuild.sh 
 
 ret=`grep -c "HTDOCS_ROOT" /pia/settings.conf`
 if [ $ret = 0 ]; then
-  echo 'HTDOCS_ROOT="/var/www/html"' >> '/pia/settings.conf'
+    if [ -d "/var/www/html" ]; then
+        echo 'HTDOCS_ROOT="/var/www/html"' >> '/pia/settings.conf'
+    else
+        echo 'HTDOCS_ROOT="/var/www"' >> '/pia/settings.conf'
+    fi
 fi
