@@ -1,3 +1,9 @@
+update 2016-04-06
+=================
+* custom firewall ports are now working and can be set under Advanced Settings    
+* added config option to set the location for htdocs (settings.conf)     
+  HTDOCS_ROOT="/var/www"
+
 update 2016-04-04
 =================
 * found an issue that would prevent an empty setting from accepting     
