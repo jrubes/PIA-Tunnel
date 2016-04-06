@@ -42,6 +42,7 @@ class loader {
     $settings = self::$_pia_settings->get_settings();
     self::$_auth->set_namespace($settings['WEB_UI_NAMESPACE']);
     self::$_auth->set_cookie_hash($settings['WEB_UI_COOKIE']);
+    self::$_auth->set_login_form($settings['HTDOCS_ROOT']);
 
     return self::$_auth;
   }

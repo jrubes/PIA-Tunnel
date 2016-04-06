@@ -25,9 +25,19 @@ class AuthenticateUser {
     $this->cookie_name = 'pia-tunnel_reauth';
     $this->cookie_hash = $this->rand_string(10); //this sets a default value but breaks the functionality
                                                 //use set_cookie_hash() to pass your value
-    $this->login_form = $settings['HTDOCS_ROOT'].'/login.php';
+    $this->login_form = '/login.php';           // use set_login_form() method to override
     $this->cookie_lifetime = 30;
   }
+  
+  
+  /**
+   * method to set a custom path to login.php
+   * @param string $htroot path to login.php
+   */
+  function set_login_form( $htroot ){
+      $this->login_form = $htroot.'/login.php';
+  }
+  
   
   /**
    * method to set the class session namespace
