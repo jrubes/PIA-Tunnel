@@ -299,27 +299,6 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
 
 	<ul>
       <li>
-        <strong>VPN Gateway for VM LAN</strong>:  &lt;yes/no;&gt; (default: yes)<br>
-        Setting this option to yes will share the VPN connection with any computer on your private VM LAN Segment. The LAN segment is called VPN Bridge in the setup portion of this guide.
-      </li>
-
-      <li>
-        <strong>VPN Gateway for public LAN</strong>:  &lt;yes/no&gt; (default: yes)<br>
-        Setting this option to yes will share the VPN connection with any computer on your public  LAN Segment. This is your home network, so any computer that may use your current Internet connection will be able to use PIA-Tunnel to access the VPN.
-      </li>
-
-      <li>
-        <strong>Allow web-UI access on</strong>: &lt;eth0&gt; &lt;eth1&gt; (default: both checked)<br>
-        This option will open port 80 on the selected interfaces. This is needs to be enabled if you want to use the web-UI to mange PIA-Tunnel and if you want to use Torrent Monitor client.<br>
-        <strong>Warning</strong>: Unchecking both options will prevent you from accessing the web-UI. You may regain access by adding   FIREWALL_IF_WEB[0]=eth0    back into /pia/settings.conf
-      </li>
-
-      <li>
-        <strong>Allow ssh connections on</strong>: &lt;eth0&gt; &lt;eth1&gt; (default: both NOT checked)<br>
-        Same as Allow web-UI access but for port 22, remote SSH access. Dont enable this if you dont know what SSH is or if you dont indent to use it.
-      </li>
-
-      <li>
         <strong>Web-UI Username and Web-UI Password</strong><br>
         This option specifies the username and password for the Web-UI. Note: You may reset the password by setting the following options to nothing in /pia/settings.conf<br>
         WEB_UI_USER=<br>
@@ -449,8 +428,43 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
           Specifies which computer will receive the Fixed IP specified above.<br>
           Please note: The MAC Address must be separated by colons (:). Example: 00:0D:28:A7:3C:45
       </li>
-	</ul>
-	</div>
+        </ul>
+        
+        
+	<div id="s_firewall" class="sub_section">
+	<h3>Settings - Firewall Settings</h3> <a href="#main_index">Back To Top</a>
+	<p>
+            Here you may configure some firewall settings
+	</p>
+
+	<ul>
+      <li>
+        <strong>VPN Gateway for VM LAN</strong>:  &lt;yes/no;&gt; (default: yes)<br>
+        Setting this option to yes will share the VPN connection with any computer on your private VM LAN Segment. The LAN segment is called VPN Bridge in the setup portion of this guide.
+      </li>
+
+      <li>
+        <strong>VPN Gateway for public LAN</strong>:  &lt;yes/no&gt; (default: yes)<br>
+        Setting this option to yes will share the VPN connection with any computer on your public  LAN Segment. This is your home network, so any computer that may use your current Internet connection will be able to use PIA-Tunnel to access the VPN.
+      </li>
+
+      <li>
+        <strong>Allow web-UI access on</strong>: &lt;eth0&gt; &lt;eth1&gt; (default: both checked)<br>
+        This option will open port 80 on the selected interfaces. This is needs to be enabled if you want to use the web-UI to mange PIA-Tunnel and if you want to use Torrent Monitor client.<br>
+        <strong>Warning</strong>: Unchecking both options will prevent you from accessing the web-UI. You may regain access by adding   FIREWALL_IF_WEB[0]=eth0    back into /pia/settings.conf
+      </li>
+
+      <li>
+        <strong>Allow ssh connections on</strong>: &lt;eth0&gt; &lt;eth1&gt; (default: both NOT checked)<br>
+        Same as Allow web-UI access but for port 22, remote SSH access. Dont enable this if you dont know what SSH is or if you dont indent to use it.
+      </li>
+      
+      <li>
+          <strong>New Port on eth0/eth1</strong><br>
+          Open specific TCP ports in the firewall. One port entry per field
+      </li>
+        </ul>
+    </div>
 
 </div>
 
@@ -866,6 +880,10 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
 
   Below are a few things that should fix the condition. Try one and check if the problem persists.
   <ul>
+    <li>
+        Generate a new MAC address for both network interfaces. The option can be found in your VMware or Virtual Box configuration manager.<br>
+        <a href="./grfx/generate_new_MAC.png"><img src="./grfx/generate_new_MAC-small.png" alt="generate new MAC screenshot"></a>
+    </li>
     <li>
       Delete the VM and redeploy with the primary network adapter set to "NAT". Some firewalls
       can not handle bridged VM traffic, OnlineArmor is one of them.
