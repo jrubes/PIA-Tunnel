@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<rss version="2.0">
+<channel>
+	<title>PIA-Tunnel</title>
+	<link>https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui</link>
+	<description>Release notes for PIA-Tunnel VM</description>
+	<language>en-us</language>
+	<docs>http://blogs.law.harvard.edu/tech/rss</docs>
+	<generator>My Super Simple RSS Generator 0.0001</generator>
+	<lastBuildDate>Mon, 11 Apr 2016 03:08:56 +0200</lastBuildDate>
+	<item>
+		<title>update 2016-04-11</title>
+		<description><![CDATA[* You can get this page as an rss feed by pointing your RSS reader to the following URL         <br />
+[http://www.kaisersoft.net/pia_latest.xml](http://www.kaisersoft.net/pia_latest.xml)    <br />
+<a href="http://www.kaisersoft.net/pia_latest.xml">http://www.kaisersoft.net/pia_latest.xml</a>]]></description>
+		<pubDate>Mon, 11 Apr 2016 03:08:56 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:18</guid>
+	</item>
+	<item>
+		<title>update 2016-04-06</title>
+		<description><![CDATA[* custom firewall ports are now working and can be set under Advanced Settings<br />
+* added config option to set the location for htdocs (settings.conf)     <br />
+  HTDOCS_ROOT="/var/www"]]></description>
+		<pubDate>Wed, 06 Apr 2016 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:17</guid>
+	</item>
+	<item>
+		<title>update 2016-04-04</title>
+		<description><![CDATA[* found an issue that would prevent an empty setting from accepting     <br />
+  a new value after it has been cleared. I don't think that this was causing    <br />
+  any issues before but it would break the new custom firewall rules]]></description>
+		<pubDate>Mon, 04 Apr 2016 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:16</guid>
+	</item>
+	<item>
+		<title>update 2016-04-01</title>
+		<description><![CDATA[* added support for custom firewall TCP ports    <br />
+  Settings => Advanced => Firewall Settings    <br />
+  Ports listed here will be open even if the VPN is disconnected.]]></description>
+		<pubDate>Fri, 01 Apr 2016 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:15</guid>
+	</item>
+	<item>
+		<title>update 2015-11-19</title>
+		<description><![CDATA[* added arm7l for Raspberry Pi 2]]></description>
+		<pubDate>Thu, 19 Nov 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:14</guid>
+	</item>
+	<item>
+		<title>update 2015-09-16</title>
+		<description><![CDATA[* fixed a bug configuring the second network interface for DHCP use. Before: iface eth1 inet static, after: iface eth1 inet dhcp]]></description>
+		<pubDate>Wed, 16 Sep 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:13</guid>
+	</item>
+	<item>
+		<title>update 2015-09-14</title>
+		<description><![CDATA[* Added Virtual Box setup instructions to the new manual<br />
+* Updated the "Credits" section]]></description>
+		<pubDate>Mon, 14 Sep 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:12</guid>
+	</item>
+	<item>
+		<title>update 2015-09-13</title>
+		<description><![CDATA[* VM now waits until it receives an IP from the DHCP server. This should fix any issues where the LAN IP was not displayed after booting.<br />
+* added network.log to log the state of the network before and after connecting to the VPN]]></description>
+		<pubDate>Sun, 13 Sep 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:11</guid>
+	</item>
+	<item>
+		<title>bug 2015-09-01</title>
+		<description><![CDATA[* there is a bug in the code counting the available updates. The 90+ updates have been in <br />
+the development branch but not in the release branch. Applying the update will only reset the counter since there are no release updates.<br />
+Will try to get a fix out soonish....]]></description>
+		<pubDate>Tue, 01 Sep 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:10</guid>
+	</item>
+	<item>
+		<title>update 2015-05-12</title>
+		<description><![CDATA[* had some time to work on the new manual. still a mess but it is slowly getting there.<br />
+The new manual can be found under "Tools"]]></description>
+		<pubDate>Tue, 12 May 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:9</guid>
+	</item>
+	<item>
+		<title>updated 2015-05-10</title>
+		<description><![CDATA[* added configuration option to allow incoming SNMP traffic through the firewall. This setting is disabled by default.]]></description>
+		<pubDate>Sun, 10 May 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:8</guid>
+	</item>
+	<item>
+		<title>update 2015-05-06</title>
+		<description><![CDATA[* **WARNING** major changes! Don't update yet unless you want to use the latest and greatest features. PLEASE REPORT ANY ISSUES!!!!<br />
+* removed most of the code that binds PIA-Tunnel to PrivateInternetAccess.com.      <br />
+  It should be possible to use this VM with most VPN providers soon.<br />
+* PrivateInternetAccess.com: added openVPN files for TCP and UDP connections.     <br />
+  UDP may be enabled in "General Settings" => "VPN Provider"<br />
+* ALL connections are now prefixed with a custom provider prefix. "PIAtcp/France" will create a TCP VPN tunnel to France and "PIAudp/France" will do the same using the UDP protocol.<br />
+* this update breaks your current PIA-Daemon configuration. You need to set new failover locations (Settings).<br />
+* the new changes may break some CMD line tools. I'll have to rewrite some parts to support the new dynamic format.]]></description>
+		<pubDate>Wed, 06 May 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:7</guid>
+	</item>
+	<item>
+		<title>update 2015-04-28</title>
+		<description><![CDATA[* I have received reports that a recent update degraded VPN performance for high speed connections (+1MB/s). The issue appears to be caused by a switch from a UDP to a TCP based VPN connections.      <br />
+I will implement an option to select which protocol to use ASAP.]]></description>
+		<pubDate>Tue, 28 Apr 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:6</guid>
+	</item>
+	<item>
+		<title>update 2015-04-08</title>
+		<description><![CDATA[* sry for the delay. This updates the connection files to match PIA's latest changes. VPN should work once again.<br />
+Please logout of the webUI to update your list of available VPN locations.]]></description>
+		<pubDate>Wed, 08 Apr 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:5</guid>
+	</item>
+	<item>
+		<title>update 2015-04-04</title>
+		<description><![CDATA[* their appears to be an issue with keeping a VPN connection up when there is more then a few KB of load on the tunnel. I suspect the issue is related to the latest openSSL bugs and the resulting patches. I will investigate ASAP.]]></description>
+		<pubDate>Sat, 04 Apr 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:4</guid>
+	</item>
+	<item>
+		<title>update 2015-03-21</title>
+		<description><![CDATA[* added an alternative SOCKS5 server package "3proxy" for i686 and arm6l. Looks like this one handles load a bit better.<br />
+  Please report any issues or if it improves performance.    <br />
+  Ensure the proxy server is not running then switch the software under "Settings" => "SOCKS 5 Proxy Server".]]></description>
+		<pubDate>Sat, 21 Mar 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:3</guid>
+	</item>
+	<item>
+		<title>update 2015-03-20</title>
+		<description><![CDATA[* The old SOCKS5 server configuration was verbose for testing. This is not required anymore and<br />
+  has been changed with last release. Please disable the SOCKS5 server on at least one interface<br />
+  to generate a new configuration file.  <br />
+  The current log file could be quite large. You may login as root and execute the following command to clear it.   <br />
+  echo "" >  /var/log/sockd.log<br />
+* Do not connect both network interfaces to the same network or use IPs in the same range!<br />
+  I have been working on the documentation and noticed that the VPN may not connect<br />
+  when both adapters are connected to the same network. In my case eth0 was set to 192.168.1.240<br />
+  and eth1 to 192.168.1.25 with a subnet of 255.255.255.0   <br />
+  Changing eth1 to 192.168.2.25 and disconnecting the network cable appears to have fixed it.<br />
+* retrieving this list before an update should work now<br />
+* few updates to the new manual]]></description>
+		<pubDate>Fri, 20 Mar 2015 11:30:00 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:2</guid>
+	</item>
+	<item>
+		<title>update 2015-03-16</title>
+		<description><![CDATA[* added release notes to the update client - this box.  <br />
+  These notes are updated before you apply an update and will list any important changes.<br />
+* Optimized javascript on "Overview" page<br />
+* Added "Refresh Overview" setting to control the refreshing interval of the overview page<br />
+* Added Ping Utility to "Tools"<br />
+* webUI will be reloaded automatically from "Rebooting VM...." page<br />
+* Updated SOCKS5 server to dante 1.4.1<br />
+* Few optimizations here and there....<br />
+* Added <a href="http://parsedown.org/">Parsedown</a> to help generate these notes<br />
+* Working on a new Documentation. Local link under "Tools" or <a href="http://www.kaisersoft.net/pia_doc/index.html">New Manual</a>     <br />
+  Special thanks to Alan Diamond for rescuing the documentation from the grips of Microsoft ;)<br />
+* Added support for the Raspberry Pi 1 Model B+ and probably other ARM based devices. This is still experimental but it looks very promising.  <br />
+The RasbPi will act as a stand alone VPN router for you network with support for all PIA-Tunnel features.  <br />
+<a href="http://www.kaisersoft.net/pia_doc/index.html#pi_setup">Rasberry Pi Setup Instructions</a>. These will be turned into an installation script later on.]]></description>
+		<pubDate>Mon, 16 Mar 2015 11:26:56 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:1</guid>
+	</item>
+</channel>
+</rss>
