@@ -26,7 +26,6 @@ require_once $inc_dir.'classes/class_token.php';
 $_files = loader::loadFiles();
 $_settings = loader::PIASettings();
 $_services = loader::SystemServices();
-$_services= loader::SystemServices();
 $_pia = loader::PIACommands();
 $_auth = loader::AuthenticateUser();
 $_token = loader::loadToken();

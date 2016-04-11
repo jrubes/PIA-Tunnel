@@ -50,6 +50,8 @@ switch($_REQUEST['cmd']){
 
       }
       $disp_body .= "</div>\n";
+      unset($_SESSION['settings.conf']);
+      $settings = $_settings->get_settings();
 
       break;
 
