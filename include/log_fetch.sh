@@ -1,5 +1,8 @@
 #!/bin/bash
 # fetch the latest git log for the webui
+LANG=en_US.UTF-8
+export LANG
+source '/pia/settings.conf'
 
 val=`cd /pia ; git fetch origin &> /dev/null ; git rev-list HEAD... origin/"$1" --count 2>/dev/null`
 
