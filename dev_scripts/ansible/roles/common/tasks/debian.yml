@@ -21,9 +21,9 @@
   when: ansible_distribution == 'Debian'
 
   
-- name: fuck systemD
-  replace: dest='/etc/systemd/system/getty.target.wants/getty@tty1.service' regexp='TTYVTDisallocate=yes' replace='TTYVTDisallocate=no'
-  when: ansible_distribution == 'Debian'
+#- name: show service status
+#  replace: dest='/etc/systemd/system/getty.target.wants/getty@tty1.service' regexp='TTYVTDisallocate=yes' replace='TTYVTDisallocate=no'
+#  when: ansible_distribution == 'Debian'
   
 - template: src=dhcpd-debian.conf dest=/etc/dhcp/dhcpd.conf
   when: ansible_distribution == 'Debian'
@@ -37,7 +37,7 @@
   when: ansible_distribution == 'Debian'
 
   
-- shell: "grep -q 'www-data ALL = NOPASSWD' /etc/sudoers || echo 'www-data ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown' >> /etc/sudoers"
+- shell: "grep -q 'www-data ALL = NOPASSWD' /etc/sudoers || echo 'www-data ALL = NOPASSWD: /pia/*,/pia/include/*,/sbin/shutdown' >> /etc/sudoers"
   when: ansible_distribution == 'Debian'
 
   
