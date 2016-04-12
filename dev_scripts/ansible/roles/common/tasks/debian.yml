@@ -44,3 +44,14 @@
 - name: set apt recommended and suggested packages to zero
   shell: "echo 'APT::Install-Recommends \"0\" ; APT::Install-Suggests \"0\" ;' >> /etc/apt/apt.conf.d/70debconf"
   when: ansible_distribution == 'Debian'
+
+- template: src=pia-boot-debian.sh dest=/usr/local/bin/pia-boot.sh owner=root group=root mode=0555
+  notify: reboot VM
+  when: ansible_distribution == 'Debian'
+  
+- template: src=pia.service dest=/etc/systemd/system/pia.service owner=root group=root  mode=0444
+  when: ansible_distribution == 'Debian'
+  
+- name: enable pia autostart "service"
+  shell: "systemctl enable pia.service"
+  when: ansible_distribution == 'Debian'

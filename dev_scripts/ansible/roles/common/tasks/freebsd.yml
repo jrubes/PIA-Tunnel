@@ -3,6 +3,7 @@
 
 - name: set pkg to assume "yes"
   replace: dest=/usr/local/etc/pkg.conf regexp='^#ASSUME_ALWAYS_YES = false;$' replace='ASSUME_ALWAYS_YES = true;'
+  when: ansible_distribution == 'FreeBSD'
 
 
 - name: install basic software
@@ -24,30 +25,41 @@
  
 
 - shell: grep -q "supersede domain-name-servers" /etc/dhclient.conf || echo 'supersede domain-name-servers 8.8.8.8, 208.67.222.222, 8.8.4.4, 208.67.220.220;' >> /etc/dhclient.conf
+  when: ansible_distribution == 'FreeBSD'
 
 - template: src=dhcpd.conf dest=/usr/local/etc/dhcpd.conf
+  when: ansible_distribution == 'FreeBSD'
 
 
 - shell: "grep -q 'www ALL = NOPASSWD' /usr/local/etc/sudoers || echo 'www ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown' >> /usr/local/etc/sudoers"
+  when: ansible_distribution == 'FreeBSD'
 
 - name: install bash
   pkgng: name="bash"
+  when: ansible_distribution == 'FreeBSD'
 
 - name: add fstab entries for bash
   shell: "grep -q '/dev/fd' /etc/fstab || echo 'fdesc    /dev/fd    fdescfs    rw    0  0' >> /etc/fstab"
+  when: ansible_distribution == 'FreeBSD'
 
-- template: src=pia-autostart.sh dest=/usr/local/etc/rc.d/pia-autostart owner=root group=wheel mode=0555
+- template: src=pia-boot.sh dest=/usr/local/etc/rc.d/pia-boot owner=root group=wheel mode=0555
   notify: reboot VM
+  when: ansible_distribution == 'FreeBSD'
 
 - shell: grep -q 'vpnvm' /etc/group || pw groupadd vpnvm -M root,www
+  when: ansible_distribution == 'FreeBSD'
 
 - shell: grep -q 'ntpd_enable=' /etc/rc.conf || echo 'ntpd_enable="YES"' >> /etc/rc.conf
+  when: ansible_distribution == 'FreeBSD'
 
 - shell: pw groupshow vpnvm | grep -q "vpnvm:" && pw groupmod vpnvm -m root,www
+  when: ansible_distribution == 'FreeBSD'
 
 - shell: "[ ! -f /bin/bash ] && ln -s /usr/local/bin/bash /bin/bash || exit 0"
+  when: ansible_distribution == 'FreeBSD'
 
 - name: reduce boot menu timeout
   shell: "grep -q 'autoboot_delay' /boot/loader.conf || echo 'autoboot_delay=3' >> /boot/loader.conf"
+  when: ansible_distribution == 'FreeBSD'
 
   

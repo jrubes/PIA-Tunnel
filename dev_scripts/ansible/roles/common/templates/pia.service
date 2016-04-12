@@ -1,0 +1,10 @@
+[Unit]
+Description=pia-tunnel autostart
+After=network.target auditd.service sshd.service
+
+[Service]
+Type=oneshot
+ExecStart=ExecStart=/usr/local/bin/pia-boot.sh
+
+[Install]
+WantedBy=multi-user.target
