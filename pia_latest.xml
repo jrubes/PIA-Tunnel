@@ -7,7 +7,15 @@
 	<language>en-us</language>
 	<docs>http://blogs.law.harvard.edu/tech/rss</docs>
 	<generator>My Super Simple RSS Generator 0.0001</generator>
-	<lastBuildDate>Mon, 11 Apr 2016 03:08:56 +0200</lastBuildDate>
+	<lastBuildDate>Tue, 12 Apr 2016 19:50:21 +0200</lastBuildDate>
+	<item>
+		<title>update 2016-04-12</title>
+		<description><![CDATA[* added openVPN files for <a href="https://www.ivpn.net">https://www.ivpn.net</a><br />
+* iVPN support untested. please report any issues<br />
+* no port forwarding at this time but I will try to add it ASAP]]></description>
+		<pubDate>Tue, 12 Apr 2016 19:50:21 +0200</pubDate>
+		<guid isPermaLink="false">ch:2-itm:19</guid>
+	</item>
 	<item>
 		<title>update 2016-04-11</title>
 		<description><![CDATA[* You can get this page as an rss feed by pointing your RSS reader to the following URL         <br />
