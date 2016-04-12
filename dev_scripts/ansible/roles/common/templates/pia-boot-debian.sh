@@ -31,7 +31,8 @@ case "$1" in
         fi
 
         # auto start loads default firewall rules and more....
-        #/pia/include/autostart.sh &
+        /pia/include/autostart.sh &
+		printf "\n\n" >> /etc/issue
         exit 0
         ;;
 stop)
