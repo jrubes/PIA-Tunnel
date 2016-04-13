@@ -112,8 +112,9 @@ function load_menu(){
  */
 function VM_shutdown(){
   global $_pia;
+  global $settings;
   $_pia->clear_session();
-  exec('/usr/local/bin/sudo /sbin/shutdown -p now &>/dev/null &');
+  exec( $settings['CMD_SUDO'].' /sbin/shutdown -p now &>/dev/null &');
 }
 
 /**
@@ -121,8 +122,9 @@ function VM_shutdown(){
  */
 function VM_restart(){
   global $_pia;
+  global $settings;
   $_pia->clear_session();
-  exec('/usr/local/bin/sudo /sbin/shutdown -r now &>/dev/null &');
+  exec( $settings['CMD_SUDO'].' /sbin/shutdown -r now &>/dev/null &');
 }
 
 
