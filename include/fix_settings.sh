@@ -299,6 +299,3 @@ if [ $ret = 0 ]; then
     fi
     
 fi
-
-# ensure CMD paths are added to settings.conf
-/usr/local/pia/fix_commands.sh
