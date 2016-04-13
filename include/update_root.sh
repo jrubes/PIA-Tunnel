@@ -19,8 +19,13 @@ if [ "$len" -lt 3 ]; then
  exit 2
 fi
 
-# Linux echo "root:$1" | chpasswd -c SHA512 2> /dev/null
-echo "$1" | pw mod user root -h 0 2>/dev/null
+
+if [ "$OS_TYPE" = "FreeBSD" ]; then
+  echo "$1" | pw mod user root -h 0 2>/dev/null
+else
+  #Debian
+  echo "root:$1" | chpasswd -c SHA512 2> /dev/null
+fi
 
 if [ $? = 0 ]; then
   # PW has been changed

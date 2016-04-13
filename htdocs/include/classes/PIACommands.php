@@ -73,7 +73,8 @@ class PIACommands {
   function check_forward_state( $interface = '' ){
     $ret = array();
     $pass = escapeshellarg($interface);
-    exec( $this->_settings['CMD_SUDO'].' /usr/local/pia/include/fw_get_forward_state.sh '.$pass, $ret);
+    $set = $this->_settings->get_settings();
+    exec( $set['CMD_SUDO'].' /usr/local/pia/include/fw_get_forward_state.sh '.$pass, $ret);
     if( array_key_exists( '0', $ret) === true ){
         if( $ret[0] === 'ON' ){
             return true;
@@ -91,7 +92,8 @@ class PIACommands {
    */
   function rebuild_autostart(){
     $ret = array();
-    exec( $this->_settings['CMD_SUDO'].' /usr/local/pia/include/autostart_rebuild.sh', $ret);
+    $set = $this->_settings->get_settings();
+    exec( $set['CMD_SUDO'].' /usr/local/pia/include/autostart_rebuild.sh', $ret);
     if( array_key_exists( '0', $ret) === true ){
         if( $ret[0] === 'OK' ){
             return true;
@@ -271,7 +273,7 @@ class PIACommands {
 
     //time to initiate the connection
     //using bash allows this to happen in the background
-    exec("bash -c \" {$this->_settings['CMD_SUDO']} /usr/local/pia/pia-start $arg &>> $f &\" &>/dev/null &");
+    exec("bash -c \" {$set['CMD_SUDO']} /usr/local/pia/pia-start $arg &>> $f &\" &>/dev/null &");
   }
 
   /**
@@ -279,9 +281,10 @@ class PIACommands {
    */
   function pia_disconnect(){
     $this->clear_session();
+    $set = $this->_settings->get_settings();
 
     $this->_files->rm('/usr/local/pia/cache/php_pia-start.log');
-    exec("bash -c \" {$this->_settings['CMD_SUDO']} /usr/local/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
+    exec("bash -c \" {$set['CMD_SUDO']} /usr/local/pia/pia-stop &>/dev/null &\" &>/dev/null &"); //using bash allows this to happen in the background
   }
 
   /**
@@ -293,15 +296,16 @@ class PIACommands {
    * </ul>
    */
   function pia_daemon( $command ){
+    $set = $this->_settings->get_settings();
     switch( $command ){
       case 'stop':
         $foo = array();
-        exec( $this->_settings['CMD_SUDO'].' /usr/local/pia/pia-daemon stop', $foo);
+        exec( $set['CMD_SUDO'].' /usr/local/pia/pia-daemon stop', $foo);
         break;
       case 'start':
         exec('killall /usr/local/pia/pia-daemon &> /dev/null');
-        exec( $this->_settings['CMD_SUDO'].' /usr/local/pia/pia-daemon stop');
-        exec('bash -c "'.$this->_settings['CMD_SUDO'].' /usr/local/pia/pia-daemon &>/usr/local/pia/cache/pia-daemon.log &" &>/dev/null &');
+        exec( $set['CMD_SUDO'].' /usr/local/pia/pia-daemon stop');
+        exec('bash -c "'.$set['CMD_SUDO'].' /usr/local/pia/pia-daemon &>/usr/local/pia/cache/pia-daemon.log &" &>/dev/null &');
         break;
     }
   }
@@ -337,6 +341,7 @@ class PIACommands {
  * @param string $new_pw new root password as string or
  */
 function update_root_password( $new_pw = null ){
+  $set = $this->_settings->get_settings();
   if( $new_pw == '' || strlen($new_pw) < 3 ){
     $new_pw = $this->rand_string(50);
   }
@@ -344,7 +349,7 @@ function update_root_password( $new_pw = null ){
 
   $out = array();
   $stat = 99;
-  exec( $this->_settings['CMD_SUDO']." /usr/local/pia/include/update_root.sh $new_pw", $out, $stat);
+  exec( $set['CMD_SUDO']." /usr/local/pia/include/update_root.sh $new_pw", $out, $stat);
 
   $ret = "";
   switch($stat){
@@ -423,14 +428,16 @@ function is_mounted( $mount_point ){
  * mount the drive defined in settings
  */
 function cifs_mount(){
-  exec( $this->_settings['CMD_SUDO'].' /usr/local/pia/include/cifs_mount.sh');
+  $set = $this->_settings->get_settings();
+  exec( $set['CMD_SUDO'].' /usr/local/pia/include/cifs_mount.sh');
 }
 
 /**
  * unmount the drive defined in settings
  */
 function cifs_umount(){
-  exec( $this->_settings['CMD_SUDO'].' /usr/local/pia/include/cifs_umount.sh');
+  $set = $this->_settings->get_settings();
+  exec( $set['CMD_SUDO'].' /usr/local/pia/include/cifs_umount.sh');
 }
 
 
@@ -438,14 +445,16 @@ function cifs_umount(){
  * killall transmission-daemon
  */
 function transmission_stop(){
-  exec( $this->_settings['CMD_SUDO'].' /usr/local/pia/include/transmission-stop.sh');
+  $set = $this->_settings->get_settings();
+  exec( $set['CMD_SUDO'].' /usr/local/pia/include/transmission-stop.sh');
 }
 
 /**
  * start transmission-daemon
  */
 function transmission_start(){
-  exec( $this->_settings['CMD_SUDO'].' /usr/local/pia/include/transmission-start.sh');
+  $set = $this->_settings->get_settings();
+  exec( $set['CMD_SUDO'].' /usr/local/pia/include/transmission-start.sh');
 }
 
 

@@ -145,5 +145,4 @@ fi
 #ALWAYS RUN THIS LAST
 chmod 0660 /usr/local/pia/settings.conf
 chown -R root:vpnvm /usr/local/pia
-chmod 0770 /usr/local/pia
-chmod -R o-rwx /usr/local/pia
+chmod -R 0770 /usr/local/pia

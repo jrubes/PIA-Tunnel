@@ -3,10 +3,10 @@
  * class to handle simple authentication without account mangement
  * the username and password are store elsewehere and are only passed to this
  * class for verification and to setup the session.
- * 
+ *
  * the class will compare a username and password passed and return true or false
  *  it will then store an authentication cookie on the client system to rember the user
- * 
+ *
  * this is useful to protect an admin interface
  * @author Mirko Kaiser
  */
@@ -18,16 +18,16 @@ class AuthenticateUser {
   private $cookie_name;//string, holds name of "login"remember me" cookie
   private $cookie_hash;//value stored on client used to reauthenticate
   private $cookie_lifetime; //time in days for the cookie to life
-  
-  function __construct(){
+
+  function __construct($HTDOCS_PATH=''){
     $this->namespace = '45BauNuMYV';
     $this->cookie_name = 'pia-tunnel_reauth';
     $this->cookie_hash = $this->rand_string(10); //this sets a default value but breaks the functionality
                                                 //use set_cookie_hash() to pass your value
-    $this->login_form = '/usr/local/www/apache24/data/login.php';
+    $this->login_form = $HTDOCS_PATH.'/login.php';
     $this->cookie_lifetime = 30;
   }
-  
+
   /**
    * method to set the class session namespace
    * @param string $ns some string to use as for the namespace (strlen > 7)
@@ -36,9 +36,9 @@ class AuthenticateUser {
     if( strlen($ns) < 8 ){
       $ns = $this->rand_string(8);
     }
-    $this->namespace = $ns;  
+    $this->namespace = $ns;
   }
-  
+
   /**
    * method to pass a know hash to be used by the "remember me" cookie
    * @param string $hash hash to be used for the re-auth cookie
@@ -49,14 +49,14 @@ class AuthenticateUser {
     }
     $this->cookie_hash = $hash;
   }
-  
+
   function set_cookie_lifetime( $days ){
         if( strlen($days) < 1){
       $days = 0;
     }
     $this->cookie_lifetime = $days;
   }
-  
+
   /**
    * main authentication method, first auth must be username+password then a cookie will be used
    * @param array $expected expected values for ['username],['password']
@@ -64,7 +64,7 @@ class AuthenticateUser {
    * @return none will die and display a login form on authentication error
    */
   function authenticate( $expected=array('username' => '', 'password' => ''), $supplied=array('username' => '', 'password' => '')){
-    
+
     if( isset($_SESSION[$this->namespace.'authenticated']) === false ){
       $_SESSION[$this->namespace.'authenticated'] = false;
     }else{
@@ -73,7 +73,7 @@ class AuthenticateUser {
         return true;
       }
     }
-    
+
     //try a password login first
     if( $supplied['username'] !== '' && $supplied['password'] !== '' )
     {
@@ -83,19 +83,19 @@ class AuthenticateUser {
         require $this->login_form;
         die();
       }
-      
-      if( $expected['username'] == $supplied['username'] 
+
+      if( $expected['username'] == $supplied['username']
               && $expected['password'] == $supplied['password'] ){
-        
+
         //good login
         $this->login_set_cookie();
         $_SESSION[$this->namespace.'authenticated'] = true;
         return true;
-        
+
       }
     }//end of pw login
-    
-    
+
+
     //check cookie
     if( $this->login_cookie() === true ){
       $_SESSION[$this->namespace.'authenticated'] = true;
@@ -105,22 +105,22 @@ class AuthenticateUser {
       require $this->login_form;
       die();
     }
-  
+
   //catch all
   require $this->login_form;
   die();
   }
 
-  
-/** 
+
+/**
  * descroy a user cookie and session
- */  
+ */
 function logout(){
   //clear "rember me"
   setcookie($this->cookie_name, '', 1); //Clear Old Cookie First
   $this->session_destory();
-}  
- 
+}
+
 /**
  * completely destroy the user session
  */
@@ -134,14 +134,14 @@ private function session_destory()
   $_SESSION = array();
   session_destroy();
 }
-  
+
 /**
  * method to allow persisten authentication via a cookie
  * @return boolean true if successful or false if not
- */  
+ */
 private function login_cookie(){
   $cookie_string = '';
-  
+
   if( isset($_COOKIE[$this->cookie_name]) === true ){
     $cookie_string = $_COOKIE[$this->cookie_name];
     if( $cookie_string === $this->cookie_hash ){
@@ -152,8 +152,8 @@ private function login_cookie(){
   }else{
     return false;
   }
-}  
-  
+}
+
 private function login_set_cookie( )
 {
   if( $this->cookie_lifetime > 0 ){
@@ -169,7 +169,7 @@ private function login_set_cookie( )
   }
   return true;
 }
-  
+
 /**
  * create a random string, uses mt_rand. This one is faster then my old GetRandomString()
  * rand_string(20, array('A','Z','a','z',0,9), '`,~,!,@,#,%,^,&,*,(,),_,|,+,=,-');
@@ -186,11 +186,11 @@ function rand_string($lenth, $range=array('A','Z','a','z',0,9), $other='' ) {
 	$sel_range = array_merge($sel_range, range($range[$x], $range[$x+1]));
   if( $other !== '' )
 	$sel_range = array_merge($sel_range, explode (',', $other));
-  $out =''; 
+  $out ='';
   $cnt = count($sel_range);
   for( $x = 0 ; $x < $lenth ; ++$x )
 	$out .= $sel_range[mt_rand(0,$cnt-1)];
-  return $out; 
+  return $out;
 /*
     // test the "randomness", replace mt_rand() with rand() to see why you should use mt_rand()
     header("Content-type: image/png");
@@ -204,6 +204,6 @@ function rand_string($lenth, $range=array('A','Z','a','z',0,9), $other='' ) {
     imagepng($img);
     imagedestroy($img);
 */
-}  
+}
 }
 ?>

@@ -21,14 +21,14 @@ class loader {
 
     return self::$_pia_settings;
   }
-  
+
   public static function PIACommands(){
     self::$_pia_commands = new PIACommands();
     self::$_pia_commands->set_files(self::$_files);
     self::$_pia_commands->set_settings(self::$_pia_settings);
 
     return self::$_pia_commands;
-  }  
+  }
 
   public static function SystemServices(){
     self::$_system_services = new SystemServices();
@@ -36,10 +36,10 @@ class loader {
     return self::$_system_services;
   }
 
- 
+
   public static function AuthenticateUser(){
-    self::$_auth = new AuthenticateUser();
     $settings = self::$_pia_settings->get_settings();
+    self::$_auth = new AuthenticateUser($settings['HTDOCS_PATH']);
     self::$_auth->set_namespace($settings['WEB_UI_NAMESPACE']);
     self::$_auth->set_cookie_hash($settings['WEB_UI_COOKIE']);
 
