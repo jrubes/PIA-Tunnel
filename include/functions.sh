@@ -14,9 +14,9 @@ RET_GET_PACKET_LOSS=""
 PING_VER=`$CMD_PING -V > /dev/null 2>&1`
 if [ $? -eq 0 ]; then
 	#Debian
-	PING_COMMAND="$CMD_PING -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep -c \", 0% packet loss\""
-	#PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\" | gawk -F\",\" '{print \$3}' | gawk -F \"%\" '{print \$1}' | tr -d ' '"
-	PING_PACKET_LOSS="$CMD_PING -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | grep \"packet loss\""
+	PING_COMMAND="$CMD_PING -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | $CMD_GREP -c \", 0% packet loss\""
+	#PING_PACKET_LOSS="ping -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | $CMD_GREP \"packet loss\" | $CMD_GAWK -F\",\" '{print \$3}' | $CMD_GAWK -F \"%\" '{print \$1}' | tr -d ' '"
+	PING_PACKET_LOSS="$CMD_PING -qn -i 0.5 -w 4 -W 0.5 -I INTERFACE IP2TOPING 2>/dev/null | $CMD_GREP \"packet loss\""
 else
 	#FreeBSD
     PING_COMMAND="$CMD_PING -qn -i 0.5 -t 4 -W 0.5 IP2TOPING 2>/dev/null | $CMD_GREP -c \", 0% packet loss\""
@@ -330,7 +330,7 @@ function echo_conn_established() {
   # show connection data
   maintain_status_cache '/usr/local/pia/cache/status.txt'
   vpn_port=`cat "/usr/local/pia/cache/status.txt" | $CMD_GREP "VPNPORT" | $CMD_GAWK -F":" '{print $2}'`
-  #vpn_ip=`cat "/usr/local/pia/cache/status.txt" | $CMD_GREP "VPNIP" | gawk -F":" '{print $2}'`
+  #vpn_ip=`cat "/usr/local/pia/cache/status.txt" | $CMD_GREP "VPNIP" | $CMD_GAWK -F":" '{print $2}'`
   vpn_ip=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | cut -d/ -f1`
   echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- VPN connection to $1 established\n\tVPN IP: $vpn_ip Port: $vpn_port"
@@ -349,7 +349,7 @@ function switch_vpn() {
         echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $CONN" > /usr/local/pia/cache/session.log
 
         #get the provider / directory name
-        VPNprovider=`echo "$CONN" | gawk -F"/" '{print $1}'`
+        VPNprovider=`echo "$CONN" | $CMD_GAWK -F"/" '{print $1}'`
 
         #start openVPN session
         if [ -f "/usr/local/pia/ovpn/$CONN.ovpn" ]; then
@@ -430,7 +430,7 @@ function get_forward_port() {
     PIA_CLIENT_ID=`cat /usr/local/pia/client_id`
     PIA_UN=`$CMD_SED -n '1p' /usr/local/pia/login-pia.conf`
     PIA_PW=`$CMD_SED -n '2p' /usr/local/pia/login-pia.conf`
-    TUN_IP=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+    TUN_IP=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | cut -d/ -f1`
 
     #get open port of tunnel connection
     TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
@@ -533,7 +533,7 @@ function cache_age_check() {
 	fi
 
 	if [ -f "$1" ]; then
-		date_string=`head -n1 $1 | gawk -F" " '{print $4" "$5}'`
+		date_string=`head -n1 $1 | $CMD_GAWK -F" " '{print $4" "$5}'`
 		#convert date into timestamp
 		cache_ts=`date -d "$date_string" "+%s"`
 		cache_ts_expired=`date -d "$cache_age_check_time_passed minutes ago" "+%s"`
@@ -807,7 +807,7 @@ function get_packet_loss(){
     unset RET_GET_PACKET_LOSS
 
     #Debian returns 0%
-    #ret=`echo "$passed" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | tr -d ' '`
+    #ret=`echo "$passed" | $CMD_GAWK -F"," '{print \$3}' | $CMD_GAWK -F "%" '{print \$1}' | tr -d ' '`
     # BSD returns as 0.0%
     ret=`echo "$passed" | $CMD_GAWK -F"," '{print \$3}' | $CMD_GAWK -F "%" '{print \$1}' | $CMD_GAWK -F "." '{print \$1}' | tr -d ' '`
     errors=`echo "$ret" | $CMD_GREP -c "errors"`
@@ -816,7 +816,7 @@ function get_packet_loss(){
         RET_GET_PACKET_LOSS=$ret
     else
         #failure string detected, run grep again
-	RET_GET_PACKET_LOSS=`echo "$passed" | gawk -F"," '{print \$4}' | gawk -F "%" '{print \$1}' | tr -d ' '`
+	RET_GET_PACKET_LOSS=`echo "$passed" | $CMD_GAWK -F"," '{print \$4}' | $CMD_GAWK -F "%" '{print \$1}' | tr -d ' '`
     fi
     return
 }
