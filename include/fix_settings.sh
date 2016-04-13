@@ -4,6 +4,7 @@
 LANG=en_US.UTF-8
 export LANG
 source '/usr/local/pia/settings.conf'
+source '/usr/local/pia/include/commands.sh'
 
 
 
@@ -277,9 +278,9 @@ grep "IF_DEFAULTROUTER" /usr/local/pia/settings.conf &> /dev/null || echo 'IF_DE
 ret=$(ps -p 1 | grep -c systemd )
 if [ "$ret" -eq 1 ] && [ ! -L "/etc/systemd/system/pia-boot-msg.service" ]; then
 	# system running systemD
-	ln -s /usr/local/pia/include/pia-autostart.service /etc/systemd/system/pia-autostart.service
-	ln -s /usr/local/pia/include/pia-boot-msg.service /etc/systemd/system/pia-boot-msg.service
-	ln -s /usr/local/pia/include/pia-daemon.service /etc/systemd/system/pia-daemon.service
+	ln -s /usr/local/pia/include/service/pia-autostart.service /etc/systemd/system/pia-autostart.service
+	ln -s /usr/local/pia/include/service/pia-boot-msg.service /etc/systemd/system/pia-boot-msg.service
+	ln -s /usr/local/pia/include/service/pia-daemon.service /etc/systemd/system/pia-daemon.service
 elif [ "$ret" -eq 0 ] && [ ! -L "/etc/systemd/system/pia-boot-msg.service" ]; then
 	echo "do to";
 fi
@@ -297,5 +298,5 @@ if [ $ret = 0 ]; then
         echo 'HTDOCS_PATH="/usr/local/www/apache24/data"' >> '/usr/local/pia/settings.conf'
         echo 'APACHE_USER="www"' >> '/usr/local/pia/settings.conf'
     fi
-    
+
 fi

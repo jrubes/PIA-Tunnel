@@ -4,7 +4,7 @@
 
 LANG=en_US.UTF-8
 export LANG
-source '/usr/local/pia/settings.conf'
+source '/usr/local/pia/include/commands.sh'
 
 
 #clear existing ssh key
@@ -43,9 +43,6 @@ rm -rf "/usr/local/pia/cache/"
 #delete settings.conf
 rm -f /usr/local/pia/settings.conf
 
-#add commands back to settings.conf
-/usr/local/pia/fix_commands.sh
-
 
 # clear cache and SWAP
 # Debian sync && /sbin/sysctl vm.drop_caches=3 && swapoff -a && swapon -a
@@ -57,6 +54,7 @@ cd /usr/local/pia ; /usr/local/bin/git reset --hard HEAD &> /dev/null
 #Now run setup to get settings back and apply permissions
 chmod ugo+x /usr/local/pia/pia-setup
 /usr/local/pia/pia-setup
+source '/usr/local/pia/settings.conf'
 
 #force wizard to start
 if [ "$OS_TYPE" = "Linux" ]; then

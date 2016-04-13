@@ -9,9 +9,14 @@ chmod 0750 /usr/local/pia
 find /usr/local/pia -type d -exec chmod 0750 {} \;
 find /usr/local/pia -type f -exec chmod 0640 {} \;
 
-# ensure CMD paths are added to settings.conf
-/usr/local/pia/fix_commands.sh
-source '/usr/local/pia/settings.sh'
+if [ "$CMD_GREP" = "" ]; then
+	chmod u+x '/usr/local/pia/include/commands.sh'
+    source '/usr/local/pia/include/commands.sh'
+fi
+
+if [ ! -f '/usr/local/pia/settings.conf' ]; then
+    touch '/usr/local/pia/settings.conf';
+fi
 
 #create a fresh settings file or load existing
 ret=$( "$CMD_GREP" -c "FORWARD_PORT_ENABLE" /usr/local/pia/settings.conf)
@@ -39,7 +44,7 @@ if [ "$ret" -eq 0 ]; then
 		echo 'FIREWALL_IF_WEB[0]="eth0"' >> '/usr/local/pia/settings.conf'
 		echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/usr/local/pia/settings.conf'
 	fi
-	
+
 
     echo 'FORWARD_IP="192.168.10.100"' >> '/usr/local/pia/settings.conf'
     echo 'FORWARD_PORT_ENABLED="no"' >> '/usr/local/pia/settings.conf'
@@ -62,7 +67,7 @@ do
 done
 
 #handle files in include, these don't get /bin/ links
-FILES="fw-forward.sh fw-pf-no-forward.sh build_ping_list.sh fix_settings.sh fix_commands.sh network-interfaces.sh"
+FILES="fw-forward.sh fw-pf-no-forward.sh build_ping_list.sh fix_settings.sh commands.sh network-interfaces.sh"
 FILES="$FILES network-restart.sh autostart.sh dhcpd-reconfigure.sh dhcpd-start.sh log_fetch.sh"
 FILES="$FILES dhcpd-stop.sh dhcpd-status.sh update_root.sh fw_get_forward_state.sh autostart_rebuild.sh"
 FILES="$FILES sockd-dante-start.sh sockd-dante-status.sh sockd-dante-stop.sh sockd-dante-reconfigure.sh"
