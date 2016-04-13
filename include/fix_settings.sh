@@ -302,7 +302,7 @@ if [ $ret = 0 ]; then
 fi
 
 
-ret=$("$cmd_GREP" -c "CMD_SUDO" /usr/local/pia/settings.conf)
+ret=$("$CMD_GREP" -c "CMD_SUDO" /usr/local/pia/settings.conf)
 if [ "$ret" -eq 0 ]; then
     if [ -f '/usr/local/bin/gawk' ]; then
       #FreeBSD
