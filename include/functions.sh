@@ -527,16 +527,16 @@ function file_is_writable() {
 # s2 how many minutes ago as integer, defaults to 30
 # returns RET_CACHE_AGE_CHECK "OK", "EXPIRED", "NOT FOUND"
 function cache_age_check() {
-	cache_age_check_time_pas$CMD_SED=30
+	cache_age_check_time_passed=30
 	if [ "$2" != "" ]; then
-		cache_age_check_time_pas$CMD_SED="$2"
+		cache_age_check_time_passed="$2"
 	fi
 
 	if [ -f "$1" ]; then
 		date_string=`head -n1 $1 | gawk -F" " '{print $4" "$5}'`
 		#convert date into timestamp
 		cache_ts=`date -d "$date_string" "+%s"`
-		cache_ts_expired=`date -d "$cache_age_check_time_pas$CMD_SED minutes ago" "+%s"`
+		cache_ts_expired=`date -d "$cache_age_check_time_passed minutes ago" "+%s"`
 		if [ $cache_ts -gt $cache_ts_expired ]; then
 			RET_CACHE_AGE_CHECK="OK"
 			return
@@ -803,20 +803,20 @@ function ping_host_new() {
 # ping with 100% packet loss
 #   6 packets transmitted, 0 received, +3 errors, 100% packet loss, time 2547ms
 function get_packet_loss(){
-    pas$CMD_SED=$1
+    passed=$1
     unset RET_GET_PACKET_LOSS
 
     #Debian returns 0%
-    #ret=`echo "$pas$CMD_SED" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | tr -d ' '`
+    #ret=`echo "$passed" | gawk -F"," '{print \$3}' | gawk -F "%" '{print \$1}' | tr -d ' '`
     # BSD returns as 0.0%
-    ret=`echo "$pas$CMD_SED" | $CMD_GAWK -F"," '{print \$3}' | $CMD_GAWK -F "%" '{print \$1}' | $CMD_GAWK -F "." '{print \$1}' | tr -d ' '`
+    ret=`echo "$passed" | $CMD_GAWK -F"," '{print \$3}' | $CMD_GAWK -F "%" '{print \$1}' | $CMD_GAWK -F "." '{print \$1}' | tr -d ' '`
     errors=`echo "$ret" | $CMD_GREP -c "errors"`
 
     if [ "$errors" = "0" ]; then
         RET_GET_PACKET_LOSS=$ret
     else
         #failure string detected, run grep again
-	RET_GET_PACKET_LOSS=`echo "$pas$CMD_SED" | gawk -F"," '{print \$4}' | gawk -F "%" '{print \$1}' | tr -d ' '`
+	RET_GET_PACKET_LOSS=`echo "$passed" | gawk -F"," '{print \$4}' | gawk -F "%" '{print \$1}' | tr -d ' '`
     fi
     return
 }
