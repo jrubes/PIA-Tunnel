@@ -70,7 +70,7 @@ else
       eth0IP=`/sbin/ifconfig "$IF_EXT" | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
       echo "$IF_EXT IP: $eth0IP" >> /etc/issue
   else
-      echo "$SIF_EXT IP: ERROR: interface not found" >> /etc/issue
+      echo "$IF_EXT IP: ERROR: interface not found" >> /etc/issue
   fi
 
 
