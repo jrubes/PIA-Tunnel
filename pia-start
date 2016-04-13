@@ -7,7 +7,6 @@
 LANG=en_US.UTF-8
 export LANG
 source '/usr/local/pia/settings.conf'
-source '/usr/local/pia/commands.sh'
 source '/usr/local/pia/include/functions.sh'
 source '/usr/local/pia/include/functions-freebsd.sh'
 FAIL_RETRY_INTERNET=3

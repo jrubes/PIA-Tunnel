@@ -2,7 +2,7 @@
 # script to update everything in /usr/local/pia/ from the GitRepo
 LANG=en_US.UTF-8
 export LANG
-source '/usr/local/pia/include/commands.sh'
+source '/usr/local/pia/settings.conf'
 
 clear
 echo "getting updates from https://github.com/KaiserSoft/PIA-Tunnel"

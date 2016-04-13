@@ -3,7 +3,6 @@
 
 LANG=en_US.UTF-8
 export LANG
-source '/usr/local/pia/include/commands.sh'
 
 #set file permissions as needed
 chmod 0750 /usr/local/pia
@@ -11,9 +10,10 @@ find /usr/local/pia -type d -exec chmod 0750 {} \;
 find /usr/local/pia -type f -exec chmod 0640 {} \;
 
 
-
-#create a fresh settings file
-if [ ! -f "/usr/local/pia/settings.conf" ]; then
+#create a fresh settings file or load existing
+if [ -f "/usr/local/pia/settings.conf" ]; then
+    source '/usr/local/pia/include/commands.sh'
+else
     echo '#!/bin/bash' > '/usr/local/pia/settings.conf'
     echo 'LANG=en_US.UTF-8' >> '/usr/local/pia/settings.conf'
     echo 'export LANG' >> '/usr/local/pia/settings.conf'

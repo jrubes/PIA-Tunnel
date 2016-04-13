@@ -3,7 +3,6 @@
 # this script will add missing settings to the config file
 LANG=en_US.UTF-8
 export LANG
-source '/usr/local/pia/include/commands.sh'
 source '/usr/local/pia/settings.conf'
 
 

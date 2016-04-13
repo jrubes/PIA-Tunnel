@@ -1,7 +1,6 @@
 #!/bin/bash
 LANG=en_US.UTF-8
 export LANG
-source '/usr/local/pia/include/commands.sh'
 
 #return variables and static stuff
 RET_PING_HOST=""

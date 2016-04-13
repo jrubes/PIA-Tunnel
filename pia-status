@@ -5,7 +5,6 @@ LANG=en_US.UTF-8
 export LANG
 
 source '/usr/local/pia/settings.conf'
-source '/usr/local/pia/commands.sh'
 source '/usr/local/pia/include/functions.sh'
 
 # check for default username and exit
