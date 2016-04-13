@@ -312,7 +312,7 @@ grep "IF_DEFAULTROUTER" /usr/local/pia/settings.conf &> /dev/null || echo 'IF_DE
 
 
 ret=$(ps -p 1 | grep -c systemd )
-if [ "$ret" -eq 1 ]; then
+if [ "$ret" -eq 1 ] && [ ! -L "/etc/systemd/system/pia-boot-msg.service" ]; then
 	# system running systemD
 	ln -s /usr/local/pia/include/pia-autostart.service /etc/systemd/system/pia-autostart.service
 	ln -s /usr/local/pia/include/pia-boot-msg.service /etc/systemd/system/pia-boot-msg.service
