@@ -1,0 +1,10 @@
+[Unit]
+Description=pia-tunnel first boot checks
+After=network.target auditd.service sshd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/pia/include/first_boot.sh
+
+[Install]
+WantedBy=multi-user.target
