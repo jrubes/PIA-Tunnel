@@ -20,15 +20,15 @@
     - sudo
   when: ansible_distribution == 'Debian'
 
-  
+
 #- name: show service status
 #  replace: dest='/etc/systemd/system/getty.target.wants/getty@tty1.service' regexp='TTYVTDisallocate=yes' replace='TTYVTDisallocate=no'
 #  when: ansible_distribution == 'Debian'
-  
+
 - template: src=dhcpd-debian.conf dest=/etc/dhcp/dhcpd.conf
   when: ansible_distribution == 'Debian'
 
-  
+
 - cron: name="update time" minute="0" hour="*/6" job="ntpd -q > /dev/null"
   when: ansible_distribution == 'Debian'
 
@@ -36,22 +36,11 @@
 - shell: "grep -q 'supersede domain-name-servers' /etc/dhcp/dhclient.conf || echo 'supersede domain-name-servers 8.8.8.8, 208.67.222.222, 8.8.4.4, 208.67.220.220;' >> /etc/dhclient.conf"
   when: ansible_distribution == 'Debian'
 
-  
+
 - shell: "grep -q 'www-data ALL = NOPASSWD' /etc/sudoers || echo 'www-data ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown' >> /etc/sudoers"
   when: ansible_distribution == 'Debian'
 
-  
+
 - name: set apt recommended and suggested packages to zero
   shell: "echo 'APT::Install-Recommends \"0\" ; APT::Install-Suggests \"0\" ;' >> /etc/apt/apt.conf.d/70debconf"
-  when: ansible_distribution == 'Debian'
-
-- template: src=pia-boot-debian.sh dest=/usr/local/bin/pia-boot.sh owner=root group=root mode=0555
-  notify: reboot VM
-  when: ansible_distribution == 'Debian'
-  
-- template: src=pia.service dest=/etc/systemd/system/pia.service owner=root group=root  mode=0444
-  when: ansible_distribution == 'Debian'
-  
-- name: enable pia autostart "service"
-  shell: "systemctl enable pia.service"
   when: ansible_distribution == 'Debian'

@@ -21,62 +21,11 @@ switch($_REQUEST['cmd']){
     $disp_body .= '<p>All done! <a href="/?page=main">Please login to continue</a></p>';
     $disp_body .= '</div>';
     break;
-  case 'reset-system':
-    $settings = $_settings->get_settings();
-
-    if( $settings['HAS_BEEN_RESET'] != "yes" ){ //don't run again on page refresh
-      //reset to HEAD then run update
-      exec("cd /usr/local/pia ; {$CMD['git']} reset --hard HEAD");
-      exec("{$CMD['sudo']} /usr/local/pia/pia-update");
-
-      $result = array();
-      exec("{$CMD['sudo']} /usr/local/pia/reset-pia", $result);
-      if( array_key_exists('0', $result) === true ){
-        $_SESSION = array(); //clear all session vars
-        $disp_body .= "<div class=\"feedback\">Full system reset has been executed - system will reboot now.<br>Please double check the IP as it tends to change after a reset.</div>\n";
-        $disp_body .= '<script type="text/javascript">'
-                        .'var timr_reboot=setInterval(function(){'
-                        .'var _overview = new OverviewObj();'
-                        .'_overview.reload_after_reboot();'
-                        .'},4000);'
-                       .'</script>';
-        $_settings->save_settings('HAS_BEEN_RESET', "yes");
-        VM_restart();
-      }else{
-        $disp_body .= "<div id=\"feedback\" class=\"feedback\">FATAL ERROR when attempting to reset the system. This should never happen! Please contact support!</div>\n";
-      }
-    }else{
-      $disp_body .= disp_wizard_default();
-    }
-    break;
   default:
-    $settings = $_settings->get_settings();
-    if( $settings['HAS_BEEN_RESET'] != "yes" ){
-      $disp_body .= disp_wizard_reset();
-    }else{
-     $disp_body .= disp_wizard_default();
-    }
+    $disp_body .= disp_wizard_default();
     break;
 }
 
-/**
- * returns UI elements in HTML
- * @return string string with HTML for body of this page
- */
-function disp_wizard_reset(){
-  $disp_body = '';
-
-  $disp_body .= '<noscript><strong>Notice:</strong> Please enable javascript before you continue (optional)</noscript>';
-
-  $disp_body .= '<p>Brand new setup detected!<br>';
-  $disp_body .= 'PIA-Tunnel needs to check for updates and reset some settings to unkown values.</p>'
-                .'<p>Please be patient, this is for your protection.</p>';
-  $disp_body .= '<p><form action="/?page=wizard&amp;cmd=reset-system" method="post">'."\n";
-  $disp_body .= '<br><input type="submit" name="reset-pia" value="Prepare the System and Reboot">';
-  $disp_body .= "</form></p>\n";
-
-  return $disp_body;
-}
 
 /**
  * generates a setup UI for the user
