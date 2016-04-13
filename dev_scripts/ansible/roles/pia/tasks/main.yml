@@ -20,13 +20,10 @@
 
 - file: path=/usr/local/pia/pia-setup owner=root group=wheel mode=0750
   when: ansible_distribution == 'FreeBSD'
-  
-- file: path=/usr/local/pia/pia-setup owner=root group=root mode=0750
-  when: ansible_distribution == 'Debian'  
 
-- template: src=rc-debian.local dest=/etc/rc.local
+- file: path=/usr/local/pia/pia-setup owner=root group=root mode=0750
   when: ansible_distribution == 'Debian'
-  
-  
+
+
 - name: setup PIA
   shell: /usr/local/pia/pia-setup
