@@ -124,7 +124,8 @@ function VM_restart(){
   global $_pia;
   global $settings;
   $_pia->clear_session();
-  exec( $settings['CMD_SUDO'].' sleep 2 && /sbin/shutdown -r now &>/dev/null &');
+  //exec( 'sleep 2 && '.$settings['CMD_SUDO'].' /sbin/shutdown -r now &>/dev/null &');
+  exec("bash -c \"sleep 2 && {$settings['CMD_SUDO']} /sbin/shutdown -r now &> /dev/null &\" &>/dev/null &");
 }
 
 
