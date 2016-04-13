@@ -56,7 +56,7 @@ chmod ugo+x /usr/local/pia/pia-setup
 /usr/local/pia/pia-setup
 
 #force wizard to start
-if [ "$OS_TYPE" = "Linux ]; then
+if [ "$OS_TYPE" = "Linux" ]; then
     $CMD_SED -i 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf
 else
     $CMD_SED -i '' 's/SETUP_WIZARD_COMPLETED="yes"/SETUP_WIZARD_COMPLETED="no"/' /usr/local/pia/settings.conf

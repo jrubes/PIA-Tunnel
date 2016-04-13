@@ -20,16 +20,21 @@ if [ ! -f "/usr/local/pia/settings.conf" ]; then
     echo '' >> '/usr/local/pia/settings.conf'
     echo '' >> '/usr/local/pia/settings.conf'
 
-	if [ -f '/usr/local/bin/gawk' ]; then
-		#FreeBSD
+	if [ "$OS_TYPE" = "FreeBSD" ]; then
 		echo 'IF_EXT="em0"' >> '/usr/local/pia/settings.conf'
 		echo 'IF_INT="em1"' >> '/usr/local/pia/settings.conf'
-		echo 'IF_TUNNEL="tun0"' >> '/usr/local/pia/settings.conf'		
+		echo 'IF_TUNNEL="tun0"' >> '/usr/local/pia/settings.conf'
+		echo 'FIREWALL_IF_SSH[0]="em0"' >> '/usr/local/pia/settings.conf'
+		echo 'FIREWALL_IF_WEB[0]="em0"' >> '/usr/local/pia/settings.conf'
+		echo 'FIREWALL_IF_WEB[1]="em1"' >> '/usr/local/pia/settings.conf'
 	else
-		#Debian
+		#Linux
 		echo 'IF_EXT="eth0"' >> '/usr/local/pia/settings.conf'
 		echo 'IF_INT="eth1"' >> '/usr/local/pia/settings.conf'
 		echo 'IF_TUNNEL="tun0"' >> '/usr/local/pia/settings.conf'
+		echo 'FIREWALL_IF_SSH[0]="eth0"' >> '/usr/local/pia/settings.conf'
+		echo 'FIREWALL_IF_WEB[0]="eth0"' >> '/usr/local/pia/settings.conf'
+		echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/usr/local/pia/settings.conf'
 	fi
 	
 
@@ -37,9 +42,6 @@ if [ ! -f "/usr/local/pia/settings.conf" ]; then
     echo 'FORWARD_PORT_ENABLED="no"' >> '/usr/local/pia/settings.conf'
     echo 'FORWARD_PUBLIC_LAN="yes"' >> '/usr/local/pia/settings.conf'
     echo 'FORWARD_VM_LAN="yes"' >> '/usr/local/pia/settings.conf'
-    echo 'FIREWALL_IF_SSH[0]="em0"' >> '/usr/local/pia/settings.conf'
-    echo 'FIREWALL_IF_WEB[0]="em0"' >> '/usr/local/pia/settings.conf'
-    echo 'FIREWALL_IF_WEB[1]="em1"' >> '/usr/local/pia/settings.conf'
     echo '' >> '/usr/local/pia/settings.conf'
 fi
 
