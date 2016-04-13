@@ -58,7 +58,7 @@ do
 done
 
 #handle files in include, these don't get /bin/ links
-FILES="fw-forward.sh fw-pf-no-forward.sh build_ping_list.sh fix_settings.sh network-interfaces.sh"
+FILES="fw-forward.sh fw-pf-no-forward.sh build_ping_list.sh fix_settings.sh fix_commands.sh network-interfaces.sh"
 FILES="$FILES network-restart.sh autostart.sh dhcpd-reconfigure.sh dhcpd-start.sh log_fetch.sh"
 FILES="$FILES dhcpd-stop.sh dhcpd-status.sh update_root.sh fw_get_forward_state.sh autostart_rebuild.sh"
 FILES="$FILES sockd-dante-start.sh sockd-dante-status.sh sockd-dante-stop.sh sockd-dante-reconfigure.sh"
