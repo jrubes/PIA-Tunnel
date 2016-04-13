@@ -459,7 +459,8 @@ function cifs_auth(){
  * update transmission config file
  */
 function tcupdate(){
-  exec('/usr/local/bin/sudo /usr/local/pia/include/transmission-config.sh');
+  $settings = $this->get_settings();
+  exec( $settings['CMD_SUDO'].' /usr/local/pia/include/transmission-config.sh');
 }
 
 }

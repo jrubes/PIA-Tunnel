@@ -209,25 +209,28 @@ $disp_body .= '<script type="text/javascript">'
  * based on settings.conf
  */
 function VPN_generate_interfaces(){
-  exec("/usr/local/bin/sudo /usr/local/pia/include/network-interfaces.sh"); //write new dhcpd.conf
+  global $settings;
+  exec( $settings['CMD_SUDO']." /usr/local/pia/include/network-interfaces.sh"); //write new dhcpd.conf
 }
 
 /**
  * function to generate a new dhcpd.conf file after a config change
  */
 function VPN_generate_dhcpd_conf(){
+  global $settings;
   $template = dhcpd_process_template();
   $save = escapeshellarg($template);
-  exec("/usr/local/bin/sudo /usr/local/pia/include/dhcpd-reconfigure.sh $save"); //write new dhcpd.conf
+  exec( $settings['CMD_SUDO']." /usr/local/pia/include/dhcpd-reconfigure.sh $save"); //write new dhcpd.conf
 }
 
 /**
  * function to generate a new danted.conf file after a config change
  */
 function VPN_generate_socks_conf(){
+  global $settings;
   $template = socks_process_template();
   $save = escapeshellarg($template);
-  exec("/usr/local/bin/sudo /usr/local/pia/include/sockd-dante-reconfigure.sh $save"); //write new dhcpd.conf
+  exec( $settings['CMD_SUDO']." /usr/local/pia/include/sockd-dante-reconfigure.sh $save"); //write new dhcpd.conf
 }
 
 /**

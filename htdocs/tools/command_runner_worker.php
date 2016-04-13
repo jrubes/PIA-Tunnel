@@ -37,7 +37,7 @@ switch($_POST['cmd'])
     }
 
     echo "executing command {$_POST['exec']}\n";
-    exec("bash -c \"/usr/local/bin/sudo {$valid_commands[$_POST['exec']]} &> /dev/null &\" &>/dev/null &");
+    exec("bash -c \"{$settings['CMD_SUDO']} {$valid_commands[$_POST['exec']]} &> /dev/null &\" &>/dev/null &");
     break;
 
   case 'read':

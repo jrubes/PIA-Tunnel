@@ -29,12 +29,12 @@ switch($_POST['cmd'])
     $parts = explode("\n", $_POST['tcrule']);
     foreach( $parts as $line ){
       if( $line != '' ){
-        exec("/usr/local/bin/sudo $line");
+        exec( $settings['CMD_SUDO']." $line");
       }
     }
 
     $ret = array();
-    exec("/usr/local/bin/sudo  tc -s -d class show dev tun0", $ret);
+    exec( $settings['CMD_SUDO']."  tc -s -d class show dev tun0", $ret);
     foreach( $ret as $r )
     {
       echo "$r <br>";

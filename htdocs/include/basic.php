@@ -124,7 +124,7 @@ function VM_restart(){
   global $_pia;
   global $settings;
   $_pia->clear_session();
-  exec( $settings['CMD_SUDO'].' /sbin/shutdown -r now &>/dev/null &');
+  exec( $settings['CMD_SUDO'].' sleep 2 && /sbin/shutdown -r now &>/dev/null &');
 }
 
 
@@ -594,7 +594,7 @@ function get_system_load(){
   $cpu = sys_getloadavg();
   $ret['load'] = round($cpu[0], 2).', '.round($cpu[1], 2).', '.round($cpu[2], 2);
 
-  /* FreeBSD disabled 
+  /* FreeBSD disabled
   $mem = get_meminfo();
   $used = $mem['total'] - $mem['free'];
   $used_swap = $mem['swap_total'] - $mem['swap_free'];
@@ -685,6 +685,7 @@ function get_meminfo(){
 function VPN_sessionlog_status(){
   global $_files;
   global $_pia;
+  global $settings;
 
   $content = $_files->readfile('/usr/local/pia/cache/session.log');
   if( $content == '' ){
@@ -734,7 +735,7 @@ function VPN_sessionlog_status(){
         $_pia->clear_session();
         $_SESSION['conn_auth_fail_cnt'] = 0;
         $_SESSION['conn_auth_perma_error'] = true;
-        exec('killall pia-start; /usr/local/pia/include/ovpn_kill.sh; sudo /usr/local/pia/pia-daemon stop &> /dev/null ; rm -rf /usr/local/pia/cache/pia-daemon.log');
+        exec('killall pia-start; /usr/local/pia/include/ovpn_kill.sh; '.$settings['CMD_SUDO'].' /usr/local/pia/pia-daemon stop &> /dev/null ; rm -rf /usr/local/pia/cache/pia-daemon.log');
 
       }elseif( $_SESSION['conn_auth_perma_error'] === false ){
         ++$_SESSION['conn_auth_fail_cnt'];
