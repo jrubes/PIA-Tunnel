@@ -41,7 +41,7 @@ if [ "$1" = "fix" ]; then
 			"- will attempt to stop any VPN tunnels \n\tand restart all network interfaces"
 
 		killall openvpn 2>/dev/null
-        	rm -f /usr/local/pia/cache/status.txt 2>/dev/null
+        rm -f /usr/local/pia/cache/status.txt 2>/dev/null
 		/usr/local/pia/include/fw-no-forward.sh
 		# restart networking to get default routes through em0 working again
 		# service network restart #CentOS

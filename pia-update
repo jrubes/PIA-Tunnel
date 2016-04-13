@@ -2,38 +2,39 @@
 # script to update everything in /usr/local/pia/ from the GitRepo
 LANG=en_US.UTF-8
 export LANG
+source '/usr/local/pia/include/commands.sh'
 
 clear
 echo "getting updates from https://github.com/KaiserSoft/PIA-Tunnel"
 cd /usr/local/pia/
-/usr/local/bin/git config core.fileMode false
-/usr/local/bin/git reset --hard HEAD
+"$CMD_GIT" config core.fileMode false
+"$CMD_GIT" reset --hard HEAD
 
-/usr/local/bin/git pull origin 2>&1
+"$CMD_GIT" pull origin 2>&1
 if [ "$?" -ne "0" ]; then
   # error updating repo, abort
   exit 1
 fi
 
-/usr/local/bin/git submodule init htdocs/plugin/phpdhcpd 2>&1
+"$CMD_GIT" submodule init htdocs/plugin/phpdhcpd 2>&1
 if [ "$?" -ne "0" ]; then
   # error updating repo, abort
   exit 1
 fi
 
-/usr/local/bin/git submodule update htdocs/plugin/phpdhcpd 2>&1
+"$CMD_GIT" submodule update htdocs/plugin/phpdhcpd 2>&1
 if [ "$?" -ne "0" ]; then
   # error updating repo, abort
   exit 1
 fi
 
-/usr/local/bin/git submodule init htdocs/plugin/parsedown 2>&1
+"$CMD_GIT" submodule init htdocs/plugin/parsedown 2>&1
 if [ "$?" -ne "0" ]; then
   # error updating repo, abort
   exit 1
 fi
 
-/usr/local/bin/git submodule update htdocs/plugin/parsedown 2>&1
+"$CMD_GIT" submodule update htdocs/plugin/parsedown 2>&1
 if [ "$?" -ne "0" ]; then
   # error updating repo, abort
   exit 1
@@ -47,4 +48,4 @@ chmod ugo+x /usr/local/pia/pia-setup
 
 
 echo "Showing the last 3 commit messages"
-/usr/local/bin/git --no-pager log -n 3 --pretty="format:%ci%n>> %s <<%n"
+"$CMD_GIT" --no-pager log -n 3 --pretty="format:%ci%n>> %s <<%n"

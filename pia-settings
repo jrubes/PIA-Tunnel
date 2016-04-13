@@ -5,13 +5,19 @@
 LANG=en_US.UTF-8
 export LANG
 source '/usr/local/pia/settings.conf'
+source '/usr/local/pia/commands.sh'
 
 
 if [ ! "$1" = "" ]; then
     #escape arrays or sed will fail MYVPN[0] => MYVPN\[0]
     escaped=`echo "$1" | sed -e 's/\[/\\\[/g'`
 
-    #update settings
-    #Debian sed -i "s/$escaped=.*/$escaped='$2'/" /usr/local/pia/settings.conf
-    sed -i '' "s/$escaped=.*/$escaped='$2'/" /usr/local/pia/settings.conf
+
+	if [ -f '/usr/local/bin/gawk' ]; then
+		#FreeBSD
+		sed -i '' "s/$escaped=.*/$escaped='$2'/" /usr/local/pia/settings.conf
+	else
+		#Debian
+		sed -i "s/$escaped=.*/$escaped='$2'/" /usr/local/pia/settings.conf
+	fi
 fi

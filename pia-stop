@@ -5,6 +5,7 @@
 LANG=en_US.UTF-8
 export LANG
 source '/usr/local/pia/settings.conf'
+source '/usr/local/pia/commands.sh'
 
 
 if [ "$1" = "verbose" ]; then
@@ -44,7 +45,7 @@ fi
 
 
 # attempting to fix an issue where the default GW may be lost when disconnecting the VPN
-GATEWAY=`/sbin/ip route show | /usr/bin/grep "default via" | /usr/local/bin/gawk -F" " '{print $3}'`
+GATEWAY=`"$CMD_IP" route show | "$CMD_GREP" "default via" | "$CMD_GAWK" -F" " '{print $3}'`
 if [ "$GATEWAY" = "" ] && [ "$IF_ETH0_DHCP" = "no" ] && [ "$IF_ETH0_GW" != "" ]; then
   route add default gw $IF_ETH0_GW $IF_EXT
 
@@ -55,7 +56,7 @@ elif [ "$GATEWAY" = "" ] && ([ "$IF_ETH0_DHCP" = "yes" ] || [ "$IF_ETH1_DHCP" = 
 
   #get info from dhcp leases file
   if [ -f "/var/lib/dhcp/dhclient.${IF_EXT}.leases" ]; then
-    DHCP_GW_IP=`cat "/var/lib/dhcp/dhclient.${IF_EXT}.leases" | /usr/bin/grep -m 1 'option routers' | /usr/local/bin/gawk -F" " '{print $3}' | /usr/bin/cut -d';' -f1`
+    DHCP_GW_IP=`cat "/var/lib/dhcp/dhclient.${IF_EXT}.leases" | "$CMD_GREP" -m 1 'option routers' | "$CMD_GAWK" -F" " '{print $3}' | /usr/bin/cut -d';' -f1`
     route add default gw $DHCP_GW_IP $IF_EXT
 
   else

@@ -5,6 +5,7 @@ LANG=en_US.UTF-8
 export LANG
 
 source '/usr/local/pia/settings.conf'
+source '/usr/local/pia/commands.sh'
 source '/usr/local/pia/include/functions.sh'
 
 # check for default username and exit
@@ -28,16 +29,16 @@ ping_host "vpn" "quick"
 vpn_up=$RET_PING_HOST
 if [ "$RET_PING_HOST" = "OK" ]; then
   echo -e "[\e[1;32m ok \e[0m] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is UP!"
-  port=`cat "/usr/local/pia/cache/status.txt" | /usr/bin/grep "VPNPORT" | /usr/local/bin/gawk -F":" '{print $2}'`
+  port=`cat "/usr/local/pia/cache/status.txt" | "$CMD_GREP" "VPNPORT" | "$CMD_GAWK" -F":" '{print $2}'`
   if [ "$port" = "none" ]; then
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`/usr/bin/grep "TCPv4_CLIENT link remote: \[AF_INET]" /usr/local/pia/cache/session.log | /usr/local/bin/gawk -F"]" '{print $2}' | /usr/local/bin/gawk -F":" '{print $1}'`" Port: not supported"
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`"$CMD_GREP" "TCPv4_CLIENT link remote: \[AF_INET]" /usr/local/pia/cache/session.log | "$CMD_GAWK" -F"]" '{print $2}' | "$CMD_GAWK" -F":" '{print $1}'`" Port: not supported"
   else
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`/usr/bin/grep "TCPv4_CLIENT link remote: \[AF_INET]" /usr/local/pia/cache/session.log | /usr/local/bin/gawk -F"]" '{print $2}' | /usr/local/bin/gawk -F":" '{print $1}'`" Port: $port"
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN IP: "`"$CMD_GREP" "TCPv4_CLIENT link remote: \[AF_INET]" /usr/local/pia/cache/session.log | "$CMD_GAWK" -F"]" '{print $2}' | "$CMD_GAWK" -F":" '{print $1}'`" Port: $port"
   fi
 
-  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/usr/local/pia/cache/status.txt" | /usr/bin/grep "INTERNETIP" | /usr/local/bin/gawk -F":" '{print $2}'`
+  echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/usr/local/pia/cache/status.txt" | "$CMD_GREP" "INTERNETIP" | "$CMD_GAWK" -F":" '{print $2}'`
 
-  PLANIP=`cat "/usr/local/pia/cache/status.txt" | /usr/bin/grep 	"INTIP" | /usr/local/bin/gawk -F":" '{print $2}'`
+  PLANIP=`cat "/usr/local/pia/cache/status.txt" | "$CMD_GREP" 	"INTIP" | "$CMD_GAWK" -F":" '{print $2}'`
   if [ "$PLANIP" != "" ] ; then
     echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: $PLANIP"
   fi
@@ -46,12 +47,12 @@ if [ "$RET_PING_HOST" = "OK" ]; then
 else
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is DOWN!"
   if [ ! -f '/usr/local/pia/cache/status.txt' ]; then
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`/sbin/ip addr show $IF_EXT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | cut -d/ -f1`
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`/sbin/ip addr show $IF_INT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | cut -d/ -f1`
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`"$CMD_IP" addr show $IF_EXT | "$CMD_GREP" -w "inet" | "$CMD_GAWK" -F" " '{print $2}' | cut -d/ -f1`
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`"$CMD_IP" addr show $IF_INT | "$CMD_GREP" -w "inet" | "$CMD_GAWK" -F" " '{print $2}' | cut -d/ -f1`
   else
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/usr/local/pia/cache/status.txt" | /usr/bin/grep "INTERNETIP" | /usr/local/bin/gawk -F":" '{print $2}'`
+    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/usr/local/pia/cache/status.txt" | "$CMD_GREP" "INTERNETIP" | "$CMD_GAWK" -F":" '{print $2}'`
 
-    PLANIP=`cat "/usr/local/pia/cache/status.txt" | /usr/bin/grep 	"INTIP" | /usr/local/bin/gawk -F":" '{print $2}'`
+    PLANIP=`cat "/usr/local/pia/cache/status.txt" | "$CMD_GREP" 	"INTIP" | "$CMD_GAWK" -F":" '{print $2}'`
     if [ "$PLANIP" != "" ] ; then
       echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: $PLANIP"
     fi
