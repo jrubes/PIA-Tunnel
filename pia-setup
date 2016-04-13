@@ -20,7 +20,8 @@ if [ ! -f "/usr/local/pia/settings.conf" ]; then
     echo '' >> '/usr/local/pia/settings.conf'
     echo '' >> '/usr/local/pia/settings.conf'
 
-	if [ "$OS_TYPE" = "FreeBSD" ]; then
+	if [ -f '/usr/local/bin/gawk' ]; then
+		#FreeBSD
 		echo 'IF_EXT="em0"' >> '/usr/local/pia/settings.conf'
 		echo 'IF_INT="em1"' >> '/usr/local/pia/settings.conf'
 		echo 'IF_TUNNEL="tun0"' >> '/usr/local/pia/settings.conf'
