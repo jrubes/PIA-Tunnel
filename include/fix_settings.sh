@@ -317,7 +317,7 @@ if [ "$ret" -eq 1 ] && [ ! -L "/etc/systemd/system/pia-boot-msg.service" ]; then
 	ln -s /usr/local/pia/include/pia-autostart.service /etc/systemd/system/pia-autostart.service
 	ln -s /usr/local/pia/include/pia-boot-msg.service /etc/systemd/system/pia-boot-msg.service
 	ln -s /usr/local/pia/include/pia-daemon.service /etc/systemd/system/pia-daemon.service
-else
+elif [ "$ret" -eq 0 ] && [ ! -L "/etc/systemd/system/pia-boot-msg.service" ]; then
 	echo "do to";
 fi
 
