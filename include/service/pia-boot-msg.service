@@ -1,0 +1,10 @@
+[Unit]
+Description=write IP to /etc/issue
+After=network.target auditd.service sshd.service
+
+[Service]
+Type=oneshot
+ExecStart=/pia/include/service/pia-boot-msg.sh
+
+[Install]
+WantedBy=multi-user.target

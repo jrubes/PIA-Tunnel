@@ -308,8 +308,18 @@ fi
 # added fix for eth0 not getting an IP quick enough during boot for pia-status to display the IP
 grep "allow-hotplug eth0" /etc/network/interfaces &> /dev/null  && /pia/include/network-interfaces.sh
 
-
 grep "IF_DEFAULTROUTER" /usr/local/pia/settings.conf &> /dev/null || echo 'IF_DEFAULTROUTER=""' >> /usr/local/pia/settings.conf
+
+
+ret=$(ps -p 1 | grep -c systemd )
+if [ "$ret" -eq 1 ]; then
+	# system running systemD
+	ln -s /usr/local/pia/include/pia-autostart.service /etc/systemd/system/pia-autostart.service
+	ln -s /usr/local/pia/include/pia-boot-msg.service /etc/systemd/system/pia-boot-msg.service
+	ln -s /usr/local/pia/include/pia-daemon.service /etc/systemd/system/pia-daemon.service
+else
+	echo "do to";
+fi
 
 ret=`$CMD_GREP -c "HTDOCS_PATH" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then

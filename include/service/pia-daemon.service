@@ -1,0 +1,10 @@
+[Unit]
+Description=pia-tunnel daemon
+After=network.target auditd.service sshd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/pia/pia-start daemon &>>  /pia/cache/session.log
+
+[Install]
+WantedBy=multi-user.target
