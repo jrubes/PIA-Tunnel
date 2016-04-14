@@ -736,7 +736,7 @@ function VPN_sessionlog_status(){
             && strpos($content, 'TUN/TAP device tun0 opened') !== false ){
       return array('connected');
 
-    }elseif( strpos($content, 'Received AUTH_FAILED control message') !== false ){
+    }elseif( strpos($content, 'Received control message: AUTH_FAILED') !== false ){
       //auth will sometimes fail even with correct credentials
       //will have to allow auth to fail a few times before terminating the connection attempt
       if( !isset($_SESSION['conn_auth_fail_cnt']) ){
