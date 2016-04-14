@@ -783,8 +783,8 @@ function disp_transmission_box(){
             'id' => 'CIFS_INTERFACE',
             'selected' =>  $settings['CIFS_INTERFACE'],
             array( 'any', 'any'),
-            array( 'em0', 'em0'),
-            array( 'em1', 'em1')
+            array( $settings['WEB_UI_IF1'] , $settings['WEB_UI_IF1']),
+            array( $settings['WEB_UI_IF2'], $settings['WEB_UI_IF2'])
           );
   $disp_body .= '<tr><td>SMB/CIFS Interface</td><td>'.build_select($sel).'</td></tr>'."\n";
   $disp_body .= '<tr><td>SMB/CIFS Share</td><td><input type="text" class="long" id="CIFS_SHARE" name="CIFS_SHARE" value="'.$settings['CIFS_SHARE'].'" placeholder="//192.168.1.10/Network/Share"></td></tr>'."\n";
@@ -950,8 +950,8 @@ function disp_general_box(){
   $sel = array(
             'id' => $use,
             'selected' =>  $fw_ssh,
-            array( 'FIREWALL_IF_WEB[0]', 'em0'),
-            array( 'FIREWALL_IF_WEB[1]', 'em1')
+            array( 'FIREWALL_IF_WEB[0]', $settings['WEB_UI_IF1']),
+            array( 'FIREWALL_IF_WEB[1]', $settings['WEB_UI_IF2'])
           );
   $disp_body .= '<tr><td><span title="incoming on port 80">Allow webUI access on</span></td><td><span title="incoming on port 80">'.build_checkbox($sel).'</span></td></tr>'."\n";
 
@@ -963,8 +963,8 @@ function disp_general_box(){
   $sel = array(
             'id' => $use,
             'selected' =>  $fw_ssh,
-            array( 'FIREWALL_IF_SSH[0]', 'em0'),
-            array( 'FIREWALL_IF_SSH[1]', 'em1')
+            array( 'FIREWALL_IF_SSH[0]', $settings['WEB_UI_IF1']),
+            array( 'FIREWALL_IF_SSH[1]', $settings['WEB_UI_IF2'])
           );
   $disp_body .= '<tr><td><span title="incoming on port 22">Allow SSH on</span></td><td><span title="incoming on port 22">'.build_checkbox($sel).'</span></td></tr>'."\n";
 
@@ -975,8 +975,8 @@ function disp_general_box(){
   $sel = array(
             'id' => $use,
             'selected' =>  $fw_ssh,
-            array( 'FIREWALL_IF_SNMP[0]', 'em0'),
-            array( 'FIREWALL_IF_SNMP[1]', 'em1')
+            array( 'FIREWALL_IF_SNMP[0]', $settings['WEB_UI_IF1']),
+            array( 'FIREWALL_IF_SNMP[1]', $settings['WEB_UI_IF2'])
           );
   $disp_body .= '<tr><td><span title="incoming on port 161 and outgoing on 162">Allow SNMP on</span></td><td><span title="incoming on port 161 and outgoing on 162">'.build_checkbox($sel).'</span></td></tr>'."\n";
 
@@ -986,8 +986,8 @@ function disp_general_box(){
   $sel = array(
             'id' => $use,
             'selected' =>  $fw_ssh,
-            array( 'FIREWALL_IF_SECSNMP[0]', 'em0'),
-            array( 'FIREWALL_IF_SECSNMP[1]', 'em1')
+            array( 'FIREWALL_IF_SECSNMP[0]', $settings['WEB_UI_IF1']),
+            array( 'FIREWALL_IF_SECSNMP[1]', $settings['WEB_UI_IF2'])
           );
   $disp_body .= '<tr><td><span title="incoming on port 10161 and outgoing on 10162">Allow Secure SNMP on</span></td><td><span title="incoming on port 10161 and outgoing on 10162">'.build_checkbox($sel).'</span></td></tr>'."\n";
 
@@ -1139,8 +1139,8 @@ function disp_interface(){
   $sel = array(
           'id' => 'IF_EXT',
           'selected' =>  $settings['IF_EXT'],
-          array( 'em0', 'em0'),
-          array( 'em1', 'em1'),
+          array( $settings['WEB_UI_IF1'], $settings['WEB_UI_IF1']),
+          array( $settings['WEB_UI_IF2'], $settings['WEB_UI_IF2']),
           array( 'tun0', 'tun0')
         );
   $disp_body .= '<tr><td>Public LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
@@ -1148,8 +1148,8 @@ function disp_interface(){
   $sel = array(
           'id' => 'IF_INT',
           'selected' =>  $settings['IF_INT'],
-          array( 'em0', 'em0'),
-          array( 'em1', 'em1'),
+          array( $settings['WEB_UI_IF1'], $settings['WEB_UI_IF1']),
+          array( $settings['WEB_UI_IF2'], $settings['WEB_UI_IF2']),
           array( 'tun0', 'tun0')
         );
   $disp_body .= '<tr><td>VM LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
@@ -1157,8 +1157,8 @@ function disp_interface(){
   $sel = array(
           'id' => 'IF_TUNNEL',
           'selected' =>  $settings['IF_TUNNEL'],
-          array( 'em0', 'em0'),
-          array( 'em1', 'em1'),
+          array( $settings['WEB_UI_IF1'], $settings['WEB_UI_IF1']),
+          array( $settings['WEB_UI_IF2'], $settings['WEB_UI_IF2']),
           array( 'tun0', 'tun0')
         );
   $disp_body .= '<tr><td>VPN interface</td><td>'.build_select($sel).'</td></tr>'."\n";

@@ -35,6 +35,8 @@ if [ "$ret" -eq 0 ]; then
 		echo 'FIREWALL_IF_SSH[0]="em0"' >> '/usr/local/pia/settings.conf'
 		echo 'FIREWALL_IF_WEB[0]="em0"' >> '/usr/local/pia/settings.conf'
 		echo 'FIREWALL_IF_WEB[1]="em1"' >> '/usr/local/pia/settings.conf'
+		echo 'WEB_UI_IF1="em0"' >> '/usr/local/pia/settings.conf'
+		echo 'WEB_UI_IF2="em1"' >> '/usr/local/pia/settings.conf'
 	else
 		#Linux
 		echo 'IF_EXT="eth0"' >> '/usr/local/pia/settings.conf'
@@ -43,6 +45,8 @@ if [ "$ret" -eq 0 ]; then
 		echo 'FIREWALL_IF_SSH[0]="eth0"' >> '/usr/local/pia/settings.conf'
 		echo 'FIREWALL_IF_WEB[0]="eth0"' >> '/usr/local/pia/settings.conf'
 		echo 'FIREWALL_IF_WEB[1]="eth1"' >> '/usr/local/pia/settings.conf'
+		echo 'WEB_UI_IF1="eth0"' >> '/usr/local/pia/settings.conf'
+		echo 'WEB_UI_IF2="eth1"' >> '/usr/local/pia/settings.conf'
 	fi
 
 
