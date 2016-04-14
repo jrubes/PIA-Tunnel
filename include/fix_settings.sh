@@ -226,10 +226,10 @@ if [ ! ${VPN_PROVIDERS[0]+abc} ]; then
 fi
 
 
-# add setup wizard value to settings - default to yes since a full reset will set it to no
+# add setup wizard value to settings
 ret=`$CMD_GREP -c "SETUP_WIZARD_COMPLETED" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
-  echo 'SETUP_WIZARD_COMPLETED="yes"' >> '/usr/local/pia/settings.conf'
+  echo 'SETUP_WIZARD_COMPLETED="no"' >> '/usr/local/pia/settings.conf'
 fi
 
 
