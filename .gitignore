@@ -10,6 +10,7 @@
 /ip_list.txt
 /include/autostart.conf
 /cache/
+/ovpn.d/
 /nbproject/
 /php/PHP_sessions/
 /htdocs/nbproject/
