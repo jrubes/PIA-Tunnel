@@ -2,13 +2,18 @@
 # script to allow the webUI to install the required software
 LANG=en_US.UTF-8
 export LANG
+source '/usr/local/pia/settings.conf'
 
 # update system to latest first since transmission may depend on a latest lib
 echo "running system update first .... this may take a bit" > /usr/local/pia/cache/cmd_runner.txt
 /usr/local/pia/system-update.sh
 
-#apt-get install -y transmission-cli transmission-daemon cifs-utils
-pkg install transmission transmission-cli transmission-daemon >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
+
+if [ "$OS_TYPE" = "Linux" ]; then
+  apt-get install -y transmission-cli transmission-daemon cifs-utils
+else
+  pkg install transmission transmission-cli transmission-daemon >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
+fi
 if [ $? -ne 0 ]; then
   echo 'fatal error while installing transmission. please install by hand' >> /usr/local/pia/cache/cmd_runner.txt
   exit 1

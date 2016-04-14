@@ -8,10 +8,10 @@ RET_FORWARD_PORT="FALSE"
 
 #get default gateway of tunnel interface using "ip"
 #get IP of tunnel Gateway
-TUN_GATEWAY=`/sbin/ip route show | /usr/bin/grep "0.0.0.0/1" | gawk -F" " '{print $3}'`
+TUN_GATEWAY=`/sbin/ip route show | $CMD_GREP "0.0.0.0/1" | gawk -F" " '{print $3}'`
 
 #get tunnel IP
-TUN_IP=`/sbin/ip addr show $IF_TUNNEL 2> /dev/null | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | cut -d/ -f1`
+TUN_IP=`/sbin/ip addr show $IF_TUNNEL 2> /dev/null | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | cut -d/ -f1`
 if [ "$TUN_IP" = "" ]; then
 	echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
 	  "- FATAL SCRIPT ERROR, tunnel interface: '$IF_TUNNEL' does not exist!"
@@ -19,10 +19,10 @@ if [ "$TUN_IP" = "" ]; then
 fi
 
 #get IP of external interface
-EXT_IP=`/sbin/ip addr show $IF_EXT | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
+EXT_IP=`/sbin/ip addr show $IF_EXT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
 
 #current default gateway
-EXT_GW=`/usr/bin/netstat -rn -4 | /usr/bin/grep "default" | /usr/local/bin/gawk -F" " '{print $2}'`
+EXT_GW=`/usr/bin/netstat -rn -4 | $CMD_GREP "default" | $CMD_GAWK -F" " '{print $2}'`
 
 
 
@@ -47,7 +47,7 @@ function get_forward_port() {
     PIA_CLIENT_ID=`cat /usr/local/pia/client_id`
     PIA_UN=`sed -n '1p' /usr/local/pia/login-pia.conf`
     PIA_PW=`sed -n '2p' /usr/local/pia/login-pia.conf`
-    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
+    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
 
     #get open port of tunnel connection
     TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
@@ -196,7 +196,7 @@ fi
 
 #allowing incoming SOCKS traffic
 if [ "$SOCKS_INT_ENABLED" = 'yes' ]; then
-    INT_IP=`/sbin/ip addr show "$IF_INT" | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/local/cut -d/ -f1`
+    INT_IP=`/sbin/ip addr show "$IF_INT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | /usr/local/cut -d/ -f1`
 
     iptables -A INPUT -i "$IF_INT" -p tcp --dport "$SOCKS_INT_PORT" -j ACCEPT
     iptables -A INPUT -i "$IF_INT" -p udp --dport "$SOCKS_INT_PORT" -j ACCEPT

@@ -8,7 +8,10 @@ LANG=en_US.UTF-8
 export LANG
 source '/usr/local/pia/settings.conf'
 source '/usr/local/pia/include/functions.sh'
-source '/usr/local/pia/include/functions-freebsd.sh'
+if [ "$OS_TYPE" = "FreeBSD" ]; then
+  source '/usr/local/pia/include/functions-freebsd.sh'
+fi
+
 FAIL_RETRY_INTERNET=3
 SLEEP_PING_RETEST=4
 
@@ -99,9 +102,6 @@ if [ -f "/usr/local/pia/ovpn/$filename.ovpn" ]; then
       exit 1
     fi
 
-
-echo "Debug script end"
-exit 0
 
 	# start the FW script once the VPN is up and running
 	LOOP_PROTECT=0
