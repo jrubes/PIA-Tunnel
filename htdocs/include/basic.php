@@ -336,7 +336,7 @@ function VPN_ovpn_to_session(){
   $providers = $_settings->get_settings_array('VPN_PROVIDERS'); //possible providers
 
   foreach( $providers as $set ){
-    if( is_dir('/usr/local/pia/ovpn/'.$set[1]) ){
+    if( is_dir('/usr/local/pia/ovpn/'.$set[1]) || is_dir('/usr/local/pia/ovpn.d/'.$set[1]) ){
 
       $ovpn_list = get_ovpn_list($set[1]);
       foreach( $ovpn_list as $ovpn ){
@@ -381,15 +381,20 @@ function get_ovpn_list($provider_dir){
  */
 function VPN_get_providers( ){
   $ret = array();
-  $dir = "/usr/local/pia/ovpn";
-  $handle = opendir($dir);
-  if($handle)
-  {
-    /* This is the correct way to loop over the directory. */
-    while (false !== ($file = readdir($handle))) {
-      if( $file !== '.' && $file !== '..' && is_dir($dir."/".$file) === true )
-      {
-        $ret[] = array( $file , $file ); //comma is correct ... I think ... some part of the code should  expect it
+  $dirs = array( '/usr/local/pia/ovpn', '/usr/local/pia/ovpn.d' );
+  
+  foreach( $dirs as $d ){
+    $handle = opendir($d);
+    if($handle)
+    {
+      /* This is the correct way to loop over the directory. */
+      while (false !== ($file = readdir($handle))) {
+        if( $file !== '.' && $file !== '..' && is_dir($d."/".$file) === true )
+        {
+            if ( array_is_value_unique( $ret, $file) === true ){
+                $ret[] = array( $file , $file ); //comma is correct ... I think ... some part of the code should  expect it
+            }
+        }
       }
     }
   }
@@ -1121,7 +1126,8 @@ function VPN_get_loginfile($VPN_provider){
   if( !array_key_exists(0, $ovpns) ){ return FALSE; }
 
   //pick first one of the ovpn files to get "auth-user-pass" setting
-  $inj = escapeshellarg('/usr/local/pia/ovpn/'.$ovpns[0].'.ovpn');
+  $filepath ( is_file('/usr/local/pia/ovpn.d/'.$ovpns[0].'.ovpn') ) ? '/usr/local/pia/ovpn.d/'.$ovpns[0].'.ovpn' : '/usr/local/pia/ovpn/'.$ovpns[0].'.ovpn';
+  $inj = escapeshellarg( $filepath );
   $cmdret = array();
   exec( $settings['CMD_GREP'].' "auth-user-pass" '.$inj.' | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' ', $cmdret);
   $login_file = $cmdret[0];
