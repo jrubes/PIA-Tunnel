@@ -360,8 +360,14 @@ function get_ovpn_list($provider_dir){
   $_files->set_ls_filter($tmp, 2);
   $_files->set_ls_filter_mode('include');
 
-  //strip .ovpn before storing in session
-  $ls = $_files->ls('/usr/local/pia/ovpn/'.$provider_dir);
+  /* load .ovpn files into session */
+  if(is_dir('/usr/local/pia/ovpn.d/'.$provider_dir)){
+    $ls = $_files->ls('/usr/local/pia/ovpn.d/'.$provider_dir);
+  }else{
+    $ls = $_files->ls('/usr/local/pia/ovpn/'.$provider_dir);
+  }
+
+
   foreach( $ls as $val ){
     $ret[] = $provider_dir.'/'.substr($val, 0, (mb_strlen($val)-5) );
   }
