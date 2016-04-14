@@ -113,10 +113,7 @@ if [ -z "${DHCPD_ENABLED2}" ]; then
   echo 'DHCPD_MASK2=""' >> '/usr/local/pia/settings.conf'
 fi
 
-#add HAS_BEEN_RESET for the setup wizard
-if [ -z "${HAS_BEEN_RESET}" ]; then
-  echo 'HAS_BEEN_RESET="no"' >> '/usr/local/pia/settings.conf'
-fi
+
 
 
 # in BASH DHCPD_STATIC_MAC="" then -z fails

@@ -14,7 +14,7 @@ require_once $inc_dir.'commands.php';
 require_once $inc_dir.'basic.php';
 
 //force setup wizard if PIA username is set to default
-if( $settings['SETUP_WIZARD_COMPLETED'] === 'no' || $settings['HAS_BEEN_RESET'] != "yes" ){
+if( $settings['SETUP_WIZARD_COMPLETED'] === 'no' ){
   $_REQUEST['page'] = 'setup-wizard';
 }
 unset($login_dta);
