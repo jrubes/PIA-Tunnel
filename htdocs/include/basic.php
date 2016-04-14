@@ -1126,7 +1126,7 @@ function VPN_get_loginfile($VPN_provider){
   if( !array_key_exists(0, $ovpns) ){ return FALSE; }
 
   //pick first one of the ovpn files to get "auth-user-pass" setting
-  $filepath ( is_file('/usr/local/pia/ovpn.d/'.$ovpns[0].'.ovpn') ) ? '/usr/local/pia/ovpn.d/'.$ovpns[0].'.ovpn' : '/usr/local/pia/ovpn/'.$ovpns[0].'.ovpn';
+  $filepath = ( is_file('/usr/local/pia/ovpn.d/'.$ovpns[0].'.ovpn') ) ? '/usr/local/pia/ovpn.d/'.$ovpns[0].'.ovpn' : '/usr/local/pia/ovpn/'.$ovpns[0].'.ovpn';
   $inj = escapeshellarg( $filepath );
   $cmdret = array();
   exec( $settings['CMD_GREP'].' "auth-user-pass" '.$inj.' | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' ', $cmdret);
