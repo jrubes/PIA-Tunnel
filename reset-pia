@@ -18,6 +18,20 @@ cd /tmp/ ; rm -rf *
 #delete all files in /var/log
 find /var/log -type f -delete
 
+# PHP session files
+if [ -d '/var/lib/php5/sessions' ]; then
+    rm -f '/var/lib/php5/sessions/'*
+fi
+
+# restart apache
+if [ "$OS_TYPE" = "Linux" ]; then
+    systemctl restart apache2
+else
+    echo "To DO, restart apache"
+    exit 99
+fi
+
+
 #delete and recreate dhcpd cache files
 service isc-dhcp-server stop
 # Debian cd /var/lib/dhcp/ ; rm -f *.leases
