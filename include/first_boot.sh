@@ -59,7 +59,7 @@ if [ "$RET_PING_HOST" != "OK" ]; then
 else
 
   echo '' > /etc/issue
-  printf "\n\n\tFetching the latest version of PIA-Tunnel ....\n\tPlease wait until this VM reboots and this message disappears.\n\n" >> /etc/issue
+  printf "\n\n\tFetching the latest version of PIA-Tunnel ....\n\tPlease wait until the VM reboots and this message disappears.\n\n" >> /etc/issue
 
   # add current commit state of PIA-Tunnel
   PIAVER=`cd /usr/local/pia ; git log -n 1 | gawk -F" " '{print $2}' | head -n 1`
