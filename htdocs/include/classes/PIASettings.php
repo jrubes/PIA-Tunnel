@@ -287,6 +287,7 @@ class PIASettings {
 function remove_array($array_name){
   $removed = 0;
   $ret =  array();
+  $set = $this->get_settings();
 
   //get line numbers of current settings
   if( strpos($array_name, '[') === false ){
@@ -295,11 +296,11 @@ function remove_array($array_name){
   }else{
     $config_value = substr($array_name, 0, strpos($array_name, '[') ); //this is the value of $key without [n]. this is used for the array name when writing it back
   }
-  exec('/usr/bin/grep -n  "'.$config_value.'" '.$this->_settings_file.' | /usr/bin/cut -d: -f1', $ret); // $ret[] will contain line number with current settings
+  exec( $set['CMD_GREP'].' -n  "'.$config_value.'" '.$this->_settings_file.' | '.$set['CMD_CUT'].' -d: -f1', $ret); // $ret[] will contain line number with current settings
 
   //loop over returned values and remove the lines
   for( $x = count($ret)-1 ; $x >= 0 ; --$x ){ //go backwards or line numbers need to be adjusted
-    exec('sed "'.$ret[$x].'d" '.$this->_settings_file.' > '.$this->_settings_file.'.back');
+    exec( $set['CMD_SED'].'  "'.$ret[$x].'d" '.$this->_settings_file.' > '.$this->_settings_file.'.back');
 //    exec('sed -e :a -e \'/^\n*$/{$d;N;};/\n$/ba\' '.$this->_settings_file.'.back');
     exec('mv '.$this->_settings_file.'.back '.$this->_settings_file.'');
     ++$removed;

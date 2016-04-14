@@ -462,6 +462,7 @@ function group_enabled_providers(){
   $providers = array(); //this is returned
 
   $enabled = $_settings->get_settings_array('VPN_PROVIDERS');
+  $set = $_settings->get_settings();
 
   foreach( $enabled as $ep ){
     $cmdret = array();
@@ -469,8 +470,9 @@ function group_enabled_providers(){
     if( !array_key_exists(0, $ovpns) ){ return FALSE; }
 
     //pick first one of the ovpn files to get "auth-user-pass" setting
-    $inj = escapeshellarg('/usr/local/pia/ovpn/'.$ovpns[0].'.ovpn');
-    exec('/usr/bin/grep "auth-user-pass" '.$inj.' | /usr/local/bin/gawk -F" " \'{print $2}\' ', $cmdret);
+    $filepath = ( is_file('/usr/local/pia/ovpn.d/'.$ovpns[0].'.ovpn') ) ? '/usr/local/pia/ovpn.d/'.$ovpns[0].'.ovpn' : '/usr/local/pia/ovpn/'.$ovpns[0].'.ovpn';
+    $inj = escapeshellarg( $filepath );
+    exec( $set['CMD_GREP'].' "auth-user-pass" '.$inj.' | '.$set['CMD_GAWK'].' -F" " \'{print $2}\' ', $cmdret);
     $providers[$cmdret[0]][] = $ep[1];
   }
 
