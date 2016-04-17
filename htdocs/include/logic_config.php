@@ -754,16 +754,16 @@ function disp_transmission_box(){
 
   $ret = array();
   if( $settings['OS_TYPE'] === 'Linux' ){
-    exec('/sbin/ip addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
+    exec( $settings['CMD_IP'].' addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
   }else{
-    exec('/sbin/ifconfig '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
+    exec( $settings['CMD_IP'].' '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
   }
   $ret_arr['lan_ip'] = $ret[0];
   unset($ret);
 
   $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>transmission client</h2>'."\n";
-  $disp_body .= '<a href="http://'.$ret_arr['lan_ip'].':9091/" target="_blank">transmission webUI</a>'."\n";
+  $disp_body .= '<a href="http://'.$ret_arr['lan_ip'].':9091/" target="_blank">transmission webUI (connect VPN first)</a><br>'."\n";
   $disp_body .= 'don\'t change these while the transmission client is running!';
   $disp_body .= "<table>\n";
   $disabled = ($_pia->service_count('transmission-daemon') === true) ? 'disabled' : ''; //can not be changed if service is running

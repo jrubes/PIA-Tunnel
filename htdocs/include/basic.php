@@ -778,16 +778,18 @@ function VPN_sessionlog_status(){
  * returns IP of VPN. Checks session.log to get external IP for
  */
 function VPN_get_IP(){
+  global $settings;
   $cmdret = array();
-  exec(''.$settings['CMD_GREP'].' "link remote: \[AF_INET]" /usr/local/pia/cache/session.log | '.$settings['CMD_GAWK'].' -F"]" \'{print $2}\' | '.$settings['CMD_GAWK'].' -F":" \'{print $1}\'', $cmdret);
+
+  exec($settings['CMD_GREP'].' "link remote: \[AF_INET]" /usr/local/pia/cache/session.log | '.$settings['CMD_GAWK'].' -F"]" \'{print $2}\' | '.$settings['CMD_GAWK'].' -F":" \'{print $1}\'', $cmdret);
   if(array_key_exists(0, $cmdret) === true && $cmdret[0] != '' ){
     return $cmdret[0];
   }
 
   if( $settings['OS_TYPE'] === 'Linux' ){
-    exec('/sbin/ip addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
+    exec($settings['CMD_IP'].' addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $cmdret);
   }else{
-    exec('/sbin/ifconfig '.$settings['IF_TUN'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $cmdret);
+    exec($settings['CMD_IP'].' '.$settings['IF_TUN'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $cmdret);
   }
   if(array_key_exists(0, $cmdret) === true && $cmdret[0] != '' ){
     return $cmdret[0];
