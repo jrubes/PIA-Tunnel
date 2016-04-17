@@ -520,7 +520,7 @@ function VM_get_status( $output = 'html'){
   $ret = array();
   if( $settings['OS_TYPE'] === 'Linux' ){
     exec('/sbin/ip addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
-  }else
+  }else{
     exec('/sbin/ifconfig '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
   }
   $ret_arr['public_ip'] = $ret[0];
