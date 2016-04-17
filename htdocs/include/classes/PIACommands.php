@@ -36,10 +36,12 @@ class PIACommands {
    * </ul>
    */
   function status_pia_daemon(){
+    global $_settings;
+    $set = get_settings();
 
     //check the return from screen -ls
     $ex = array();
-    exec('ps aux | /usr/bin/grep -c "pia-daemon"', $ex);
+    exec('ps aux | '.$set['CMD_GREP'].' -c "pia-daemon"', $ex);
     if( array_key_exists('0', $ex) === true && (int)$ex[0] > 2 ){ // 2 for command and grep itself
       return 'running';
     }else{
@@ -52,11 +54,13 @@ class PIACommands {
    * @return boolean true if service is running, false if not
    */
   function service_count($service_name){
+    global $_settings;
+    $set = get_settings();
 
     //check the return from screen -ls
     $ex = array();
     $esc = escapeshellarg($service_name);
-    exec('ps aux | /usr/bin/grep -c '.$esc, $ex);
+    exec('ps aux | '.$set['CMD_GREP'].' -c '.$esc, $ex);
     if( array_key_exists('0', $ex) === true && (int)$ex[0] > 2 ){ // 2 for command and grep itself
       return true;
     }else{
@@ -230,7 +234,7 @@ class PIACommands {
     $ret = array();
     $sret = '';
     $count = escapeshellarg($count);
-    exec('cd /usr/local/pia ; /usr/local/bin/git --no-pager log -n '.$count.' --pretty="format:%ci%n>> %s <<%n" origin/'.$settings['GIT_BRANCH'], $ret);
+    exec('cd /usr/local/pia ; '.$settings['CMD_GIT'].' --no-pager log -n '.$count.' --pretty="format:%ci%n>> %s <<%n" origin/'.$settings['GIT_BRANCH'], $ret);
 
     $cnt = count($ret);
     if( $cnt > 0 ){

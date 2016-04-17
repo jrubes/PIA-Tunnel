@@ -181,12 +181,12 @@ function disp_client_tools(){
   $if_VLAN = $settings['IF_INT'];
 
   $ret = array();
-  exec('/sbin/ifconfig '.$if_LAN.' | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
+  exec('/sbin/ifconfig '.$if_LAN.' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
   $ret_arr['lan_ip'] = $ret[0];
   unset($ret);
 
   $ret = array();
-  exec('/sbin/ifconfig '.$if_VLAN.' | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
+  exec('/sbin/ifconfig '.$if_VLAN.' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
   $ret_arr['vlan_ip'] = (array_key_exists(0, $ret)) ? $ret[0] : '';
   unset($ret);
 
@@ -214,12 +214,12 @@ function disp_docu(){
   $if_VLAN = $settings['IF_INT'];
 
   $ret = array();
-  exec('/sbin/ifconfig '.$if_LAN.' | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
+  exec('/sbin/ifconfig '.$if_LAN.' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
   $ret_arr['lan_ip'] = $ret[0];
   unset($ret);
 
   $ret = array();
-  exec('/sbin/ifconfig '.$if_VLAN.' | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
+  exec('/sbin/ifconfig '.$if_VLAN.' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
   $ret_arr['vlan_ip'] = (array_key_exists(0, $ret)) ? $ret[0] : '';
   unset($ret);
 

@@ -11,6 +11,7 @@ CMD_CUT=$(whereis -b cut | gawk -F" " '{print $2}')
 CMD_SED=$(whereis -b sed | gawk -F" " '{print $2}')
 CMD_SUDO=$(whereis -b sudo | gawk -F" " '{print $2}')
 CMD_NETSTAT=$(whereis -b netstat | gawk -F" " '{print $2}')
+CMD_TAIL=$(whereis -b tail | gawk -F" " '{print $2}')
 
 
 
@@ -29,6 +30,7 @@ function write_commands_settings() {
 	echo "CMD_SED='$CMD_SED'" >> /usr/local/pia/settings.conf
 	echo "CMD_SUDO='$CMD_SUDO'" >> /usr/local/pia/settings.conf
     echo "CMD_NETSTAT='$CMD_NETSTAT'" >> /usr/local/pia/settings.conf
+    echo "CMD_TAIL='$CMD_TAIL'" >> /usr/local/pia/settings.conf
 
 }
 

@@ -10,6 +10,9 @@
  */
 function get_port(){
    global $_files;
+   global $_settings;
+   $set = $_settings->get_settings();
+
   //get username and password from file or SESSION
   if( array_key_exists('login-pia.conf', $_SESSION) !== true ){
    if( load_login() === false ){
@@ -37,7 +40,7 @@ function get_port(){
   $PIA_PW = urlencode($_SESSION['login-pia.conf']['password']);
   $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
   $ret = array();
-  exec('/sbin/ip addr show tun0 2>/dev/null | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
+  exec('/sbin/ip addr show tun0 2>/dev/null | '.$set['CMD_GREP'].' -w "inet" | '.$set['CMD_GAWK'].' -F" " \'{print $2}\' | '.$set['CMD_CUT'].' -d/ -f1', $ret);
   if( array_key_exists( '0', $ret) !== true ){
     //VPN  is down, can not continue to check for open ports
     return false;

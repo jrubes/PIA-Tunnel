@@ -35,12 +35,12 @@ fi
 
 
 #get IP of external interface
-#Debian EXT_IP=`/sbin/ip addr show "$IF_EXT" | /usr/bin/grep -w "inet" |  /usr/local/bin/gawk -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
-EXT_IP=`/sbin/ifconfig "$IF_EXT" 2>/dev/null  | /usr/bin/grep -w "inet" |  /usr/local/bin/gawk -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
-#Debian TUN_IP=`/sbin/ip addr show "$IF_TUNNEL" | /usr/bin/grep -w "inet" |  /usr/local/bin/gawk -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
-TUN_IP=`/sbin/ifconfig "$IF_TUNNEL" 2>/dev/null | /usr/bin/grep -w "inet" |  /usr/local/bin/gawk -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
-#Debian INT_IP=`/sbin/ip addr show "$IF_INT" | /usr/bin/grep -w "inet" |  /usr/local/bin/gawk -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
-INT_IP=`/sbin/ifconfig "$IF_INT" 2>/dev/null | /usr/bin/grep -w "inet" |  /usr/local/bin/gawk -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
+#Debian EXT_IP=`/sbin/ip addr show "$IF_EXT" | $CMD_GREP -w "inet" |  $CMD_GAWK -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
+EXT_IP=`/sbin/ifconfig "$IF_EXT" 2>/dev/null  | $CMD_GREP -w "inet" |  $CMD_GAWK -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
+#Debian TUN_IP=`/sbin/ip addr show "$IF_TUNNEL" | $CMD_GREP -w "inet" |  $CMD_GAWK -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
+TUN_IP=`/sbin/ifconfig "$IF_TUNNEL" 2>/dev/null | $CMD_GREP -w "inet" |  $CMD_GAWK -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
+#Debian INT_IP=`/sbin/ip addr show "$IF_INT" | $CMD_GREP -w "inet" |  $CMD_GAWK -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
+INT_IP=`/sbin/ifconfig "$IF_INT" 2>/dev/null | $CMD_GREP -w "inet" |  $CMD_GAWK -F" " '{print $2}' |  /usr/bin/cut -d/ -f1`
 
 if [ "$TUN_IP" = "" ]; then
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\

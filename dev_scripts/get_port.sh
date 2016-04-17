@@ -20,20 +20,20 @@ function get_forward_port() {
       head -n 100 /dev/urandom | md5sum | tr -d " -" > "/usr/local/pia/client_id"
     fi
     PIA_CLIENT_ID=`cat /usr/local/pia/client_id`
-    PIA_UN=`sed -n '1p' /usr/local/pia/login-pia.conf`
-    PIA_PW=`sed -n '2p' /usr/local/pia/login-pia.conf`
+    PIA_UN=`$CMD_SED -n '1p' /usr/local/pia/login-pia.conf`
+    PIA_PW=`$CMD_SED -n '2p' /usr/local/pia/login-pia.conf`
 
-    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | /usr/bin/grep -w "inet" | /usr/local/bin/gawk -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
+    TUN_IP=`/sbin/ip addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
 
     #get open port of tunnel connection
-    TUN_PORT=`/usr/local/bin/curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
+    TUN_PORT=`$CMD_CURL -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
 
 
     #print output to aid in debugging
     echo -e "[info] cID: $PIA_CLIENT_ID UN: $PIA_UN PW: $PIA_PW"
     echo -e "[info] asking PIA for IP: $TUN_IP - returned $TUN_PORT"
     echo -e "[info] rerunning curl with error reporting enabled ...."
-    /usr/local/bin/curl -ksS -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment
+    $CMD_CURL -ksS -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment
     echo
 
 

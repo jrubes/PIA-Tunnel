@@ -4,8 +4,12 @@ LANG=en_US.UTF-8
 export LANG
 
 # see if a process is running
-# Debian pcnt=`ps asxww | /usr/bin/grep -c "socks -i"`
-pcnt=`ps axww | /usr/bin/grep -c "socks -i"`
+if [ "$OS_TYPE" = "Linux" ]; then
+  pcnt=`ps asxww | $CMD_GREP -c "socks -i"`
+else
+  pcnt=`ps axww | $CMD_GREP -c "socks -i"`
+fi
+
 if [ "$pcnt" -gt "1" ]; then
   # daemon should be running
   echo 'running'
