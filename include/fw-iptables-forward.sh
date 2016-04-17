@@ -47,7 +47,7 @@ function get_forward_port() {
     PIA_CLIENT_ID=`cat /usr/local/pia/client_id`
     PIA_UN=`$CMD_SED -n '1p' /usr/local/pia/login-pia.conf`
     PIA_PW=`$CMD_SED -n '2p' /usr/local/pia/login-pia.conf`
-    TUN_IP=`$cmd_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+    TUN_IP=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
 
     #get open port of tunnel connection
     TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
