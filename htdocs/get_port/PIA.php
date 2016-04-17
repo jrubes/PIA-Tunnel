@@ -41,9 +41,9 @@ function get_port(){
   $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
   $ret = array();
   if( $set['OS_TYPE'] === 'Linux'){
-    exec('/sbin/ip addr show '.$set['IF_EXT'].' | '.$set['CMD_GREP'].' -w "inet" | '.$set['CMD_GAWK'].' -F" " \'{print $2}\' | '.$set['CMD_CUT'].' -d/ -f1', $ret);
+    exec( $set['CMD_IP'].' addr show '.$set['IF_TUNNEL'].' | '.$set['CMD_GREP'].' -w "inet" | '.$set['CMD_GAWK'].' -F" " \'{print $2}\' | '.$set['CMD_CUT'].' -d/ -f1', $ret);
   }else{
-    exec('/sbin/ip addr show '.$set['IF_TUNNEL'].' 2>/dev/null | '.$set['CMD_GREP'].' -w "inet" | '.$set['CMD_GAWK'].' -F" " \'{print $2}\' | '.$set['CMD_CUT'].' -d/ -f1', $ret);
+    exec( $set['CMD_IP'].' '.$set['IF_TUNNEL'].' 2>/dev/null | '.$set['CMD_GREP'].' -w "inet" | '.$set['CMD_GAWK'].' -F" " \'{print $2}\' | '.$set['CMD_CUT'].' -d/ -f1', $ret);
   }
   if( array_key_exists( '0', $ret) !== true ){
     //VPN  is down, can not continue to check for open ports
