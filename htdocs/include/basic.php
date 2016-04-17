@@ -1134,7 +1134,7 @@ function build_checkbox( &$content, $double=false ){
  */
 function VPN_get_loginfile($VPN_provider){
   global $settings;
-  if( !preg_match("/^[a-zA-Z]{3,10}+\z/", $VPN_provider ) ){ throw new Exception('FATAL ERROR: invalid vpn_provider by user.'); }
+  if( !preg_match("/^[a-zA-Z]{3,20}+\z/", $VPN_provider ) ){ throw new Exception('FATAL ERROR: invalid vpn_provider by user.'); }
 
   $ovpns = get_ovpn_list($VPN_provider);
   if( !array_key_exists(0, $ovpns) ){ return FALSE; }
