@@ -11,7 +11,11 @@ if [ "$1" = "start" ]; then
 			"- turning port forwarding ON"
 	fi
 
-	/usr/local/pia/include/fw-forward.sh
+    if [ "$OS_TYPE" = "Linux" ]; then
+      /usr/local/pia/include/fw-iptables-forward.sh
+    else
+      /usr/local/pia/include/fw-pf-forward.sh
+    fi
 	exit
 fi
 
@@ -21,7 +25,12 @@ if [ "$1" = "stop" ] || [ "$2" = "stop" ]; then
 		echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 			"- turning port forwarding OFF"
 	fi
-	/usr/local/pia/include/fw-no-forward.sh
+
+    if [ "$OS_TYPE" = "Linux" ]; then
+      /usr/local/pia/include/fw-iptables-no-forward.sh
+    else
+      /usr/local/pia/include/fw-pf-no-forward.sh
+    fi
 	exit
 fi
 
@@ -29,11 +38,11 @@ fi
 if [ "$1" = "fix" ]; then
 	printf "\n" >> /usr/local/pia/cache/network.log
 	echo $(date +"%Y-%m-%d %H:%M:%S")\
-		"script pia-forward fix needs to run ... network status right now" >> /usr/local/pia/cache/network.log
-		ifconfig tun0 &>> /usr/local/pia/cache/network.log
-		ifconfig em0 &>> /usr/local/pia/cache/network.log
-		ifconfig em1 &>> /usr/local/pia/cache/network.log
-		netstat -rn &>> /usr/local/pia/cache/network.log
+    "script pia-forward fix needs to run ... network status right now" >> /usr/local/pia/cache/network.log
+    ifconfig "$IF_TUNNEL" &>> /usr/local/pia/cache/network.log
+    ifconfig "$IF_EXT" &>> /usr/local/pia/cache/network.log
+    ifconfig "$IF_INT" &>> /usr/local/pia/cache/network.log
+    netstat -rn &>> /usr/local/pia/cache/network.log
 
 
 	if [ ! "$1" = "quite" ] && [ ! "$2" = "quite" ]; then
@@ -45,11 +54,11 @@ if [ "$1" = "fix" ]; then
 		/usr/local/pia/include/fw-no-forward.sh
 		# restart networking to get default routes through em0 working again
 		# service network restart #CentOS
-		ifdown em0 && ifup em0 #Debian
+		ifdown "$IF_EXT" && ifup "$IF_EXT" #Debian
 	else
 		killall openvpn 2>/dev/null
 		/usr/local/pia/include/fw-no-forward.sh
-		ifdown em0 2>/dev/null	 && ifup em0 2>/dev/null
+		ifdown "$IF_EXT" 2>/dev/null && ifup "$IF_EXT" 2>/dev/null
 	fi
 
 	echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Done! Please try again."
@@ -57,9 +66,9 @@ if [ "$1" = "fix" ]; then
 	printf "\n" >> /usr/local/pia/cache/network.log
 	echo $(date +"%Y-%m-%d %H:%M:%S")\
 	        "network status after run" >> /usr/local/pia/cache/network.log
-	ifconfig tun0 &>> /usr/local/pia/cache/network.log
-	ifconfig em0 &>> /usr/local/pia/cache/network.log
-	ifconfig em1 &>> /usr/local/pia/cache/network.log
+	ifconfig "$IF_TUNNEL" &>> /usr/local/pia/cache/network.log
+	ifconfig "$IF_EXT" &>> /usr/local/pia/cache/network.log
+	ifconfig "$IF_INT" &>> /usr/local/pia/cache/network.log
 	netstat -rn &>> /usr/local/pia/cache/network.log
 	printf "\nforward fix done"
 
