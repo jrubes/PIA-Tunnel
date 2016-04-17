@@ -1329,10 +1329,10 @@ function disp_network_default(){
   $disp_body .= '<form action="/?page=config&amp;cmd=store_setting&amp;cid=cnet" method="post">'."\n";
 
   $disp_body .= disp_general_box();
-  $disp_body .= disp_pia_daemon_box_new();
-  $disp_body .= disp_transmission_box();
-  $disp_body .= '<div class="clear"></div>';
+  //$disp_body .= disp_pia_daemon_box_new();
   $disp_body .= disp_interface();
+  $disp_body .= '<div class="clear"></div>';
+  $disp_body .= disp_transmission_box();
   $disp_body .= disp_socks_box_new();
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= '<p class="hidden" id="advanced_button"><a id="toggle_advanced_settings_toggle" class="button" href="" onclick="toggle_hide(\'toggle_advanced_settings\', \'toggle_advanced_settings_toggle\', \'Show Advanced Settings,Hide Advanced Settings\'); return false;">Show Advanced Settings</a></p>';

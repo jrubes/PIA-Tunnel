@@ -337,6 +337,9 @@ class PIACommands {
     $_SESSION['conn_auth_perma_error'] = false;
     $_SESSION['conn_auth_fail_cnt'] = 0;
     unset($_SESSION['client_id']);
+    if( isset($_SESSION['ovpn_providers']) ){ unset($_SESSION['ovpn_providers']); }
+    if( isset($_SESSION['ovpn_assembled']) ){ unset($_SESSION['ovpn_assembled']); }
+    if( isset($_SESSION['settings.conf']) ){ unset($_SESSION['settings.conf']); }
   }
   /**
  * method to update the root password with a custom or random password

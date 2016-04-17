@@ -15,30 +15,42 @@ case "$1" in
         PIAVER=`cd /usr/local/pia ; $CMD_GIT log -n 1 | $CMD_GAWK -F" " '{print $2}' | head -n 1`
         printf "\n\nPIA-Tunnel version: $PIAVER\n\n" >> /etc/issue
 
-        $CMD_IP "$IF_EXT" 2> /dev/null 1> /dev/null
-        if [ $? -eq 0 ]; then
-            if [ "$OS_TYPE" = "Linux" ]; then
+        if [ "$OS_TYPE" = "Linux" ]; then
+            $CMD_IP addr show "$IF_EXT" 2> /dev/null 1> /dev/null
+            if [ $? -eq 0 ]; then
               eth0IP=`$CMD_IP addr show "$IF_EXT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+              echo "$IF_EXT IP: $eth0IP" >> /etc/issue
             else
+              echo "ERROR: interface(EXT:$IF_EXT) not found" >> /etc/issue
+            fi
+
+        else
+            $CMD_IP "$IF_EXT" 2> /dev/null 1> /dev/null
+            if [ $? -eq 0 ]; then
               eth0IP=`$CMD_IP "$IF_EXT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
-            fi
-            echo "$IF_EXT IP: $eth0IP" >> /etc/issue
-        else
-            echo "$SIF_EXT IP: ERROR: interface not found" >> /etc/issue
-        fi
-
-
-        $CMD_IP "$IF_INT" 2> /dev/null 1> /dev/null
-        if [ $? -eq 0 ]; then
-            if [ "$OS_TYPE" = "Linux" ]; then
-              eth1IP=`$CMD_IP addr show "$IF_INT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+              echo "$IF_EXT IP: $eth0IP" >> /etc/issue
             else
-              eth1IP=`$CMD_IP "$IF_INT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+              echo "ERROR: interface(EXT:$IF_EXT) not found" >> /etc/issue
             fi
-            echo "$IF_INT IP: $eth1IP" >> /etc/issue
-        else
-            echo "$IF_INT IP: interface not found" >> /etc/issue
         fi
+
+
+
+        if [ "$OS_TYPE" = "Linux" ]; then
+            $CMD_IP addr show "$IF_INT" 2> /dev/null 1> /dev/null
+            if [ $? -eq 0 ]; then
+              eth1IP=`$CMD_IP addr show "$IF_INT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+              echo "$IF_INT IP: $eth1IP" >> /etc/issue
+            fi
+
+        else
+            $CMD_IP "$IF_INT" 2> /dev/null 1> /dev/null
+            if [ $? -eq 0 ]; then
+              eth1IP=`$CMD_IP "$IF_INT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+              echo "$IF_INT IP: $eth1IP" >> /etc/issue
+            fi
+        fi
+
 
 
 		printf "\n\n" >> /etc/issue

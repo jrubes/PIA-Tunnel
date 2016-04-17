@@ -240,23 +240,23 @@ function disp_default(){
   $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
   $disp_body .= " </form>\n";
 
-  $pass = array('handle user request - start or stop pia-daemon');
-  $tokens = $_token->pgen($pass);
-  $disp_body .= '<form class="inline" action="/" method="post">';
-  $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
-  $disp_body .= '<table class="control_box">';
-  $disp_body .= '<tr>';
-  $disp_body .= '<td id="ele_daemon_lbl">PIA VPN Daemon</td>';
-  $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" name="daemon_start" value="Start pia-daemon">';
-  $disp_body .= '</td>';
-  $disp_body .= '<td>';
-  $disp_body .= ' <input type="submit" name="daemon_stop" value="Stop pia-daemon">';
-  $disp_body .= '</td>';
-  $disp_body .= '</tr>';
-  $disp_body .= '</table>';
-  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
-  $disp_body .= " </form>\n";
+//  $pass = array('handle user request - start or stop pia-daemon');
+//  $tokens = $_token->pgen($pass);
+//  $disp_body .= '<form class="inline" action="/" method="post">';
+//  $disp_body .= '<input type="hidden" name="cmd" value="network_control">';
+//  $disp_body .= '<table class="control_box">';
+//  $disp_body .= '<tr>';
+//  $disp_body .= '<td id="ele_daemon_lbl">PIA VPN Daemon</td>';
+//  $disp_body .= '<td>';
+//  $disp_body .= ' <input type="submit" name="daemon_start" value="Start pia-daemon">';
+//  $disp_body .= '</td>';
+//  $disp_body .= '<td>';
+//  $disp_body .= ' <input type="submit" name="daemon_stop" value="Stop pia-daemon">';
+//  $disp_body .= '</td>';
+//  $disp_body .= '</tr>';
+//  $disp_body .= '</table>';
+//  $disp_body .= '<input type="hidden" name="token" value="'.$tokens[0].'">';
+//  $disp_body .= " </form>\n";
 
   if( $settings['SOCKS_INT_ENABLED'] == 'yes' || $settings['SOCKS_EXT_ENABLED'] == 'yes' )
   {

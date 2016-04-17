@@ -196,21 +196,26 @@ function VPN_get_connections( $name, $build_options=array()){
     return false;
   }
 
-  //loop over session to generate options
-  foreach( $_SESSION['ovpn'] as $ovpn ){
+  if( !isset($_SESSION['ovpn_assembled']) )
+  {
+    //loop over session to generate options
+    foreach( $_SESSION['ovpn'] as $ovpn ){
 
-    if( provider_ready2use($ovpn) === true ){
-      $html = htmlentities($ovpn);
-      //$ret .= "<option value=\"$html\">$html</option>\n";
-      if( supports_forwarding($html) === true ){
-        $fw_ret[] = array( $html, '*'.$html);
-      }else{
-        $ret[] = array( $html, $html);
+      if( provider_ready2use($ovpn) === true ){
+        $html = htmlentities($ovpn);
+        //$ret .= "<option value=\"$html\">$html</option>\n";
+        if( supports_forwarding($html) === true ){
+          $fw_ret[] = array( $html, '*'.$html);
+        }else{
+          $ret[] = array( $html, $html);
+        }
       }
     }
+    if( count($ret) > 0 ){ $_SESSION['ovpn_assembled'] = $ret; }
+  }else{
+    $ret = $_SESSION['ovpn_assembled'];
   }
-
-  if( $ret == '' ){ return false; }
+  if( $ret == '' ){ unset($_SESSION['ovpn_assembled']);return false; }
 
   sort($ret);sort($fw_ret);
   if( count($ret) === 0 && count($fw_ret) === 0 ){ $ret[] = array( 'invalid login data', 'invalid login data'); }
@@ -383,21 +388,28 @@ function VPN_get_providers( ){
   $ret = array();
   $dirs = array( '/usr/local/pia/ovpn', '/usr/local/pia/ovpn.d' );
 
-  foreach( $dirs as $d ){
-    $handle = opendir($d);
-    if($handle)
-    {
-      /* This is the correct way to loop over the directory. */
-      while (false !== ($file = readdir($handle))) {
-        if( $file !== '.' && $file !== '..' && is_dir($d."/".$file) === true )
-        {
-            if ( array_is_value_unique( $ret, $file) === true ){
-                $ret[] = array( $file , $file ); //comma is correct ... I think ... some part of the code should  expect it
-            }
+  if( !isset($_SESSION['ovpn_providers']) )
+  {
+    foreach( $dirs as $d ){
+      $handle = opendir($d);
+      if($handle)
+      {
+        /* This is the correct way to loop over the directory. */
+        while (false !== ($file = readdir($handle))) {
+          if( $file !== '.' && $file !== '..' && is_dir($d."/".$file) === true )
+          {
+              if ( array_is_value_unique( $ret, $file) === true ){
+                  $ret[] = array( $file , $file ); //comma is correct ... I think ... some part of the code should  expect it
+              }
+          }
         }
       }
     }
+    if( count($ret) > 1 ){ $_SESSION['ovpn_providers'] = $ret; }
+  }else{
+    $ret = $_SESSION['ovpn_providers'];
   }
+
 
   return $ret;
 }
@@ -580,7 +592,7 @@ function VM_get_status( $output = 'html'){
     $table .= "<tr><td style=\"width:7em\">System</td><td>system load <span id=\"system_load\">{$sysload['load']}</span></td></tr>\n";
     //$table .= "<tr><td></td><td>Mem <span id=\"system_mem\">{$sysload['mem']}</span> SWAP <span id=\"system_swap\">{$sysload['swap']}</span></td></tr>\n";
     $table .= '<tr><td>Software</td><td id="software_update">'.$up_txt.'</td></tr>';
-    $table .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">{$ret_arr['daemon_status']}</td></tr>\n";
+    //$table .= "<tr><td>PIA Daemon</td><td id=\"daemon_status\">{$ret_arr['daemon_status']}</td></tr>\n";
     $table .= "<tr><td>VPN Status</td><td id=\"vpn_status\">{$ret_arr['vpn_status']}</td></tr>\n";
     $table .= "<tr><td>&nbsp;</td><td></td></tr>\n";
     $table .= "<tr><td id=\"vpn_lbl\" style=\"vertical-align: top;\">{$ret_arr['vpn_lbl']}</td><td><span id=\"vpn_public_lbl1\">{$ret_arr['vpn_public_lbl1']}</span> <span id=\"vpn_public_ip\">{$ret_arr['vpn_public_ip']}</span> <span id=\"vpn_public_lbl2\">{$ret_arr['vpn_public_lbl2']}</span> <span id=\"vpn_port\">{$ret_arr['vpn_port']}</span></td></tr>\n";
