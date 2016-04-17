@@ -40,8 +40,16 @@ function check_default_username(){
 
     if [ "$FCOUNT" -lt 1 ]; then
         # FATAL ERROR: make sure to always print IP info
-        INT_IP=`$CMD_IP addr show $IF_INT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
-        EXT_IP=`$CMD_IP addr show $IF_EXT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+        if [ "$OS_TYPE" = "Linux" ]; then
+          INT_IP=`$CMD_IP addr show $IF_INT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+        else
+          INT_IP=`$CMD_IP $IF_INT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+        fi
+        if [ "$OS_TYPE" = "Linux" ]; then
+          EXT_IP=`$CMD_IP addr show $IF_EXT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+        else
+          EXT_IP=`$CMD_IP $IF_EXT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+        fi
         echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: $EXT_IP"
         echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: $INT_IP"
 
@@ -433,7 +441,11 @@ function get_forward_port() {
     PIA_CLIENT_ID=`cat /usr/local/pia/client_id`
     PIA_UN=`$CMD_SED -n '1p' /usr/local/pia/login-pia.conf`
     PIA_PW=`$CMD_SED -n '2p' /usr/local/pia/login-pia.conf`
-    TUN_IP=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | cut -d/ -f1`
+    if [ "$OS_TYPE" = "Linux" ]; then
+      TUN_IP=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | cut -d/ -f1`
+    else
+      TUN_IP=`$CMD_IP $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | cut -d/ -f1`
+    fi
 
     #get open port of tunnel connection
     TUN_PORT=`curl -ks -d "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP" https://www.privateinternetaccess.com/vpninfo/port_forward_assignment | cut -d: -f2 | cut -d} -f1`
@@ -585,7 +597,11 @@ function maintain_status_cache() {
 
   interface_exists "$IF_TUNNEL"
   if [ "$RET_INTERFACE_EXISTS" = "yes" ]; then
-    TUN_IP=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+    if [ "$OS_TYPE" = "Linux" ]; then
+      TUN_IP=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+    else
+      TUN_IP=`$CMD_IP $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+    fi
   else
     TUN_IP=""
   fi

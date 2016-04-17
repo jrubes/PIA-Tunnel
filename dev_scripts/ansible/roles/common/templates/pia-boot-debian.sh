@@ -15,7 +15,7 @@ case "$1" in
 
         /sbin/ifconfig eth0 2> /dev/null 1> /dev/null
         if [ $? -eq 0 ]; then
-            eth0IP=`/sbin/ifconfig eth0 | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+            eth0IP=`/sbin/ifconfig eth0 | grep -w "inet" | gawk -F" " '{print $2}' | cut -d: -f2`
             echo "eth0 IP: $eth0IP" >> /etc/issue
         else
             echo "emo IP: ERROR: interface not found" >> /etc/issue
@@ -24,7 +24,7 @@ case "$1" in
 
         /sbin/ifconfig eth1 2> /dev/null 1> /dev/null
         if [ $? -eq 0 ]; then
-            eth1IP=`/sbin/ifconfig eth1 | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+            eth1IP=`/sbin/ifconfig eth1 | grep -w "inet" | gawk -F" " '{print $2}' | cut -d: -f2`
             echo "eth1 IP: $eth1IP" >> /etc/issue
         else
             echo "eth1 IP: interface not found" >> /etc/issue

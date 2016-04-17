@@ -46,12 +46,17 @@ if [ "$RET_PING_HOST" = "OK" ]; then
 else
   echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - VPN is DOWN!"
   if [ ! -f '/usr/local/pia/cache/status.txt' ]; then
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`"$CMD_IP" addr show $IF_EXT | "$CMD_GREP" -w "inet" | "$CMD_GAWK" -F" " '{print $2}' | cut -d/ -f1`
-    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`"$CMD_IP" addr show $IF_INT | "$CMD_GREP" -w "inet" | "$CMD_GAWK" -F" " '{print $2}' | cut -d/ -f1`
+    if [ "$OS_TYPE" = "Linux" ]; then
+      echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`"$CMD_IP" addr show $IF_EXT | "$CMD_GREP" -w "inet" | "$CMD_GAWK" -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+      echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`"$CMD_IP" addr show $IF_INT | "$CMD_GREP" -w "inet" | "$CMD_GAWK" -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+    else
+      echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`"$CMD_IP" $IF_EXT | "$CMD_GREP" -w "inet" | "$CMD_GAWK" -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+      echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: "`"$CMD_IP" $IF_INT | "$CMD_GREP" -w "inet" | "$CMD_GAWK" -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+    fi
   else
     echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Public LAN IP: "`cat "/usr/local/pia/cache/status.txt" | "$CMD_GREP" "INTERNETIP" | "$CMD_GAWK" -F":" '{print $2}'`
 
-    PLANIP=`cat "/usr/local/pia/cache/status.txt" | "$CMD_GREP" 	"INTIP" | "$CMD_GAWK" -F":" '{print $2}'`
+    PLANIP=`cat "/usr/local/pia/cache/status.txt" | "$CMD_GREP" "INTIP" | "$CMD_GAWK" -F":" '{print $2}'`
     if [ "$PLANIP" != "" ] ; then
       echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")" - Private LAN IP: $PLANIP"
     fi

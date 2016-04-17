@@ -518,8 +518,11 @@ function VM_get_status( $output = 'html'){
 
   //had some trouble reading status.txt right after VPN was established to I am doing it in PHP
   $ret = array();
-  #exec('/sbin/ip addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
-  exec('/sbin/ifconfig '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
+  if( $settings['OS_TYPE'] === 'Linux' ){
+    exec('/sbin/ip addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
+  }else
+    exec('/sbin/ifconfig '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
+  }
   $ret_arr['public_ip'] = $ret[0];
   unset($ret);
 
@@ -541,8 +544,11 @@ function VM_get_status( $output = 'html'){
 
   $ret_arr['vpn_gw'] = '';
   $ret = array();
-  #exec('/sbin/ip addr show '.$settings['IF_INT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
-  exec('/sbin/ifconfig '.$settings['IF_INT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
+  if( $settings['OS_TYPE'] === 'Linux' ){
+    exec('/sbin/ip addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
+  }else{
+    exec('/sbin/ifconfig '.$settings['IF_INT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
+  }
   if(array_key_exists('0', $ret) ){
     $ret_arr['private_ip'] = $ret[0];
 
@@ -778,8 +784,11 @@ function VPN_get_IP(){
     return $cmdret[0];
   }
 
-  #exec('/sbin/ip -4 addr show tun0 | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $cmdret);
-  exec('/sbin/ifconfig '.$settings['IF_TUN'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $cmdret);
+  if( $settings['OS_TYPE'] === 'Linux' ){
+    exec('/sbin/ip addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
+  }else{
+    exec('/sbin/ifconfig '.$settings['IF_TUN'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $cmdret);
+  }
   if(array_key_exists(0, $cmdret) === true && $cmdret[0] != '' ){
     return $cmdret[0];
   }
@@ -908,8 +917,11 @@ function get_port(){
   $PIA_PW = urlencode($_SESSION[$filename]['password']);
   $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
   $ret = array();
-  #exec('/sbin/ip addr show tun0 2>/dev/null | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
-  exec('/sbin/ifconfig '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $ret);
+  if( $settings['OS_TYPE'] === 'Linux' ){
+    exec('/sbin/ip addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
+  }else{
+    exec('/sbin/ifconfig '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
+  }
   if( array_key_exists( '0', $ret) !== true ){
     //VPN  is down, can not continue to check for open ports
     return false;

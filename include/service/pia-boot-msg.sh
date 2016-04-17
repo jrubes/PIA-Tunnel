@@ -12,21 +12,29 @@ case "$1" in
         echo > /etc/issue
 
         # add current commit state of PIA-Tunnel
-        PIAVER=`cd /usr/local/pia ; git log -n 1 | gawk -F" " '{print $2}' | head -n 1`
+        PIAVER=`cd /usr/local/pia ; $CMD_GIT log -n 1 | $CMD_GAWK -F" " '{print $2}' | head -n 1`
         printf "\n\nPIA-Tunnel version: $PIAVER\n\n" >> /etc/issue
 
-        /sbin/ifconfig "$IF_EXT" 2> /dev/null 1> /dev/null
+        $CMD_IP "$IF_EXT" 2> /dev/null 1> /dev/null
         if [ $? -eq 0 ]; then
-            eth0IP=`/sbin/ifconfig "$IF_EXT" | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+            if [ "$OS_TYPE" = "Linux" ]; then
+              eth0IP=`$CMD_IP addr show "$IF_EXT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+            else
+              eth0IP=`$CMD_IP "$IF_EXT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+            fi
             echo "$IF_EXT IP: $eth0IP" >> /etc/issue
         else
             echo "$SIF_EXT IP: ERROR: interface not found" >> /etc/issue
         fi
 
 
-        /sbin/ifconfig "$IF_INT" 2> /dev/null 1> /dev/null
+        $CMD_IP "$IF_INT" 2> /dev/null 1> /dev/null
         if [ $? -eq 0 ]; then
-            eth1IP=`/sbin/ifconfig "$IF_INT" | grep -w "inet" | gawk -F" " '{print $2}' | cut -d/ -f1`
+            if [ "$OS_TYPE" = "Linux" ]; then
+              eth1IP=`$CMD_IP addr show "$IF_INT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+            else
+              eth1IP=`$CMD_IP "$IF_INT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+            fi
             echo "$IF_INT IP: $eth1IP" >> /etc/issue
         else
             echo "$IF_INT IP: interface not found" >> /etc/issue

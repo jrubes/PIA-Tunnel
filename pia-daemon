@@ -233,7 +233,12 @@ while true; do
 	if [ "$VERBOSE" = "yes" ]; then
 	  vpn_port=`cat "/usr/local/pia/cache/status.txt" | $CMD_GREP "VPNPORT" | $CMD_GAWK -F":" '{print $2}'`
 	  #vpn_ip=`cat "/usr/local/pia/cache/status.txt" | $CMD_GREP "VPNIP" | $CMD_GAWK -F":" '{print $2}'`
-      vpn_ip=`/sbin/ip addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
+
+      if [ "$OS_TYPE" = "Linux" ]; then
+        vpn_ip=`$CMD_IP addr show $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+      else
+        vpn_ip=`$CMD_IP $IF_TUNNEL | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+      fi
 	  if [ "$vpn_port" = "none" ]; then
 	    echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
 		    "- VPN is UP - VPN IP: $vpn_ip Port: no support"

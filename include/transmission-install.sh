@@ -13,6 +13,7 @@ if [ "$OS_TYPE" = "Linux" ]; then
   apt-get install -y transmission-cli transmission-daemon cifs-utils
 else
   pkg install transmission transmission-cli transmission-daemon >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
+  systemctl disable transmission-daemon
 fi
 if [ $? -ne 0 ]; then
   echo 'fatal error while installing transmission. please install by hand' >> /usr/local/pia/cache/cmd_runner.txt
@@ -29,7 +30,7 @@ fi
 
 # make sure it is not running yet
 killall transmission-daemon
-#update-rc.d transmission-daemon remove
+
 
 
 echo 'transmission installed - rebooting system' >> /usr/local/pia/cache/cmd_runner.txt
