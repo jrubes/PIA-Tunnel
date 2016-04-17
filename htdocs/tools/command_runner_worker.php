@@ -46,4 +46,5 @@ switch($_POST['cmd'])
     break;
 }
 
+unset($_SESSION['settings.conf']); //force reload
 ?>

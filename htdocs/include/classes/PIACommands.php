@@ -36,8 +36,7 @@ class PIACommands {
    * </ul>
    */
   function status_pia_daemon(){
-    global $_settings;
-    $set = $_settings->get_settings();
+    $set = $this->_settings->get_settings();
 
     //check the return from screen -ls
     $ex = array();
@@ -54,8 +53,7 @@ class PIACommands {
    * @return boolean true if service is running, false if not
    */
   function service_count($service_name){
-    global $_settings;
-    $set = get_settings();
+    $set = $this->_settings->get_settings();
 
     //check the return from screen -ls
     $ex = array();
