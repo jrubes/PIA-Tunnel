@@ -382,7 +382,7 @@ function get_ovpn_list($provider_dir){
 function VPN_get_providers( ){
   $ret = array();
   $dirs = array( '/usr/local/pia/ovpn', '/usr/local/pia/ovpn.d' );
-  
+
   foreach( $dirs as $d ){
     $handle = opendir($d);
     if($handle)
@@ -884,7 +884,7 @@ function get_port(){
   //get provider from connectin2
   $provider = explode('/', $_SESSION['connecting2']);
   $filename = VPN_get_loginfile($provider[0]);
-  if( !preg_match("/^\/usr/local/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $filename ) ){throw new Exception('FATAL ERROR: invalid login file name - '.$filename); }
+  if( !preg_match("/^\/usr\/local\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $filename ) ){throw new Exception('FATAL ERROR: invalid login file name - '.$filename); }
 
 
   //get username and password from file or SESSION
