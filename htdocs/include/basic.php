@@ -779,7 +779,7 @@ function VPN_get_IP(){
   }
 
   #exec('/sbin/ip -4 addr show tun0 | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $cmdret);
-  exec('/sbin/ifconfig '.$settings['IF_TUN'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | /usr/bin/cut -d/ -f1', $cmdret);
+  exec('/sbin/ifconfig '.$settings['IF_TUN'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $cmdret);
   if(array_key_exists(0, $cmdret) === true && $cmdret[0] != '' ){
     return $cmdret[0];
   }
