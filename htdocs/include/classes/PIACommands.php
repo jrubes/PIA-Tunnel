@@ -37,7 +37,7 @@ class PIACommands {
    */
   function status_pia_daemon(){
     global $_settings;
-    $set = get_settings();
+    $set = $_settings->get_settings();
 
     //check the return from screen -ls
     $ex = array();
