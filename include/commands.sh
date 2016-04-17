@@ -1,10 +1,17 @@
 #!/bin/bash
 # find paths to programs
 
+# need gawk first
+if [ -f '/usr/local/bin/gawk' ]; then
+  CMD_GAWK='/usr/local/bin/gawk'
+elif [ -f '/usr/bin/gawk' ]; then
+  CMD_GAWK='/usr/bin/gawk'
+else
+  CMD_GAWK=$(whereis -b gawk | gawk -F" " '{print $2}')
+fi
 
 CMD_GREP=$(whereis -b grep | gawk -F" " '{print $2}')
 CMD_GIT=$(whereis -b git | gawk -F" " '{print $2}')
-CMD_GAWK=$(whereis -b gawk | gawk -F" " '{print $2}')
 CMD_PING=$(whereis -b ping | gawk -F" " '{print $2}')
 CMD_IP=$(whereis -b ip | gawk -F" " '{print $2}')
 CMD_CUT=$(whereis -b cut | gawk -F" " '{print $2}')
@@ -12,6 +19,7 @@ CMD_SED=$(whereis -b sed | gawk -F" " '{print $2}')
 CMD_SUDO=$(whereis -b sudo | gawk -F" " '{print $2}')
 CMD_NETSTAT=$(whereis -b netstat | gawk -F" " '{print $2}')
 CMD_TAIL=$(whereis -b tail | gawk -F" " '{print $2}')
+CMD_WGET=$(whereis -b wget | gawk -F" " '{print $2}')
 
 
 
@@ -31,6 +39,7 @@ function write_commands_settings() {
 	echo "CMD_SUDO='$CMD_SUDO'" >> /usr/local/pia/settings.conf
     echo "CMD_NETSTAT='$CMD_NETSTAT'" >> /usr/local/pia/settings.conf
     echo "CMD_TAIL='$CMD_TAIL'" >> /usr/local/pia/settings.conf
+    echo "CMD_WGET='$CMD_WGET'" >> /usr/local/pia/settings.conf
 
 }
 
