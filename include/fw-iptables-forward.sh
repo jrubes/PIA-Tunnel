@@ -22,7 +22,7 @@ fi
 EXT_IP=`/sbin/ip addr show $IF_EXT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | /usr/bin/cut -d/ -f1`
 
 #current default gateway
-EXT_GW=`/usr/bin/netstat -rn -4 | $CMD_GREP "default" | $CMD_GAWK -F" " '{print $2}'`
+EXT_GW=`$CMD_NETSTAT -rn -4 | $CMD_GREP "default" | $CMD_GAWK -F" " '{print $2}'`
 
 
 
