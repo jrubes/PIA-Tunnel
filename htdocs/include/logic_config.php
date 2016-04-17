@@ -908,100 +908,6 @@ function disp_general_box(){
   $disp_body .= build_providers();
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
 
-  //VM LAN segment forwarding
-  $GLOB_disp_network_default_fields .= 'FORWARD_VM_LAN,';
-  $sel = array(
-            'id' => 'FORWARD_VM_LAN',
-            'selected' =>  $settings['FORWARD_VM_LAN'],
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>VPN Gateway for VM LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
-  //use public LAN segment for forwarding
-  $GLOB_disp_network_default_fields .= 'FORWARD_PUBLIC_LAN,';
-  $sel = array(
-            'id' => 'FORWARD_PUBLIC_LAN',
-            'selected' =>  $settings['FORWARD_PUBLIC_LAN'],
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>VPN Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
-
-/*  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'NETWORK_MAX_SPEED,';
-  $sel = array(
-            'id' => 'NETWORK_MAX_SPEED',
-            'selected' =>  $settings['NETWORK_MAX_SPEED'],
-            array( '0', 'no limit'),
-            array( '1600', '200KB/s'),
-            array( '3200', '400KB/s'),
-            array( '4800', '600KB/s'),
-            array( '6400', '800KB/s'),
-            array( '8192', '1MB/s'),
-            array( '12288', '1.5MB/s'),
-            array( '16384', '2MB/s'),
-            array( '20480', '2.5MB/s'),
-            array( '24576', '3MB/s'),
-            array( '32768', '4MB/s'),
-            array( '40960', '5MB/s'),
-            array( '81920', '10MB/s'),
-            array( '819200', '100MB/s')
-          );
-  $disp_body .= '<tr><td><strong>Experimental</strong><br>Limit network throughput<br></td><td>'.build_select($sel).'</td></tr>'."\n";
-*/
-
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-
-  //now FIREWALL_IF_WEB options
-  $use = 'FIREWALL_IF_WEB';
-  $GLOB_disp_network_default_fields .= 'FIREWALL_IF_WEB,';
-  $fw_ssh = $_settings->get_settings_array($use);
-  //Wvar_dump($fw_ssh);die();
-  $sel = array(
-            'id' => $use,
-            'selected' =>  $fw_ssh,
-            array( 'FIREWALL_IF_WEB[0]', $settings['WEB_UI_IF1']),
-            array( 'FIREWALL_IF_WEB[1]', $settings['WEB_UI_IF2'])
-          );
-  $disp_body .= '<tr><td><span title="incoming on port 80">Allow webUI access on</span></td><td><span title="incoming on port 80">'.build_checkbox($sel).'</span></td></tr>'."\n";
-
-
-  $use = 'FIREWALL_IF_SSH';
-  $GLOB_disp_network_default_fields .= 'FIREWALL_IF_SSH,';
-  $fw_ssh = $_settings->get_settings_array($use);
-  //Wvar_dump($fw_ssh);die();
-  $sel = array(
-            'id' => $use,
-            'selected' =>  $fw_ssh,
-            array( 'FIREWALL_IF_SSH[0]', $settings['WEB_UI_IF1']),
-            array( 'FIREWALL_IF_SSH[1]', $settings['WEB_UI_IF2'])
-          );
-  $disp_body .= '<tr><td><span title="incoming on port 22">Allow SSH on</span></td><td><span title="incoming on port 22">'.build_checkbox($sel).'</span></td></tr>'."\n";
-
-
-  $use = 'FIREWALL_IF_SNMP';
-  $GLOB_disp_network_default_fields .= 'FIREWALL_IF_SNMP,';
-  $fw_ssh = $_settings->get_settings_array($use);
-  $sel = array(
-            'id' => $use,
-            'selected' =>  $fw_ssh,
-            array( 'FIREWALL_IF_SNMP[0]', $settings['WEB_UI_IF1']),
-            array( 'FIREWALL_IF_SNMP[1]', $settings['WEB_UI_IF2'])
-          );
-  $disp_body .= '<tr><td><span title="incoming on port 161 and outgoing on 162">Allow SNMP on</span></td><td><span title="incoming on port 161 and outgoing on 162">'.build_checkbox($sel).'</span></td></tr>'."\n";
-
-  $use = 'FIREWALL_IF_SECSNMP';
-  $GLOB_disp_network_default_fields .= 'FIREWALL_IF_SECSNMP,';
-  $fw_ssh = $_settings->get_settings_array($use);
-  $sel = array(
-            'id' => $use,
-            'selected' =>  $fw_ssh,
-            array( 'FIREWALL_IF_SECSNMP[0]', $settings['WEB_UI_IF1']),
-            array( 'FIREWALL_IF_SECSNMP[1]', $settings['WEB_UI_IF2'])
-          );
-  $disp_body .= '<tr><td><span title="incoming on port 10161 and outgoing on 10162">Allow Secure SNMP on</span></td><td><span title="incoming on port 10161 and outgoing on 10162">'.build_checkbox($sel).'</span></td></tr>'."\n";
-
-
 
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $disp_body .= '<tr><td>Web-UI Username</td><td><input type="text" name="WEB_UI_USER" value="'.htmlspecialchars($settings['WEB_UI_USER']).'"></td></tr>'."\n";
@@ -1029,6 +935,130 @@ function disp_general_box(){
 
   return $disp_body;
 }
+
+
+
+function disp_firewall_box(){
+  global $_settings;
+  global $GLOB_disp_network_default_fields;
+
+  $settings = $_settings->get_settings();
+  $disp_body = '';
+
+  $disp_body .= '<div class="box options">';
+  $disp_body .= '<h2>Firewall Settings</h2>'."\n";
+  $disp_body .= "<table>\n";
+
+  //VM LAN segment forwarding
+  $GLOB_disp_network_default_fields .= 'FORWARD_VM_LAN,';
+  $sel = array(
+            'id' => 'FORWARD_VM_LAN',
+            'selected' =>  $settings['FORWARD_VM_LAN'],
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>VPN Gateway for VM LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+  //use public LAN segment for forwarding
+  $GLOB_disp_network_default_fields .= 'FORWARD_PUBLIC_LAN,';
+  $sel = array(
+            'id' => 'FORWARD_PUBLIC_LAN',
+            'selected' =>  $settings['FORWARD_PUBLIC_LAN'],
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+  $disp_body .= '<tr><td>VPN Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+
+
+  //now FIREWALL_IF_WEB options
+  $use = 'FIREWALL_IF_WEB';
+  $GLOB_disp_network_default_fields .= 'FIREWALL_IF_WEB,';
+  $fw_ssh = $_settings->get_settings_array($use);
+  //Wvar_dump($fw_ssh);die();
+  $sel = array(
+            'id' => $use,
+            'selected' =>  $fw_ssh,
+            array( 'FIREWALL_IF_WEB[0]', 'eth0'),
+            array( 'FIREWALL_IF_WEB[1]', 'eth1')
+          );
+  $disp_body .= '<tr><td><span title="incoming on port 80">Allow webUI access on</span></td><td><span title="incoming on port 80">'.   build_checkbox($sel).'</span></td></tr>'."\n";
+
+
+  $use = 'FIREWALL_IF_SSH';
+  $GLOB_disp_network_default_fields .= 'FIREWALL_IF_SSH,';
+  $fw_ssh = $_settings->get_settings_array($use);
+  //Wvar_dump($fw_ssh);die();
+  $sel = array(
+            'id' => $use,
+            'selected' =>  $fw_ssh,
+            array( 'FIREWALL_IF_SSH[0]', 'eth0'),
+            array( 'FIREWALL_IF_SSH[1]', 'eth1')
+          );
+  $disp_body .= '<tr><td><span title="incoming on port 22">Allow SSH on</span></td><td><span title="incoming on port 22">'.build_checkbox($sel).'</span></td></tr>'."\n";
+
+
+  $use = 'FIREWALL_IF_SNMP';
+  $GLOB_disp_network_default_fields .= 'FIREWALL_IF_SNMP,';
+  $fw_ssh = $_settings->get_settings_array($use);
+  $sel = array(
+            'id' => $use,
+            'selected' =>  $fw_ssh,
+            array( 'FIREWALL_IF_SNMP[0]', 'eth0'),
+            array( 'FIREWALL_IF_SNMP[1]', 'eth1')
+          );
+  $disp_body .= '<tr><td><span title="incoming on port 161 and outgoing on 162">Allow SNMP on</span></td><td><span title="incoming on port 161 and outgoing on 162">'.build_checkbox($sel).'</span></td></tr>'."\n";
+
+  $use = 'FIREWALL_IF_SECSNMP';
+  $GLOB_disp_network_default_fields .= 'FIREWALL_IF_SECSNMP,';
+  $fw_ssh = $_settings->get_settings_array($use);
+  $sel = array(
+            'id' => $use,
+            'selected' =>  $fw_ssh,
+            array( 'FIREWALL_IF_SECSNMP[0]', 'eth0'),
+            array( 'FIREWALL_IF_SECSNMP[1]', 'eth1')
+          );
+  $disp_body .= '<tr><td><span title="incoming on port 10161 and outgoing on 10162">Allow Secure SNMP on</span></td><td><span title="incoming on port 10161 and outgoing on 10162">'.build_checkbox($sel).'</span></td></tr>'."\n";
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $disp_body .= "</table>\n";
+
+
+  $disp_body .= 'Enter one port per field or keep empty.';
+  $disp_body .= "<table>\n";
+  $GLOB_disp_network_default_fields .= 'FIREWALL_EXT,';
+  $max_range = $_settings->get_array_count('FIREWALL_EXT');
+  $ports = '';
+  for( $x = 0 ; $x < $max_range ; ++$x ){
+    if( array_key_exists('FIREWALL_EXT['.$x.']', $settings) === true && $settings['FIREWALL_EXT['.$x.']'] !== '' ){
+
+      $ports .= '<tr><td>Port on '.$settings['IF_EXT'].'</td><td><input type="text" name="FIREWALL_EXT['.$x.']" value="'.$settings['FIREWALL_EXT['.$x.']'].'"></td></tr>'."\n";
+    }
+  }
+  $disp_body .= '<tr><td>New Port on '.$settings['IF_EXT'].'</td><td><input type="text" name="FIREWALL_EXT['.$x.']" value=""></td></tr>'."\n";
+  $disp_body .= $ports; //add existing ports below "new field"
+
+  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+  $GLOB_disp_network_default_fields .= 'FIREWALL_INT,';
+  $max_range = $_settings->get_array_count('FIREWALL_INT');
+  $ports = '';
+  for( $x = 0 ; $x < $max_range ; ++$x ){
+    if( array_key_exists('FIREWALL_INT['.$x.']', $settings) === true && $settings['FIREWALL_INT['.$x.']'] !== '' ){
+
+      $ports .= '<tr><td>Port on '.$settings['IF_INT'].'</td><td><input type="text" name="FIREWALL_INT['.$x.']" value="'.$settings['FIREWALL_INT['.$x.']'].'"></td></tr>'."\n";
+    }
+  }
+  $disp_body .= '<tr><td>New Port on '.$settings['IF_INT'].'</td><td><input type="text" name="FIREWALL_INT['.$x.']" value=""></td></tr>'."\n";
+  $disp_body .= $ports; //add existing ports below "new field"
+
+
+  $disp_body .= "</table>\n";
+  $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings">';
+  $disp_body .= ' &nbsp; <input type="submit" name="restart_firewall" value="Restart Firewall">';
+  $disp_body .= '</div>';
+
+  return $disp_body;
+}
+
+
 
 function disp_advanced_box(){
   global $_settings;
@@ -1310,6 +1340,7 @@ function disp_network_default(){
   $disp_body .= '<div id="toggle_advanced_settings">';
   $disp_body .= disp_advanced_box();
   $disp_body .= disp_dhcpd_box_new();
+  $disp_body .= disp_firewall_box();
   $disp_body .= '</div>';
 
 

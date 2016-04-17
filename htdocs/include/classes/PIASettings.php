@@ -26,6 +26,27 @@ class PIASettings {
   function set_files(&$files){
     $this->_files = $files;
   }
+  
+  
+  
+  /**
+   * returns the number of members an array setting contains
+   * @param string $name name of member without []
+   */
+  function get_array_count( $name ){
+      $settings = $this->get_settings();
+      $name_len = mb_strlen($name);
+      $cnt = 0;
+      
+      reset($settings);
+      foreach( $settings as $key => $val ){
+          if( substr($key, 0, $name_len) === $name  ){
+              ++$cnt;
+          }
+      }
+      return $cnt;
+  }
+  
 
   /**
    * main method to call when you want settings stored
@@ -49,17 +70,15 @@ class PIASettings {
 
         $parray = $this->get_post_array($posted, true);
         $sarray = $this->get_settings_array($posted);
-        if( $sarray !== false ){
-            $tmp_array = $this->compare_settings_arrays( $sarray, $parray);
+        $tmp_array = $this->compare_settings_arrays( $sarray, $parray);
 
-            /* new_settings now contains the new values to be stored or empty for "no values" */
-            $array2store = $this->format_array($posted, $tmp_array);
-            $this->save_settings_array($posted, $array2store);
-            if( $this->settings_array_changes > 0 ){
-              $onechanged=true;
-            }else{
-              //echo "no changes to $posted<br>";
-            }
+        /* new_settings now contains the new values to be stored or empty for "no values" */
+        $array2store = $this->format_array($posted, $tmp_array);
+        $this->save_settings_array($posted, $array2store);
+        if( $this->settings_array_changes > 0 ){
+          $onechanged=true;
+        }else{
+          //echo "no changes to $posted<br>";
         }
 
       }else{

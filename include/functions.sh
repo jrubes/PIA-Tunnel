@@ -592,8 +592,13 @@ function maintain_status_cache() {
   #get IP of tunnel Gateway
   TUN_GATEWAY=`$CMD_IP route show | $CMD_GREP "0.0.0.0/1" | $CMD_GAWK -F" " '{print $3}'`
   #get IPs of interfaces
-  INT_IP=`$CMD_IP addr show $IF_INT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
-  EXT_IP=`$CMD_IP addr show $IF_EXT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+  if [ "$OS_TYPE" = "Linux" ]; then
+    INT_IP=`$CMD_IP addr show $IF_INT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+    EXT_IP=`$CMD_IP addr show $IF_EXT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+  else
+    INT_IP=`$CMD_IP $IF_INT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+    EXT_IP=`$CMD_IP $IF_EXT | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
+  fi
 
   interface_exists "$IF_TUNNEL"
   if [ "$RET_INTERFACE_EXISTS" = "yes" ]; then
