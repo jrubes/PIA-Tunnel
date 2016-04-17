@@ -262,8 +262,12 @@ if [ $ret = 0 ]; then
   echo 'TRANSMISSION_AUTH_REQUIRED="true"' >> '/usr/local/pia/settings.conf'
 fi
 
-if [ ! -d "/usr/local/pia/firewall" ]; then
-    mkdir "/usr/local/pia/firewall"
+# add support for custom firewall ports
+if [ ! ${FIREWALL_INT[0]+abc} ]; then
+  echo 'FIREWALL_INT[0]=""' >> '/usr/local/pia/settings.conf'
+fi
+if [ ! ${FIREWALL_EXT[0]+abc} ]; then
+  echo 'FIREWALL_EXT[0]=""' >> '/usr/local/pia/settings.conf'
 fi
 
 # added fix for eth0 not getting an IP quick enough during boot for pia-status to display the IP
