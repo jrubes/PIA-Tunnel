@@ -1,13 +1,11 @@
 ---
 
-- name: setup PIA-Tunnel on a Raspberry running a fresh installation of Raspbian Lite 
+- name: setup PIA-Tunnel on a Raspberry running a fresh installation of Raspbian Lite
   hosts: pia-tunnel-raspberry
   remote_user: pi
   sudo: yes
   vars:
-    git_branch: "release_php-gui"
-    git_branch: "master-debian"
-    git_branch: "master"
+    git_branch: "release_php-gui-v2"
 
   roles:
     - common

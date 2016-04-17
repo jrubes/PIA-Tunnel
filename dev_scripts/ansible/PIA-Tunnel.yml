@@ -4,9 +4,7 @@
   hosts: pia-tunnel-freebsd
   remote_user: root
   vars:
-    git_branch: "release_php-gui"
-    git_branch: "master-debian"
-    git_branch: "master"
+    git_branch: "release_php-gui-v2"
 
   roles:
     - common
