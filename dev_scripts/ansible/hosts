@@ -2,7 +2,7 @@
 192.168.56.101 ansible_ssh_user=root
 
 [pia-tunnel-debian]
-192.168.153.156
+127.0.0.1
 
 [pia-tunnel-raspberry]
 172.16.11.244
