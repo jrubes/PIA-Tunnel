@@ -10,10 +10,10 @@ echo "running system update first .... this may take a bit" > /usr/local/pia/cac
 
 
 if [ "$OS_TYPE" = "Linux" ]; then
-  apt-get install -y transmission-cli transmission-daemon cifs-utils
+  apt-get install -y transmission-cli transmission-daemon cifs-utils >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
+  systemctl disable transmission-daemon
 else
   pkg install transmission transmission-cli transmission-daemon >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
-  systemctl disable transmission-daemon
 fi
 if [ $? -ne 0 ]; then
   echo 'fatal error while installing transmission. please install by hand' >> /usr/local/pia/cache/cmd_runner.txt

@@ -7,7 +7,8 @@ then
 	# non interactive system updates
 	# http://debian-handbook.info/browse/wheezy/sect.automatic-upgrades.html
 	export DEBIAN_FRONTEND=noninteractive
-	yes '' | apt-get update -qq -y ; apt-get -qq -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
+	yes '' | apt-get update -qq -y >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
+    yes '' | apt-get -qq -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade >> /usr/local/pia/cache/cmd_runner.txt 2>> /usr/local/pia/cache/cmd_runner.txt
 fi
 
 
