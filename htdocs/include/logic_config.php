@@ -744,7 +744,7 @@ function disp_transmission_box(){
   $settings = $_settings->get_settings();
   $disp_body = '';
 
-  if( ! file_exists('/usr/local/bin/transmission-cli') ){
+  if( ! file_exists( $settings['CMD_TCCLI'] ) ){
     $disp_body .= '<div class="box options">';
     $disp_body .= '<h2>transmission client</h2>'."\n";
     $disp_body .= '<a href="/?page=command_runner&amp;cmdsel=transmission">Install transmission client</a>';

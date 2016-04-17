@@ -19,6 +19,13 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+ret=$("$CMD_GREP" -c "CMD_TCCLI" /usr/local/pia/settings.conf)
+if [ "$ret" -eq 0 ]; then
+  CMD_TCCLI=$(whereis -b transmission-cli | $CMD_GAWK -F" " '{print $2}')
+  echo "CMD_TCCLI='$CMD_TCCLI'" >> /usr/local/pia/settings.conf
+fi
+
+
 
 # make sure it is not running yet
 killall transmission-daemon
