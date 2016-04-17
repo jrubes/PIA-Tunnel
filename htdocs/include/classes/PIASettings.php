@@ -26,9 +26,9 @@ class PIASettings {
   function set_files(&$files){
     $this->_files = $files;
   }
-  
-  
-  
+
+
+
   /**
    * returns the number of members an array setting contains
    * @param string $name name of member without []
@@ -37,7 +37,7 @@ class PIASettings {
       $settings = $this->get_settings();
       $name_len = mb_strlen($name);
       $cnt = 0;
-      
+
       reset($settings);
       foreach( $settings as $key => $val ){
           if( substr($key, 0, $name_len) === $name  ){
@@ -46,7 +46,7 @@ class PIASettings {
       }
       return $cnt;
   }
-  
+
 
   /**
    * main method to call when you want settings stored
@@ -146,12 +146,15 @@ class PIASettings {
 
     //the array functions do not honor line numbers so strip all comments as they will not
     //be above the settings anymore
-    exec('sed \'/^#/ d\' "/usr/local/pia/settings.conf" > "/usr/local/pia/settings.conf.bak"');
-    exec('mv "/usr/local/pia/settings.conf.bak" "/usr/local/pia/settings.conf"');
+    exec('sed \'/^#/ d\' "/usr/local/pia/settings.conf" > "/usr/local/pia/cache/settings.conf.bak"');
+    exec('cp "/usr/local/pia/cache/settings.conf.bak" "/usr/local/pia/settings.conf"');
 
+    // ensure SettingsArray of [0] always exists
+    if( $array2store === '' ){
+        $array2store = "$index=''";
+    }
 
     $this->remove_array($array_name);
-
     $this->append_settings($array2store);
 
     //clear to force a reload
@@ -300,7 +303,7 @@ class PIASettings {
   }
 
 /**
- * methhod to remove a settings array from settings.conf
+ * method to remove a settings array from settings.conf
  * @return int number of lines removed
  */
 function remove_array($array_name){
