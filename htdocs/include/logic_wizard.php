@@ -64,6 +64,7 @@ function disp_wizard_default(){
     $disp_body .= '<option value="PIAtcp">PrivateInternetAccess.com</option>';
     $disp_body .= '<option value="FrootVPN">FrootVPN.com</option>';
     $disp_body .= '<option value="iVPN">iVPN.net</option>';
+    $disp_body .= '<option value="HideIPVPNtcp">HideIPVPN.com</option>';
     $disp_body .= '</select>';
   $disp_body .= '</td>';
   $disp_body .= '<tr><td>VPN Account Username</td><td><input type="text" style="width: 15em" name="username" value="" placeholder="Your Account Username" required></td>';
