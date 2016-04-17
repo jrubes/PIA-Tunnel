@@ -113,7 +113,7 @@ if [ ! -f '/usr/local/pia/ip_list.txt' ]; then
 fi
 
 
-#update files in /usr/local/www/apache24/data/
+#update files in $HTDOCS_PATH
 source '/usr/local/pia/settings.conf'
 cp -r /usr/local/pia/htdocs/* "$HTDOCS_PATH/"
 if [ -f "$HTDOCS_PATH/README.txt" ]; then rm -f "$HTDOCS_PATH/README.txt"; fi

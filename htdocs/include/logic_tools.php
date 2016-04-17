@@ -276,8 +276,10 @@ function disp_pia_update(){
 function disp_pia_update_client(){
   global $_pia;
   global $_files;
+  global $_settings;
   require_once './plugin/parsedown/Parsedown.php';
   $Parsedown = new Parsedown();
+  $set = $_settings->get_settings();
 
   $up = $_pia->get_update_status();
   if(is_int($up) === true && $up == 0 ){
@@ -295,7 +297,7 @@ function disp_pia_update_client(){
   $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
 
   $disp_body .= '<div class="box changelog">';
-  $cl = $_files->readfile("/usr/local/www/apache24/data/pia_latest_changes.md");
+  $cl = $_files->readfile( $set['HTDOCS_PATH']."/pia_latest_changes.md");
   $disp_body .=  $Parsedown->text($cl);
   $disp_body .= '</div>';
 
