@@ -291,9 +291,8 @@ ret=`$CMD_GREP -c "HTDOCS_PATH" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
     unamestr=`uname`
 
-    if [ "$unamestr" == "Linux" ]; then
+    if [ "$unamestr" = "Linux" ]; then
         OS_TYPE="Linux"
-        OS_TYPE="FreeBSD"
         HTDOCS_PATH="/var/www/html"
         APACHE_USER="www-data"
         echo 'OS_TYPE="Linux"' >> '/usr/local/pia/settings.conf'
