@@ -89,7 +89,7 @@ if [ -f "/usr/local/pia/ovpn/$filename.ovpn" ]; then
       echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to $filename" > /usr/local/pia/cache/session.log
 
       echo "$VPNprovider" > /usr/local/pia/cache/provider.txt
-      openvpn "/usr/local/pia/ovpn/$filename.ovpn" &>> /usr/local/pia/cache/session.log &
+      $CMD_SUDO openvpn "/usr/local/pia/ovpn/$filename.ovpn" &>> /usr/local/pia/cache/session.log &
 
     else
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\

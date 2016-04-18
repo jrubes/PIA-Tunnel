@@ -37,7 +37,7 @@
   when: ansible_distribution == 'Debian'
 
 
-- shell: "grep -q 'www-data ALL = NOPASSWD' /etc/sudoers || echo 'www-data ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown' >> /etc/sudoers"
+- shell: "grep -q 'www-data ALL = NOPASSWD' /etc/sudoers || echo 'www-data ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown,/usr/sbin/openvpn' >> /etc/sudoers"
   when: ansible_distribution == 'Debian'
 
 

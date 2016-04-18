@@ -31,7 +31,7 @@
   when: ansible_distribution == 'FreeBSD'
 
 
-- shell: "grep -q 'www ALL = NOPASSWD' /usr/local/etc/sudoers || echo 'www ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown' >> /usr/local/etc/sudoers"
+- shell: "grep -q 'www ALL = NOPASSWD' /usr/local/etc/sudoers || echo 'www ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown,/sbin/openvpn' >> /usr/local/etc/sudoers"
   when: ansible_distribution == 'FreeBSD'
 
 - name: install bash
