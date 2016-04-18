@@ -1335,13 +1335,11 @@ function disp_network_default(){
   $disp_body .= disp_transmission_box();
   $disp_body .= disp_socks_box_new();
   $disp_body .= '<div class="clear"></div>';
-  $disp_body .= '<p class="hidden" id="advanced_button"><a id="toggle_advanced_settings_toggle" class="button" href="" onclick="toggle_hide(\'toggle_advanced_settings\', \'toggle_advanced_settings_toggle\', \'Show Advanced Settings,Hide Advanced Settings\'); return false;">Show Advanced Settings</a></p>';
-  $disp_body .= '<div class="clear"></div>';
-  $disp_body .= '<div id="toggle_advanced_settings">';
   $disp_body .= disp_advanced_box();
   $disp_body .= disp_dhcpd_box_new();
   $disp_body .= disp_firewall_box();
-  $disp_body .= '</div>';
+  $disp_body .= '<div class="clear"></div>';  
+
 
 
   /* protect the form and input elements with a token */
