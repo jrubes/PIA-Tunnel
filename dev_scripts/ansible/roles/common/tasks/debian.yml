@@ -33,6 +33,12 @@
 - template: src=dhcpd-debian.conf dest=/etc/dhcp/dhcpd.conf
   when: ansible_distribution == 'Debian'
 
+- template: src=resolv.conf dest=/tmp/resolv.conf
+  when: ansible_distribution == 'Debian'
+
+- shell: "resolvconf -a eth0 < /tmp/resolv.conf"
+  when: ansible_distribution == 'Debian'
+
 
 - cron: name="update time" minute="0" hour="*/6" job="ntpd -q > /dev/null"
   when: ansible_distribution == 'Debian'

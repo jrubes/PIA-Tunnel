@@ -884,35 +884,6 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
         <li>The <a href="#wizard">Setup Wizard</a> should open</li>
       </ol>
     </li>
-
-    <li>
-      Make sure that you use a valid DNS server. These settings will override the DNS server
-      sent by your router. Edit /etc/dhcp/dhclient.conf and add the following on line 21
-      <pre>
-        supersede domain-name-servers 8.8.8.8, 208.67.222.222, 8.8.4.4, 208.67.220.220;
-      </pre>
-    </li>
-
-    <li>
-      Edit /etc/resolv.conf and add alternative name servers
-      <pre>
-        nameserver 8.8.8.8
-        nameserver 208.67.222.222
-        nameserver 8.8.4.4
-        nameserver 208.67.220.220
-      </pre>
-    </li>
-
-    <li>
-      Add the following to line 21 in /etc/sudoers
-      <pre>
-        www-data ALL = NOPASSWD: /usr/local/pia/*,/usr/local/pia/include/*,/sbin/shutdown
-      </pre>
-    </li>
-
-
-
-    </li>
   </ul>
 
 </div>
