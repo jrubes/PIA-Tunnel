@@ -280,9 +280,12 @@ ret=$(ps -p 1 | grep -c systemd )
 if [ "$ret" -eq 1 ] && [ ! -L "/etc/systemd/system/pia-boot-msg.service" ]; then
 	# system running systemD
 	systemctl enable  /usr/local/pia/include/service/pia-autostart.service
-	systemctl enable  /usr/local/pia/include/service/pia-boot-msg.service
 	systemctl disable  /usr/local/pia/include/service/pia-daemon.service
     systemctl enable  /usr/local/pia/include/service/pia-firstboot.service
+    
+    # systemD is a pile of shit - now using if-up.d since systemD is not consistent
+    #systemctl enable  /usr/local/pia/include/service/pia-boot-msg.service
+    ln -s /usr/local/pia/include/service/pia-boot-msg.sh  /etc/network/if-up.d/piamessage
 
 elif [ "$ret" -eq 0 ] && [ ! -L "/etc/systemd/system/pia-boot-msg.service" ]; then
 	echo "do to";
