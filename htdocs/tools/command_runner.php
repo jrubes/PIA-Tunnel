@@ -31,7 +31,7 @@ function disp_command_ui(){
   $ret .= '<h2>Shell Command Utility</h2>';
   $ret .= '<noscript><strong>The utility requires javascript. You may use the command line instead</strong></noscript>';
 
-  $ret .= 'Comand to execute '.build_select($sel);
+  $ret .= 'Command to execute '.build_select($sel);
   $ret .= ' <input id="btn_exec" type="button" href="#" onclick="execute_command();" name="execute" value="Execute" disabled><br>';
 
   $ret .= '<textarea id="cmd_out" style="width: 625px; height: 20em;">this box will contain the command output';
