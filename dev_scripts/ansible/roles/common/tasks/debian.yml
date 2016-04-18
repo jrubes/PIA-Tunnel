@@ -16,7 +16,6 @@
     - git-core
     - gawk
     - curl
-    - psmisc
     - sudo
   when: ansible_distribution == 'Debian'
 

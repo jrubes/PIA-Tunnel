@@ -134,7 +134,7 @@
     <li>Ensure that the second network adapter is a member of a private LAN segment
       <ol>
         <li>Select "Network Adapter 2"</li>
-        <li>Click "LAN Segments" => "Add"</li>
+        <li>Click "LAN Segments" =&gt; "Add"</li>
         <li>Enter name of LAN segment. For example: "VPN Bridge"</li>
         <li>Click OK to close</li>
         <li>Use Dropdown to select the LAN segment you just created and click OK</li>
@@ -149,8 +149,8 @@
   <li>Setup private VM LAN segment first using vSphere Client
     <ol>
       <li>select your ESXi server and choose "Configuration"</li>
-      <li>Click on "Networking" => "Add Networking..."</li>
-      <li>"Virtual Machine" => "Create a vSphere standard switch" uncheck any selected interfaces!<br>
+      <li>Click on "Networking" =&gt; "Add Networking..."</li>
+      <li>"Virtual Machine" =&gt; "Create a vSphere standard switch" uncheck any selected interfaces!<br>
           NOTE: The preview must list "No adapters" on the "Physical Adapters" side!</li>
       <li>Enter a network name. For example VPN Network - PIA</li>
     </ol>
@@ -159,9 +159,9 @@
   <li>Import the OVF Image
     <ol>
       <li>Extract the file you downloaded. You should now have a folder with tree files</li>
-      <li>"File" => "Deploy OVF Template..."</li>
-      <li> Browse to the extracted files and select "PIA-Tunnel.ovf" => "Next" => "Next"</li>
-      <li>Give the VM a name and select a datastore to keep the machine on => "Next"</li>
+      <li>"File" =&gt; "Deploy OVF Template..."</li>
+      <li> Browse to the extracted files and select "PIA-Tunnel.ovf" =&gt; "Next" =&gt; "Next"</li>
+      <li>Give the VM a name and select a datastore to keep the machine on =&gt; "Next"</li>
       <li>Use "Thin Provision" since the VM will not change much</li>
       <li>Select your external Network on the "Network Mapping" screen</li>
       <li>Do not auto power the machine once deployment is complete</li>
@@ -170,7 +170,7 @@
 
   <li>Configure the VM
     <ol>
-      <li>Select the VM => "Edit Settings"</li>
+      <li>Select the VM =&gt; "Edit Settings"</li>
       <li>Make sure that "Network adapter 1" is connected to the network with Internet access and that "Network adapter 2" is connected to the private LAN segment you created in step 1 above.</li>
       <li>RAM should be set to at least 256MB RAM. You may set it to as little as 92MB if you don't intend to run the SOCKS proxy server.</li>
     </ol>
@@ -186,7 +186,7 @@
 
   <h3 id="vm_vbox">Virtual Box</h3>
   <ol>
-      <li>Use the menu option "File" => "Import Appliance" to import the OVF Template</li>
+      <li>Use the menu option "File" =&gt; "Import Appliance" to import the OVF Template</li>
       <li>
           Select the option "Reinitialize the MAC address of all network cards"<br>
           <a href="./grfx/vbox_import1.png"><img src="./grfx/vbox_import1-small.png" alt="webUI screenshot"></a>
@@ -529,7 +529,7 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
 
 	<ul>
       <li>Goto "Settings" and set "Enable Port Forwarding" to "no"</li>
-      <li>Goto "Settings" => "SOCKS5 Proxy Server" and set "Public LAN" to enable</li>
+      <li>Goto "Settings" =&gt; "SOCKS5 Proxy Server" and set "Public LAN" to enable</li>
       <li>Disconnect or change your current VPN connection. The SOCKS5 server will be started once the VPN connection is established.</li>
       <li>All done. Use the "Public LAN IP" and the SOCKS5 port in your browser or other programs that support SOCKS5 servers.</li>
 	</ul>
@@ -734,7 +734,7 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
   <div class="sub_section">
     <h3>Debian 8</h3>
     <ol>
-      <li>Recomended HW: 1-2 CPUs, 512MB RAM (1024MB for SOCKS proxy)</li>
+      <li>Recommended HW: 1-2 CPUs, 512MB RAM (1024MB for SOCKS proxy)</li>
       <li>Install Debian 8 with an 3GB root (lvm) device</li>
       <li>Software selection:
         <ul>
@@ -852,7 +852,7 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
   </p>
 
   <ul>
-    <li>Start by installing <a href="http://downloads.raspberrypi.org/raspbian_latest.torrent">Raspbian</a> onto your SD card</li>
+    <li>Start by installing <a href="http://downloads.raspberrypi.org/raspbian_latest.torrent">Raspbian Jessie Lite</a> onto your SD card</li>
     <li>Login with pi:raspberry and elevate to root
       <pre>
         sudo su -
@@ -860,29 +860,33 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
     </li>
     <li>Make sure the OS is up to date
       <pre>
-        apt-get update -y
-        apt-get upgrade -y
+        apt-get update -y && apt-get upgrade -y
       </pre>
     </li>
-    <li>Use raspi-config to overclock your CPU to TURBO or the VPN connection will not be established! (RasbPi 1 only)</li>
-    <li>Make sure you have the "en_US.UTF-8" locale installed. Use raspi-config</li>
-    <li>
-      run the following command to install the required software. You may receive an error message when installing the DHCP server. You may ignore  it at this point.<br>
+    <li>Use raspi-config to setup the RaspBerry Pi
       <pre>
-        apt-get install -y psmisc openvpn dnsutils isc-dhcp-server vim git-core gawk curl psmisc lighttpd php5-cgi php5-curl php5-cli php5-mcrypt sudo ca-certificates
+        raspi-config
       </pre>
-    </li>
+      <ul>
+        <li>Internationalisation Options =&gt; Change Locale =&gt; en_US.UTF-8</li>
+        <li>(RasbPi 1 only) overclock your CPU to TURBO</li>
+        <li>Expand the file system, if you have not already done so</li>
+      </ul>
     <li>
-      Run the following commands
-      <pre>
-        update-rc.d lighttpd enable
-        lighttpd-enable-mod fastcgi fastcgi-php
-        /etc/init.d/lighttpd force-reload
-        addgroup vpnvm
-        usermod -G vpnvm www-data
-        usermod -G vpnvm root
-        echo "0" > /proc/sys/vm/swappiness
-      </pre>
+      Copy and paste the following commands to to install PIA-Tunnel
+      <ol>
+        <li>Edit /etc/ssh/sshd_config and change "PermitRootLogin without-password" to "PermitRootLogin yes"</li>
+        <li>Restart sshd with <pre>systemctl restart sshd</pre></li>
+        <li>try to login as pi <pre>ssh pi@127.0.0.1</pre></li>
+        <li>close the connection with <pre>exit</pre></li>
+        <li><pre>apt-get update -y &amp;&amp; apt-get upgrade -y</pre></li>
+        <li><pre>apt-get install -y ansible git sshpass</pre></li>
+        <li><pre><pre>mkdir /usr/local/pia && git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia</pre></li>
+        <li><pre>cd /usr/local/pia ; git checkout master-debian8</pre></li>
+        <li><pre>cd /usr/local/pia/dev_scripts/ansible/ && ansible-playbook -i hosts PIA-Tunnel_Raspberry.yml --ask-pass</pre></li>
+        <li>Optional: delete "/usr/local/pia/settings.conf" if you want to clone the VM</li>
+        <li>reboot the system, then open the IP display with your web browser. Follow the webUI from here</li>
+      </ol>
     </li>
 
     <li>
@@ -957,7 +961,7 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
     </p>
 
     <ol>
-        <li>Goto Settings => Advanced and scroll down to "Development branch"</li>
+        <li>Goto Settings =&gt; Advanced and scroll down to "Development branch"</li>
         <li>Edit the dropdown menu with your browser's DOM inspector</li>
         <li>Change the value of the dropdown from "release_php-gui" to the name of the new banch and confirm with "Store Settings"</li>
         <li>You will see a confirmation message similar to "git branch switched to XXXXX"</li>

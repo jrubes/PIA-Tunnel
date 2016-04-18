@@ -1,8 +1,8 @@
 [pia-tunnel-freebsd]
-192.168.56.101 ansible_ssh_user=root
+127.0.0.1 ansible_ssh_user=root
 
 [pia-tunnel-debian]
 127.0.0.1
 
 [pia-tunnel-raspberry]
-172.16.11.244
+127.0.0.1
