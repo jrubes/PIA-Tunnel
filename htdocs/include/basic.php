@@ -602,9 +602,11 @@ function VM_get_status( $output = 'html'){
     $table .= "<tr><td></td><td id=\"public_gw\">{$ret_arr['public_gw']}</td></tr>\n";
     $table .= "<tr><td></td><td id=\"SOCKS_EXT_ENABLED\">{$ret_arr['SOCKS_EXT_ENABLED']}</td></tr>\n";
     $table .= "<tr><td>&nbsp;</td><td></td></tr>\n";
+  if( $ret_arr['private_ip'] !== 'interface missing' ){
     $table .= "<tr><td style=\"vertical-align: top;\">VM LAN</td><td>IP <span id=\"private_ip\">{$ret_arr['private_ip']}</span></td></tr>\n";
     $table .= "<tr><td></td><td id=\"vpn_gw\">{$ret_arr['vpn_gw']}</td></tr>\n";
     $table .= "<tr><td></td><td id=\"SOCKS_INT_ENABLED\">{$ret_arr['SOCKS_INT_ENABLED']}</td></tr>\n";
+  }
     $table .= "</tbody></table>\n";
   }
 
