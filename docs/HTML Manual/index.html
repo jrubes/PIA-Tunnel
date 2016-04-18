@@ -851,38 +851,8 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
 
   <ul>
     <li>Start by installing <a href="http://downloads.raspberrypi.org/raspbian_latest.torrent">Raspbian Jessie Lite</a> onto your SD card</li>
-    <li>Login with pi:raspberry and elevate to root
-      <pre>
-        sudo su -
-      </pre>
-    </li>
-    <li>Make sure the OS is up to date
-      <pre>
-        apt-get update -y && apt-get upgrade -y
-      </pre>
-    </li>
-    <li>Use raspi-config to setup the RaspBerry Pi
-      <pre>
-        raspi-config
-      </pre>
-      <ul>
-        <li>Internationalisation Options =&gt; Change Locale =&gt; en_US.UTF-8</li>
-        <li>(RasbPi 1 only) overclock your CPU to TURBO</li>
-        <li>Expand the file system, if you have not already done so</li>
-      </ul>
-    <li>
-      Copy and paste the following commands to to install PIA-Tunnel
-      <ol>
-        <li>try to login as pi <pre>ssh pi@127.0.0.1</pre></li>
-        <li>close the connection with <pre>exit</pre></li>
-        <li><pre>apt-get update -y &amp;&amp; apt-get upgrade -y</pre></li>
-        <li><pre>apt-get install -y ansible git sshpass</pre></li>
-        <li><pre><pre>mkdir /usr/local/pia && git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia</pre></li>
-        <li><pre>cd /usr/local/pia ; git checkout master-debian8</pre></li>
-        <li><pre>cd /usr/local/pia/dev_scripts/ansible/ && ansible-playbook -i hosts PIA-Tunnel_Raspberry.yml --ask-pass</pre></li>
-        <li>reboot the Pi .... wait a bit .... then ... type the IP of your RasPi into your browser</li>
-        <li>The <a href="#wizard">Setup Wizard</a> should open</li>
-      </ol>
+    <li><pre>curl -o /tmp/prepare_debian.sh https://raw.githubusercontent.com/KaiserSoft/PIA-Tunnel/master/dev_scripts/prepare_debian.sh && chmod 0777 /tmp/prepare_debian.sh && ./tmp/prepare_debian.sh</pre></li>
+    <li>The <a href="#wizard">Setup Wizard</a> should open</li>
     </li>
   </ul>
 

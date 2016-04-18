@@ -1,6 +1,11 @@
 ---
 # common tasks
 
+- shell: "sed -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen > /tmp/locale.gen && mv  /tmp/locale.gen /etc/locale.gen"
+  when: ansible_distribution == 'Debian'
+- shell: "locale-gen"
+  when: ansible_distribution == 'Debian'
+
 - name: install required packages
   apt: name="{{ item }}" state=present update_cache=yes
   with_items:
