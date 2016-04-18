@@ -24,5 +24,5 @@ fi
 
 
 printf "\n\n\nPlease enter the password for your "pi" account when prompted\n\n\n"
-cd /usr/local/pia/dev_scripts/ansible/ && ansible-playbook -i hosts PIA-Tunnel_Debian.yml --ask-pass
+cd /usr/local/pia/dev_scripts/ansible/ && ansible-playbook -i hosts PIA-Tunnel_Raspberry.yml --ask-pass
 
