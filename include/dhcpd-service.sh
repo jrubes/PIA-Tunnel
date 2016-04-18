@@ -3,9 +3,17 @@
 LANG=en_US.UTF-8
 export LANG
 
+if [ "$OS_TYPE" = "Linux" ]; then
+  if [ "$1" = "enable" ]; then
+    systemctl enable isc-dhcp-server 2>&1
+  else
+    systemctl disable isc-dhcp-server 2>&1
+  fi
 
-if [ "$1" = "enable" ]; then
-  update-rc.d lighttpd enable
 else
-  update-rc.d lighttpd disable
+  if [ "$1" = "enable" ]; then
+    update-rc.d lighttpd enable 2>&1
+  else
+    update-rc.d lighttpd disable 2>&1
+  fi
 fi

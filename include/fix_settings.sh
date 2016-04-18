@@ -96,7 +96,7 @@ if [ -z "${IF_ETH1_DHCP}" ]; then
 fi
 
 if [ -z "${DHCPD_ENABLED1}" ]; then
-  echo 'DHCPD_ENABLED1="yes"' >> '/usr/local/pia/settings.conf'
+  echo 'DHCPD_ENABLED1="no"' >> '/usr/local/pia/settings.conf'
   echo 'DHCPD_RANGE1="192.168.10.101 192.168.10.151"' >> '/usr/local/pia/settings.conf'
   echo 'DHCPD_BROADCAST1="192.168.10.255"' >> '/usr/local/pia/settings.conf'
   echo 'DHCPD_ROUTER1="192.168.10.1"' >> '/usr/local/pia/settings.conf'

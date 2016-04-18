@@ -21,6 +21,11 @@
   when: ansible_distribution == 'Debian'
 
 
+
+- shell: "systemctl stop isc-dhcp-server ; systemctl disable isc-dhcp-server"
+  when: ansible_distribution == 'Debian'
+
+
 #- name: show service status
 #  replace: dest='/etc/systemd/system/getty.target.wants/getty@tty1.service' regexp='TTYVTDisallocate=yes' replace='TTYVTDisallocate=no'
 #  when: ansible_distribution == 'Debian'
