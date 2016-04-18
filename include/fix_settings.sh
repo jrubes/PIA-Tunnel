@@ -271,7 +271,7 @@ grep "IF_DEFAULTROUTER" /usr/local/pia/settings.conf &> /dev/null || echo 'IF_DE
 
 
 ret=$(ps -p 1 | grep -c systemd )
-if [ "$ret" -eq 1 ] && [ ! -L "/etc/systemd/system/pia-boot-msg.service" ]; then
+if [ "$ret" -eq 1 ] && [ ! -L "/etc/systemd/system/pia-autostart.service" ]; then
 	# system running systemD
 	systemctl enable  /usr/local/pia/include/service/pia-autostart.service
 	systemctl disable  /usr/local/pia/include/service/pia-daemon.service
@@ -279,7 +279,9 @@ if [ "$ret" -eq 1 ] && [ ! -L "/etc/systemd/system/pia-boot-msg.service" ]; then
 
     # systemD is a pile of shit - now using if-up.d since systemD is not consistent
     #systemctl enable  /usr/local/pia/include/service/pia-boot-msg.service
-    ln -s /usr/local/pia/include/service/pia-boot-msg.sh  /etc/network/if-up.d/piamessage
+    if [ ! -L '/etc/network/if-up.d/piamessage' ] && [ ! -f '/etc/network/if-up.d/piamessage' ]; then
+      ln -s /usr/local/pia/include/service/pia-boot-msg.sh  /etc/network/if-up.d/piamessage
+    fi
 
 elif [ "$ret" -eq 0 ] && [ ! -L "/etc/systemd/system/pia-boot-msg.service" ]; then
 	echo "do to";
