@@ -875,8 +875,6 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
     <li>
       Copy and paste the following commands to to install PIA-Tunnel
       <ol>
-        <li>Edit /etc/ssh/sshd_config and change "PermitRootLogin without-password" to "PermitRootLogin yes"</li>
-        <li>Restart sshd with <pre>systemctl restart sshd</pre></li>
         <li>try to login as pi <pre>ssh pi@127.0.0.1</pre></li>
         <li>close the connection with <pre>exit</pre></li>
         <li><pre>apt-get update -y &amp;&amp; apt-get upgrade -y</pre></li>
