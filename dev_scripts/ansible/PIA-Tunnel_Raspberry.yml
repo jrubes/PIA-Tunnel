@@ -5,7 +5,7 @@
   remote_user: pi
   sudo: yes
   vars:
-    git_branch: "release_php-gui-v2"
+    git_branch: "master"
 
   roles:
     - common
