@@ -215,7 +215,11 @@ fi
 # SOCKS5 software selection
 ret=`$CMD_GREP -c "SOCKS_SERVER_TYPE" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
-  echo 'SOCKS_SERVER_TYPE="3proxy"' >> '/usr/local/pia/settings.conf'
+  if [ "$OS_TYPE" = "Linux" ]; then
+    echo 'SOCKS_SERVER_TYPE="dante"' >> '/usr/local/pia/settings.conf'
+  else
+    echo 'SOCKS_SERVER_TYPE="3proxy"' >> '/usr/local/pia/settings.conf'
+  fi
 fi
 
 
@@ -282,7 +286,7 @@ if [ "$ret" -eq 1 ] && [ ! -L "/etc/systemd/system/pia-boot-msg.service" ]; then
 	systemctl enable  /usr/local/pia/include/service/pia-autostart.service
 	systemctl disable  /usr/local/pia/include/service/pia-daemon.service
     systemctl enable  /usr/local/pia/include/service/pia-firstboot.service
-    
+
     # systemD is a pile of shit - now using if-up.d since systemD is not consistent
     #systemctl enable  /usr/local/pia/include/service/pia-boot-msg.service
     ln -s /usr/local/pia/include/service/pia-boot-msg.sh  /etc/network/if-up.d/piamessage

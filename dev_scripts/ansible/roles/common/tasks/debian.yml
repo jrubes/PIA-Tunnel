@@ -17,6 +17,7 @@
     - gawk
     - curl
     - sudo
+    - dante-server
   when: ansible_distribution == 'Debian'
 
 

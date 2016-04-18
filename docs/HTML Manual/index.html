@@ -884,8 +884,10 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
         <li><pre><pre>mkdir /usr/local/pia && git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia</pre></li>
         <li><pre>cd /usr/local/pia ; git checkout master-debian8</pre></li>
         <li><pre>cd /usr/local/pia/dev_scripts/ansible/ && ansible-playbook -i hosts PIA-Tunnel_Raspberry.yml --ask-pass</pre></li>
-        <li>Optional: delete "/usr/local/pia/settings.conf" if you want to clone the VM</li>
-        <li>reboot the system, then open the IP display with your web browser. Follow the webUI from here</li>
+        <li>reboot the Pi .... wait a bit .... then ... type the IP of your RasPi into your browser</li>
+        <li>The <a href="#wizard">Setup Wizard</a> should open<br>
+            <a href="./grfx/static_ip_wizard.png"><img alt="start wizard after reboot" src="./grfx/static_ip_wizard-small.png"></a>
+        </li>
       </ol>
     </li>
 
@@ -914,37 +916,8 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
       </pre>
     </li>
 
-    <li>
-      Almost done. Time to pull the PIA Tunnel scripts .... this will take a bit
-      <pre>
-        mkdir /usr/local/pia ; chown -R root.root /usr/local/pia ; chmod -R og-rwx /usr/local/pia;
-        git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia
-        cd /usr/local/pia ; git checkout release_php-gui
-      </pre>
-    </li>
 
-    <li>
-      The next commands will execute the PIA-Tunnel setup script.
-      Please report any error messages you encounter.
-      <pre>
-        chmod 777 /usr/local/pia/pia-setup ; /usr/local/pia/pia-setup
-      </pre>
-    </li>
 
-    <li>
-      Add the following line to /etc/rc.local make sure you paste it above "exit 0"
-      <pre>
-        /usr/local/pia/include/autostart.sh
-      </pre>
-    </li>
-
-    <li>
-      <p>
-        Reboot your system  and open the IP of your Rasberry Pi in your webbrowser.
-        Your RasbPi is now setup to act as a stand alone VPN router. Please follow the
-        the setup Wizard Tutorial next.
-      </p>
-      <a href="./grfx/static_ip_wizard.png"><img alt="start wizard after reboot" src="./grfx/static_ip_wizard-small.png"></a>
     </li>
   </ul>
 
