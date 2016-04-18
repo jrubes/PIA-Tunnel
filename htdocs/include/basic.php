@@ -557,7 +557,7 @@ function VM_get_status( $output = 'html'){
   $ret_arr['vpn_gw'] = '';
   $ret = array();
   if( $settings['OS_TYPE'] === 'Linux' ){
-    exec('/sbin/ip addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
+    exec('/sbin/ip addr show '.$settings['IF_INT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
   }else{
     exec('/sbin/ifconfig '.$settings['IF_INT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
   }
