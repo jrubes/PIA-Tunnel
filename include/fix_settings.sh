@@ -212,16 +212,6 @@ if [ $ret = 0 ]; then
 fi
 
 
-# SOCKS5 software selection
-ret=`$CMD_GREP -c "SOCKS_SERVER_TYPE" /usr/local/pia/settings.conf`
-if [ $ret = 0 ]; then
-  if [ "$OS_TYPE" = "Linux" ]; then
-    echo 'SOCKS_SERVER_TYPE="dante"' >> '/usr/local/pia/settings.conf'
-  else
-    echo 'SOCKS_SERVER_TYPE="3proxy"' >> '/usr/local/pia/settings.conf'
-  fi
-fi
-
 
 # new setting to enable or disable VPN providers
 if [ ! ${VPN_PROVIDERS[0]+abc} ]; then
@@ -300,13 +290,32 @@ if [ $ret = 0 ]; then
     unamestr=`uname`
 
     if [ "$unamestr" == "Linux" ]; then
+        OS_TYPE="Linux"
+        OS_TYPE="FreeBSD"
+        HTDOCS_PATH="/var/www/html"
+        APACHE_USER="www-data"
         echo 'OS_TYPE="Linux"' >> '/usr/local/pia/settings.conf'
         echo 'HTDOCS_PATH="/var/www/html"' >> '/usr/local/pia/settings.conf'
         echo 'APACHE_USER="www-data"' >> '/usr/local/pia/settings.conf'
     else
+        OS_TYPE="FreeBSD"
+        HTDOCS_PATH="/usr/local/www/apache24/data"
+        APACHE_USER="www"
         echo 'OS_TYPE="FreeBSD"' >> '/usr/local/pia/settings.conf'
         echo 'HTDOCS_PATH="/usr/local/www/apache24/data"' >> '/usr/local/pia/settings.conf'
         echo 'APACHE_USER="www"' >> '/usr/local/pia/settings.conf'
     fi
 
+fi
+
+
+
+# SOCKS5 software selection
+ret=`$CMD_GREP -c "SOCKS_SERVER_TYPE" /usr/local/pia/settings.conf`
+if [ $ret = 0 ]; then
+  if [ "$OS_TYPE" = "Linux" ]; then
+    echo 'SOCKS_SERVER_TYPE="dante"' >> '/usr/local/pia/settings.conf'
+  else
+    echo 'SOCKS_SERVER_TYPE="3proxy"' >> '/usr/local/pia/settings.conf'
+  fi
 fi
