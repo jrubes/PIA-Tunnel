@@ -1,6 +1,6 @@
 [Unit]
 Description=pia-tunnel daemon
-After=network-online.target sshd.service
+After=network-online.target multi-user.target
 
 [Service]
 Type=oneshot

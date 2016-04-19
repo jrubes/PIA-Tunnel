@@ -1,6 +1,6 @@
 [Unit]
 Description=pia-tunnel autostart
-After=network-online.target sshd.service
+After=network-online.target multi-user.target
 
 [Service]
 Type=oneshot

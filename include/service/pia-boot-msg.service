@@ -1,6 +1,6 @@
 [Unit]
 Description=write IP to /etc/issue - now using if-up.d since systemD is not consistent
-After=network-online.target sshd.service
+After=network-online.target multi-user.target
 
 [Service]
 Type=oneshot
