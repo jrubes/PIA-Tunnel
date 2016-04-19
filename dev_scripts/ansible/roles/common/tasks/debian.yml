@@ -25,7 +25,7 @@
   when: ansible_distribution == 'Debian'
   
 - name: install dante-server on RasPi only
-  shell: "grep -q 'raspberry' /etc/apt/sources.list.d/* && apt-get install -y dante-server"
+  shell: "grep -r -q 'raspberry' /etc/apt/sources.list.d/ && apt-get install -y dante-server"
   when: ansible_distribution == 'Debian'
 
 
