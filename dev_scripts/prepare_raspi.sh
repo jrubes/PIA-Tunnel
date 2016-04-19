@@ -1,6 +1,8 @@
 #!/bin/bash
 # script to setup the ansible environment and run it
 
+ssh-keyscan 127.0.0.1 > /home/pi/.ssh/known_hosts
+sudo sh -c "ssh-keyscan 127.0.0.1 > /root/.ssh/known_hosts"
 
 apt-get update -y && apt-get upgrade -y
 

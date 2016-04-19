@@ -1,5 +1,6 @@
-[pia-tunnel-freebsd]
-127.0.0.1 ansible_ssh_user=root
+#[pia-tunnel-freebsd]
+# ansible_ssh_user=root overrides setting for raspberry ... needs to move into PIA-Tunnel_FreeBSD.yml 
+#127.0.0.1 ansible_ssh_user=root
 
 [pia-tunnel-debian]
 127.0.0.1
