@@ -2,6 +2,12 @@
 # script to setup the ansible environment and run it
 
 
+if [ ! -d '/root/.ssh' ]; then
+    sudo mkdir -p /root/.ssh
+    chmod 077 /root/.ssh
+fi
+sudo sh -c "ssh-keyscan 127.0.0.1 > /root/.ssh/known_hosts"
+
 apt-get update -y && apt-get upgrade -y
 
 apt-get install -y ansible git sshpass
