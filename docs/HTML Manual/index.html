@@ -32,7 +32,8 @@
       </ul>
   </li>
 
-  <li><a href="#pi_setup">Raspberry Pi / stand alone setup</a></li>
+  <li><a href="#debian8_setup">[from scratch] Debian 8 setup</a></li>
+  <li><a href="#pi_setup">[from scratch] Raspberry Pi setup</a></li>
 
   <li><a href="#start_vm">Starting PIA-Tunnel for the first time</a></li>
 
@@ -820,6 +821,23 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
     data to the correct interface. Any bug in the code and your data may end up getting send out
     the wrong interface....
   </p>
+
+</div>
+
+<div id="debian8_setup" class="section">
+  <h2>[from scratch]Debian 8 Setup</h2> <a href="#main_index">Back To Top</a>
+  <p>
+    Do TO
+  </p>
+
+
+  <ul>
+    <li>Start by installing <a href="http://downloads.raspberrypi.org/raspbian_latest.torrent">Raspbian Jessie Lite</a> onto your SD card</li>
+    <li>Login to your Debian 8 installation so you can copy and paste the following commands</li>
+    <li>From the command prompt<br>
+        Copy and paste the following in one line and grab a beer<br><pre>f='prepare_debian.sh' ; wget --no-check-certificate -O /tmp/$f https://raw.githubusercontent.com/KaiserSoft/PIA-Tunnel/master/dev_scripts/$f && chmod 0777 /tmp/$f && /tmp/$f</pre></li>
+    <li>Now open the IP of your Pi in your web browser</li>
+  </ul>
 
 </div>
 
