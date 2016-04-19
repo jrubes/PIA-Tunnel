@@ -1,12 +1,16 @@
 #!/bin/bash
 # script to setup the ansible environment and run it
 
+if [ $(whoami) != "root" ]; then
+    printf "\nERROR: you must be root to run this script\n"
+    exit 99
+fi
 
 if [ ! -d '/root/.ssh' ]; then
-    sudo mkdir -p /root/.ssh
+    mkdir -p /root/.ssh
     chmod 077 /root/.ssh
 fi
-sudo sh -c "ssh-keyscan 127.0.0.1 > /root/.ssh/known_hosts"
+ssh-keyscan 127.0.0.1 > /root/.ssh/known_hosts
 
 apt-get update -y && apt-get upgrade -y
 
@@ -31,4 +35,3 @@ fi
 
 printf "\n\n\nPlease enter the password for your "pi" account when prompted\n\n\n"
 cd /usr/local/pia/dev_scripts/ansible/ && ansible-playbook -i hosts PIA-Tunnel_Debian.yml --ask-pass
-
