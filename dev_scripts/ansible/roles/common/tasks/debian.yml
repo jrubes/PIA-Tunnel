@@ -26,6 +26,7 @@
   
 - name: install dante-server on RasPi only
   shell: "grep -r -q 'raspberry' /etc/apt/sources.list.d/ && apt-get install -y dante-server"
+  ignore_errors: yes
   when: ansible_distribution == 'Debian'
 
 
