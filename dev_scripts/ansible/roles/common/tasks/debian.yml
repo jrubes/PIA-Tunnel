@@ -45,7 +45,7 @@
 - template: src=resolv.conf dest=/tmp/resolv.conf
   when: ansible_distribution == 'Debian'
 
-- shell: "resolvconf -a eth0 < /tmp/resolv.conf"
+- shell: "bash -c 'if [ -f /sbin/resolvconf ]; then resolvconf -a eth0 < /tmp/resolv.conf; else cat /tmp/resolv.conf > /etc/resolv.conf; fi'"
   when: ansible_distribution == 'Debian'
 
 
