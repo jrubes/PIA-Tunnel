@@ -723,41 +723,6 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
 </div>
 
 
-<div id="ansible_setup" class="section">
-  <h2>Manual installation on Debian, RaspBerry Pi or FreeBSD</h2> <a href="#main_index">Back To Top</a>
-  <p>
-    PIA-Tunnel has switched to ansible so getting a fresh system up an running is very easy.<br>
-    Start by installing Debian 8, Raspbian or FreeBSD onto your VM or device.
-  </p>
-
-  <div class="sub_section">
-    <h3>Debian 8</h3>
-    <ol>
-      <li>Recommended HW: 1-2 CPUs, 512MB RAM (1024MB for SOCKS proxy)</li>
-      <li>Install Debian 8 with an 3GB root (lvm) device</li>
-      <li>Software selection:
-        <ul>
-          <li>SSH Server</li>
-          <li>standard system utilities</li>
-        </ul>
-      </li>
-      <li>Finish the installation and login to your system. Copy and paste the commands below.</li>
-      <li>Edit /etc/ssh/sshd_config and change "PermitRootLogin without-password" to "PermitRootLogin yes"</li>
-      <li>Restart sshd with "systemctl restart sshd"</li>
-      <li>try to login as root "ssh root@127.0.0.1"</li>
-      <li>apt-get update -y &amp;&amp; apt-get upgrade -y</li>
-      <li>apt-get install -y ansible git sshpass</li>
-      <li>mkdir /usr/local/pia && git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia</li>
-      <li>cd /usr/local/pia ; git checkout master-debian8</li>
-      <li>cd /usr/local/pia/dev_scripts/ansible/ && ansible-playbook -i hosts PIA-Tunnel_Debian.yml --ask-pass</li>
-      <li>Optional: delete "/usr/local/pia/settings.conf" if you want to clone the VM</li>
-      <li>reboot the system, then open the IP display with your web browser. Follow the webUI from here</li>
-    </ol>
-
-  </div>
-</div>
-
-
 
 <div id="defaultgw_bindnic" class="section">
   <h2>Single PC with Default Gateway Setup</h2> <a href="#main_index">Back To Top</a>
@@ -825,17 +790,32 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
 </div>
 
 <div id="debian8_setup" class="section">
-  <h2>[from scratch] Debian 8 Setup</h2> <a href="#main_index">Back To Top</a>
-  <p>
-    Do TO
-  </p>
+	<h2>[from scratch] Debian 8 Setup</h2> <a href="#main_index">Back To Top</a>
 
-  <ul>
-    <li>Login to your Debian 8 installation so you can copy and paste the following commands</li>
-    <li>From the command prompt<br>
-        Copy and paste the following in one line and grab a beer<br><pre>f='prepare_debian.sh' ; wget --no-check-certificate -O /tmp/$f https://raw.githubusercontent.com/KaiserSoft/PIA-Tunnel/master/dev_scripts/$f && chmod 0777 /tmp/$f && /tmp/$f</pre></li>
-    <li>Now open the IP of your Pi in your web browser</li>
-  </ul>
+	<p>
+		PIA-Tunnel has switched to ansible so getting a fresh system up an running is very easy.<br>
+		Start by installing Debian 8 onto your VM or device.
+	</p>
+
+	<ol>
+		<li>Recommended HW: 1-2 CPUs, 512MB RAM (1024MB for SOCKS proxy)</li>
+		<li>Install Debian 8 using a 3GB hard drive setup as lvm</li>
+		<li>Software selection:
+			<ul>
+				<li>SSH Server</li>
+				<li>standard system utilities</li>
+			</ul>
+		</li>
+		<li>Finish the installation and login to your system. Copy and paste the commands below.</li>
+		<li>Edit /etc/ssh/sshd_config and change "PermitRootLogin without-password" to "PermitRootLogin yes"</li>
+		<li>Restart sshd with "systemctl restart sshd"</li>
+		<li>try to login as root "ssh root@127.0.0.1"</li>
+		<li>Copy and paste the following in one line<br>
+		<pre>f='prepare_debian.sh' ; wget --no-check-certificate -O /tmp/$f https://raw.githubusercontent.com/KaiserSoft/PIA-Tunnel/master/dev_scripts/$f && chmod 0777 /tmp/$f && /tmp/$f     </pre>
+		</li>
+      <li>Optional: delete "/usr/local/pia/settings.conf" if you want to clone the VM</li>
+      <li>reboot the system, then open the IP with your web browser. Follow the webUI from here</li>
+	</ol>
 
 </div>
 
