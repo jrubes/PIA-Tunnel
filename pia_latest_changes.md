@@ -1,10 +1,15 @@
 PIA-Tunnel    
 Release notes for PIA-Tunnel VM [rss feed](http://www.kaisersoft.net/pia_latest.xml)    
     
+update 2016-06-16
+=================
+* added latest OpenVPN files for PIA. These add Norway, Turkey, Italy and so on
+* Removed "Hong Kong" from list of port forwarding locations. Source: https://www.privateinternetaccess.com/pages/client-support/#sixth   
     
-    
+
+	
 update 2016-04-12
-===============
+=================
 * added openVPN files for <a href="https://www.ivpn.net">https://www.ivpn.net</a>
 * iVPN support untested. please report any issues
 * no port forwarding at this time but I will try to add it ASAP
