@@ -1,12 +1,11 @@
 PIA.php
-CA North York
 CA Toronto
-Switzerland
-Sweden
-Romania
-Germany
-France
+CA North York
 Netherlands
+Sweden
+Switzerland
+France
+Germany
 Russia
-Hong Kong
+Romania
 Israel

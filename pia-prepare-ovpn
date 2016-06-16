@@ -1,23 +1,19 @@
 #!/bin/bash
 # script to prepare the "raw" .ovpn files from PIA
-# https://www.privateinternetaccess.com/openvpn/openvpn.zip
+# https://deu.privateinternetaccess.com/pages/client-support/#third
 # only run this after a fresh download or if you know why you want to run it :)
 
 # hardcode path to PIA ca.cert
- sed -i 's/ca ca.crt/ca \/usr/local/pia\/ovpn\/pia\/ca.crt/g' /usr/local/pia/ovpn/pia/*.ovpn
+sed -i 's/ca ca.crt/ca \/usr\/local\/pia\/ovpn\/PIAtcp\/ca.crt/g' /usr/local/pia/ovpn/PIAtcp/*.ovpn
+sed -i 's/ca ca.crt/ca \/usr\/local\/pia\/ovpn\/PIAudp\/ca.crt/g' /usr/local/pia/ovpn/PIAudp/*.ovpn
 
 # hardcode path to PIA crl.pem
- sed -i 's/crl-verify crl.pem/crl-verify \/usr/local/pia\/ovpn\/pia\/crl.pem/g' /usr/local/pia/ovpn/pia/*.ovpn
+sed -i 's/crl-verify crl.pem/crl-verify \/usr\/local\/pia\/ovpn\/PIAtcp\/crl.pem/g' /usr/local/pia/ovpn/PIAtcp/*.ovpn
+sed -i 's/crl-verify crl.pem/crl-verify \/usr\/local\/pia\/ovpn\/PIAudp\/crl.pem/g' /usr/local/pia/ovpn/PIAudp/*.ovpn
 
 # use login.conf to store the password localy instead of prompting for it
-sed -i 's/auth-user-pass/auth-user-pass \/usr/local/pia\/login-pia.conf /g' /usr/local/pia/ovpn/pia/*.ovpn
+sed -i 's/auth-user-pass/auth-user-pass \/usr\/local\/pia\/login-pia.conf /g' /usr/local/pia/ovpn/PIAtcp/*.ovpn
+sed -i 's/auth-user-pass/auth-user-pass \/usr\/local\/pia\/login-pia.conf /g' /usr/local/pia/ovpn/PIAudp/*.ovpn
+
 
 echo "Files have been updated"
-
-
-
-sed -i 's/usr/local/pia\/ovpn\/pia\//pia\/ovpn\/PIAtcp\//g' /usr/local/pia/ovpn/PIAtcp/*.ovpn
-
-sed -i 's/usr/local/pia\/ovpn\/pia\//usr/local/pia\/ovpn\/PIAudp\//g' /usr/local/pia/ovpn/PIAudp/*.ovpn
-sed -i 's/proto tcp/proto udp/g' /usr/local/pia/ovpn/PIAudp/*.ovpn
-sed -i 's/443/1194/g' /usr/local/pia/ovpn/PIAudp/*.ovpn
