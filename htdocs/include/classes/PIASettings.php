@@ -108,6 +108,13 @@ class PIASettings {
    */
   function save_settings( $setting, $value ){
 
+    //only store the password if it is not empty
+    $setting_part = substr( $setting, -9);
+    if( $setting_part === '_PASSWORD' && $value == '' ){
+        //write old password to $value to keep the old one
+        $value = $_SESSION['settings.conf'][$setting];
+    }
+  
     $k = escapeshellarg($setting);
     $v = escapeshellarg($value);
     exec("/pia/pia-settings $k $v");

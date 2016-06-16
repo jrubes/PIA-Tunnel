@@ -2,3 +2,4 @@
 *.vbs text eol=crlf
 *.pattern text eol=crlf
 *.ini text eol=crlf
+*.sh text eol=lf
