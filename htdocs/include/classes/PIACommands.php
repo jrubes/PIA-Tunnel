@@ -416,10 +416,11 @@ function rand_string($lenth, $range=array('A','Z','a','z',0,9), $other='' ) {
  * @return boolean true or false
  */
 function is_mounted( $mount_point ){
+  $set = $this->_settings->get_settings();
 
   $ret = array();
   $mp = escapeshellarg($mount_point);
-  exec('mount | /usr/bin/grep '.$mp ,$ret);
+  exec('mount | '.$set['CMD_GREP'].' '.$mp ,$ret);
 
   if( count($ret) > 0 ){
     return true;

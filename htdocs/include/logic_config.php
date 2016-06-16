@@ -785,8 +785,8 @@ function disp_transmission_box(){
             array( 'false', 'disabled')
           );
   $disp_body .= '<tr><td>webUI authentication</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $disp_body .= '<tr><td>webUI username</td><td><input type="text" '.$disabled.' id="TRANSMISSION_WHITELIST" name="TRANSMISSION_USER" value="'.$settings['TRANSMISSION_USER'].'"></td></tr>'."\n";
-  $disp_body .= '<tr><td>webUI password</td><td><input type="text" '.$disabled.' id="TRANSMISSION_WHITELIST" name="TRANSMISSION_PASSWORD" value="" placeholder="**********"></td></tr>'."\n";
+  $disp_body .= '<tr><td>webUI username</td><td><input type="text" '.$disabled.' id="TRANSMISSION_USER" name="TRANSMISSION_USER" value="'.$settings['TRANSMISSION_USER'].'"></td></tr>'."\n";
+  $disp_body .= '<tr><td>webUI password</td><td><input type="text" '.$disabled.' id="TRANSMISSION_PASSWORD" name="TRANSMISSION_PASSWORD" value="" placeholder="**********"></td></tr>'."\n";
 
   $GLOB_disp_network_default_fields .= 'CIFS_INTERFACE,CIFS_SHARE,CIFS_USER,CIFS_PASSWORD,CIFS_MOUNT,';
   $sel = array(
@@ -912,7 +912,7 @@ function disp_general_box(){
   $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
   $disp_body .= '<tr><td>Web-UI Username</td><td><input type="text" name="WEB_UI_USER" value="'.htmlspecialchars($settings['WEB_UI_USER']).'"></td></tr>'."\n";
   $disp_body .= '<tr><td>Web-UI Password</td><td><input type="password" name="WEB_UI_PASSWORD" value="" placeholder="*********"></td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'WEB_UI_COOKIE_LIFETIME,';
+  $GLOB_disp_network_default_fields .= 'WEB_UI_COOKIE_LIFETIME,WEB_UI_PASSWORD,';
   $disp_body .= '<tr><td>Remember Me for</td><td><input type="text" class="short" name="WEB_UI_COOKIE_LIFETIME" value="'.htmlspecialchars($settings['WEB_UI_COOKIE_LIFETIME']).'"> days</td></tr>'."\n";
 
   $GLOB_disp_network_default_fields .= 'WEB_UI_REFRESH_TIME,';
