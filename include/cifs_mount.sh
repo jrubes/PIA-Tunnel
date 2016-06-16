@@ -15,7 +15,7 @@ if [ "${mounted}" = "" ]; then
   if [ "${CIFS_SHARE}" != "" ] && [ "${CIFS_MOUNT}" != "" ]; then
     #apply firewall rules to allow CIFS traffic
     /usr/local/pia/include/cifs_fwopen.sh
-    mount -t cifs -o credentials=/usr/local/pia/smbpasswd.conf,iocharset=utf8,noatime "${CIFS_SHARE}" "${CIFS_MOUNT}"
+    mount -t cifs -o credentials=/usr/local/pia/smbpasswd.conf,iocharset=utf8 "${CIFS_SHARE}" "${CIFS_MOUNT}"
 
   elif [ "${CIFS_MOUNT}" != "" ]; then
 
