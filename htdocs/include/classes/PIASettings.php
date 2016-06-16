@@ -108,16 +108,19 @@ class PIASettings {
    * @param string $value value of settings
    */
   function save_settings( $setting, $value ){
+      //global $disp_body;
 
     //ensure paths use forward slashes
     if( $setting === 'CIFS_SHARE' || $setting === 'CIFS_MOUNT' ){
       $value = str_replace('\\', '/', $value);
     }
 
-    if( $setting === 'CIFS_PASSWORD' ){
-      $value = $_SESSION['settings.conf']['CIFS_PASSWORD'];
+    //only store the password if it is not empty
+    $setting_part = substr( $setting, -9);
+    if( $setting_part === '_PASSWORD' && $value == '' ){
+        //write old password to $value to keep the old one
+        $value = $_SESSION['settings.conf'][$setting];
     }
-
 
     //escape slashes for 'sed' in pia-settings
     $value = str_replace(array('\\','/'), array('\\\\','\\/'), $value);
