@@ -114,7 +114,7 @@ function VM_shutdown(){
   global $_pia;
   global $settings;
   $_pia->clear_session();
-  exec( $settings['CMD_SUDO'].' /sbin/shutdown -p now &>/dev/null &');
+  exec( $settings['CMD_SUDO'].' /sbin/shutdown -P now &>/dev/null &');
 }
 
 /**
