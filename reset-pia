@@ -13,6 +13,9 @@ if [ -f "/usr/sbin/dpkg-reconfigure" ]; then
 	/usr/sbin/dpkg-reconfigure openssh-server
 fi
 
+rm -rf /root/.ansible
+rm -rf /root/.viminfo
+rm /root/.ssh/*
 echo "" > /root/.bash_history
 cd /tmp/ ; rm -rf *
 #delete all files in /var/log
@@ -59,15 +62,20 @@ rm -f /usr/local/pia/settings.conf
 
 
 # clear cache and SWAP
-# Debian sync && /sbin/sysctl vm.drop_caches=3 && swapoff -a && swapon -a
-sync && swapoff -a && swapon -a
+if [ -f "/sbin/sysctl" ]; then
+	sync && /sbin/sysctl vm.drop_caches=3 && swapoff -a && swapon -a
+else
+	sync && swapoff -a && swapon -a
+fi
 
-# reset the git repo to the last know commit
+
+# reset the git repo to the last know commit and pull
 cd /usr/local/pia ; /usr/local/bin/git reset --hard HEAD &> /dev/null
 
 #Now run setup to get settings back and apply permissions
 chmod ugo+x /usr/local/pia/pia-setup
 /usr/local/pia/pia-setup
+/usr/local/pia/pia-update
 
 
 echo "Done, reboot or shutdown now!"
