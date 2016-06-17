@@ -1,6 +1,13 @@
 PIA-Tunnel    
 Release notes for PIA-Tunnel VM [rss feed](http://www.kaisersoft.net/pia_latest.xml)    
     
+
+update 2016-06-17
+=================
+* fixed password change for webUI
+* added eol rules for git, should be consistent now	  
+	
+	
 update 2016-06-16
 =================
 * added latest OpenVPN files for PIA. These add Norway, Turkey, Italy and so on

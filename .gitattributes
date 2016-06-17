@@ -1,4 +1,9 @@
 # force proper line endings for certain files
+*.odt -text
+*.pdf -text
+*.png -text
+*.gif -text
+*.jpg -text
 *.vbs text eol=crlf
 *.pattern text eol=crlf
 *.ini text eol=crlf
