@@ -3,10 +3,9 @@ Project: PIA-Tunnel VM
 
 NOTICE
 ------
-PIA-Tunnel VM is currently switching from Debian to FreeBSD in the master branch!
-This should not affect anyone since the VM is setup to use the 'release_php-gui' branch    
-https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui   
-You will receive a notification when the FreeBSD version replaces the Linux VM.
+The future of PIA-Tunnel has finally been decided. I will support a FreeBSD and a Debian 8 edition.    
+The Debian 8 client is very close for release while the FreeBSD version currently lacks firewall rules.    
+Please check out the new documentation for details (work in progress): http://www.KaiserSoft.net/pia_doc/index.html
 
 
 
