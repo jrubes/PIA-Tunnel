@@ -22,8 +22,19 @@ CMD_NETSTAT=$(whereis -b netstat | $CMD_GAWK -F" " '{print $2}')
 CMD_TAIL=$(whereis -b tail | $CMD_GAWK -F" " '{print $2}')
 CMD_WGET=$(whereis -b wget | $CMD_GAWK -F" " '{print $2}')
 
+if [ -f '/usr/sbin/sockd' ]; then
+  CMD_DANTECLI='/usr/sbin/sockd'
+else
+  CMD_DANTECLI=''
+fi
+if [ -f '/usr/sbin/socks' ]; then
+  CMD_3PROXYCLI='/usr/sbin/socks'
+else
+  CMD_3PROXYCLI=''
+fi
 
 
+# write for webUI
 function write_commands_settings() {
 
 	if [ ! -f "/usr/local/pia/settings.conf" ]; then
@@ -41,16 +52,13 @@ function write_commands_settings() {
     echo "CMD_NETSTAT='$CMD_NETSTAT'" >> /usr/local/pia/settings.conf
     echo "CMD_TAIL='$CMD_TAIL'" >> /usr/local/pia/settings.conf
     echo "CMD_WGET='$CMD_WGET'" >> /usr/local/pia/settings.conf
+    echo "CMD_DANTECLI"='$CMD_DANTECLI'" >> /usr/local/pia/settings.conf
+    echo "CMD_3PROXYCLI"='$CMD_3PROXYCLI'" >> /usr/local/pia/settings.conf
 
 }
 
 
-# store commands in settings as well
+# store commands in settings.conf as well
 if [ ! -f "/usr/local/pia/settings.conf" ]; then
-	write_commands_settings
-fi
-
-ret=$("$CMD_GREP" -c "CMD_SUDO" /usr/local/pia/settings.conf)
-if [ "$ret" -eq 0 ]; then
 	write_commands_settings
 fi

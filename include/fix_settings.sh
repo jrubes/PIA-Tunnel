@@ -320,3 +320,16 @@ if [ $ret = 0 ]; then
     echo 'SOCKS_SERVER_TYPE="3proxy"' >> '/usr/local/pia/settings.conf'
   fi
 fi
+
+
+# Set proxy command values
+if [ -f '/usr/sbin/sockd' ]; then
+    echo "CMD_DANTECLI='/usr/sbin/sockd'" >> /usr/local/pia/settings.conf
+else
+    echo "CMD_DANTECLI=''" >> /usr/local/pia/settings.conf
+fi
+if [ -f '/usr/sbin/socks' ]; then
+    echo "CMD_3PROXYCLI='/usr/sbin/socks'" >> /usr/local/pia/settings.conf
+else
+    echo "CMD_3PROXYCLI=''" >> /usr/local/pia/settings.conf
+fi

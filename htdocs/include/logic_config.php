@@ -559,9 +559,14 @@ function disp_dhcpd_box_new(){
 function disp_socks_box_new(){
   global $_settings;
   global $GLOB_disp_network_default_fields;
-
-  $settings = $_settings->get_settings();
   $disp_body = '';
+  $settings = $_settings->get_settings();
+
+  if( ! file_exists( $settings['CMD_DANTECLI'] ) && ! file_exists( $settings['CMD_3PROXYCLI'] ) ){
+    //disabled when not installed
+    return $disp_body;
+  }
+
 
   $disp_body .= '<div class="box options">';
   $disp_body .= '<h2>SOCKS 5 Proxy Server</h2>'."\n";
@@ -1332,13 +1337,13 @@ function disp_network_default(){
   //$disp_body .= disp_pia_daemon_box_new();
   $disp_body .= disp_interface();
   $disp_body .= '<div class="clear"></div>';
-  $disp_body .= disp_transmission_box();
   $disp_body .= disp_socks_box_new();
   $disp_body .= '<div class="clear"></div>';
   $disp_body .= disp_advanced_box();
   $disp_body .= disp_dhcpd_box_new();
   $disp_body .= disp_firewall_box();
-  $disp_body .= '<div class="clear"></div>';  
+  $disp_body .= disp_transmission_box();
+  $disp_body .= '<div class="clear"></div>';
 
 
 
