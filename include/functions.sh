@@ -712,7 +712,8 @@ function ping_host_new() {
 
 
 	#shall we make this a "quick" ping?
-	if [ "$2" = "quick" ] || [ "$3" = "quick" ]; then
+	if [ "$2" = "quick" ] || [ "$3" = "quick" ] || [ "$4" = "quick" ]; then
+        QUICK="quick"
 		pingthis=`echo "$PING_PACKET_LOSS" | $CMD_SED -e "s/-i 0.5 -w 4 -W 0.5/-c 1 -w 1/g"`
 
 		if [ "$VERBOSE_DEBUG" = "yes" ]; then
@@ -720,8 +721,10 @@ function ping_host_new() {
 				"- using \"quick\" ping command"
 		fi
 	else
+        QUICK=""
 		pingthis=$PING_PACKET_LOSS
 	fi
+
 
   if [ "$1" = "internet" ]; then
     #replace IP in $PING_COMMAND with $host_ip
@@ -744,10 +747,10 @@ function ping_host_new() {
     # handle "any" ping by calling itself with either "vpn" or "internet"
     interface_exists "$IF_TUNNEL"
     if [ "$RET_INTERFACE_EXISTS" = "yes" ]; then
-        ping_host_new "vpn" "$host_ip" "keep"
+        ping_host_new "vpn" "$host_ip" "keep" $QUICK
         return
     else
-        ping_host_new "internet" "$host_ip" "keep"
+        ping_host_new "internet" "$host_ip" "keep" $QUICK
         return
     fi
   fi

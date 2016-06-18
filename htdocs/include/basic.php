@@ -441,19 +441,14 @@ function VM_get_status( $output = 'html'){
 
 
 
-  if( $output !== 'html')
-  {
-    $up = $_pia->get_update_status();
-    if(is_int($up) === true && $up == 0 ){
-      $up_txt = '<a href="./?page=tools&amp;cid=tools&amp;cmd=update_software_client">latest release</a>';
-    }elseif( $up > 0 ){
-      $s = ( $up > 1 ) ? 's' : '';
-      $up_txt = '<a href="/?page=tools&amp;cid=tools&amp;cmd=update_software_client">'."$up update{$s} available</a>";
-    }else{
-      $up_txt = $up;
-    }
+  $up = $_pia->get_update_status();
+  if(is_int($up) === true && $up == 0 ){
+    $up_txt = '<a href="./?page=tools&amp;cid=tools&amp;cmd=update_software_client">latest release</a>';
+  }elseif( $up > 0 ){
+    $s = ( $up > 1 ) ? 's' : '';
+    $up_txt = '<a href="/?page=tools&amp;cid=tools&amp;cmd=update_software_client">'."$up update{$s} available</a>";
   }else{
-    $up_txt = '<a href="./?page=tools&amp;cid=tools&amp;cmd=update_software_client">checking ...</a>';
+    $up_txt = $up;
   }
   $ret_arr['software_update'] = $up_txt;
 
