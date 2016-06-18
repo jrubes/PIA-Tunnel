@@ -441,23 +441,28 @@ function VM_get_status( $output = 'html'){
 
 
 
-  $up = $_pia->get_update_status();
-  if(is_int($up) === true && $up == 0 ){
-    $up_txt = '<a href="./?page=tools&amp;cid=tools&amp;cmd=update_software_client">latest release</a>';
-  }elseif( $up > 0 ){
-    $s = ( $up > 1 ) ? 's' : '';
-    $up_txt = '<a href="/?page=tools&amp;cid=tools&amp;cmd=update_software_client">'."$up update{$s} available</a>";
+  if( $output !== 'html')
+  {
+    $up = $_pia->get_update_status();
+    if(is_int($up) === true && $up == 0 ){
+      $up_txt = '<a href="./?page=tools&amp;cid=tools&amp;cmd=update_software_client">latest release</a>';
+    }elseif( $up > 0 ){
+      $s = ( $up > 1 ) ? 's' : '';
+      $up_txt = '<a href="/?page=tools&amp;cid=tools&amp;cmd=update_software_client">'."$up update{$s} available</a>";
+    }else{
+      $up_txt = $up;
+    }
   }else{
-    $up_txt = $up;
+    $up_txt = '<a href="./?page=tools&amp;cid=tools&amp;cmd=update_software_client">checking ...</a>';
   }
   $ret_arr['software_update'] = $up_txt;
 
 
-  if( $_pia->status_pia_daemon() === 'running' ){
-    $ret_arr['daemon_status'] = "running (autostart:{$settings['DAEMON_ENABLED']})";
-  }else{
-    $ret_arr['daemon_status'] = "not running (autostart:{$settings['DAEMON_ENABLED']})";
-  }
+//  if( $_pia->status_pia_daemon() === 'running' ){
+//    $ret_arr['daemon_status'] = "running (autostart:{$settings['DAEMON_ENABLED']})";
+//  }else{
+//    $ret_arr['daemon_status'] = "not running (autostart:{$settings['DAEMON_ENABLED']})";
+//  }
 
 
   //check session.log if for current status
