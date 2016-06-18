@@ -114,7 +114,7 @@ function VM_shutdown(){
   global $_pia;
   $_pia->clear_session();
   exec('sudo /usr/local/pia/include/shutdown.sh shutdown');
-  
+
 }
 
 /**
@@ -209,18 +209,16 @@ function VPN_get_connections( $name, $build_options=array()){
         }
       }
     }
-    if( count($ret) > 0 ){ $_SESSION['ovpn_assembled'] = $ret; }
+    sort($ret);sort($fw_ret);
+    if( count($ret) === 0 && count($fw_ret) === 0 ){ $ret[] = array( 'invalid login data', 'invalid login data'); }
+    if( count($ret) > 0 ){ $ret = array_merge($sel, $fw_ret, $ret); $_SESSION['ovpn_assembled'] = $ret; }
+
   }else{
     $ret = $_SESSION['ovpn_assembled'];
   }
-  if( $ret == '' ){ unset($_SESSION['ovpn_assembled']);return false; }
 
-  sort($ret);sort($fw_ret);
-  if( count($ret) === 0 && count($fw_ret) === 0 ){ $ret[] = array( 'invalid login data', 'invalid login data'); }
-  $t = array_merge($sel, $fw_ret, $ret);
-  $assembled = build_select($t);
-  //return "<select name=\"vpn_connections\">\n$ret</select>\n";
-
+  if( $ret == '' ){ unset($_SESSION['ovpn_assembled']); return false; }
+  $assembled = build_select($ret);
   return $assembled;
 }
 
