@@ -62,3 +62,9 @@ function write_commands_settings() {
 if [ ! -f "/usr/local/pia/settings.conf" ]; then
 	write_commands_settings
 fi
+
+# append commands
+ret=$("$CMD_GREP" -c "CMD_SUDO" /usr/local/pia/settings.conf)
+if [ "$ret" -eq 0 ]; then
+	write_commands_settings
+fi
