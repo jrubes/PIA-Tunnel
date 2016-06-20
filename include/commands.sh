@@ -52,8 +52,8 @@ function write_commands_settings() {
     echo "CMD_NETSTAT='$CMD_NETSTAT'" >> /usr/local/pia/settings.conf
     echo "CMD_TAIL='$CMD_TAIL'" >> /usr/local/pia/settings.conf
     echo "CMD_WGET='$CMD_WGET'" >> /usr/local/pia/settings.conf
-    echo "CMD_DANTECLI"='$CMD_DANTECLI'" >> /usr/local/pia/settings.conf
-    echo "CMD_3PROXYCLI"='$CMD_3PROXYCLI'" >> /usr/local/pia/settings.conf
+    echo "CMD_DANTECLI='$CMD_DANTECLI'" >> /usr/local/pia/settings.conf
+    echo "CMD_3PROXYCLI='$CMD_3PROXYCLI'" >> /usr/local/pia/settings.conf
 
 }
 
