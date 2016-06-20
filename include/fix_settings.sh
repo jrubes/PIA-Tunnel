@@ -126,7 +126,7 @@ if [ $ret = 0 ]; then
   echo 'DHCPD_STATIC_IP=""' >> '/usr/local/pia/settings.conf'
 fi
 
-#add web UI user info
+#add web UI user info - cookie and namespace is generated when booting
 ret=`$CMD_GREP -c "WEB_UI_USER" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_USER=""' >> '/usr/local/pia/settings.conf'
@@ -135,19 +135,10 @@ ret=`$CMD_GREP -c "WEB_UI_PASSWORD" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_PASSWORD=""' >> '/usr/local/pia/settings.conf'
 fi
-ret=`$CMD_GREP -c "WEB_UI_NAMESPACE" /usr/local/pia/settings.conf`
-if [ $ret = 0 ]; then
-  echo 'WEB_UI_NAMESPACE="3DApa2ezdm"' >> '/usr/local/pia/settings.conf'
-fi
-ret=`$CMD_GREP -c "WEB_UI_COOKIE" /usr/local/pia/settings.conf`
-if [ $ret = 0 ]; then
-  echo 'WEB_UI_COOKIE=""' >> '/usr/local/pia/settings.conf'
-fi
 ret=`$CMD_GREP -c "WEB_UI_COOKIE_LIFETIME" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then
   echo 'WEB_UI_COOKIE_LIFETIME="120"' >> '/usr/local/pia/settings.conf'
 fi
-
 #ping failure
 ret=`$CMD_GREP -c "PING_MAX_LOSS" /usr/local/pia/settings.conf`
 if [ $ret = 0 ]; then

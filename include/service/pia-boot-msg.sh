@@ -6,7 +6,22 @@
 
 case "$1" in
 *)
-		source '/usr/local/pia/settings.conf'
+        if [ ! -f '/usr/local/pia/settings.conf' ]; then
+          # will not exist after a reset
+          source '/usr/local/pia/commands.sh'
+          if [ "$OS_TYPE" = "Linux" ]; then
+            $IF_EXT='eth0'
+          else
+            $IF_EXT='em0'
+          fi
+
+          # commands.sh creates settings so remove it again
+          rm '/usr/local/pia/settings.conf'
+
+        else
+          source '/usr/local/pia/settings.conf'
+        fi
+
 
         # start with a fresh /etc/issue
         echo > /etc/issue

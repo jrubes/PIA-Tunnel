@@ -5,6 +5,18 @@ LANG=en_US.UTF-8
 export LANG
 source '/usr/local/pia/settings.conf'
 
+# check if namespace in case this system has been reset with 'reset-pia'
+# untested on FreeBSD ATM  2016-06-20
+if [ "$WEB_UI_NAMESPACE" = "" ]; then
+  WEB_UI_NAMESPACE=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c12)
+  echo "WEB_UI_NAMESPACE='$WEB_UI_NAMESPACE'" >> '/usr/local/pia/settings.conf'
+fi
+if [ "$WEB_UI_COOKIE" = "" ]; then
+  # this value is reset when running the setup wizard but let's start with something unknown
+  WEB_UI_COOKIE=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c40)
+  echo "WEB_UI_COOKIE='$WEB_UI_COOKIE'" >> '/usr/local/pia/settings.conf'
+fi
+
 
 #read list of commands into array
 IFS=$'\r\n' CMD_LIST=($(cat "/usr/local/pia/include/autostart.conf"))

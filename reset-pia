@@ -15,7 +15,7 @@ fi
 
 rm -rf /root/.ansible
 rm -rf /root/.viminfo
-rm /root/.ssh/*
+rm /root/.ssh/* &> /dev/null
 echo "" > /root/.bash_history
 cd /tmp/ ; rm -rf *
 #delete all files in /var/log
@@ -24,14 +24,6 @@ find /var/log -type f -delete
 # PHP session files
 if [ -d '/var/lib/php5/sessions' ]; then
     rm -f '/var/lib/php5/sessions/'*
-fi
-
-# restart apache
-if [ "$OS_TYPE" = "Linux" ]; then
-    systemctl restart apache2
-else
-    echo "To DO, restart apache"
-    exit 99
 fi
 
 
@@ -78,4 +70,4 @@ chmod ugo+x /usr/local/pia/pia-setup
 /usr/local/pia/pia-update
 
 
-echo "Done, reboot or shutdown now!"
+echo "Done, you must reboot or shutdown now!"

@@ -1,0 +1,9 @@
+- name: remove ansible
+  apt: name="{{ item }}" state=absent purge=yes
+  with_items:
+    - ansible
+    - sshpass
+  when: ansible_distribution == 'Debian'
+
+- shell: "apt-get autoremove"
+  when: ansible_distribution == 'Debian'
