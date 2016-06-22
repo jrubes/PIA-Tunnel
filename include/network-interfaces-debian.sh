@@ -29,8 +29,8 @@ if [ "${IF_ETH0_DHCP}" = 'no' ] && [ ! -z "${IF_ETH0_IP}" ] && [ ! -z "${IF_ETH0
   cont="${cont}        address ${IF_ETH0_IP}\n"
   cont="${cont}        netmask ${IF_ETH0_SUB}\n"
 fi
-if [ "${IF_ETH0_DHCP}" = 'no' ] && [ ! -z "${IF_ETH0_GW}" ] && [ ! -z "${IF_ETH0_IP}" ] && [ ! -z "${IF_ETH0_SUB}" ]; then
-  cont="${cont}        gateway ${IF_ETH0_GW}\n"
+if [ "${IF_ETH0_DHCP}" = 'no' ] && [ ! -z "${IF_DEFAULTROUTER}" ] && [ ! -z "${IF_ETH0_IP}" ] && [ ! -z "${IF_ETH0_SUB}" ]; then
+  cont="${cont}        gateway ${IF_DEFAULTROUTER}\n"
 fi
 
 
@@ -53,9 +53,6 @@ fi
 if [ "${IF_ETH1_DHCP}" = 'no' ] && [ ! -z "${IF_ETH1_IP}" ] && [ ! -z "${IF_ETH1_SUB}" ]; then
   cont="${cont}        address ${IF_ETH1_IP}\n"
   cont="${cont}        netmask ${IF_ETH1_SUB}\n"
-fi
-if [ "${IF_ETH1_DHCP}" = 'no' ] && [ ! -z "${IF_ETH1_GW}" ] && [ ! -z "${IF_ETH1_IP}" ] && [ ! -z "${IF_ETH1_SUB}" ]; then
-  cont="${cont}        gateway ${IF_ETH1_GW}\n"
 fi
 
 cont="${cont}\n"
