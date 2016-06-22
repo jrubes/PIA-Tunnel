@@ -210,7 +210,11 @@ $disp_body .= '<script type="text/javascript">'
  */
 function VPN_generate_interfaces(){
   global $settings;
-  exec( $settings['CMD_SUDO']." /usr/local/pia/include/network-interfaces.sh"); //write new dhcpd.conf
+  if( $settings['OS_TYPE'] === 'Linux' ){
+    exec( $settings['CMD_SUDO']." /usr/local/pia/include/network-interfaces-debian.sh"); //write new dhcpd.conf
+  }else{
+    exec( $settings['CMD_SUDO']." /usr/local/pia/include/network-interfaces.sh"); //write new dhcpd.conf
+  }
 }
 
 /**
@@ -1222,7 +1226,7 @@ function disp_interface(){
   $sel = array(
           'id' => 'IF_ETH0_DHCP',
           'selected' => $settings['IF_ETH0_DHCP'],
-          'onchange' => "toggle(this, 'IF_ETH0_IP,IF_ETH0_SUB', 'yes', 'disabled', '', '');",
+          'onchange' => "toggle(this, 'IF_DEFAULTROUTER,IF_ETH0_IP,IF_ETH0_SUB', 'yes', 'disabled', '', '');",
           array( 'yes', 'yes'),
           array( 'no', 'no')
         );
@@ -1233,22 +1237,25 @@ function disp_interface(){
   $disp_body .= '<tr><td>'.$settings['WEB_UI_IF1'].' Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH0_SUB" name="IF_ETH0_SUB" value="'.$settings['IF_ETH0_SUB'].'"></td></tr>'."\n";
 
   // eth1 / em1
-  $disabled = ($settings['IF_ETH1_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH1_DHCP,';
-  $sel = array(
-          'id' => 'IF_ETH1_DHCP',
-          'selected' => $settings['IF_ETH1_DHCP'],
-          'onchange' => "toggle(this, 'IF_ETH1_IP,IF_ETH1_SUB', 'yes', 'disabled', '', '');",
-          array( 'yes', 'yes'),
-          array( 'no', 'no')
-        );
-  $disp_body .= '<tr><td>'.$settings['WEB_UI_IF2'].' use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH1_IP,';
-  $disp_body .= '<tr><td>'.$settings['WEB_UI_IF2'].' IP</td><td><input '.$disabled.' type="text" id="IF_ETH1_IP" name="IF_ETH1_IP" value="'.$settings['IF_ETH1_IP'].'"></td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_ETH1_SUB,';
-  $disp_body .= '<tr><td>'.$settings['WEB_UI_IF2'].' Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH1_SUB" name="IF_ETH1_SUB" value="'.$settings['IF_ETH1_SUB'].'"></td></tr>'."\n";
-
+  if( $settings['IF_INT_AVAILABLE'] === 'yes')
+  {
+    $disabled = ($settings['IF_ETH1_DHCP'] === 'yes') ? 'disabled' : ''; //disable input fields when DHCP is set
+    $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+    $GLOB_disp_network_default_fields .= 'IF_ETH1_DHCP,';
+    $sel = array(
+            'id' => 'IF_ETH1_DHCP',
+            'selected' => $settings['IF_ETH1_DHCP'],
+            'onchange' => "toggle(this, 'IF_ETH1_IP,IF_ETH1_SUB', 'yes', 'disabled', '', '');",
+            array( 'yes', 'yes'),
+            array( 'no', 'no')
+          );
+    $disp_body .= '<tr><td>'.$settings['WEB_UI_IF2'].' use DHCP</td><td>'.build_select($sel).'</td></tr>'."\n";
+    $GLOB_disp_network_default_fields .= 'IF_ETH1_IP,';
+    $disp_body .= '<tr><td>'.$settings['WEB_UI_IF2'].' IP</td><td><input '.$disabled.' type="text" id="IF_ETH1_IP" name="IF_ETH1_IP" value="'.$settings['IF_ETH1_IP'].'"></td></tr>'."\n";
+    $GLOB_disp_network_default_fields .= 'IF_ETH1_SUB,';
+    $disp_body .= '<tr><td>'.$settings['WEB_UI_IF2'].' Subnet</td><td><input '.$disabled.' type="text" id="IF_ETH1_SUB" name="IF_ETH1_SUB" value="'.$settings['IF_ETH1_SUB'].'"></td></tr>'."\n";
+  }
+  
   $disp_body .= '</table>';
   $disp_body .= '<br><input type="submit" name="store settings" value="Store Settings"> ';
   $disp_body .= ' &nbsp; <input type="submit" name="restart_network" value="Network Restart">';

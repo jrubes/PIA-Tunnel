@@ -324,3 +324,11 @@ if [ -f '/usr/sbin/socks' ]; then
 else
     echo "CMD_3PROXYCLI=''" >> /usr/local/pia/settings.conf
 fi
+
+
+# This value is used by the webUI to hide INT_IF settings if it is not available
+# the setting is defined by pia-boot-msg.sh
+$CMD_GREP -q "IF_INT_AVAILABLE" /usr/local/pia/settings.conf
+if [ $? -ne 0 ]; then
+    echo 'IF_INT_AVAILABLE="maybe"' >> "/usr/local/pia/settings.conf"
+fi

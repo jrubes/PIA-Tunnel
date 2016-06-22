@@ -16,20 +16,20 @@ cont="${cont}iface lo inet loopback\n"
 cont="${cont}\n"
 
 
-#setup em0
+#setup eth0
 cont="${cont}# The primary network interface\n"
-cont="${cont}auto em0\n"
+cont="${cont}auto $IF_EXT\n"
 if [ "${IF_ETH0_DHCP}" = 'yes' ]; then
-  cont="${cont}iface em0 inet dhcp\n"
+  cont="${cont}iface $IF_EXT inet dhcp\n"
 else
-  cont="${cont}iface em0 inet static\n"
+  cont="${cont}iface $IF_EXT inet static\n"
 fi
 
-if [ ! -z "${IF_ETH0_IP}" ] && [ ! -z "${IF_ETH0_SUB}" ]; then
+if [ "${IF_ETH0_DHCP}" = 'no' ] && [ ! -z "${IF_ETH0_IP}" ] && [ ! -z "${IF_ETH0_SUB}" ]; then
   cont="${cont}        address ${IF_ETH0_IP}\n"
   cont="${cont}        netmask ${IF_ETH0_SUB}\n"
 fi
-if [ ! -z "${IF_ETH0_GW}" ] && [ ! -z "${IF_ETH0_IP}" ] && [ ! -z "${IF_ETH0_SUB}" ]; then
+if [ "${IF_ETH0_DHCP}" = 'no' ] && [ ! -z "${IF_ETH0_GW}" ] && [ ! -z "${IF_ETH0_IP}" ] && [ ! -z "${IF_ETH0_SUB}" ]; then
   cont="${cont}        gateway ${IF_ETH0_GW}\n"
 fi
 
@@ -43,18 +43,18 @@ cont="${cont}\n"
 
 
 cont="${cont}# The private VM LAN interface\n"
-cont="${cont}auto em1\n"
+cont="${cont}auto $IF_INT\n"
 if [ "${IF_ETH1_DHCP}" = 'yes' ] && [ ! -z "${IF_ETH1_IP}" ] && [ ! -z "${IF_ETH1_SUB}" ]; then
-  cont="${cont}iface em1 inet dhcp\n"
+  cont="${cont}iface $IF_INT inet dhcp\n"
 else
-  cont="${cont}iface em1 inet static\n"
+  cont="${cont}iface $IF_INT inet static\n"
 fi
 
-if [ ! -z "${IF_ETH1_IP}" ] && [ ! -z "${IF_ETH1_SUB}" ]; then
+if [ "${IF_ETH1_DHCP}" = 'no' ] && [ ! -z "${IF_ETH1_IP}" ] && [ ! -z "${IF_ETH1_SUB}" ]; then
   cont="${cont}        address ${IF_ETH1_IP}\n"
   cont="${cont}        netmask ${IF_ETH1_SUB}\n"
 fi
-if [ ! -z "${IF_ETH1_GW}" ] && [ ! -z "${IF_ETH1_IP}" ] && [ ! -z "${IF_ETH1_SUB}" ]; then
+if [ "${IF_ETH1_DHCP}" = 'no' ] && [ ! -z "${IF_ETH1_GW}" ] && [ ! -z "${IF_ETH1_IP}" ] && [ ! -z "${IF_ETH1_SUB}" ]; then
   cont="${cont}        gateway ${IF_ETH1_GW}\n"
 fi
 

@@ -56,6 +56,9 @@ case "$1" in
             if [ $? -eq 0 ]; then
               eth1IP=`$CMD_IP addr show "$IF_INT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
               echo "$IF_INT IP: $eth1IP" >> /etc/issue
+              /usr/local/pia/pia-settings "IF_INT_AVAILABLE" "yes"
+            else
+              /usr/local/pia/pia-settings "IF_INT_AVAILABLE" "no"
             fi
 
         else
@@ -63,6 +66,9 @@ case "$1" in
             if [ $? -eq 0 ]; then
               eth1IP=`$CMD_IP "$IF_INT" | $CMD_GREP -w "inet" | $CMD_GAWK -F" " '{print $2}' | $CMD_CUT -d/ -f1`
               echo "$IF_INT IP: $eth1IP" >> /etc/issue
+              /usr/local/pia/pia-settings "IF_INT_AVAILABLE" "yes"
+            else
+              /usr/local/pia/pia-settings "IF_INT_AVAILABLE" "no"
             fi
         fi
 
