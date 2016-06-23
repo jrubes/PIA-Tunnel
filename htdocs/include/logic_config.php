@@ -988,8 +988,12 @@ function disp_firewall_box(){
             'id' => $use,
             'selected' =>  $fw_ssh,
             array( 'FIREWALL_IF_WEB[0]', 'eth0'),
-            array( 'FIREWALL_IF_WEB[1]', 'eth1')
+            //array( 'FIREWALL_IF_WEB[1]', 'eth1')
           );
+  if( $settings['IF_INT_AVAILABLE'] === 'yes')
+  {
+      array_push($sel, array( 'FIREWALL_IF_WEB[1]', 'eth1'));
+  }
   $disp_body .= '<tr><td><span title="incoming on port 80">Allow webUI access on</span></td><td><span title="incoming on port 80">'.   build_checkbox($sel).'</span></td></tr>'."\n";
 
 
@@ -1045,18 +1049,21 @@ function disp_firewall_box(){
   $disp_body .= '<tr><td>New Port on '.$settings['IF_EXT'].'</td><td><input type="text" name="FIREWALL_EXT['.$x.']" value=""></td></tr>'."\n";
   $disp_body .= $ports; //add existing ports below "new field"
 
-  $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'FIREWALL_INT,';
-  $max_range = $_settings->get_array_count('FIREWALL_INT');
-  $ports = '';
-  for( $x = 0 ; $x < $max_range ; ++$x ){
-    if( array_key_exists('FIREWALL_INT['.$x.']', $settings) === true && $settings['FIREWALL_INT['.$x.']'] !== '' ){
+  if( $settings['IF_INT_AVAILABLE'] === 'yes')
+  {
+    $disp_body .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'."\n";
+    $GLOB_disp_network_default_fields .= 'FIREWALL_INT,';
+    $max_range = $_settings->get_array_count('FIREWALL_INT');
+    $ports = '';
+    for( $x = 0 ; $x < $max_range ; ++$x ){
+      if( array_key_exists('FIREWALL_INT['.$x.']', $settings) === true && $settings['FIREWALL_INT['.$x.']'] !== '' ){
 
-      $ports .= '<tr><td>Port on '.$settings['IF_INT'].'</td><td><input type="text" name="FIREWALL_INT['.$x.']" value="'.$settings['FIREWALL_INT['.$x.']'].'"></td></tr>'."\n";
+        $ports .= '<tr><td>Port on '.$settings['IF_INT'].'</td><td><input type="text" name="FIREWALL_INT['.$x.']" value="'.$settings['FIREWALL_INT['.$x.']'].'"></td></tr>'."\n";
+      }
     }
-  }
-  $disp_body .= '<tr><td>New Port on '.$settings['IF_INT'].'</td><td><input type="text" name="FIREWALL_INT['.$x.']" value=""></td></tr>'."\n";
-  $disp_body .= $ports; //add existing ports below "new field"
+    $disp_body .= '<tr><td>New Port on '.$settings['IF_INT'].'</td><td><input type="text" name="FIREWALL_INT['.$x.']" value=""></td></tr>'."\n";
+    $disp_body .= $ports; //add existing ports below "new field"
+    }
 
 
   $disp_body .= "</table>\n";
@@ -1193,15 +1200,20 @@ function disp_interface(){
           array( 'tun0', 'tun0')
         );
   $disp_body .= '<tr><td>Public LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
-  $GLOB_disp_network_default_fields .= 'IF_INT,';
-  $sel = array(
-          'id' => 'IF_INT',
-          'selected' =>  $settings['IF_INT'],
-          array( $settings['WEB_UI_IF1'], $settings['WEB_UI_IF1']),
-          array( $settings['WEB_UI_IF2'], $settings['WEB_UI_IF2']),
-          array( 'tun0', 'tun0')
-        );
-  $disp_body .= '<tr><td>VM LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+  
+  if( $settings['IF_INT_AVAILABLE'] === 'yes')
+  {
+    $GLOB_disp_network_default_fields .= 'IF_INT,';
+    $sel = array(
+            'id' => 'IF_INT',
+            'selected' =>  $settings['IF_INT'],
+            array( $settings['WEB_UI_IF1'], $settings['WEB_UI_IF1']),
+            array( $settings['WEB_UI_IF2'], $settings['WEB_UI_IF2']),
+            array( 'tun0', 'tun0')
+          );
+    $disp_body .= '<tr><td>VM LAN interface</td><td>'.build_select($sel).'</td></tr>'."\n";
+   }
+    
   $GLOB_disp_network_default_fields .= 'IF_TUNNEL,';
   $sel = array(
           'id' => 'IF_TUNNEL',
