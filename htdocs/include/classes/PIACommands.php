@@ -416,6 +416,7 @@ function rand_string($lenth, $range=array('A','Z','a','z',0,9), $other='' ) {
  * @return boolean true or false
  */
 function is_mounted( $mount_point ){
+  if( $mount_point == '' ){ return false; }
   $set = $this->_settings->get_settings();
 
   $ret = array();
