@@ -315,14 +315,14 @@ fi
 
 # Set proxy command values
 if [ -f '/usr/sbin/sockd' ]; then
-    echo "CMD_DANTECLI='/usr/sbin/sockd'" >> /usr/local/pia/settings.conf
+    /usr/local/pia/pia-setting 'CMD_DANTECLI' '/usr/sbin/sockd'
 else
-    echo "CMD_DANTECLI=''" >> /usr/local/pia/settings.conf
+    /usr/local/pia/pia-setting 'CMD_DANTECLI' ''
 fi
 if [ -f '/usr/sbin/socks' ]; then
-    echo "CMD_3PROXYCLI='/usr/sbin/socks'" >> /usr/local/pia/settings.conf
+    /usr/local/pia/pia-setting 'CMD_3PROXYCLI' '/usr/sbin/socks'
 else
-    echo "CMD_3PROXYCLI=''" >> /usr/local/pia/settings.conf
+    /usr/local/pia/pia-setting 'CMD_3PROXYCLI' ''
 fi
 
 
