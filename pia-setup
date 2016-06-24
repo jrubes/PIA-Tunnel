@@ -134,6 +134,28 @@ if [ -f '/usr/local/pia/login.conf' ]; then
   mv '/usr/local/pia/login.conf' '/usr/local/pia/login-pia.conf'
 fi
 
+# check if namespace in case this system has been reset with 'reset-pia'
+# untested on FreeBSD ATM  2016-06-20
+if [ "$WEB_UI_NAMESPACE" = "" ]; then
+    WEB_UI_NAMESPACE=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c12)
+    $CMD_GREP -q 'WEB_UI_NAMESPACE' '/usr/local/pia/settings.conf'
+    if [ $? -eq 0 ]; then
+        /usr/local/pia/pia-settings 'WEB_UI_NAMESPACE' "$WEB_UI_NAMESPACE"
+    else
+        echo "WEB_UI_NAMESPACE='$WEB_UI_NAMESPACE'" >> '/usr/local/pia/settings.conf'
+    fi
+fi
+if [ "$WEB_UI_COOKIE_AUTH" = "" ]; then
+    # this value is reset when running the setup wizard but let's start with something unknown
+    WEB_UI_COOKIE_AUTH=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c40)
+    $CMD_GREP -q 'WEB_UI_COOKIE_AUTH' '/usr/local/pia/settings.conf'
+    if [ $? -eq 0 ]; then
+        /usr/local/pia/pia-settings 'WEB_UI_COOKIE_AUTH' "$WEB_UI_COOKIE_AUTH"
+    else
+        echo "WEB_UI_COOKIE_AUTH='$WEB_UI_COOKIE_AUTH'" >> '/usr/local/pia/settings.conf'
+    fi
+fi
+
 
 # rebuild autostart.conf to apply new default values from update (pia-update runs pia-setup)
 /usr/local/pia/include/autostart_rebuild.sh &> /dev/null

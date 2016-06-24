@@ -35,8 +35,8 @@ function disp_admin_ui_default(){
   $disp_body .= '<tr><td>Web-UI Password</td><td><input type="password" style="width: 15em" name="WEB_UI_PASSWORD" value="" placeholder="Password for the Web-UI"></td>';
   $disp_body .= "</table>\n";
   $disp_body .= '<input type="hidden" name="WEB_UI_NAMESPACE" value="'.$_pia->rand_string(10).'">';
-  $disp_body .= '<input type="hidden" name="WEB_UI_COOKIE" value="'.$_pia->rand_string(20).'">';
-  $fields .= 'WEB_UI_USER,WEB_UI_PASSWORD,WEB_UI_NAMESPACE,WEB_UI_COOKIE';
+  $disp_body .= '<input type="hidden" name="WEB_UI_COOKIE_AUTH" value="'.$_pia->rand_string(20).'">';
+  $fields .= 'WEB_UI_USER,WEB_UI_PASSWORD,WEB_UI_NAMESPACE,WEB_UI_COOKIE_AUTH';
 
   $disp_body .= '<input type="hidden" name="store_fields" value="'.$fields.'">';
   $disp_body .= '<br><input type="submit" name="store_admin_info" value="Save Info">';

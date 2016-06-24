@@ -11,10 +11,10 @@ if [ "$WEB_UI_NAMESPACE" = "" ]; then
   WEB_UI_NAMESPACE=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c12)
   echo "WEB_UI_NAMESPACE='$WEB_UI_NAMESPACE'" >> '/usr/local/pia/settings.conf'
 fi
-if [ "$WEB_UI_COOKIE" = "" ]; then
+if [ "$WEB_UI_COOKIE_AUTH" = "" ]; then
   # this value is reset when running the setup wizard but let's start with something unknown
-  WEB_UI_COOKIE=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c40)
-  echo "WEB_UI_COOKIE='$WEB_UI_COOKIE'" >> '/usr/local/pia/settings.conf'
+  WEB_UI_COOKIE_AUTH=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c40)
+  echo "WEB_UI_COOKIE_AUTH='$WEB_UI_COOKIE_AUTH'" >> '/usr/local/pia/settings.conf'
 fi
 
 

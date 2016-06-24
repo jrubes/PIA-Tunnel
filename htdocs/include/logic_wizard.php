@@ -16,6 +16,9 @@ switch($_REQUEST['cmd']){
     $disp_body .= $_settings->save_settings_logic($_POST['store_fields']);
     $disp_body .= $_pia->update_root_password($_POST['new_root_password']);
     $_settings->save_settings('SETUP_WIZARD_COMPLETED', 'yes');
+    
+    //enable the selected VPN provider
+    $_settings->save_settings('VPN_PROVIDERS[0]', $_POST['vpn_provider']);
 
     $disp_body .= '<div class="box">';
     $disp_body .= '<p>All done! <a href="/?page=main">Please login to continue</a></p>';
@@ -51,9 +54,9 @@ function disp_wizard_default(){
   $disp_body .= '<tr><td>Web-UI Password</td><td><input type="password" style="width: 15em" name="WEB_UI_PASSWORD" value="" placeholder="Password for the Web-UI" required></td>';
   $disp_body .= "</table>\n";
   $disp_body .= '<input type="hidden" name="WEB_UI_NAMESPACE" value="'.$_pia->rand_string(10).'">';
-  $disp_body .= '<input type="hidden" name="WEB_UI_COOKIE" value="'.$_pia->rand_string(20).'">';
+  $disp_body .= '<input type="hidden" name="WEB_UI_COOKIE_AUTH" value="'.$_pia->rand_string(20).'">';
   $disp_body .= '<hr>';
-  $fields .= 'WEB_UI_USER,WEB_UI_PASSWORD,WEB_UI_NAMESPACE,WEB_UI_COOKIE,';
+  $fields .= 'WEB_UI_USER,WEB_UI_PASSWORD,WEB_UI_NAMESPACE,WEB_UI_COOKIE_AUTH,';
 
   //username
   $disp_body .= '<p>Please enter your VPN account information for one provider.<br>'
@@ -87,14 +90,20 @@ function disp_wizard_default(){
             array( 'no', 'no')
           );
   $disp_body .= '<tr><td>VPN Gateway for public LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+  
   $fields .= 'FORWARD_VM_LAN,';
-  $sel = array(
-            'id' => 'FORWARD_VM_LAN',
-            'selected' =>  $settings['FORWARD_VM_LAN'],
-            array( 'yes', 'yes'),
-            array( 'no', 'no')
-          );
-  $disp_body .= '<tr><td>VPN Gateway for VM LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+  if( $settings['IF_INT_AVAILABLE'] === 'yes')
+  {
+    $sel = array(
+              'id' => 'FORWARD_VM_LAN',
+              'selected' =>  $settings['FORWARD_VM_LAN'],
+              array( 'yes', 'yes'),
+              array( 'no', 'no')
+            );
+    $disp_body .= '<tr><td>VPN Gateway for VM LAN</td><td>'.build_select($sel).'</td></tr>'."\n";
+  }else{
+    $disp_body .= '<tr><td>&nbsp;</td><td><input type="hidden" name="FORWARD_VM_LAN" value="no"></td></tr>'."\n";
+  }
   $disp_body .= "</table>\n";
   $disp_body .= '<hr>';
 
