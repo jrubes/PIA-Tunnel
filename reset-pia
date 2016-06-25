@@ -20,6 +20,7 @@ echo "" > /root/.bash_history
 cd /tmp/ ; rm -rf *
 #delete all files in /var/log
 find /var/log -type f -delete
+rm -rf /usr/local/pia/ovpn.d/* &> /dev/null
 
 # PHP session files
 if [ -d '/var/lib/php5/sessions' ]; then
