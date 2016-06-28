@@ -823,7 +823,14 @@ function VPN_get_IP(){
     return 'not connected yet';
   }
 
+  // no point in going further if port forwarding is not supported
   if( supports_forwarding(trim($_SESSION['connecting2'])) === false ){return false; }
+  
+  
+  //require any custom port lookup scripts from the get_port directory
+  $port_script = VPN_get_port_script();
+  if( $port_script === false ){ return false; }
+  require_once './get_port/'.$port_script;
 
 
   //check if the port cache should be considered old
@@ -894,100 +901,21 @@ function VPN_get_IP(){
  }
 
 /**
- * get forwarded port from PIA
- * @global object $_files
- * @return int,boolean integer with port number or boolean false on failure
+ * retrieves the name of the port from port_forward.txt (first line)
  */
-function get_port(){
-  global $_files;
-  if( $_SESSION['connecting2'] == '' ){ return ''; }
+function VPN_get_port_script(){
+    global $_files;
 
-  //get provider from connectin2
-  $provider = explode('/', $_SESSION['connecting2']);
-  $filename = VPN_get_loginfile($provider[0]);
-  if( !preg_match("/^\/usr\/local\/pia\/login-[a-zA-Z]{3,10}\.conf+\z/", $filename ) ){throw new Exception('FATAL ERROR: invalid login file name - '.$filename); }
+    $ppath = explode('/', $_SESSION['connecting2']);
 
-
-  //get username and password from file or SESSION
-  if( array_key_exists($filename, $_SESSION) !== true ){
-    if( load_login($filename) === false ){ return false; }
-  }
-
-  //get the client ID
-  if( array_key_exists('client_id', $_SESSION) !== true ){
-    $c = $_files->readfile('/usr/local/pia/client_id');
+    $c = $_files->readfile('/usr/local/pia/ovpn/'.$ppath[0].'/port_forward.txt');
     if( $c !== false ){
-      if( mb_strlen($c) < 1 ){ return false; }
-      $_SESSION['client_id'] = $c; //store for later
-
-    }else{
-      return false;
+        $c = explode( "\n", eol($c));
+        return $c[0];
     }
-  }
-
-  $PIA_UN = urlencode($_SESSION[$filename]['username']);
-  $PIA_PW = urlencode($_SESSION[$filename]['password']);
-  $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
-  $ret = array();
-  if( $settings['OS_TYPE'] === 'Linux' ){
-    exec('/sbin/ip addr show '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
-  }else{
-    exec('/sbin/ifconfig '.$settings['IF_EXT'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
-  }
-  if( array_key_exists( '0', $ret) !== true ){
-    //VPN  is down, can not continue to check for open ports
     return false;
-  }else{
-    $TUN_IP = $ret[0];
-  }
-
-  //combine vars to submit as avPOST request
-  $post_vars = "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP";
-
-
-  // setup cURL resource
-  $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL, 'https://www.privateinternetaccess.com/vpninfo/port_forward_assignment');
-  curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
-  curl_setopt($ch, CURLOPT_HEADER, 0);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($ch, CURLOPT_POST, count(explode('&', $post_vars)));
-  curl_setopt($ch, CURLOPT_POSTFIELDS, $post_vars);
-  curl_setopt($ch, CURLOPT_TIMEOUT, 4); //max runtime for CURL
-  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 4); //only the connection timeout
-
-
-  $curl_timeout = strtotime('-10 minutes'); //time until timeout lock expires
-  if( array_key_exists('PIA_port_timeout', $_SESSION) === true ){
-    //validate time
-    if( $_SESSION['PIA_port_timeout'] < $curl_timeout ){
-      //echo 'debug: ran curl after timeout';
-      $curl_ret = curl_exec($ch);
-    }else{
-      //echo 'debug: lock still good';
-      return false;
-    }
-  }else{
-    //echo 'debug: ran curl';
-    $curl_ret = curl_exec($ch);
-  }
-  if( $curl_ret === false ){
-    //timeout or connection error, preventing retrying with every request
-    //echo 'debug: curl failed, setting timeout';
-    $_SESSION['PIA_port_timeout'] = strtotime('now');
-  }else{
-    //worked
-    if( array_key_exists('PIA_port_timeout', $_SESSION) === true ){ unset($_SESSION['PIA_port_timeout']); }
-  }
-
-  // grab URL and pass it to the browser
-  $return = json_decode(curl_exec($ch), true);
-  curl_close($ch);
-
-  return $return;
 }
-
-
+ 
 /**
  * ensures that every string uses only \n
  * @param string $string string that may contain \r\n
@@ -1020,8 +948,12 @@ function load_login( $filename ){
       if( $un == '' || $pw == '' ){
         return false;
       }
-      $_SESSION[$filename] = array( 'username' => $un , 'password' => $pw); //store for later
-      return $_SESSION[$filename];
+      
+      $nopath = explode('/', $filename);
+      $last = count($nopath)-1;
+      $_SESSION[$nopath[$last]] = array( 'username' => $un , 'password' => $pw); //store for later
+      return $_SESSION[$nopath[$last]];
+      
     }else{
       return false;
     }

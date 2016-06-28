@@ -254,13 +254,13 @@ class PIACommands {
    * @param string $ovpn name of connection or 'daemon' to use MYVPN array
    */
   function pia_connect( $ovpn ){
+    $set = $this->_settings->get_settings();
     $arg = escapeshellarg($ovpn);
 
     $this->clear_session();
 
     //add header to new session.log
     if( $ovpn === 'daemon' ){
-      $set = $this->_settings->get_settings();
       $s = $set['MYVPN[0]'];
       $c = "connecting to $s\n\n";
       $_SESSION['connecting2'] = $s; //store for messages

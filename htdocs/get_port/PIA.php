@@ -6,16 +6,19 @@
 /**
  * get forwarded port from PIA
  * @global object $_files
+ * @global object $_settings
  * @return int,boolean integer with port number or boolean false on failure
  */
 function get_port(){
    global $_files;
    global $_settings;
-   $set = $_settings->get_settings();
+   $settings = $_settings->get_settings();
 
   //get username and password from file or SESSION
   if( array_key_exists('login-pia.conf', $_SESSION) !== true ){
-   if( load_login() === false ){
+   $tmp = explode('/', $_SESSION['connecting2']);
+   $filename = VPN_get_loginfile($tmp[0]);
+   if( load_login($filename) === false ){
      return false;
    }
   }
@@ -33,17 +36,15 @@ function get_port(){
     }
   }
 
-  // create a new cURL resource
-  $ch = curl_init();
 
   $PIA_UN = urlencode($_SESSION['login-pia.conf']['username']);
   $PIA_PW = urlencode($_SESSION['login-pia.conf']['password']);
   $PIA_CLIENT_ID = urlencode(trim($_SESSION['client_id']));
   $ret = array();
-  if( $set['OS_TYPE'] === 'Linux'){
-    exec( $set['CMD_IP'].' addr show '.$set['IF_TUNNEL'].' | '.$set['CMD_GREP'].' -w "inet" | '.$set['CMD_GAWK'].' -F" " \'{print $2}\' | '.$set['CMD_CUT'].' -d/ -f1', $ret);
+  if( $settings['OS_TYPE'] === 'Linux'){
+    exec( $settings['CMD_IP'].' addr show '.$settings['IF_TUNNEL'].' | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
   }else{
-    exec( $set['CMD_IP'].' '.$set['IF_TUNNEL'].' 2>/dev/null | '.$set['CMD_GREP'].' -w "inet" | '.$set['CMD_GAWK'].' -F" " \'{print $2}\' | '.$set['CMD_CUT'].' -d/ -f1', $ret);
+    exec( $settings['CMD_IP'].' '.$settings['IF_TUNNEL'].' 2>/dev/null | '.$settings['CMD_GREP'].' -w "inet" | '.$settings['CMD_GAWK'].' -F" " \'{print $2}\' | '.$settings['CMD_CUT'].' -d/ -f1', $ret);
   }
   if( array_key_exists( '0', $ret) !== true ){
     //VPN  is down, can not continue to check for open ports
@@ -51,17 +52,17 @@ function get_port(){
   }else{
     $TUN_IP = $ret[0];
   }
-
   $post_vars = "user=$PIA_UN&pass=$PIA_PW&client_id=$PIA_CLIENT_ID&local_ip=$TUN_IP";
 
-  // set URL and other appropriate options
+  // setup cURL
+  $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, 'https://www.privateinternetaccess.com/vpninfo/port_forward_assignment');
   curl_setopt($ch, CURLOPT_USERAGENT,'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
   curl_setopt($ch, CURLOPT_HEADER, 0);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($ch, CURLOPT_POST, count(explode('&', $post_vars)));
   curl_setopt($ch, CURLOPT_POSTFIELDS, $post_vars);
-  curl_setopt($ch, CURLOPT_TIMEOUT, 4); //max runtime for CURL
+  curl_setopt($ch, CURLOPT_TIMEOUT, 4); //max runtime for cURL
   curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 4); //only the connection timeout
 
 
@@ -88,12 +89,9 @@ function get_port(){
     if( array_key_exists('PIA_port_timeout', $_SESSION) === true ){ unset($_SESSION['PIA_port_timeout']); }
   }
 
-  // grab URL and pass it to the browser
+
   $return = json_decode($curl_ret, true);
-
-  // close cURL resource, and free up system resources
   curl_close($ch);
-
   return $return;
  }
 
