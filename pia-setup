@@ -15,7 +15,8 @@ if [ "$CMD_GREP" = "" ]; then
 fi
 
 if [ ! -f '/usr/local/pia/settings.conf' ]; then
-    touch '/usr/local/pia/settings.conf';
+    touch '/usr/local/pia/settings.conf'
+    chmod 0660 /usr/local/pia/settings.conf
 fi
 
 #create a fresh settings file or load existing

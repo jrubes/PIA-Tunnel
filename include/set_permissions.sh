@@ -42,4 +42,8 @@ chmod a+x /usr/local/pia/include/service/*.sh
 
 #reset-pia is special - ug+x but no /bin link
 chmod ug+x "/usr/local/pia/reset-pia"
+
+# more special stuff below
 chmod ug+x "/usr/local/pia/system-update.sh"
+chmod 0660 /usr/local/pia/settings.conf
+chmod ug+w "/usr/local/pia"
