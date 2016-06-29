@@ -70,7 +70,6 @@ fi
 cd /usr/local/pia ; /usr/local/bin/git reset --hard HEAD &> /dev/null
 
 #Now run setup to get settings back and apply permissions
-rm /usr/local/pia/ip_list.txt
 chmod ugo+x /usr/local/pia/pia-setup
 /usr/local/pia/pia-setup
 /usr/local/pia/pia-update

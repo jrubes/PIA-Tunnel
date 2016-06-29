@@ -69,6 +69,10 @@ else
   echo '' > /etc/issue
   printf "\n\n\tFetching the latest version of PIA-Tunnel ....\n\tPlease wait until the VM reboots and this message disappears.\n\n" >> /etc/issue
 
+  if [ ! -f '/usr/local/pia/ip_list.txt' ]; then
+    printf "\n\tIP cache does not exists. Generating it will require a few extra minutes.\n\n" >> /etc/issue
+  fi
+
   # add current commit state of PIA-Tunnel
   PIAVER=`cd /usr/local/pia ; $CMD_GIT log -n 1 | $CMD_GAWK -F" " '{print $2}' | head -n 1`
   printf "\n\nPIA-Tunnel version: $PIAVER\n\n" >> /etc/issue
