@@ -104,6 +104,6 @@ else
 
 
   printf "\n\n" >> /etc/issue
-  sh -c "echo \"sleep 2 && cd /usr/local/pia && $CMD_GIT reset --hard HEAD && chmod u+x /usr/local/pia/pia-setup && /usr/local/pia/pia-setup && /usr/local/pia/pia-update && /sbin/shutdown -r now\" | at now"
+  sh -c "echo \"sleep 2 && cd /usr/local/pia && $CMD_GIT reset --hard origin/master && chmod u+x /usr/local/pia/pia-setup && /usr/local/pia/pia-setup && /usr/local/pia/pia-update && /sbin/shutdown -r now\" | at now"
 
 fi

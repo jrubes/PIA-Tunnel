@@ -21,4 +21,5 @@ if [ ! "$1" = "" ]; then
 		sed "s/$escaped=.*/$escaped='$2'/" /usr/local/pia/settings.conf > /usr/local/pia/cache/settings.tmp
 		mv /usr/local/pia/cache/settings.tmp /usr/local/pia/settings.conf
 	fi
+    chmod 0660 /usr/local/pia/settings.conf
 fi
