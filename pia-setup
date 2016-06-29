@@ -60,8 +60,8 @@ source '/usr/local/pia/settings.conf'
 
 
 #Now run setup to get settings back and apply permissions
-chmod 0750 /usr/local/pia/set_permissions.sh
-/usr/local/pia/set_permissions.sh
+chmod 0750 /usr/local/pia/include/set_permissions.sh
+/usr/local/pia/include/set_permissions.sh
 
 
 #add missing (new) settings to settings.conf
