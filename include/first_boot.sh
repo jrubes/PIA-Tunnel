@@ -107,7 +107,6 @@ else
 
   cd /usr/local/pia ; $CMD_GIT reset --hard HEAD
   /usr/local/pia/pia-update
-  /usr/local/pia/reset-pia
   printf "" > /etc/issu
   /sbin/shutdown -r now
 fi
