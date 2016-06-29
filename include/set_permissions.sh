@@ -47,3 +47,4 @@ chmod ug+x "/usr/local/pia/reset-pia"
 chmod ug+x "/usr/local/pia/system-update.sh"
 chmod 0660 /usr/local/pia/settings.conf
 chmod ug+w "/usr/local/pia"
+chmod 777 "/usr/local/pia/cache"
