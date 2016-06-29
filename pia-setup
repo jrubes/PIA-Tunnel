@@ -59,9 +59,9 @@ fi
 source '/usr/local/pia/settings.conf'
 
 
-# set permissions and symlinks
-chmod 0750 /usr/local/set_permissions.sh
-/usr/local/set_permissions.sh
+#Now run setup to get settings back and apply permissions
+chmod 0750 /usr/local/pia/set_permissions.sh
+/usr/local/pia/set_permissions.sh
 
 
 #add missing (new) settings to settings.conf
