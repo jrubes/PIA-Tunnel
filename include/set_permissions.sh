@@ -37,6 +37,9 @@ do
     chmod ug+rx "/usr/local/pia/include/$f"
 done
 
+# services may be executed by anyone
+chmod a+x /usr/local/pia/include/service/*.sh
+
 #reset-pia is special - ug+x but no /bin link
 chmod ug+x "/usr/local/pia/reset-pia"
 chmod ug+x "/usr/local/pia/system-update.sh"
