@@ -66,6 +66,8 @@ chmod 0750 /usr/local/pia/set_permissions.sh
 
 #add missing (new) settings to settings.conf
 /usr/local/pia/include/fix_settings.sh
+# reload config since fix_settings.sh may add new values
+source '/usr/local/pia/settings.conf'
 
 ### add changes below this lines as settings.conf may not be upto date above
 
