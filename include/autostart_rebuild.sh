@@ -11,7 +11,6 @@ cont="${cont}rm -f /usr/local/pia/cache/webui-port.txt\n"
 cont="${cont}rm -f /usr/local/pia/cache/webui-update_status.txt\n"
 cont="${cont}rm -f /usr/local/pia/cache/php_pia-start.log\n"
 cont="${cont}rm -f /usr/local/pia/cache/pia-daemon.log\n"
-cont="${cont}/usr/local/pia/pia-status\n"
 
 
 if [ "${DAEMON_ENABLED}" = 'yes' ]; then

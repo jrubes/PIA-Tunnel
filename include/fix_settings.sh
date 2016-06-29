@@ -265,7 +265,7 @@ if [ "$ret" -eq 1 ] && [ ! -L "/etc/systemd/system/pia-autostart.service" ]; the
     # system running systemD
     systemctl enable  /usr/local/pia/include/service/pia-autostart.service
     systemctl disable  /usr/local/pia/include/service/pia-daemon.service
-    systemctl enable  /usr/local/pia/include/service/pia-firstboot.service
+    systemctl disable  /usr/local/pia/include/service/pia-firstboot.service
 
     # systemD is a pile of shit
     systemctl enable  /usr/local/pia/include/service/pia-boot-msg.service

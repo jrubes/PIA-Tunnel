@@ -3,6 +3,10 @@
 # you should not change this as it is controlled by the webbased PHP config script
 LANG=en_US.UTF-8
 export LANG
+
+# always run this first
+/usr/local/pia/include/first_boot.sh
+
 source '/usr/local/pia/settings.conf'
 
 # check if namespace in case this system has been reset with 'reset-pia'
