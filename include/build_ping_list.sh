@@ -11,12 +11,12 @@ source '/usr/local/pia/include/functions.sh'
 #tc qdisc change dev em0 root netem loss 25%
 
 HOSTS="startpage.com icann.org wikipedia.org internic.net"
-HOSTS="$HOSTS google.com google.de"
+HOSTS="$HOSTS google.com google.de github.com pingdom.com"
 HOSTS="$HOSTS wordpress.com hosteurope.de 1und1.de"
-HOSTS="$HOSTS gnu.org kernel.org cnet.com zdnet.com"
-HOSTS="$HOSTS whitehouse.gov strato.de hetzner.de"
+HOSTS="$HOSTS gnu.org kernel.org heise.de asus.com"
+HOSTS="$HOSTS strato.de hetzner.de youtube.com"
 HOSTS="$HOSTS gandi.net rackspace.com arin.net"
-HOSTS="$HOSTS spiegel.de thetimes.co.uk nytimes.com slashdot.org"
+HOSTS="$HOSTS spiegel.de slashdot.org debian.org"
 HOSTS="$HOSTS kaisersoft.net ticket.workorderts.com"
 
 #will contain a list of IPs that can be pinged

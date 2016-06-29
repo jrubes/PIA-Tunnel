@@ -30,10 +30,14 @@ fi
 
 #delete and recreate dhcpd cache files
 service isc-dhcp-server stop
-# Debian cd /var/lib/dhcp/ ; rm -f *.leases
-# Debian cd /var/lib/dhcp/ ; rm -f *.leases~
-# Debian cd /var/lib/dhcp/ ; touch dhcpd.leases
-rm -f /tmp/dhcpd.leases* ; touch /tmp/dhcpd.leases
+# Debian 
+if [ -d '/var/lib/dhcp/' ]; then
+    cd /var/lib/dhcp/ ; rm -f *.leases
+    cd /var/lib/dhcp/ ; rm -f *.leases~
+    cd /var/lib/dhcp/ ; touch dhcpd.leases
+fi
+
+rm -f /tmp/dhcpd.leases* &> /dev/null ; touch /tmp/dhcpd.leases &> /dev/null
 
 
 #delete pia-* files
@@ -66,9 +70,10 @@ fi
 cd /usr/local/pia ; /usr/local/bin/git reset --hard HEAD &> /dev/null
 
 #Now run setup to get settings back and apply permissions
+rm /usr/local/pia/ip_list.txt
 chmod ugo+x /usr/local/pia/pia-setup
 /usr/local/pia/pia-setup
 /usr/local/pia/pia-update
 
-
+rm /usr/local/pia/settings.conf
 echo "Done, you must reboot or shutdown now!"
