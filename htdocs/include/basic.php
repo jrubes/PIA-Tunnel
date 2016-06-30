@@ -1131,6 +1131,8 @@ function update_user_settings(){
         $ret .= "<div id=\"feedback\" class=\"feedback\">Username updated</div>\n";
         unset($_SESSION[$session]);
         unset($_SESSION[$login_file]);
+        unset($_SESSION['ovpn_assembled']);
+        unset($_SESSION['ovpn']);
       }
     }
   }
@@ -1144,6 +1146,8 @@ function update_user_settings(){
         $ret .= "<div id=\"feedback\" class=\"feedback\">Password updated</div>\n";
         unset($_SESSION[$session]);
         unset($_SESSION[$login_file]);
+        unset($_SESSION['ovpn_assembled']);
+        unset($_SESSION['ovpn']);
       }
     }
   }

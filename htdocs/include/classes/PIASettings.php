@@ -97,7 +97,10 @@ class PIASettings {
     }
 
     if( $onechanged === true ){
-      $ret = "<div id=\"feedback\" class=\"feedback\">Settings updated</div>\n";
+        //clear cached ovpn list
+        unset($_SESSION['ovpn_assembled']);
+        unset($_SESSION['ovpn']);
+        $ret = "<div id=\"feedback\" class=\"feedback\">Settings updated</div>\n";
     }
     return $ret;
   }

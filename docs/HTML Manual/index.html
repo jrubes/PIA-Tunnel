@@ -41,6 +41,12 @@
 
   <li><a href="#socks5_setup">SOCKS5 Proxy Server Setup</a></li>
 
+  <li><a href="#ovpn.d">Add custom openVPN connection files</a>
+      <ul>
+          <li><a href="#get_port">Add custom script to retrieve open ports</a></li>
+      </ul>
+  </li>
+
   <li>
     <a href="#defaultgw_setup">Default Gateway Setup</a>
     <ul>
@@ -859,6 +865,43 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
     <li>Now open the IP of your Pi in your web browser</li>
   </ul>
 
+</div>
+
+<div id="ovpn.d" class="section">
+    <h2>Custom openVPN connection files</h2> <a href="#main_index">Back To Top</a>
+    
+    <p>Use the ovpn.d directory to store your own openVPN connection files. Any files or directories inside 
+        the ovpn.d directory will not be removed during an update.
+    </p>
+    
+    <ol>
+        <li>
+            Create a new directory inside the ovpn.d directory. If the same directory already exists in the "ovpn" 
+            directory then only the one inside the "ovpn.d" directory is loaded. 
+            The name of the .ovpn file will be used as the VPN connection name.
+        </li>
+        <li>
+            Specify a file where the webUI can store your authentication data. The file must be 
+            located in '/usr/local/pia/' and called 'login-SOMESTRING.conf'.<br>
+            Example:<br>
+            auth-user-pass /usr/local/pia/login-pia.conf
+        </li>
+        <li>
+            Also specify the location of the .crt and .pem file if it is not included within your .ovpn file.<br>
+            Example:<br>
+            ca /usr/local/pia/ovpn/PIAtcp/ca.crt<br>
+            crl-verify /usr/local/pia/ovpn/PIAtcp/crl.pem<br>
+        </li>
+        <li>
+            Open the webUI and enable the new VPN connection in "Settings"
+        </li>
+        <li>
+            Goto "VPN Accounts" from the main menu and enter your username and password.
+        </li>
+        <li>
+            
+        </li>
+    </ol>
 </div>
 
 <div id="git_switch" class="section">

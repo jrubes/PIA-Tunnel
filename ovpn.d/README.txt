@@ -1,12 +1,13 @@
 You may place your own openVPN connection files here. Files placed here will not be removed during an update.
 
 1) 	Create a new directory. If the same directory already exists in the "ovpn" 
-	directory then only the one	inside the "ovpn.d" direcory are loaded. 
+	directory then only the one inside the "ovpn.d" directory is loaded. 
 	The name of the .ovpn file will be used as the VPN connection name.
 	
 2) 	Specify a file where the webUI can store your authentication data. The file must be 
-	located in '/usr/local/pia/' and called 'login-SOMESTRING.conf' to be removed when
-	'/usr/local/pia/reset-pia' is executed.
+	located in '/usr/local/pia/' and called 'login-SOMESTRING.conf'.
+        Example:
+        auth-user-pass /usr/local/pia/login-pia.conf
 	
 3) 	Also specify the location of the .crt and .pem file if it is not included within your
 	.ovpn file.
@@ -18,5 +19,5 @@ You may place your own openVPN connection files here. Files placed here will not
 
 5) 	Goto "VPN Accounts" from the main menu and enter your username and password.
 
-6) 	Every is setup at this point
+6) 	Logout of the webUI to generate a new list of openVPN connections.
 
