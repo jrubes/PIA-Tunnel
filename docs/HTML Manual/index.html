@@ -899,9 +899,43 @@ apt-get install linux-headers-$(uname -r) build-essential libfltk1.3 libfltk-ima
             Goto "VPN Accounts" from the main menu and enter your username and password.
         </li>
         <li>
-            
+            The VPN connection should now be listed on the Overview page
         </li>
     </ol>
+</div>
+
+
+<div id="get_port" class="section">
+    <h2>Add custom script to retrieve open ports</h2> <a href="#main_index">Back To Top</a>
+
+    <p>
+        Some VPN providers support port forwarding. Some will assign you a permanent port 
+        while others will assign you a new port number when you connect.
+    </p>
+    
+    <p>
+        Create a new file called "port_forward.txt" inside the directory holding your openVPN connection file(s).<br>
+        The first line must be the name of the script used to retrieve the port number. The next lines list the connections which
+        support port forwarding. The name of the connection must be the same as the .ovpn file but without the file extension.<br>
+        Example:<br>
+        The ovpn.d directory contains Foo.ovpn and Bar.ovpn<br>
+        The file "port_forward.txt" should be made up like this.
+    </p>
+<pre>
+    MyCustomScript.php
+    Foo
+    Bar
+</pre>
+    
+    <p>
+        Now place your "MyCustomScript.php" file into the "get_port" directory and reboot the system. Your custom script will be copyied
+        into the web directory on startup.<br>
+        Please note that your custom port check function must be called "get_port()" and must return the port number as an integer
+        or boolean FALSE on failure.<br>
+        Please see "htodcs\get_port\PIA.php" for details.
+    </p>
+    
+    
 </div>
 
 <div id="git_switch" class="section">
