@@ -7,6 +7,10 @@ export LANG
 # always run this first
 /usr/local/pia/include/first_boot.sh
 
+# copy html dir to webspace to refresh any custom files
+cp -r /usr/local/pia/htdocs/* $HTDOCS_PATH/
+
+
 source '/usr/local/pia/settings.conf'
 
 # check if namespace in case this system has been reset with 'reset-pia'
