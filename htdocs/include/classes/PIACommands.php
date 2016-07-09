@@ -411,6 +411,56 @@ function rand_string($lenth, $range=array('A','Z','a','z',0,9), $other='' ) {
 */
 }
 
+
+/**
+ * will place active connections to the top of the active connecton list
+ * @param array $connections multi dimensional array containing all connections, [selected] contains active providers
+ * @return array same as passed $connections array but with active connections at the top of the array
+ */
+function sort_by_active( &$connections ){
+    $active = array(); //for active connections
+    $inactive = array(); //for inactive connections
+    $sel['selected'] = $connections['selected'];
+    $cnt_a = 0; //multi dimensional array counter for active array
+    $cnt_i = 0; //multi dimensional array counter for inactive array
+    
+    reset($connections);
+    foreach( $connections as $key => $val ){
+        if( $key !== 'selected' ){
+            if( $this->is_connection_active( $connections['selected'], $val[0]) === true ){
+                $active[$cnt_a][] = $val[0];
+                $active[$cnt_a][] = $val[1];
+                ++$cnt_a;
+            }else{
+                $inactive[$cnt_i][] = $val[0];
+                $inactive[$cnt_i][] = $val[1];
+                ++$cnt_i;
+            }
+        }
+    }
+    $merge = array();
+    $merge = $sel + $active + $inactive; //rebuild array with active connections first
+
+    return $merge;
+}
+
+/**
+ * checks if connection name is part of the "selected" array
+ * @param array $active_connections ['selected'] array
+ * @param string $to_check name of connection to check
+ * @return boolean TRUE if found, FALSE if not
+ */
+function is_connection_active( &$active_connections, $to_check){
+    reset($active_connections);
+    foreach( $active_connections as $val ){
+        if( $val[1] === $to_check ){
+            return true;
+        }
+    }
+    return false;
+}
+
+
 /**
  * checks if "$mount_point" is mounted
  * @return boolean true or false

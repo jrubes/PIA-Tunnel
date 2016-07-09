@@ -1397,6 +1397,7 @@ function disp_network_default(){
 
 function build_providers(){
   global $_settings;
+  global $_pia;
   global $GLOB_disp_network_default_fields;
   $sel_head = array();
 
@@ -1407,6 +1408,7 @@ function build_providers(){
   $sel_head['selected'] = $set_selp;
   $provs = VPN_get_providers(); //get list of all possible providers as an array
   $sel_providers = array_merge($sel_head, $provs);
+  $sel_providers = $_pia->sort_by_active($sel_providers);
 
   return '<tr><td>VPN Providers</td><td>'.nl2br(build_checkbox($sel_providers)).'</td></tr>'."\n";
 }
