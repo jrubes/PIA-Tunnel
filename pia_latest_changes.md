@@ -1,5 +1,10 @@
 PIA-Tunnel    
 Release notes for PIA-Tunnel VM [rss feed](http://www.kaisersoft.net/pia_latest.xml)    
+
+
+update 2016-07-12
+=================
+* removed Russian VPN locations for PIA since they can no longer be trusted. Source: https://www.privateinternetaccess.com/forum/discussion/21779/we-are-removing-our-russian-presence    
     
 
 update 2016-06-17
