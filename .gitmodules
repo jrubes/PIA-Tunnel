@@ -1,6 +1,8 @@
 [submodule "htdocs/plugin/phpdhcpd"]
 	path = htdocs/plugin/phpdhcpd
 	url = https://github.com/KaiserSoft/phpdhcpd
+	branch = master
 [submodule "htdocs/plugin/parsedown"]
 	path = htdocs/plugin/parsedown
 	url = https://github.com/KaiserSoft/parsedown
+	branch = master
