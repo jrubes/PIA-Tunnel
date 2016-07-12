@@ -3,7 +3,7 @@ Project: PIA-Tunnel VM
 PIA-Tunnel VM is a series of scripts designed to share an openVPN connection with your network. 
 It is designed to run stand alone on a virtual machine or RaspberryPi.    
      
-DO NOT run IA-Tunnel VM on a multiuser system because it contains scripts to allow the webUI to change the root 
+DO NOT run PIA-Tunnel VM on a multiuser system because it contains scripts to allow the webUI to change the root 
 password, apply firewall rules and other things. Users with command line access could use these scripts to gain root access!    
 
 Overview
@@ -14,7 +14,7 @@ DHCP server and lease view (phpdhcpd) and the transmission torrent client with s
 files onto a local NAS.
     
     
-The included web interface makes it easy to setup connections and get the system configured to
+The included web interface makes it easy to setup connections and get the system configured for
 your network.    
 The included shell scripts make it possible to control the system from the command line as well.
 
@@ -23,7 +23,7 @@ with support for PrivateInternetAccess.com
 It has since been updated to offer
 * support for more VPN proviers out of the box and offers support to add custom .ovpn files
 * also tested on KVM, XEN, Hyper-V and other virtual machine solutions
-* full support for Raspberry Pi which makes it possible to create a stand alone VPN router
+* full support for Raspberry Pi which makes it possible to create a stand alone VPN router with a simple webUI
     
     
 Documentation:	http://www.KaiserSoft.net/r/?PIADOCU    
@@ -41,15 +41,19 @@ All rights reserved.
 
 Features
 ========
-* Open by design, script based with no binaries.
-* Use your own Linux installation by following the steps in the "setup" subdirectory
-* Can provide complete network isolation (leak protection)
+* Open by design, script based with no binaries
 * Simple Web-interface and/or command line support
+* Can provide complete network isolation (leak protection)
 * SOCKS 5 proxy for LAN or VM LAN segment. proxifier.com compatible
-* Port forwarding to 1 IP on your LAN or private VM LAN (reqires VPN provider support)
+* Port forwarding to 1 IP on your LAN or private VM LAN (requires VPN provider support)
 * Supports PrivateInternetAccess.com, HideMyAss, iVPN, HideIPVPN and FrootVPN out of the box
+* Use your own Linux installation by following the steps in the "setup" subdirectory
 
 
-Setup
-=====
+Getting Started and Setup Instructions
+======================================
+    
 Documentation: http://www.KaiserSoft.net/r/?PIADOCU     
+    
+	
+	
