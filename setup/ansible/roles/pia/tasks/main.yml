@@ -9,7 +9,7 @@
   shell: "[ ! -f /usr/local/pia/pia-start ] && git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia || exit 0"
   ignore_errors: yes
 
-- name: checking out release_php-gui
+- name: checking out git branch {{ git_branch }}
   shell: cd /usr/local/pia ; git checkout {{ git_branch }}
   ignore_errors: yes
 

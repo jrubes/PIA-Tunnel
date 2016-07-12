@@ -1173,7 +1173,7 @@ function disp_advanced_box(){
   $sel = array(
             'id' => 'GIT_BRANCH',
             'selected' =>  $settings['GIT_BRANCH'],
-            array( 'release_php-gui', 'release_php-gui')
+            array( 'release-v2', 'release-v2')
             ,array( $settings['GIT_BRANCH'], $settings['GIT_BRANCH'])
           );
   $disp_body .= '<tr><td>Development branch</td><td>'.build_select($sel).'</td></tr>'."\n";

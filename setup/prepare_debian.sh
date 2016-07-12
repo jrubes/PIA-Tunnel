@@ -26,7 +26,7 @@ if [ $? -ne 0 ]; then
   exit 99
 fi
 
-cd /usr/local/pia ; git checkout master
+cd /usr/local/pia ; git checkout release-v2
 if [ $? -ne 0 ]; then
   echo "Fatal Error during checkout"
   exit 99
@@ -34,4 +34,4 @@ fi
 
 
 printf "\n\n\nPlease enter the password for your 'root' account when prompted\n\n\n"
-cd /usr/local/pia/dev_scripts/ansible/ && ansible-playbook -i hosts PIA-Tunnel_Debian.yml --ask-pass
+cd /usr/local/pia/setups/ansible/ && ansible-playbook -i hosts PIA-Tunnel_Debian.yml --ask-pass

@@ -8,12 +8,12 @@ if [ "$val" = "0" ]; then
   dt=`date +%s`
   echo "$dt|$val" > /usr/local/pia/cache/webui-update_status.txt
 
-  if [ ! -f "$HTDOCS_PATH/pia_latest_changes.md" ]; then
+  if [ ! -f "$HTDOCS_PATH/changes-v2-release.md" ]; then
     #fetch latest changelog - updated installations without the file
     cd /tmp
     mkdir piatmpget ; cd /tmp/piatmpget
-    $CMD_WGET http://www.kaisersoft.net/pia_latest_changes.md
-    mv pia_latest_changes.md "$HTDOCS_PATH/pia_latest_changes.md"
+    $CMD_WGET http://www.kaisersoft.net/changes-v2-release.md
+    mv changes-v2-release.md "$HTDOCS_PATH/changes-v2-release.md"
     cd /tmp ; rm -rf /tmp/piatmpget
   fi
 
@@ -24,8 +24,8 @@ elif [ "$val" -gt "0" ]; then
   #fetch latest changelog
   cd /tmp
   mkdir piatmpget ; cd /tmp/piatmpget
-  $CMD_WGET http://www.kaisersoft.net/pia_latest_changes.md
-  mv pia_latest_changes.md "$HTDOCS_PATH/pia_latest_changes.md"
+  $CMD_WGET http://www.kaisersoft.net/changes-v2-release.md
+  mv changes-v2-release.md "$HTDOCS_PATH/changes-v2-release.md"
   cd /tmp ; rm -rf /tmp/piatmpget
 
 else

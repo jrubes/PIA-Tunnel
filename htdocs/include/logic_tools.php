@@ -261,7 +261,7 @@ function disp_pia_update(){
   $disp_body .= '<h2>Online Update</h2>';
   $disp_body .= '<form class="inline" action="/?page=tools&amp;cid=tools" method="post">';
   $disp_body .= '<input type="hidden" name="cmd" value="run_pia_command">';
-  $disp_body .= 'Download the latest updates from the <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
+  $disp_body .= 'Download the latest updates from the <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release-v2" target="_blank">GitHub repository.</a>';
   $disp_body .= '<br><br><input type="submit" name="pia-update" value="Start Online Update">';
   $disp_body .= "</form>\n";
 
@@ -293,11 +293,11 @@ function disp_pia_update_client(){
 
   $disp_body = '<div class="box update_client">';
   $disp_body .= '<h2>Online Update Client</h2>';
-  $disp_body .= 'Updates are downloaded from the <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release_php-gui" target="_blank">GitHub repository.</a>';
+  $disp_body .= 'Updates are downloaded from the <a href="https://github.com/KaiserSoft/PIA-Tunnel/tree/release-v2" target="_blank">GitHub repository.</a>';
   $disp_body .= '<br><span id="update_refresh">Update Status: '.$up_txt."</span>";
 
   $disp_body .= '<div class="box changelog">';
-  $cl = $_files->readfile( $set['HTDOCS_PATH']."/pia_latest_changes.md");
+  $cl = $_files->readfile( $set['HTDOCS_PATH']."/changes-v2-release.md");
   $disp_body .=  $Parsedown->text($cl);
   $disp_body .= '</div>';
 
@@ -319,24 +319,6 @@ function disp_pia_update_client(){
   $disp_body .= '</div>';
   return $disp_body;
 }
-
-/**
- * build the dropdown box listing the available git repositories the user may select
- */
-function build_git_branch_options(){
-  global $settings;
-  $branches = array( 'release_php-gui', 'auth_fail_test');
-  $ret = '';
-
-  $ret .= '<option value="'.$settings['GIT_BRANCH'].'">'.$settings['GIT_BRANCH'].'</option>';
-  foreach( $branches as $branch ){
-    if( $branch !== $settings['GIT_BRANCH'] ){
-      $ret .= '<option value="'.$branch.'">'.$branch.'</option>';
-    }
-  }
-  return $ret;
-}
-
 
 /**
  * returns UI elements in HTML
