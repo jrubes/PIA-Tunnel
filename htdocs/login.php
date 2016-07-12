@@ -43,6 +43,7 @@ $tokens = $_token->pgen( $pass );
             <p>&nbsp;</p>
           <h1>PIA-Tunnel Management Interface</h1>
             <p>&nbsp;</p>
+            <noscript><p>Please enable Javascript to use the advanced UI</p></noscript>
             <form method="post" name="login_form">
                 <table class="center">
                     <tr>
