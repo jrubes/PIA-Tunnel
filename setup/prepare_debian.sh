@@ -34,4 +34,4 @@ fi
 
 
 printf "\n\n\nPlease enter the password for your 'root' account when prompted\n\n\n"
-cd /usr/local/pia/setups/ansible/ && ansible-playbook -i hosts PIA-Tunnel_Debian.yml --ask-pass
+cd /usr/local/pia/setup/ansible/ && ansible-playbook -i hosts PIA-Tunnel_Debian.yml --ask-pass
