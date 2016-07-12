@@ -1409,6 +1409,7 @@ function build_providers(){
   $provs = VPN_get_providers(); //get list of all possible providers as an array
   $sel_providers = array_merge($sel_head, $provs);
   $sel_providers = $_pia->sort_by_active($sel_providers);
+  $sel_providers['id'] = 'VPN_PROVIDERS';
 
   return '<tr><td>VPN Providers</td><td>'.nl2br(build_checkbox($sel_providers)).'</td></tr>'."\n";
 }
