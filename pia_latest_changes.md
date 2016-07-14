@@ -1,6 +1,14 @@
 PIA-Tunnel    
 Release notes for PIA-Tunnel VM [rss feed](http://www.kaisersoft.net/pia_latest.xml)    
 
+update 2016-07-14
+=================
+* new .ovpn files and certificates for PIAtcp
+* added PIAtcpHIGH with 4096 bit certificates and 256bit encryption
+* removed PIAudp since it is no longer offered on the download page and the 
+  old settings do not work with the new certificates. I will try to add it to
+  PIA-Tunnel release-v2 which should be release this weekend.  
+    
 
 update 2016-07-12
 =================
