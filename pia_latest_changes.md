@@ -1,6 +1,16 @@
 PIA-Tunnel    
 Release notes for PIA-Tunnel VM [rss feed](http://www.kaisersoft.net/pia_latest.xml)    
 
+update 2016-07-16
+=================
+* PIAudp is back. Please logout after enabling PIAudp in settings to refresh the list of VPN connections.
+    
+
+bug 2016-07-15
+==============
+* Warning! Yesterdays update will cause problems if you are using "PIAudp". PIAudp has been removed since PIA does not provide openVPN packages with UDP support for their new certificates. Ensure that you deselect "PIAudp" and select "PIAtcp" (Settings) before you apply the update. Logout after applying the update to refresh your list of VPN connections.
+    
+
 update 2016-07-14
 =================
 * new .ovpn files and certificates for PIAtcp
