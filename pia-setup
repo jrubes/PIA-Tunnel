@@ -96,8 +96,7 @@ cp -r /usr/local/pia/htdocs/* "$HTDOCS_PATH/"
 if [ -f "$HTDOCS_PATH/README.txt" ]; then rm -f "$HTDOCS_PATH/README.txt"; fi
 if [ -f "$HTDOCS_PATH/monitor-windows.zip" ]; then rm -f "$HTDOCS_PATH/monitor-windows.zip" ; fi
 cd /usr/local/pia/client_scripts ; zip -r "$HTDOCS_PATH/monitor-windows.zip" monitor-windows/ &> /dev/null
-cp "/usr/local/pia/docs/PIA-Tunnel Documentation.pdf" "$HTDOCS_PATH/pia-tunnel_documentation.pdf" &> /dev/null
-mkdir -p "$HTDOCS_PATH/docs/" ; cp -r "/usr/local/pia/docs/HTML Manual/"* "$HTDOCS_PATH/docs/"
+mkdir -p "$HTDOCS_PATH/documentation/" ; cp -r "/usr/local/pia/documentation/HTML Manual/"* "$HTDOCS_PATH/documentation/"
 chown -R "$APACHE_USER":"$APACHE_USER" "$HTDOCS_PATH/"
 find /usr/local/pia/htdocs/ -type d -exec chmod 0750 {} \;
 find /usr/local/pia/htdocs/ -type f -exec chmod 0640 {} \;
