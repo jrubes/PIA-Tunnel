@@ -426,7 +426,7 @@ function sort_by_active( &$connections ){
     
     reset($connections);
     foreach( $connections as $key => $val ){
-        if( $key !== 'selected' ){
+        if( $key !== 'selected' && $key !== 'id'){
             if( $this->is_connection_active( $connections['selected'], $val[0]) === true ){
                 $active[$cnt_a][] = $val[0];
                 $active[$cnt_a][] = $val[1];
@@ -438,8 +438,17 @@ function sort_by_active( &$connections ){
             }
         }
     }
+
     $merge = array();
-    $merge = $sel + $active + $inactive; //rebuild array with active connections first
+    //rebuild array with active connections first
+    $merge['selected'] = $connections['selected'];
+    foreach( $active as $val ){
+        $merge[] = $val;
+    }
+    foreach( $inactive as $val ){
+        $merge[] = $val;
+    }
+    
 
     return $merge;
 }

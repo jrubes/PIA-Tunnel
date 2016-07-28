@@ -208,14 +208,14 @@ class PIASettings {
       if( is_array($array2) === true ){
           reset($array2);
           foreach( $array2 as $array2_key => $array2_inside ){
-          if( $array2_inside[1] != $array_setting[1] ){
-            ++$this->settings_array_changes;
+            if( $array2_inside[1] != $array_setting[1] ){
+              ++$this->settings_array_changes;
+            }
+            $new[] = $array2_inside[1];
+            unset($array2[$array2_key]); //remove as it has been processed
+            unset($settings_array[$array_key]); //remove as it has been processed
+            break;
           }
-          $new[] = $array2_inside[1];
-          unset($array2[$array2_key]); //remove as it has been processed
-          unset($settings_array[$array_key]); //remove as it has been processed
-          break;
-        }
       }else{
         //no values posted so this value should be deleted, unset settings
         unset($settings_array[$array_key]); //remove as it has been processed
