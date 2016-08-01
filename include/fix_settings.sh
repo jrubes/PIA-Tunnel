@@ -20,7 +20,6 @@ if [ -z "${DAEMON_ENABLED}" ]; then
 fi
 
 if [ ! ${NAMESERVERS[0]+abc} ]; then
-  echo '# list of VPN connections to use, the first is always the primary' >> '/usr/local/pia/settings.conf'
   echo 'MYVPN[0]="PIAtcp/CA Toronto"' >> '/usr/local/pia/settings.conf'
   echo 'MYVPN[1]="PIAtcp/Switzerland"' >> '/usr/local/pia/settings.conf'
   echo 'MYVPN[2]="PIAtcp/Sweden"' >> '/usr/local/pia/settings.conf'

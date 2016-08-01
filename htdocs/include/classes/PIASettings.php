@@ -150,11 +150,7 @@ class PIASettings {
       return false;
     }
 
-    //the array functions do not honor line numbers so strip all comments as they will not
-    //be above the settings anymore
-    exec('sed \'/^#/ d\' "/usr/local/pia/settings.conf" > "/usr/local/pia/cache/settings.conf.bak"');
-    exec('cp "/usr/local/pia/cache/settings.conf.bak" "/usr/local/pia/settings.conf"');
-
+    
     // ensure SettingsArray of [0] always exists
     if( $array2store === '' ){
         $array2store = "$index=''";
@@ -175,8 +171,9 @@ class PIASettings {
    */
   function append_settings( $addthis ){
     if( $addthis == '' ){ return false; }
-    $save = escapeshellarg($addthis);
-    exec("echo $save >> '$this->_settings_file'");
+    $save = escapeshellarg("$addthis\n");
+    //exec("echo $save >> '$this->_settings_file'");
+    exec("printf $save >> '$this->_settings_file'");
   }
 
   /**
