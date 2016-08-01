@@ -1,6 +1,7 @@
 *~
 .DS_Store
 /login-*.conf
+/smbpasswd.conf
 /settings.conf
 /session.log
 /client_id
