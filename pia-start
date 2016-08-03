@@ -56,8 +56,8 @@ netstat -rn &>> /usr/local/pia/cache/network.log
 
 
 #execute if .ovpn file exists with name passed
-if [ -f "/usr/local/pia/ovpn/$filename.ovpn" ]; then
-	# check for default username and exit
+if [ -f "/usr/local/pia/ovpn/$filename.ovpn" ] || [ -f "/usr/local/pia/ovpn.d/$filename.ovpn" ]; then
+    # check for default username and exit
     check_default_username
 
     #check if openvpn is running
@@ -90,6 +90,15 @@ if [ -f "/usr/local/pia/ovpn/$filename.ovpn" ]; then
 
       echo "$VPNprovider" > /usr/local/pia/cache/provider.txt
       $CMD_SUDO openvpn "/usr/local/pia/ovpn/$filename.ovpn" &>> /usr/local/pia/cache/session.log &
+
+    elif [ -f "/usr/local/pia/ovpn.d/$filename.ovpn" ]; then
+      echo -e "[info] "$(date +"%Y-%m-%d %H:%M:%S")\
+          "- establishing a VPN connection to ovpn.d/$filename."
+      echo -e "\tsee ${bold}/usr/local/pia/cache/session.log${normal} for details"
+      echo $(date +"%a %b %d %H:%M:%S %Y")" connecting to ovpn.d/$filename" > /usr/local/pia/cache/session.log
+
+      echo "$VPNprovider" > /usr/local/pia/cache/provider.txt
+      $CMD_SUDO openvpn "/usr/local/pia/ovpn.d/$filename.ovpn" &>> /usr/local/pia/cache/session.log &
 
     else
       echo -e "[\e[1;31mfail\e[0m] "$(date +"%Y-%m-%d %H:%M:%S")\
