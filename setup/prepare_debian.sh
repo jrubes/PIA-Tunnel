@@ -20,7 +20,7 @@ if [ $? -ne 0 ]; then
   exit 99
 fi
 
-mkdir /usr/local/pia && git clone https://github.com/KaiserSoft/PIA-Tunnel.git /usr/local/pia
+mkdir /usr/local/pia && git clone https://github.com/jrubes/PIA-Tunnel.git /usr/local/pia
 if [ $? -ne 0 ]; then
   echo "Fatal Error cloning repo"
   exit 99
