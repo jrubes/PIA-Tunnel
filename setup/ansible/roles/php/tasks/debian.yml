@@ -5,10 +5,10 @@
 - name: install required packages
   apt: name="{{ item }}" state=present update_cache=yes
   with_items:
-    - php
-    - php-curl
-    - php-mcrypt
-    - php-json
+    - php7.3
+    - php7.3-curl
+    - php7.3-mcrypt
+    - php7.3-json
   notify: 
     - restart apache
   when: ansible_distribution == 'Debian'
