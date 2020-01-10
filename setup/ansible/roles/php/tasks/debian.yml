@@ -7,7 +7,7 @@
   with_items:
     - php7.3
     - php7.3-curl
-    - php7.3-mcrypt
+#   - php7.3-mcrypt
     - php7.3-json
   notify: 
     - restart apache
